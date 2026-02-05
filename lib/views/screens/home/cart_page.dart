@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
 import '../../../core/app_theme.dart';
 
 class CartPage extends StatelessWidget {
@@ -37,7 +39,9 @@ class CartPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 FilledButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.read<NavCubit>().goTo(1);
+                  },
                   icon: const Icon(Icons.storefront_rounded, size: 20),
                   label: const Text('تسوق الآن'),
                 ),

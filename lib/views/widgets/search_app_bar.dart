@@ -24,6 +24,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: AppColors.offWhite,
       elevation: 0,
       title: TextField(
+        cursorColor: AppColors.offWhite,
         controller: controller,
         onChanged: onChanged,
         style: const TextStyle(color: AppColors.offWhite, fontSize: 16),
@@ -39,12 +40,22 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
             size: 22,
           ),
           filled: true,
-          fillColor: AppColors.burgundy.withValues(alpha: 0.8),
+          fillColor: AppColors.taupe.withValues(alpha: 0.1),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: AppColors.offWhite, width: 1.0),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          // enabledBorder: UnderlineInputBorder(
+          //   borderSide: BorderSide(color: AppColors.offWhite, width: 1.0),
+          // ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 10,
+          ),
         ),
       ),
     );
