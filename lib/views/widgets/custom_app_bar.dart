@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/app_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
@@ -16,34 +15,35 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return AppBar(
-      backgroundColor: AppColors.burgundy,
-      foregroundColor: AppColors.offWhite,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
       elevation: 0,
       centerTitle: true,
-      leading:IconButton(
-          icon: const Icon(Icons.menu_rounded),
-          onPressed: onMenuTap,
-          tooltip: 'القائمة',
-        ),
+      leading: IconButton(
+        icon: const Icon(Icons.menu_rounded),
+        onPressed: onMenuTap,
+        tooltip: 'القائمة',
+      ),
       title: Text(
         title,
         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: AppColors.offWhite,
-              fontWeight: FontWeight.w600,
-            ),
-      ),
-      actions: [
-         Padding(
-        padding: const EdgeInsets.only(left: 8,right: 8),
-        child: Image.asset(
-          'assets/images/logo_splash.png',
-          height: 28,
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.store_rounded, size: 28, color: AppColors.offWhite),
+          color: colorScheme.onPrimary,
+          fontWeight: FontWeight.w600,
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(left: 8, right: 8),
+          child: Image.asset(
+            'assets/images/logo_splash.png',
+            height: 28,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.store_rounded, size: 28, color: colorScheme.onPrimary),
+          ),
+        ),
       ],
     );
   }

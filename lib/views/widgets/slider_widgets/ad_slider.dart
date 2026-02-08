@@ -1,9 +1,6 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 import 'package:kalivra/views/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/views/widgets/slider_widgets/custom_slider_indicator.dart';
@@ -20,26 +17,28 @@ class AdSliderState extends State<AdSlider> {
   Timer? _timer;
   int _currentPage = 0;
 
-  static const List<AdvertisementModel> _slides = [
-    AdvertisementModel(
-      title: 'عروض الدهانات',
-      subtitle: 'خصم حتى 20% على تشكيلة الدهانات',
-      gradientStart: AppColors.burgundy,
-      gradientEnd: Color(0xFF6B1A24),
-    ),
-    AdvertisementModel(
-      title: 'مواد البناء',
-      subtitle: 'أسعار منافسة على السيراميك والحديد',
-      gradientStart: AppColors.goldDark,
-      gradientEnd: AppColors.goldLight,
-    ),
-    AdvertisementModel(
-      title: 'توصيل سريع',
-      subtitle: 'توصيل لجميع المناطق',
-      gradientStart: AppColors.burgundy,
-      gradientEnd: AppColors.taupe,
-    ),
-  ];
+  static List<AdvertisementModel> _buildSlides(ColorScheme colorScheme) {
+    return [
+      AdvertisementModel(
+        title: 'عروض الدهانات',
+        subtitle: 'خصم حتى 20% على تشكيلة الدهانات',
+        gradientStart: colorScheme.primary,
+        gradientEnd: colorScheme.primary.withValues(alpha: 0.8),
+      ),
+      AdvertisementModel(
+        title: 'مواد البناء',
+        subtitle: 'أسعار منافسة على السيراميك والحديد',
+        gradientStart: colorScheme.secondary.withValues(alpha: 0.8),
+        gradientEnd: colorScheme.secondary,
+      ),
+      AdvertisementModel(
+        title: 'توصيل سريع',
+        subtitle: 'توصيل لجميع المناطق',
+        gradientStart: colorScheme.primary,
+        gradientEnd: colorScheme.surfaceContainerHighest,
+      ),
+    ];
+  }
 
   @override
   void initState() {
@@ -49,9 +48,10 @@ class AdSliderState extends State<AdSlider> {
   }
 
   void _startAutoPlay() {
+    const slideCount = 3;
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!_pageController.hasClients) return;
-      final next = (_currentPage + 1) % _slides.length;
+      final next = (_currentPage + 1) % slideCount;
       _pageController.animateToPage(
         next,
         duration: const Duration(milliseconds: 350),
@@ -69,6 +69,7 @@ class AdSliderState extends State<AdSlider> {
 
   @override
   Widget build(BuildContext context) {
+    final slides = _buildSlides(Theme.of(context).colorScheme);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -77,9 +78,9 @@ class AdSliderState extends State<AdSlider> {
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) => setState(() => _currentPage = index),
-            itemCount: _slides.length,
+            itemCount: slides.length,
             itemBuilder: (context, index) {
-              final slide = _slides[index];
+              final slide = slides[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6),
                 child: AdCard(slide: slide),
@@ -88,7 +89,7 @@ class AdSliderState extends State<AdSlider> {
           ),
         ),
         const SizedBox(height: 12),
-        CustomSliderIndicator(slides: _slides, currentPage: _currentPage),
+        CustomSliderIndicator(slides: slides, currentPage: _currentPage),
       ],
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 
 class CustomSliderIndicator extends StatelessWidget {
@@ -14,6 +13,7 @@ class CustomSliderIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
@@ -25,8 +25,8 @@ class CustomSliderIndicator extends StatelessWidget {
           height: 8,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? AppColors.burgundy
-                : AppColors.taupe.withValues(alpha: 0.5),
+                ? colorScheme.primary
+                : colorScheme.outline.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(4),
           ),
         ),

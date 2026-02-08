@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/app_theme.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -9,8 +8,9 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
       ),
@@ -19,7 +19,7 @@ class AppDrawer extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _DrawerHeader(onClose: () => Navigator.pop(context)),
-            const Divider(height: 1, color: AppColors.lightGray),
+            Divider(height: 1, color: colorScheme.outline),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -77,7 +77,7 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            const Divider(height: 1, color: AppColors.lightGray),
+            Divider(height: 1, color: colorScheme.outline),
             const _DrawerFooter(),
           ],
         ),
@@ -93,6 +93,7 @@ class _DrawerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -101,12 +102,12 @@ class _DrawerHeader extends StatelessWidget {
           Text(
             'القائمة :',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.black,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, color: AppColors.black),
+            icon: Icon(Icons.close_rounded, color: colorScheme.onSurface),
             onPressed: onClose,
             tooltip: 'إغلاق',
           ),
@@ -129,6 +130,7 @@ class _DrawerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -142,25 +144,25 @@ class _DrawerItem extends StatelessWidget {
                   child: Text(
                     label,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: AppColors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      color: colorScheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
                     textAlign: TextAlign.end,
                   ),
                 ),
                 const SizedBox(width: 12),
-                Icon(icon, color: AppColors.burgundy, size: 24),
+                Icon(icon, color: colorScheme.primary, size: 24),
                 const SizedBox(width: 12),
                 Icon(
                   Icons.chevron_left_rounded,
                   size: 22,
-                  color: AppColors.black.withValues(alpha: 0.7),
+                  color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
           ),
         ),
-        const Divider(height: 1, color: AppColors.lightGray),
+        Divider(height: 1, color: colorScheme.outline),
       ],
     );
   }
@@ -171,6 +173,7 @@ class _DrawerFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       child: Row(
@@ -180,22 +183,22 @@ class _DrawerFooter extends StatelessWidget {
             child: Container(
               width: 40,
               height: 40,
-              color: AppColors.offWhite,
+              color: colorScheme.surfaceContainerHighest,
               padding: const EdgeInsets.all(6),
               child: Image.asset(
                 'assets/images/logo_small.png',
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) =>
-                    Icon(Icons.store_rounded, size: 24, color: AppColors.burgundy),
+                    Icon(Icons.store_rounded, size: 24, color: colorScheme.primary),
               ),
             ),
           ),
           Text(
             'الإصدار 1.0.0',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.burgundy,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ],
       ),

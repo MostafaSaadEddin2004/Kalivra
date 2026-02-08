@@ -51,4 +51,39 @@ class AppTheme {
           ),
         ),
       );
+
+  static ThemeData get dark => ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.burgundy,
+          primary: AppColors.burgundy,
+          secondary: AppColors.goldLight,
+          surface: AppColors.black,
+          onSurface: AppColors.offWhite,
+          onPrimary: AppColors.offWhite,
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: AppColors.black,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.burgundy,
+          foregroundColor: AppColors.offWhite,
+          elevation: 0,
+          centerTitle: true,
+        ),
+        cardTheme: CardThemeData(
+          color: const Color(0xFF1A1918),
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.burgundy,
+            foregroundColor: AppColors.offWhite,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      );
 }

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
-import '../../../core/app_theme.dart';
 
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return CustomScrollView(
-      slivers: [   
+      slivers: [
         SliverFillRemaining(
           hasScrollBody: false,
           child: Center(
@@ -19,22 +19,22 @@ class CartPage extends StatelessWidget {
                 Icon(
                   Icons.shopping_cart_outlined,
                   size: 80,
-                  color: AppColors.taupe.withValues(alpha: 0.6),
+                  color: colorScheme.outline.withValues(alpha: 0.6),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   'السلة فارغة',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.burgundy,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'تصفح التصنيفات وأضف المنتجات هنا',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.black.withValues(alpha: 0.6),
-                      ),
+                    color: colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),

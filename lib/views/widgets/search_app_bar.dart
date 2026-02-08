@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/app_theme.dart';
 
 /// App bar with only a search bar on top (for Search page).
 class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -19,39 +18,37 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return AppBar(
-      backgroundColor: AppColors.burgundy,
-      foregroundColor: AppColors.offWhite,
+      backgroundColor: colorScheme.primary,
+      foregroundColor: colorScheme.onPrimary,
       elevation: 0,
       title: TextField(
-        cursorColor: AppColors.offWhite,
+        cursorColor: colorScheme.onPrimary,
         controller: controller,
         onChanged: onChanged,
-        style: const TextStyle(color: AppColors.offWhite, fontSize: 16),
+        style: TextStyle(color: colorScheme.onPrimary, fontSize: 16),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: AppColors.offWhite.withValues(alpha: 0.7),
+            color: colorScheme.onPrimary.withValues(alpha: 0.7),
             fontSize: 15,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: AppColors.offWhite.withValues(alpha: 0.9),
+            color: colorScheme.onPrimary.withValues(alpha: 0.9),
             size: 22,
           ),
           filled: true,
-          fillColor: AppColors.taupe.withValues(alpha: 0.1),
+          fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: AppColors.offWhite, width: 1.0),
+            borderSide: BorderSide(color: colorScheme.onPrimary, width: 1.0),
             borderRadius: BorderRadius.circular(12),
           ),
-          // enabledBorder: UnderlineInputBorder(
-          //   borderSide: BorderSide(color: AppColors.offWhite, width: 1.0),
-          // ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 10,

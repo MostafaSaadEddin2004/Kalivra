@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kalivra/views/screens/home/home_screen.dart';
-import '../core/app_theme.dart';
 
 /// Native-feel splash screen: Kalivra logo on black, then navigate to home.
 class SplashScreen extends StatefulWidget {
@@ -33,8 +32,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.black,
+      backgroundColor: colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: Column(
@@ -46,7 +46,8 @@ class _SplashScreenState extends State<SplashScreen> {
                     'assets/images/logo_splash.png',
                     fit: BoxFit.contain,
                     width: 220,
-                    errorBuilder: (context, error, stackTrace) => _buildFallbackLogo(),
+                    errorBuilder: (context, error, stackTrace) =>
+                        _buildFallbackLogo(context),
                   ),
                 ),
               ),
@@ -57,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.goldLight),
+                    valueColor: AlwaysStoppedAnimation<Color>(colorScheme.secondary),
                   ),
                 ),
               ),
@@ -68,7 +69,8 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Widget _buildFallbackLogo() {
+  Widget _buildFallbackLogo(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -77,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
           style: TextStyle(
             fontSize: 72,
             fontWeight: FontWeight.bold,
-            color: AppColors.goldLight,
+            color: colorScheme.secondary,
             height: 1,
           ),
         ),
@@ -87,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> {
           style: TextStyle(
             fontSize: 28,
             letterSpacing: 2,
-            color: AppColors.offWhite,
+            color: colorScheme.onSurface,
             fontWeight: FontWeight.w300,
           ),
         ),

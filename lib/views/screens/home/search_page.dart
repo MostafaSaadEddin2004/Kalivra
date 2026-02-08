@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/app_theme.dart';
 
 /// Search tab: body only (app bar is the search bar from MainShell).
 class SearchPage extends StatelessWidget {
@@ -7,6 +6,7 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -15,9 +15,9 @@ class SearchPage extends StatelessWidget {
             child: Text(
               'اقتراحات سريعة',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.burgundy,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -47,9 +47,9 @@ class SearchPage extends StatelessWidget {
             child: Text(
               'آخر البحث',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.burgundy,
-                    fontWeight: FontWeight.w600,
-                  ),
+                color: colorScheme.primary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ),
@@ -59,8 +59,8 @@ class SearchPage extends StatelessWidget {
             child: Text(
               'لم تبحث عن شيء بعد. اكتب في شريط البحث أعلاه.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.black.withValues(alpha: 0.6),
-                  ),
+                color: colorScheme.onSurface.withValues(alpha: 0.6),
+              ),
             ),
           ),
         ),
@@ -84,9 +84,9 @@ class _SearchChip extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: AppColors.burgundy,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
       ),

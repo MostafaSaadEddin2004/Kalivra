@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/nav_item_model.dart';
 import 'package:kalivra/views/widgets/nav/nav_item.dart';
 
@@ -16,12 +15,13 @@ class CustomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.08),
+            color: colorScheme.onSurface.withValues(alpha: 0.08),
             blurRadius: 12,
             offset: const Offset(0, -4),
           ),
