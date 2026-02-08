@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:kalivra/models/category_model.dart';
+import 'package:kalivra/models/product_model.dart';
+
+/// In-memory categories and products for the categories tab.
+/// Replace with API/repository when backend is ready.
+class CategoriesData {
+  CategoriesData._();
+
+  static const List<CategoryModel> categories = [
+    CategoryModel(id: 'all', name: 'الكل', icon: Icons.apps_rounded),
+    CategoryModel(id: 'paint', name: 'دهانات', icon: Icons.format_paint_rounded),
+    CategoryModel(id: 'tiles', name: 'سيراميك', icon: Icons.grid_4x4_rounded),
+    CategoryModel(id: 'plumbing', name: 'أدوات صحية', icon: Icons.water_drop_rounded),
+    CategoryModel(id: 'iron', name: 'حديد', icon: Icons.construction_rounded),
+    CategoryModel(id: 'electrical', name: 'كهربائيات', icon: Icons.electrical_services_rounded),
+    CategoryModel(id: 'decor', name: 'ديكور', icon: Icons.palette_rounded),
+  ];
+
+  static const List<ProductModel> products = [
+    ProductModel(id: '1', name: 'دهان داخلي لامع 18 لتر', categoryId: 'paint', price: 285.0),
+    ProductModel(id: '2', name: 'دهان خارجي مقاوم للماء', categoryId: 'paint', price: 420.0),
+    ProductModel(id: '3', name: 'برايمر للجدران', categoryId: 'paint', price: 95.0),
+    ProductModel(id: '4', name: 'سيراميك 60×60 سم', categoryId: 'tiles', price: 45.0, unit: 'م²'),
+    ProductModel(id: '5', name: 'سيراميك حمام 30×30', categoryId: 'tiles', price: 32.0, unit: 'م²'),
+    ProductModel(id: '6', name: 'بورسلين أرضيات', categoryId: 'tiles', price: 78.0, unit: 'م²'),
+    ProductModel(id: '7', name: 'حنفية حمام كروم', categoryId: 'plumbing', price: 340.0),
+    ProductModel(id: '8', name: 'خلاط مطبخ', categoryId: 'plumbing', price: 185.0),
+    ProductModel(id: '9', name: 'سيفون أرضي', categoryId: 'plumbing', price: 65.0),
+    ProductModel(id: '10', name: 'حديد تسليح 12 ملم', categoryId: 'iron', price: 28.0, unit: 'م'),
+    ProductModel(id: '11', name: 'شبك حديد ملحوم', categoryId: 'iron', price: 55.0, unit: 'م²'),
+    ProductModel(id: '12', name: 'زوايا حديدية', categoryId: 'iron', price: 42.0, unit: 'م'),
+    ProductModel(id: '13', name: 'كابل كهرباء 2.5 ملم', categoryId: 'electrical', price: 3.5, unit: 'م'),
+    ProductModel(id: '14', name: 'مفاتيح ومقابس', categoryId: 'electrical', price: 22.0),
+    ProductModel(id: '15', name: 'لوحة توزيع 12 خط', categoryId: 'electrical', price: 125.0),
+    ProductModel(id: '16', name: 'ورق جدران فاخر', categoryId: 'decor', price: 85.0, unit: 'لفة'),
+    ProductModel(id: '17', name: 'إطار مرآة خشبي', categoryId: 'decor', price: 180.0),
+    ProductModel(id: '18', name: 'ستائر رول', categoryId: 'decor', price: 95.0, unit: 'م²'),
+  ];
+
+  static List<ProductModel> productsForCategory(String categoryId) {
+    if (categoryId == 'all') return List.from(products);
+    return products.where((p) => p.categoryId == categoryId).toList();
+  }
+}

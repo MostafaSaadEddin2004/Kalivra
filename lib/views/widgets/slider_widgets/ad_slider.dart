@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 import 'package:kalivra/views/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/views/widgets/slider_widgets/custom_slider_indicator.dart';
@@ -74,7 +75,7 @@ class AdSliderState extends State<AdSlider> {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          height: 152,
+          height: 152.h,
           child: PageView.builder(
             controller: _pageController,
             onPageChanged: (index) => setState(() => _currentPage = index),
@@ -82,13 +83,13 @@ class AdSliderState extends State<AdSlider> {
             itemBuilder: (context, index) {
               final slide = slides[index];
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6),
+                padding: EdgeInsets.symmetric(horizontal: 6.w),
                 child: AdCard(slide: slide),
               );
             },
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         CustomSliderIndicator(slides: slides, currentPage: _currentPage),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -18,19 +19,19 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 12,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 16.w,
+          vertical: 12.h,
         ),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
             color: colorScheme.secondary.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10.r),
           ),
-          child: Icon(icon, color: colorScheme.secondary, size: 24),
+          child: Icon(icon, color: colorScheme.secondary, size: 24.r),
         ),
         title: Text(
           title,
@@ -40,7 +41,7 @@ class NotificationCard extends StatelessWidget {
           ),
         ),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4),
+          padding: EdgeInsets.only(top: 4.h),
           child: Text(
             body,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

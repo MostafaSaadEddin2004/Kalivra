@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/core/app_theme.dart';
 
 class NavItem extends StatelessWidget {
   const NavItem({super.key, 
@@ -15,17 +17,16 @@ class NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final isSelected = index == currentIndex;
     return InkWell(
       onTap: () => onTap(index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
         child: Icon(
           icon,
-          size: 24,
-          color: isSelected ? colorScheme.primary : colorScheme.outline,
+          size: 24.r,
+          color: isSelected ? AppColors.offWhite : AppColors.taupe,
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/views/screens/home/home_screen.dart';
 
 /// Native-feel splash screen: Kalivra logo on black, then navigate to home.
@@ -45,17 +46,17 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Image.asset(
                     'assets/images/logo_splash.png',
                     fit: BoxFit.contain,
-                    width: 220,
+                    width: 220.w,
                     errorBuilder: (context, error, stackTrace) =>
                         _buildFallbackLogo(context),
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 48),
+                padding: EdgeInsets.only(bottom: 48.h),
                 child: SizedBox(
-                  width: 28,
-                  height: 28,
+                  width: 28.w,
+                  height: 28.h,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(colorScheme.secondary),
@@ -77,17 +78,17 @@ class _SplashScreenState extends State<SplashScreen> {
         Text(
           'K',
           style: TextStyle(
-            fontSize: 72,
+            fontSize: 72.sp,
             fontWeight: FontWeight.bold,
             color: colorScheme.secondary,
             height: 1,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Text(
           'Kalivra',
           style: TextStyle(
-            fontSize: 28,
+            fontSize: 28.sp,
             letterSpacing: 2,
             color: colorScheme.onSurface,
             fontWeight: FontWeight.w300,

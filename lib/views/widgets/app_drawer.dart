@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -11,15 +12,15 @@ class AppDrawer extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return Drawer(
       backgroundColor: colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.horizontal(left: Radius.circular(20)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(left: Radius.circular(20.r)),
       ),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _DrawerHeader(onClose: () => Navigator.pop(context)),
-            Divider(height: 1, color: colorScheme.outline),
+            Divider(height: 1.h, color: colorScheme.outline),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -77,7 +78,7 @@ class AppDrawer extends StatelessWidget {
                 ],
               ),
             ),
-            Divider(height: 1, color: colorScheme.outline),
+            Divider(height: 1.h, color: colorScheme.outline),
             const _DrawerFooter(),
           ],
         ),
@@ -95,7 +96,7 @@ class _DrawerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -137,7 +138,7 @@ class _DrawerItem extends StatelessWidget {
         InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
             child: Row(
               children: [
                 Expanded(
@@ -150,19 +151,19 @@ class _DrawerItem extends StatelessWidget {
                     textAlign: TextAlign.end,
                   ),
                 ),
-                const SizedBox(width: 12),
-                Icon(icon, color: colorScheme.primary, size: 24),
-                const SizedBox(width: 12),
+                SizedBox(width: 12.w),
+                Icon(icon, color: colorScheme.primary, size: 24.r),
+                SizedBox(width: 12.w),
                 Icon(
                   Icons.chevron_left_rounded,
-                  size: 22,
+                  size: 22.r,
                   color: colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
               ],
             ),
           ),
         ),
-        Divider(height: 1, color: colorScheme.outline),
+        Divider(height: 1.h, color: colorScheme.outline),
       ],
     );
   }
@@ -175,21 +176,21 @@ class _DrawerFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ClipOval(
             child: Container(
-              width: 40,
-              height: 40,
+              width: 40.w,
+              height: 40.h,
               color: colorScheme.surfaceContainerHighest,
-              padding: const EdgeInsets.all(6),
+              padding: EdgeInsets.all(6.r),
               child: Image.asset(
                 'assets/images/logo_small.png',
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) =>
-                    Icon(Icons.store_rounded, size: 24, color: colorScheme.primary),
+                    Icon(Icons.store_rounded, size: 24.r, color: colorScheme.primary),
               ),
             ),
           ),

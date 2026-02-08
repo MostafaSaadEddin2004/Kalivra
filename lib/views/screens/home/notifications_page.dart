@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kalivra/views/widgets/notification_card.dart';
-import '../../../core/app_theme.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});

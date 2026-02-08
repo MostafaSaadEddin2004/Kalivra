@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
 
 class CartPage extends StatelessWidget {
@@ -18,31 +19,26 @@ class CartPage extends StatelessWidget {
               children: [
                 Icon(
                   Icons.shopping_cart_outlined,
-                  size: 80,
+                  size: 80.r,
                   color: colorScheme.outline.withValues(alpha: 0.6),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Text(
                   'السلة فارغة',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Text(
                   'تصفح التصنيفات وأضف المنتجات هنا',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurface.withValues(alpha: 0.6),
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 FilledButton.icon(
-                  onPressed: () {
-                    context.read<NavCubit>().goTo(1);
-                  },
-                  icon: const Icon(Icons.storefront_rounded, size: 20),
+                  onPressed: () =>
+                    context.read<NavCubit>().goTo(1)
+                  ,
+                  icon: Icon(Icons.storefront_rounded),
                   label: const Text('تسوق الآن'),
                 ),
               ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 
 class CustomSliderIndicator extends StatelessWidget {
@@ -20,14 +22,14 @@ class CustomSliderIndicator extends StatelessWidget {
         _slides.length,
         (index) => AnimatedContainer(
           duration: const Duration(milliseconds: 250),
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: _currentPage == index ? 20 : 8,
-          height: 8,
+          margin: EdgeInsets.symmetric(horizontal: 3.w),
+          width: _currentPage == index ? 20.w : 8.w,
+          height: 8.h,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? colorScheme.primary
-                : colorScheme.outline.withValues(alpha: 0.5),
-            borderRadius: BorderRadius.circular(4),
+                ? colorScheme.secondary
+                : AppColors.taupe,
+            borderRadius: BorderRadius.circular(4.r),
           ),
         ),
       ),

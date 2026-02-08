@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// Search tab: body only (app bar is the search bar from MainShell).
 class SearchPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class SearchPage extends StatelessWidget {
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+            padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 12.h),
             child: Text(
               'اقتراحات سريعة',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -22,12 +23,12 @@ class SearchPage extends StatelessWidget {
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: EdgeInsets.symmetric(horizontal: 20.w),
           sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
+              mainAxisSpacing: 12.h,
+              crossAxisSpacing: 12.w,
               childAspectRatio: 1.2,
             ),
             delegate: SliverChildListDelegate([
@@ -40,10 +41,10 @@ class SearchPage extends StatelessWidget {
             ]),
           ),
         ),
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Text(
               'آخر البحث',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -55,7 +56,7 @@ class SearchPage extends StatelessWidget {
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
             child: Text(
               'لم تبحث عن شيء بعد. اكتب في شريط البحث أعلاه.',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -79,7 +80,7 @@ class _SearchChip extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: () {},
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         child: Center(
           child: Text(
             label,

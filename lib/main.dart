@@ -24,7 +24,6 @@ void main() {
 
 class Main extends StatelessWidget {
   const Main({super.key});
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -43,7 +42,7 @@ class Main extends StatelessWidget {
           final theme = context.watch<ThemeBloc>().state;
           final locale = context.watch<LocaleBloc>().state;
           return MaterialApp(
-            debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: false,   
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             themeMode: theme is ThemeFetched ? theme.mode : ThemeMode.system,

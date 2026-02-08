@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/views/widgets/slider_widgets/ad_slider.dart';
 
 /// Home tab: welcome, carousel ads, categories grid, value propositions.
@@ -9,9 +10,9 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        const SliverToBoxAdapter(child: SizedBox(height: 8)),
+        SliverToBoxAdapter(child: SizedBox(height: 8.h)),
         const SliverToBoxAdapter(child: AdSlider()),
-        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
        ],
     );
   }

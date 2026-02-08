@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// App bar with only a search bar on top (for Search page).
 class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -14,7 +15,7 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   final TextEditingController? controller;
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(56.h);
 
   @override
   Widget build(BuildContext context) {
@@ -27,31 +28,31 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
         cursorColor: colorScheme.onPrimary,
         controller: controller,
         onChanged: onChanged,
-        style: TextStyle(color: colorScheme.onPrimary, fontSize: 16),
+        style: TextStyle(color: colorScheme.onPrimary, fontSize: 16.sp),
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
             color: colorScheme.onPrimary.withValues(alpha: 0.7),
-            fontSize: 15,
+            fontSize: 15.sp,
           ),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: colorScheme.onPrimary.withValues(alpha: 0.9),
-            size: 22,
+            size: 22.r,
           ),
           filled: true,
           fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
             borderSide: BorderSide.none,
           ),
           focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: colorScheme.onPrimary, width: 1.0),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 10,
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: 16.w,
+            vertical: 10.h,
           ),
         ),
       ),
