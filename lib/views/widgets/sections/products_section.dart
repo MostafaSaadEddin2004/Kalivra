@@ -8,9 +8,11 @@ class ProductsSection extends StatelessWidget {
   const ProductsSection({
     super.key,
     required List<ProductModel> filteredProducts,
+    this.onAddToCart,
   }) : _filteredProducts = filteredProducts;
 
   final List<ProductModel> _filteredProducts;
+  final void Function(ProductModel product)? onAddToCart;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,9 @@ class ProductsSection extends StatelessWidget {
                   child: ProductCard(
                     product: product,
                     onTap: () {},
-                    onAddToCart: () {},
+                    onAddToCart: onAddToCart != null
+                        ? () => onAddToCart!(product)
+                        : null,
                   ),
                 ),
               );

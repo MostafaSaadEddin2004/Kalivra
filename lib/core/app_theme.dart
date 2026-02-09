@@ -176,6 +176,11 @@ class AppTheme {
       fontSize: 12.sp,
       fontWeight: FontWeight.w500,
     ),
+    displayLarge: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+    ),
     displaySmall: TextStyle(
       color: AppColors.offWhite,
       fontSize: 14.sp,
@@ -183,7 +188,6 @@ class AppTheme {
     ),
   );
 
-  /// Dark theme: titles in offWhite/taupe, body in offWhite, button text in offWhite.
   static TextTheme get _darkTextTheme => TextTheme(
     headlineLarge: TextStyle(
       color: AppColors.offWhite,
@@ -244,6 +248,11 @@ class AppTheme {
       color: AppColors.taupe,
       fontSize: 12.sp,
       fontWeight: FontWeight.w500,
+    ),
+    displayLarge: TextStyle(
+      color: AppColors.black,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
     ),
     displaySmall: TextStyle(
       color: AppColors.burgundy,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/data/categories_data.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/category/category_tab_bar.dart';
@@ -114,7 +116,16 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     return ProductCard(
                       product: product,
                       onTap: () {},
-                      onAddToCart: () {},
+                      onAddToCart: () {
+                        context.read<CartCubit>().addItem(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('تمت إضافة "${product.name}" إلى السلة'),
+                            behavior: SnackBarBehavior.floating,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
                     );
                   }, childCount: _filteredProducts.length),
                 ),

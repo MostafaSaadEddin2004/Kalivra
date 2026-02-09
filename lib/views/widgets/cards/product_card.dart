@@ -74,7 +74,7 @@ class ProductCard extends StatelessWidget {
                                     '${product.price.toStringAsFixed(0)} ل.س',
                                     style: textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 12.sp,
+                                      fontSize: 12.sp,decorationColor: colorScheme.onTertiaryFixed,
                                       decoration: TextDecoration.lineThrough,
                                     ),
                                   ),

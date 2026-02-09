@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/data/categories_data.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/sections/brands_section.dart';
@@ -26,6 +28,17 @@ class HomePage extends StatelessWidget {
 
   static List<ProductModel> get _saleProducts => CategoriesData.saleProducts;
 
+  void _addToCart(BuildContext context, ProductModel product) {
+    context.read<CartCubit>().addItem(product);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('تمت إضافة "${product.name}" إلى السلة'),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -41,13 +54,19 @@ class HomePage extends StatelessWidget {
 
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(
-          child: ProductsSection(filteredProducts: _filteredProducts),
+          child: ProductsSection(
+            filteredProducts: _filteredProducts,
+            onAddToCart: (p) => _addToCart(context, p),
+          ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         const SliverToBoxAdapter(child: AdSlider()),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(
-          child: SalesSection(saleProducts: _saleProducts),
+          child: SalesSection(
+            saleProducts: _saleProducts,
+            onAddToCart: (p) => _addToCart(context, p),
+          ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 16.h)),
       ],

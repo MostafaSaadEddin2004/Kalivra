@@ -23,7 +23,7 @@ class CategoryTabBar extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         padding: EdgeInsets.symmetric(horizontal: 20.w),
         itemCount: categories.length,
-        separatorBuilder: (_, __) => SizedBox(width: 10.w),
+        separatorBuilder: (_, _) => SizedBox(width: 10.w),
         itemBuilder: (context, index) {
           final category = categories[index];
           final isSelected = category.id == selectedId;

@@ -5,10 +5,14 @@ import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/cards/product_card.dart';
 
 class SalesSection extends StatelessWidget {
-  const SalesSection({super.key, required List<ProductModel> saleProducts})
-    : _saleProducts = saleProducts;
+  const SalesSection({
+    super.key,
+    required List<ProductModel> saleProducts,
+    this.onAddToCart,
+  }) : _saleProducts = saleProducts;
 
   final List<ProductModel> _saleProducts;
+  final void Function(ProductModel product)? onAddToCart;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +64,9 @@ class SalesSection extends StatelessWidget {
                   child: ProductCard(
                     product: product,
                     onTap: () {},
-                    onAddToCart: () {},
+                    onAddToCart: onAddToCart != null
+                        ? () => onAddToCart!(product)
+                        : null,
                   ),
                 ),
               );
