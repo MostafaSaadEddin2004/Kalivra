@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/models/product_model.dart';
+import 'package:kalivra/views/widgets/buttons/cart_button.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({
@@ -18,7 +19,6 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
@@ -60,30 +60,33 @@ class ProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          '${product.price.toStringAsFixed(0)} ر.س',
-                          style: textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        InkWell(
-                          onTap: onAddToCart,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: colorScheme.onSecondaryFixed,
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 6.h,
-                            ),
-                            child: Icon(
-                              Icons.add_shopping_cart_rounded,
-                              size: 18.r,
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                        ),
+                        product.salePrice == null
+                            ? Text(
+                                '${product.price.toStringAsFixed(0)} ل.س',
+                                style: textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${product.price.toStringAsFixed(0)} ل.س',
+                                    style: textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12.sp,
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${product.salePrice!.toStringAsFixed(0)} ل.س',
+                                    style: textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                        CardButton(onTap: onAddToCart),
                       ],
                     ),
                   ],

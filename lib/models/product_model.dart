@@ -7,6 +7,7 @@ class ProductModel {
     required this.price,
     this.imagePath,
     this.unit = 'قطعة',
+    this.salePrice,
   });
 
   final String id;
@@ -15,4 +16,6 @@ class ProductModel {
   final double price;
   final String? imagePath;
   final String unit;
+  /// Price when on sale (must be less than [price]). When null, product is not on sale.
+  final double? salePrice;
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
 
 class BrandCard extends StatelessWidget {
   const BrandCard({super.key, required this.label});
@@ -9,51 +8,44 @@ class BrandCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        // padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 10.w),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.onTertiary,
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.primaryFixed,
-              blurRadius: 0.5.r,
-              spreadRadius: 0.1.r
-            )
-          ],
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-
-        width: 90.w,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              height: 70.h,
-              width: 90.w,
-              decoration: BoxDecoration(
-                color: AppColors.lightGray,
-                borderRadius: BorderRadius.circular(12.r),
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      child: InkWell(
+        onTap: () {},
+        child: SizedBox(
+          width: 90.w,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                height: 70.h,
+                width: double.infinity,
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
+                child: Icon(
+                  Icons.store_rounded,
+                  size: 28.r,
+                  color: colorScheme.primary.withValues(alpha: 0.6),
+                ),
               ),
-              child: Icon(
-                Icons.store_rounded,
-                size: 28.r,
-                color: AppColors.burgundy,
+              Padding(
+                padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 8.h),
+                child: Text(
+                  label,
+                  style: textTheme.titleSmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Text(
-                label,
-                style: theme.textTheme.displaySmall,
-                maxLines: 2,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

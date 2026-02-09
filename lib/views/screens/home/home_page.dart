@@ -24,8 +24,7 @@ class HomePage extends StatelessWidget {
 
   static List<ProductModel> get _filteredProducts => CategoriesData.products;
 
-  static List<ProductModel> get _saleProducts =>
-      CategoriesData.products.take(8).toList();
+  static List<ProductModel> get _saleProducts => CategoriesData.saleProducts;
 
   @override
   Widget build(BuildContext context) {
