@@ -31,6 +31,7 @@ class AppTheme {
       onPrimaryFixed: AppColors.offWhite,
       onSecondaryFixed: AppColors.burgundy.withValues(alpha: 0.12),
       onTertiaryFixed: AppColors.burgundy,
+      primaryFixed: AppColors.black,
       onError: AppColors.red,
       brightness: Brightness.light,
     ),
@@ -59,10 +60,10 @@ class AppTheme {
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(AppColors.burgundy),
-        foregroundColor:  WidgetStatePropertyAll(AppColors.offWhite),
-         iconSize: WidgetStatePropertyAll(20.r)
-      )
-    )
+        foregroundColor: WidgetStatePropertyAll(AppColors.offWhite),
+        iconSize: WidgetStatePropertyAll(20.r),
+      ),
+    ),
   );
 
   static ThemeData get dark => ThemeData(
@@ -79,6 +80,7 @@ class AppTheme {
       onPrimaryFixed: AppColors.burgundy,
       onSecondaryFixed: AppColors.taupe,
       onTertiaryFixed: AppColors.taupe,
+      primaryFixed: AppColors.offWhite,
       onError: AppColors.red,
       brightness: Brightness.dark,
     ),
@@ -103,148 +105,150 @@ class AppTheme {
         padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
       ),
-    ),filledButtonTheme: FilledButtonThemeData(
+    ),
+    filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(AppColors.taupe),
-        foregroundColor:  WidgetStatePropertyAll(AppColors.black),
-         iconSize: WidgetStatePropertyAll(20.r)
-      )
-    )
+        foregroundColor: WidgetStatePropertyAll(AppColors.black),
+        iconSize: WidgetStatePropertyAll(20.r),
+      ),
+    ),
   );
 
   static TextTheme get _lightTextTheme => TextTheme(
-        headlineLarge: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 22.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        headlineMedium: TextStyle(
-          color: AppColors.burgundy,
-          fontSize: 20.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        headlineSmall: TextStyle(
-          color: AppColors.burgundy,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        titleLarge: TextStyle(
-          color: AppColors.burgundy,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        titleMedium: TextStyle(
-          color: AppColors.burgundy,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        titleSmall: TextStyle(
-          color: AppColors.burgundy,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        bodyLarge: TextStyle(
-          color: AppColors.black,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.normal,
-        ),
-        bodyMedium: TextStyle(
-          color: AppColors.black,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.normal,
-        ),
-        bodySmall: TextStyle(
-          color: AppColors.black,
-          fontSize: 12.sp,
-          fontWeight: FontWeight.normal,
-        ),
-        labelLarge: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        labelMedium: TextStyle(
-          color: AppColors.black,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        labelSmall: TextStyle(
-          color: AppColors.burgundy,
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w500,
-        ),displaySmall: TextStyle(
-            color: AppColors.offWhite,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.normal,
-        )
-      );
+    headlineLarge: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 22.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineMedium: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 20.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineSmall: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 18.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    titleLarge: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 18.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    titleMedium: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    titleSmall: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    bodyLarge: TextStyle(
+      color: AppColors.black,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.normal,
+    ),
+    bodyMedium: TextStyle(
+      color: AppColors.black,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.normal,
+    ),
+    bodySmall: TextStyle(
+      color: AppColors.black,
+      fontSize: 12.sp,
+      fontWeight: FontWeight.normal,
+    ),
+    labelLarge: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    labelMedium: TextStyle(
+      color: AppColors.black,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.w500,
+    ),
+    labelSmall: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 12.sp,
+      fontWeight: FontWeight.w500,
+    ),
+    displaySmall: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.normal,
+    ),
+  );
 
   /// Dark theme: titles in offWhite/taupe, body in offWhite, button text in offWhite.
   static TextTheme get _darkTextTheme => TextTheme(
-        headlineLarge: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 24.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        headlineMedium: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 22.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        headlineSmall: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 20.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        titleLarge: TextStyle(
-          color: AppColors.taupe,
-          fontSize: 18.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        titleMedium: TextStyle(
-          color: AppColors.taupe,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        titleSmall: TextStyle(
-          color: AppColors.taupe,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        bodyLarge: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.normal,
-        ),
-        bodyMedium: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.normal,
-        ),
-        bodySmall: TextStyle(
-          color: AppColors.taupe,
-          fontSize: 12.sp,
-          fontWeight: FontWeight.normal,
-        ),
-        labelLarge: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 16.sp,
-          fontWeight: FontWeight.w600,
-        ),
-        labelMedium: TextStyle(
-          color: AppColors.offWhite,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        labelSmall: TextStyle(
-          color: AppColors.taupe,
-          fontSize: 12.sp,
-          fontWeight: FontWeight.w500,
-        ),
-        displaySmall: TextStyle(
-            color: AppColors.burgundy,
-          fontSize: 14.sp,
-          fontWeight: FontWeight.normal,
-        )
-      );
+    headlineLarge: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 24.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineMedium: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 22.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineSmall: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 20.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    titleLarge: TextStyle(
+      color: AppColors.taupe,
+      fontSize: 18.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    titleMedium: TextStyle(
+      color: AppColors.taupe,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    titleSmall: TextStyle(
+      color: AppColors.taupe,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    bodyLarge: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.normal,
+    ),
+    bodyMedium: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.normal,
+    ),
+    bodySmall: TextStyle(
+      color: AppColors.taupe,
+      fontSize: 12.sp,
+      fontWeight: FontWeight.normal,
+    ),
+    labelLarge: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+    ),
+    labelMedium: TextStyle(
+      color: AppColors.offWhite,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.w500,
+    ),
+    labelSmall: TextStyle(
+      color: AppColors.taupe,
+      fontSize: 12.sp,
+      fontWeight: FontWeight.w500,
+    ),
+    displaySmall: TextStyle(
+      color: AppColors.burgundy,
+      fontSize: 14.sp,
+      fontWeight: FontWeight.normal,
+    ),
+  );
 }
