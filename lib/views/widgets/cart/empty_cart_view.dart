@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
-import 'package:kalivra/core/app_theme.dart';
 
 class EmptyCartView extends StatelessWidget {
   const EmptyCartView({super.key});
