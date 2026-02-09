@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Kalivra brand colors from the branding guide.
-/// #0A0908 Black, #49111C Burgundy, #F2F4F3 Off-white, #A9927D Taupe, Gold accent.
 class AppColors {
   AppColors._();
 
@@ -13,6 +11,7 @@ class AppColors {
   static const Color goldLight = Color(0xFFD4AF37);
   static const Color goldDark = Color(0xFFA67C00);
   static const Color lightGray = Color(0xFFC0C0C0);
+  static const Color red = Colors.red;
 }
 
 class AppTheme {
@@ -31,6 +30,8 @@ class AppTheme {
       onTertiary: AppColors.burgundy,
       onPrimaryFixed: AppColors.offWhite,
       onSecondaryFixed: AppColors.burgundy.withValues(alpha: 0.12),
+      onTertiaryFixed: AppColors.burgundy,
+      onError: AppColors.red,
       brightness: Brightness.light,
     ),
     textTheme: _lightTextTheme,
@@ -77,6 +78,8 @@ class AppTheme {
       onTertiary: AppColors.offWhite,
       onPrimaryFixed: AppColors.burgundy,
       onSecondaryFixed: AppColors.taupe,
+      onTertiaryFixed: AppColors.taupe,
+      onError: AppColors.red,
       brightness: Brightness.dark,
     ),
     textTheme: _darkTextTheme,
@@ -169,7 +172,11 @@ class AppTheme {
           color: AppColors.burgundy,
           fontSize: 12.sp,
           fontWeight: FontWeight.w500,
-        ),
+        ),displaySmall: TextStyle(
+            color: AppColors.offWhite,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.normal,
+        )
       );
 
   /// Dark theme: titles in offWhite/taupe, body in offWhite, button text in offWhite.
@@ -234,5 +241,10 @@ class AppTheme {
           fontSize: 12.sp,
           fontWeight: FontWeight.w500,
         ),
+        displaySmall: TextStyle(
+            color: AppColors.burgundy,
+          fontSize: 14.sp,
+          fontWeight: FontWeight.normal,
+        )
       );
 }

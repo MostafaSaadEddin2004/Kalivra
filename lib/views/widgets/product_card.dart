@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/product_model.dart';
 
-/// Compact product card for the categories grid: image area, title, price, add button.
 class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
@@ -34,7 +32,9 @@ class ProductCard extends StatelessWidget {
               flex: 3,
               child: Container(
                 width: double.infinity,
-                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                color: colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.5,
+                ),
                 child: Icon(
                   Icons.inventory_2_outlined,
                   size: 40.r,
@@ -66,19 +66,21 @@ class ProductCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Material(
-                          color: colorScheme.onSecondaryFixed,
-                          borderRadius: BorderRadius.circular(8.r),
-                          child: InkWell(
-                            onTap: onAddToCart,
-                            borderRadius: BorderRadius.circular(8.r),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
-                              child: Icon(
-                                Icons.add_shopping_cart_rounded,
-                                size: 18.r,
-                                color: colorScheme.primary,
-                              ),
+                        InkWell(
+                          onTap: onAddToCart,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: colorScheme.onSecondaryFixed,
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 6.h,
+                            ),
+                            child: Icon(
+                              Icons.add_shopping_cart_rounded,
+                              size: 18.r,
+                              color: colorScheme.primary,
                             ),
                           ),
                         ),

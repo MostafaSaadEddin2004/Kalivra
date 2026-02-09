@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/views/widgets/cards/search_result_card.dart';
 
-/// Search tab: body only (app bar is the search bar from MainShell).
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -15,10 +14,7 @@ class SearchPage extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 12.h),
             child: Text(
               'اقتراحات سريعة',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.titleMedium
             ),
           ),
         ),
@@ -32,12 +28,12 @@ class SearchPage extends StatelessWidget {
               childAspectRatio: 1.2,
             ),
             delegate: SliverChildListDelegate([
-              _SearchChip(label: 'دهانات'),
-              _SearchChip(label: 'سيراميك'),
-              _SearchChip(label: 'أدوات صحية'),
-              _SearchChip(label: 'حديد'),
-              _SearchChip(label: 'كهربائيات'),
-              _SearchChip(label: 'ديكور'),
+              SearchResultCard(label: 'دهانات'),
+              SearchResultCard(label: 'سيراميك'),
+              SearchResultCard(label: 'أدوات صحية'),
+              SearchResultCard(label: 'حديد'),
+              SearchResultCard(label: 'كهربائيات'),
+              SearchResultCard(label: 'ديكور'),
             ]),
           ),
         ),
@@ -47,21 +43,16 @@ class SearchPage extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Text(
               'آخر البحث',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: colorScheme.primary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: Theme.of(context).textTheme.titleMedium
             ),
           ),
         ),
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
             child: Text(
               'لم تبحث عن شيء بعد. اكتب في شريط البحث أعلاه.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface.withValues(alpha: 0.6),
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
             ),
           ),
         ),
@@ -70,27 +61,3 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class _SearchChip extends StatelessWidget {
-  const _SearchChip({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: () {},
-        borderRadius: BorderRadius.circular(12.r),
-        child: Center(
-          child: Text(
-            label,
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

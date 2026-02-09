@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/core/app_theme.dart';
 
 /// App bar with only a search bar on top (for Search page).
 class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -20,34 +21,34 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return AppBar(
-      backgroundColor: colorScheme.primary,
-      foregroundColor: colorScheme.onPrimary,
       elevation: 0,
       title: TextField(
-        cursorColor: colorScheme.onPrimary,
+        cursorColor: AppColors.burgundy,
         controller: controller,
         onChanged: onChanged,
-        style: TextStyle(color: colorScheme.onPrimary, fontSize: 16.sp),
+        style: TextStyle(color: AppColors.burgundy, fontSize: 16.sp),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: TextStyle(
-            color: colorScheme.onPrimary.withValues(alpha: 0.7),
-            fontSize: 15.sp,
-          ),
+          hintStyle: textTheme.displaySmall?.copyWith(color: AppColors.burgundy),
           prefixIcon: Icon(
             Icons.search_rounded,
-            color: colorScheme.onPrimary.withValues(alpha: 0.9),
+            color: AppColors.burgundy,
             size: 22.r,
           ),
           filled: true,
-          fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-          border: OutlineInputBorder(
+          fillColor: AppColors.lightGray,
+          border: UnderlineInputBorder(
             borderRadius: BorderRadius.circular(12.r),
             borderSide: BorderSide.none,
           ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: colorScheme.onPrimary, width: 1.0),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: colorScheme.onPrimary, width: 1.5),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: colorScheme.onError, width: 1.0),
             borderRadius: BorderRadius.circular(12.r),
           ),
           contentPadding: EdgeInsets.symmetric(

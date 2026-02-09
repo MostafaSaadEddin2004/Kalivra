@@ -18,6 +18,7 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
       child: ListTile(
@@ -28,34 +29,29 @@ class NotificationCard extends StatelessWidget {
         leading: Container(
           padding: EdgeInsets.all(10.r),
           decoration: BoxDecoration(
-            color: colorScheme.secondary.withValues(alpha: 0.2),
+            color: colorScheme.onSecondaryFixed,
             borderRadius: BorderRadius.circular(10.r),
           ),
-          child: Icon(icon, color: colorScheme.secondary, size: 24.r),
+          child: Icon(icon, color: colorScheme.primary, size: 24.r),
         ),
         title: Text(
           title,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-            color: colorScheme.primary,
-            fontWeight: FontWeight.w600,
-          ),
+          style: textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
         ),
         subtitle: Padding(
           padding: EdgeInsets.only(top: 4.h),
           child: Text(
             body,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: colorScheme.onSurface.withValues(alpha: 0.7),
-            ),
+            style: Theme.of(context).textTheme.bodySmall,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         trailing: Text(
           time,
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: colorScheme.outline,
-          ),
+          style: Theme.of(context).textTheme.labelSmall
         ),
         onTap: () {},
       ),

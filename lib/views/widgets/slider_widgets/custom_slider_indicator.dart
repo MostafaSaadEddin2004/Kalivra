@@ -27,8 +27,8 @@ class CustomSliderIndicator extends StatelessWidget {
           height: 8.h,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? colorScheme.secondary
-                : AppColors.taupe,
+                ? colorScheme.onTertiaryFixed
+                : AppColors.lightGray,
             borderRadius: BorderRadius.circular(4.r),
           ),
         ),

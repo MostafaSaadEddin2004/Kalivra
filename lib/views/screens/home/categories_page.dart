@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/data/categories_data.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/category/category_tab_bar.dart';
 import 'package:kalivra/views/widgets/product_card.dart';
 
-/// Categories tab: horizontal category tab bar and product grid for selected category.
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
 
