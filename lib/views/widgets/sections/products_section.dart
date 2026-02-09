@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/views/widgets/cards/brand_card.dart';
+import 'package:kalivra/models/product_model.dart';
+import 'package:kalivra/views/widgets/cards/product_card.dart';
 
-class BrandsSection extends StatelessWidget {
-  const BrandsSection({super.key, required List<String> brandNames})
-    : _brandNames = brandNames;
+class ProductsSection extends StatelessWidget {
+  const ProductsSection({
+    super.key,
+    required List<ProductModel> filteredProducts,
+  }) : _filteredProducts = filteredProducts;
 
-  final List<String> _brandNames;
+  final List<ProductModel> _filteredProducts;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('العلامات التجارية', style: textTheme.titleMedium),
+              Text('المنتجات', style: textTheme.titleMedium),
               InkWell(
                 onTap: () {},
                 child: Container(
@@ -42,15 +46,26 @@ class BrandsSection extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         SizedBox(
-          height: 120.h,
-          child: ListView.separated(
-            separatorBuilder: (context, index) => SizedBox(width: 12.w),
+          height: 220.h,
+          child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             clipBehavior: Clip.none,
-            itemCount: _brandNames.length,
+            itemCount: _filteredProducts.length,
             itemBuilder: (context, index) {
-              return BrandCard(label: _brandNames[index]);
+              final product = _filteredProducts[index];
+              return Padding(
+                padding: EdgeInsets.only(left: 12.w),
+                child: SizedBox(
+                  width: 160.w,
+                  height: 220.h,
+                  child: ProductCard(
+                    product: product,
+                    onTap: () {},
+                    onAddToCart: () {},
+                  ),
+                ),
+              );
             },
           ),
         ),
