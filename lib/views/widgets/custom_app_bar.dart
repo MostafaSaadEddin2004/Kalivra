@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/core/app_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({
@@ -16,18 +17,23 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    // App bar uses theme appBarTheme (burgundy/black bg); foreground = offWhite
+    final iconColor = theme.appBarTheme.foregroundColor ?? AppColors.offWhite;
     return AppBar(
       elevation: 0,
       centerTitle: true,
       leading: IconButton(
-        icon: const Icon(Icons.menu_rounded),
+        icon: Icon(Icons.menu_rounded, color: iconColor, size: 28.r),
         onPressed: onMenuTap,
         tooltip: 'القائمة',
       ),
       title: Text(
         title,
-        style: Theme.of(context).textTheme.headlineLarge,
+        style: theme.textTheme.headlineLarge?.copyWith(
+          color: iconColor,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       actions: [
         Padding(
@@ -36,8 +42,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             'assets/images/logo_splash.png',
             height: 28.h,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) =>
-                Icon(Icons.store_rounded, size: 28.r, color: colorScheme.onPrimary),
+            errorBuilder: (context, error, stackTrace) => Icon(
+              Icons.store_rounded,
+              size: 28.r,
+              color: iconColor,
+            ),
           ),
         ),
       ],
