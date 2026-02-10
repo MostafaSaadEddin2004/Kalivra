@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/core/app_theme.dart';
 
 class CustomDrawerHeader extends StatelessWidget {
   const CustomDrawerHeader({super.key, required this.onClose});
@@ -9,30 +11,47 @@ class CustomDrawerHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final topPadding = MediaQuery.paddingOf(context).top;
+    final statusBarBrightness = ThemeData.estimateBrightnessForColor(primary) == Brightness.dark
+        ? Brightness.light
+        : Brightness.dark;
 
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('القائمة', style: theme.textTheme.titleLarge),
-              const Spacer(),
-              IconButton(
-                icon: Icon(
-                  Icons.close_rounded,
-                  color: theme.colorScheme.onTertiaryFixed,
-                  size: 26.r,
-                ),
-                onPressed: onClose,
-                tooltip: 'إغلاق',
-              ),
-            ],
-          ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: primary,
+        statusBarIconBrightness: statusBarBrightness,
+        statusBarBrightness: statusBarBrightness,
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.only(
+          top: topPadding + 12.h,
+          bottom: 12.h,
+          left: 16.w,
+          right: 16.w,
         ),
-        Divider(height: 1.h, color: theme.colorScheme.tertiaryFixed),
-      ],
+        color: primary,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'القائمة',
+              style: theme.textTheme.headlineLarge,
+            ),
+            const Spacer(),
+            IconButton(
+              icon: Icon(
+                Icons.close_rounded,
+                color: AppColors.offWhite,
+                size: 26.r,
+              ),
+              onPressed: onClose,
+              tooltip: 'إغلاق',
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

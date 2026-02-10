@@ -9,7 +9,7 @@ import 'package:kalivra/views/screens/home/home_page.dart';
 import 'package:kalivra/views/screens/home/notifications_page.dart';
 import 'package:kalivra/views/screens/home/search_page.dart';
 import 'package:kalivra/views/widgets/nav/custom_nav_bar.dart';
-import 'package:kalivra/views/widgets/app_drawer.dart';
+import 'package:kalivra/views/widgets/drawer/app_drawer.dart';
 import 'package:kalivra/views/widgets/custom_app_bar.dart';
 import 'package:kalivra/views/widgets/search_app_bar.dart';
 

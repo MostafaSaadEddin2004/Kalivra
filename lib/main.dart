@@ -5,12 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controllers/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controllers/prefs/pref_keys.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/screen_util_config.dart';
-import 'package:kalivra/views/splash_screen.dart';
 import 'l10n/app_localizations.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiBlocProvider(
       providers: [
@@ -23,7 +24,7 @@ void main() {
 }
 
 class Main extends StatelessWidget {
-  const Main({super.key});
+  const Main({super.key, });
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -41,8 +42,8 @@ class Main extends StatelessWidget {
         builder: (context) {
           final theme = context.watch<ThemeBloc>().state;
           final locale = context.watch<LocaleBloc>().state;
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,   
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             themeMode: theme is ThemeFetched ? theme.mode : ThemeMode.system,
@@ -59,7 +60,7 @@ class Main extends StatelessWidget {
             locale: locale is LocaleFetched
                 ? locale.locale
                 : Locale(PrefKeys.arLocaleKey),
-            home: const SplashScreen(),
+            routerConfig: AppRouter.appRouter(),
           );
         },
       ),
