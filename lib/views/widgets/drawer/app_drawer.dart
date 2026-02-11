@@ -1,28 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_footer.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_header.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_item.dart';
+import 'package:share_plus/share_plus.dart';
+
+/// Kalivra URL shared when user taps "مشاركة".
+const String kalivraShareUrl = 'https://kalivra.com';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
-
-  static bool get isLoggedIn => false;
 
   void _openScreen(BuildContext context, String path) {
     context.push(path);
   }
 
+  Future<void> _shareApp(BuildContext context) {
+    return Share.share(
+      kalivraShareUrl,
+      subject: 'Kalivra',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      color: theme.colorScheme.secondaryFixed,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+    final primary = theme.colorScheme.primary;
+    final statusBarBrightness =
+        ThemeData.estimateBrightnessForColor(primary) == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: primary,
+        statusBarIconBrightness: statusBarBrightness,
+        statusBarBrightness: statusBarBrightness,
+      ),
+      child: Container(
+        color: theme.colorScheme.secondaryFixed,
+        child: SafeArea(
+          top: false,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
             CustomDrawerHeader(onClose: () => context.pop(context)),
             Expanded(
               child: ListView(
@@ -66,25 +89,19 @@ class AppDrawer extends StatelessWidget {
                   DrawerItem(
                     icon: Icons.share_rounded,
                     label: 'مشاركة',
-                    onTap: () => _openScreen(context, AppRoutes.share),
+                    onTap: () => _shareApp(context),
                   ),
                   DrawerItem(
                     icon: Icons.star_rounded,
                     label: 'تقييم',
                     onTap: () => _openScreen(context, AppRoutes.rate),
                   ),
-                  DrawerItem(
-                    icon: isLoggedIn
-                        ? Icons.logout_rounded
-                        : Icons.login_rounded,
-                    label: isLoggedIn ? 'تسجيل خروج' : 'تسجيل دخول',
-                    onTap: () => _openScreen(context, AppRoutes.login),
-                  ),
                   const DrawerFooter(),
                 ],
               ),
             ),
-          ],
+            ],
+          ),
         ),
       ),
     );

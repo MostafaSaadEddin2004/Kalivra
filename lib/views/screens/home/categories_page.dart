@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/data/categories_data.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/category/category_tab_bar.dart';
@@ -115,7 +117,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     final product = _filteredProducts[index];
                     return ProductCard(
                       product: product,
-                      onTap: () {},
+                      onTap: () => context.push(AppRoutes.productDetails, extra: product),
                       onAddToCart: () {
                         context.read<CartCubit>().addItem(product);
                         ScaffoldMessenger.of(context).showSnackBar(

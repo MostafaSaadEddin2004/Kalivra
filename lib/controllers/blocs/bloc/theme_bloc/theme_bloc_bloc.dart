@@ -26,11 +26,18 @@ class ThemeBloc extends Bloc<ThemeBlocEvent, ThemeBlocState> {
       await sp.setString(PrefKeys.themeModeKey, PrefKeys.lightModeKey);
       emit(ThemeFetched(mode: ThemeMode.light));
     });
+
+    on<SetSystemMode>((_, emit) async {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString(PrefKeys.themeModeKey, PrefKeys.systemModeKey);
+      emit(ThemeFetched(mode: ThemeMode.system));
+    });
   }
   ThemeMode _getThemeModeFromString(String? themeString) =>
       switch (themeString) {
         PrefKeys.darkModeKey => ThemeMode.dark,
         PrefKeys.lightModeKey => ThemeMode.light,
+        PrefKeys.systemModeKey => ThemeMode.system,
         _ => ThemeMode.system,
       };
 }

@@ -10,12 +10,15 @@ class ProductModel {
     this.unit = 'قطعة',
     this.salePrice,
     this.quantity = 10,
+    this.brandId,
   });
 
   final String id;
   final String name;
   final String categoryId;
   final double price;
+  /// Optional brand id; used to show products on brand details screen.
+  final String? brandId;
   final String? imagePath;
   final String unit;
   final double? salePrice;

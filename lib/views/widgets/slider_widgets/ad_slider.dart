@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/data/ads_data.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 import 'package:kalivra/views/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/views/widgets/slider_widgets/custom_slider_indicator.dart';
 
 class AdSlider extends StatefulWidget {
-  const AdSlider({super.key});
+  const AdSlider({super.key, this.onAdTap});
+
+  final void Function(AdvertisementModel ad)? onAdTap;
 
   @override
   State<AdSlider> createState() => AdSliderState();
@@ -17,29 +20,6 @@ class AdSliderState extends State<AdSlider> {
   late final PageController _pageController;
   Timer? _timer;
   int _currentPage = 0;
-
-  static List<AdvertisementModel> _buildSlides(ColorScheme colorScheme) {
-    return [
-      AdvertisementModel(
-        title: 'عروض الدهانات',
-        subtitle: 'خصم حتى 20% على تشكيلة الدهانات',
-        gradientStart: colorScheme.primary,
-        gradientEnd: colorScheme.primary.withValues(alpha: 0.8),
-      ),
-      AdvertisementModel(
-        title: 'مواد البناء',
-        subtitle: 'أسعار منافسة على السيراميك والحديد',
-        gradientStart: colorScheme.secondary.withValues(alpha: 0.8),
-        gradientEnd: colorScheme.secondary,
-      ),
-      AdvertisementModel(
-        title: 'توصيل سريع',
-        subtitle: 'توصيل لجميع المناطق',
-        gradientStart: colorScheme.primary,
-        gradientEnd: colorScheme.surfaceContainerHighest,
-      ),
-    ];
-  }
 
   @override
   void initState() {
@@ -70,7 +50,7 @@ class AdSliderState extends State<AdSlider> {
 
   @override
   Widget build(BuildContext context) {
-    final slides = _buildSlides(Theme.of(context).colorScheme);
+    final slides = AdsData.getAds(Theme.of(context).colorScheme);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -84,7 +64,12 @@ class AdSliderState extends State<AdSlider> {
               final slide = slides[index];
               return Padding(
                 padding: EdgeInsets.symmetric(horizontal: 6.w),
-                child: AdCard(slide: slide),
+                child: AdCard(
+                  slide: slide,
+                  onTap: widget.onAdTap != null
+                      ? () => widget.onAdTap!(slide)
+                      : null,
+                ),
               );
             },
           ),

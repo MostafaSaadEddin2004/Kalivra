@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
 import 'package:kalivra/models/nav_item_model.dart';
 import 'package:kalivra/views/screens/home/cart_page.dart';
@@ -34,10 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => CartCubit(),
-      child: BlocProvider(
-        create: (_) => NavCubit(),
-        child: Directionality(
+      create: (_) => NavCubit(),
+      child: Directionality(
           textDirection: TextDirection.rtl,
           child: BlocBuilder<NavCubit, int>(
           builder: (context, index) {
@@ -69,7 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           },
-        ),
         ),
       ),
     );

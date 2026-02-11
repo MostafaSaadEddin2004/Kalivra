@@ -9,10 +9,14 @@ class ProductsSection extends StatelessWidget {
     super.key,
     required List<ProductModel> filteredProducts,
     this.onAddToCart,
+    this.onProductTap,
+    this.onShowAllTap,
   }) : _filteredProducts = filteredProducts;
 
   final List<ProductModel> _filteredProducts;
   final void Function(ProductModel product)? onAddToCart;
+  final void Function(ProductModel product)? onProductTap;
+  final VoidCallback? onShowAllTap;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +32,7 @@ class ProductsSection extends StatelessWidget {
             children: [
               Text('المنتجات', style: textTheme.titleMedium),
               InkWell(
-                onTap: () {},
+                onTap: onShowAllTap,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
@@ -63,7 +67,7 @@ class ProductsSection extends StatelessWidget {
                   height: 220.h,
                   child: ProductCard(
                     product: product,
-                    onTap: () {},
+                    onTap: onProductTap != null ? () => onProductTap!(product) : null,
                     onAddToCart: onAddToCart != null
                         ? () => onAddToCart!(product)
                         : null,

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/data/brands_data.dart';
 import 'package:kalivra/data/categories_data.dart';
+import 'package:kalivra/models/brand_model.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/sections/brands_section.dart';
 import 'package:kalivra/views/widgets/sections/products_section.dart';
@@ -13,16 +17,7 @@ import 'package:kalivra/views/widgets/slider_widgets/ad_slider.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  static const List<String> _brandNames = [
-    'براند 1',
-    'براند ٢',
-    'براند ٣',
-    'براند ٤',
-    'براند ٥',
-    'براند ٦',
-    'براند ٧',
-    'براند ٨',
-  ];
+  static List<BrandModel> get _brands => BrandsData.brands;
 
   static List<ProductModel> get _filteredProducts => CategoriesData.products;
 
@@ -44,11 +39,19 @@ class HomePage extends StatelessWidget {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(child: SizedBox(height: 8.h)),
-        const SliverToBoxAdapter(child: AdSlider()),
+        SliverToBoxAdapter(
+          child: AdSlider(
+            onAdTap: (ad) =>
+                context.push(AppRoutes.adDetails, extra: ad),
+          ),
+        ),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(
           child: BrandsSection(
-            brandNames: _brandNames,
+            brands: _brands,
+            onBrandTap: (brand) =>
+                context.push(AppRoutes.brandDetails, extra: brand),
+            onShowAllTap: () => context.push(AppRoutes.allBrands),
           ),
         ),
 
@@ -57,15 +60,24 @@ class HomePage extends StatelessWidget {
           child: ProductsSection(
             filteredProducts: _filteredProducts,
             onAddToCart: (p) => _addToCart(context, p),
+            onProductTap: (p) => context.push(AppRoutes.productDetails, extra: p),
+            onShowAllTap: () => context.push(AppRoutes.allProducts),
           ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-        const SliverToBoxAdapter(child: AdSlider()),
+        SliverToBoxAdapter(
+          child: AdSlider(
+            onAdTap: (ad) =>
+                context.push(AppRoutes.adDetails, extra: ad),
+          ),
+        ),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(
           child: SalesSection(
             saleProducts: _saleProducts,
             onAddToCart: (p) => _addToCart(context, p),
+            onProductTap: (p) => context.push(AppRoutes.productDetails, extra: p),
+            onShowAllTap: () => context.push(AppRoutes.allSaleProducts),
           ),
         ),
         SliverToBoxAdapter(child: SizedBox(height: 16.h)),

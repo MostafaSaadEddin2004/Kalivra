@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
@@ -50,7 +52,7 @@ class AccountScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 FilledButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.push(AppRoutes.editProfile),
                   icon: Icon(Icons.edit_rounded, size: 18.r),
                   label: const Text('تعديل الملف الشخصي'),
                   style: FilledButton.styleFrom(

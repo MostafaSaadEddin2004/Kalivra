@@ -1,16 +1,57 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/models/order_model.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
 /// My Orders: list of orders with status, date, and total.
 class OrdersScreen extends StatelessWidget {
   const OrdersScreen({super.key});
 
-  static const List<_OrderItem> _orders = [
-    _OrderItem(id: 'ORD-2024-001', date: '15 يناير 2024', total: 1250.0, status: 'مكتمل'),
-    _OrderItem(id: 'ORD-2024-002', date: '10 يناير 2024', total: 890.0, status: 'قيد التوصيل'),
-    _OrderItem(id: 'ORD-2024-003', date: '5 يناير 2024', total: 456.0, status: 'قيد المعالجة'),
+  static const List<OrderModel> _orders = [
+    OrderModel(
+      id: 'ORD-2024-001',
+      date: '15 يناير 2024',
+      status: 'مكتمل',
+      subtotal: 1180,
+      deliveryCost: 70,
+      total: 1250,
+      shippingAddress: 'الرياض، حي النخيل، شارع الملك فهد، مبنى ٤',
+      paymentMethod: 'الدفع عند الاستلام',
+      items:  [
+        OrderLineItem(productName: 'منتج فاخر أ', quantity: 2, unitPrice: 350),
+        OrderLineItem(productName: 'منتج ب', quantity: 1, unitPrice: 480),
+      ],
+    ),
+    OrderModel(
+      id: 'ORD-2024-002',
+      date: '10 يناير 2024',
+      status: 'قيد التوصيل',
+      subtotal: 840,
+      deliveryCost: 50,
+      total: 890,
+      shippingAddress: 'جدة، حي الروضة، شارع التحلية',
+      paymentMethod: 'بطاقة ائتمان',
+      items:  [
+        OrderLineItem(productName: 'منتج ج', quantity: 3, unitPrice: 280),
+      ],
+    ),
+    OrderModel(
+      id: 'ORD-2024-003',
+      date: '5 يناير 2024',
+      status: 'قيد المعالجة',
+      subtotal: 406,
+      deliveryCost: 50,
+      total: 456,
+      shippingAddress: 'الرياض، حي العليا',
+      paymentMethod: 'الدفع عند الاستلام',
+      items:  [
+        OrderLineItem(productName: 'منتج د', quantity: 1, unitPrice: 256),
+        OrderLineItem(productName: 'منتج هـ', quantity: 1, unitPrice: 150),
+      ],
+    ),
   ];
 
   @override
@@ -35,23 +76,10 @@ class OrdersScreen extends StatelessWidget {
   }
 }
 
-class _OrderItem {
-  const _OrderItem({
-    required this.id,
-    required this.date,
-    required this.total,
-    required this.status,
-  });
-  final String id;
-  final String date;
-  final double total;
-  final String status;
-}
-
 class _OrderCard extends StatelessWidget {
   const _OrderCard({required this.order});
 
-  final _OrderItem order;
+  final OrderModel order;
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +90,8 @@ class _OrderCard extends StatelessWidget {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-      child: InkWell(
-        onTap: () {},
+        child: InkWell(
+        onTap: () => context.push(AppRoutes.orderDetails, extra: order),
         borderRadius: BorderRadius.circular(14.r),
         child: Padding(
           padding: EdgeInsets.all(16.w),
@@ -126,7 +154,7 @@ class _OrderCard extends StatelessWidget {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.push(AppRoutes.orderDetails, extra: order),
                   icon: Icon(Icons.visibility_rounded, size: 18.r),
                   label: const Text('عرض التفاصيل'),
                 ),

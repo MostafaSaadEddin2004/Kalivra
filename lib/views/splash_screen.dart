@@ -16,12 +16,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Timer(const Duration(milliseconds: 2500), _goToHome);
+    Timer(const Duration(milliseconds: 2500), _goToNext);
   }
 
-  void _goToHome() {
+  void _goToNext() {
     if (!mounted) return;
-    context.go(AppRoutes.home);
+    context.go(AppRoutes.intro);
   }
 
   @override

@@ -3,15 +3,16 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 
 class AdCard extends StatelessWidget {
-  const AdCard({super.key, required this.slide});
+  const AdCard({super.key, required this.slide, this.onTap});
 
   final AdvertisementModel slide;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         decoration: BoxDecoration(

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/models/brand_model.dart';
 import 'package:kalivra/views/widgets/cards/brand_card.dart';
 
 class BrandsSection extends StatelessWidget {
-  const BrandsSection({super.key, required List<String> brandNames})
-    : _brandNames = brandNames;
+  const BrandsSection({
+    super.key,
+    required List<BrandModel> brands,
+    this.onBrandTap,
+    this.onShowAllTap,
+  }) : _brands = brands;
 
-  final List<String> _brandNames;
+  final List<BrandModel> _brands;
+  final void Function(BrandModel brand)? onBrandTap;
+  final VoidCallback? onShowAllTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +29,7 @@ class BrandsSection extends StatelessWidget {
             children: [
               Text('العلامات التجارية', style: textTheme.titleMedium),
               InkWell(
-                onTap: () {},
+                onTap: onShowAllTap,
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
@@ -48,9 +55,13 @@ class BrandsSection extends StatelessWidget {
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.symmetric(horizontal: 16.w),
             clipBehavior: Clip.none,
-            itemCount: _brandNames.length,
+            itemCount: _brands.length,
             itemBuilder: (context, index) {
-              return BrandCard(label: _brandNames[index]);
+              final brand = _brands[index];
+              return BrandCard(
+                brand: brand,
+                onTap: onBrandTap != null ? () => onBrandTap!(brand) : null,
+              );
             },
           ),
         ),

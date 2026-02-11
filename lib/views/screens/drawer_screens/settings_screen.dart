@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/controllers/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
+import 'package:kalivra/controllers/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
+import 'package:kalivra/controllers/prefs/pref_keys.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Settings: theme, language, notifications, etc.
+/// Settings: theme, language, notifications, account & security.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Scaffold(
       appBar: const DrawerScreenAppBar(title: 'الإعدادات'),
       body: ListView(
@@ -20,16 +24,36 @@ class SettingsScreen extends StatelessWidget {
           _SettingsSection(
             title: 'المظهر',
             children: [
-              _SettingsTile(
-                icon: Icons.dark_mode_rounded,
-                label: 'الوضع الليلي',
-                trailing: Switch(value: isDark, onChanged: (_) {}),
+              BlocBuilder<ThemeBloc, ThemeBlocState>(
+                buildWhen: (prev, curr) => prev != curr,
+                builder: (context, state) {
+                  final modeLabel = state is ThemeFetched
+                      ? (state.mode == ThemeMode.dark
+                          ? 'الوضع الليلي'
+                          : state.mode == ThemeMode.light
+                              ? 'الوضع النهاري'
+                              : 'نظام الجهاز')
+                      : 'نظام الجهاز';
+                  return _SettingsTile(
+                    icon: Icons.dark_mode_rounded,
+                    label: 'المظهر',
+                    subtitle: modeLabel,
+                    onTap: () => context.push(AppRoutes.themeMode),
+                  );
+                },
               ),
-              _SettingsTile(
-                icon: Icons.language_rounded,
-                label: 'اللغة',
-                subtitle: 'العربية',
-                onTap: () {},
+              BlocBuilder<LocaleBloc, LocaleBlocState>(
+                builder: (context, state) {
+                  final localeLabel = state is LocaleFetched
+                      ? (state.locale.languageCode == PrefKeys.arLocaleKey ? 'العربية' : 'English')
+                      : 'العربية';
+                  return _SettingsTile(
+                    icon: Icons.language_rounded,
+                    label: 'اللغة',
+                    subtitle: localeLabel,
+                    onTap: () => context.push(AppRoutes.language),
+                  );
+                },
               ),
             ],
           ),
@@ -56,12 +80,15 @@ class SettingsScreen extends StatelessWidget {
               _SettingsTile(
                 icon: Icons.lock_outline_rounded,
                 label: 'تغيير كلمة المرور',
-                onTap: () {},
+                onTap: () => context.push(AppRoutes.changePassword),
               ),
               _SettingsTile(
                 icon: Icons.phone_android_rounded,
-                label: 'ربط جهاز',
-                onTap: () {},
+                label: 'تغيير رقم الجوال',
+                onTap: () => context.push(
+                  AppRoutes.otp,
+                  extra: OtpScreenMode.changePhone,
+                ),
               ),
             ],
           ),

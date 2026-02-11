@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controllers/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/controllers/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
@@ -17,6 +18,7 @@ void main() async {
       providers: [
         BlocProvider(create: (context) => ThemeBloc()..add(GetThemeMode())),
         BlocProvider(create: (context) => LocaleBloc()..add(GetLocale())),
+        BlocProvider(create: (_) => CartCubit()),
       ],
       child: const Main(),
     ),
