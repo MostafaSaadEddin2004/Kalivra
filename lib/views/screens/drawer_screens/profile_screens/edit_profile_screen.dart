@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
 /// Edit profile form: name, email, phone, address. Matches account screen data.
@@ -34,13 +35,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _save() {
     if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('تم حفظ التعديلات'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
+      CustomSnackBar.show(context, 'تم حفظ التعديلات');
       context.pop();
     }
   }

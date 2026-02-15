@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 
 class CustomDrawerHeader extends StatelessWidget {
   const CustomDrawerHeader({super.key, required this.onClose});
@@ -40,12 +41,10 @@ class CustomDrawerHeader extends StatelessWidget {
               style: theme.textTheme.headlineLarge,
             ),
             const Spacer(),
-            IconButton(
-              icon: Icon(
-                Icons.close_rounded,
-                color: AppColors.offWhite,
-                size: 26.r,
-              ),
+            CustomIconButton(
+              icon: Icons.close_rounded,
+              color: AppColors.offWhite,
+              iconSize: 26.r,
               onPressed: onClose,
               tooltip: 'إغلاق',
             ),

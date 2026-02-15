@@ -62,7 +62,7 @@ class Main extends StatelessWidget {
             locale: locale is LocaleFetched
                 ? locale.locale
                 : Locale(PrefKeys.arLocaleKey),
-            routerConfig: AppRouter.appRouter(),
+            routerConfig: AppRouter.router,
           );
         },
       ),

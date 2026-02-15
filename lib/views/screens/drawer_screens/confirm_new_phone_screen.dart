@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
@@ -11,13 +12,7 @@ class ConfirmNewPhoneScreen extends StatelessWidget {
   final String phone;
 
   void _confirm(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('تم تغيير رقم الجوال بنجاح'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    CustomSnackBar.show(context, 'تم تغيير رقم الجوال بنجاح');
     context.pop();
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/models/cart_item_model.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/widgets/cart/quantity_counter.dart';
 
 class CartItemCard extends StatelessWidget {
@@ -17,84 +18,101 @@ class CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      child: Padding(
-        padding: EdgeInsets.all(12.w),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 72.w,
-              height: 72.w,
-              decoration: BoxDecoration(
-                color: colorScheme.surfaceContainerHighest.withValues(
-                  alpha: 0.5,
-                ),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: colorScheme.surface.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: colorScheme.primary.withValues(alpha: 0.2),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.06),
+            blurRadius: 8.r,
+            offset: Offset(0, 2.h),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            spacing: 8.h,
+            children: [
+              ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
+                child: Container(
+                  width: 88.w,
+                  height: 88.w,
+                  color: colorScheme.tertiaryFixed,
+                  child: item.product.imagePath != null
+                      ? Image.asset(
+                          item.product.imagePath!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => Icon(
+                            Icons.inventory_2_outlined,
+                            size: 36.r,
+                            color: colorScheme.primary.withValues(alpha: 0.6),
+                          ),
+                        )
+                      : Icon(
+                          Icons.inventory_2_outlined,
+                          size: 36.r,
+                          color: colorScheme.primary.withValues(alpha: 0.6),
+                        ),
+                ),
               ),
-              child: Icon(
-                Icons.inventory_2_outlined,
-                size: 32.r,
-                color: colorScheme.primary.withValues(alpha: 0.6),
+              QuantityCounter(
+                value: item.quantity,
+                maxQuantity: item.product.quantity,
+                onChanged: onQuantityChanged,
               ),
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                spacing: 4.h,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        item.product.name,
-                        style: textTheme.bodyLarge,
-                        maxLines: 2,
+            ],
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.product.name.toUpperCase(),
+                        style: textTheme.titleMedium,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const Spacer(),
-                      IconButton(
-                        onPressed: onRemove,
-                        icon: Icon(Icons.delete_outline_rounded, size: 22.r),
-                        color: colorScheme.onError,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        style: IconButton.styleFrom(
-                          minimumSize: Size(36.r, 36.r),
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    'متوفر: ${item.product.quantity}',
-                    style: textTheme.bodySmall,
-                  ),
-                  SizedBox(height: 6.h),
-                  Row(
-                    children: [
-                      QuantityCounter(
-                        value: item.quantity,
-                        maxQuantity: item.product.quantity,
-                        onChanged: onQuantityChanged,
-                      ),
-                      const Spacer(),
-                      Text(
-                        '${item.unitPrice.toStringAsFixed(0)} ل.س',
-                        style: textTheme.labelMedium,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                    CustomIconButton(
+                      icon: Icons.delete_outline_rounded,
+                      iconSize: 22.r,
+                      color: colorScheme.onError,
+                      onPressed: onRemove,
+                      tooltip: 'حذف',
+                    ),
+                  ],
+                ),
+
+                Text('الحجم - -', style: textTheme.bodySmall),
+                SizedBox(height: 4.h),
+                Text('اللون - -', style: textTheme.bodySmall),
+                SizedBox(height: 8.h),
+                Text(
+                  '${item.unitPrice.toStringAsFixed(0)} ل.س',
+                  style: textTheme.bodyLarge,
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

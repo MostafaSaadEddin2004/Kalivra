@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/models/advertisement_model.dart';
 
-class CustomSliderIndicator extends StatelessWidget {
-  const CustomSliderIndicator({
+class CustomIndicator extends StatelessWidget {
+  const CustomIndicator({
     super.key,
-    required List<AdvertisementModel> slides,
-    required int currentPage,
-  }) : _slides = slides, _currentPage = currentPage;
+    required this.itemCount,
+    required this.currentPage,
+  });
 
-  final List<AdvertisementModel> _slides;
-  final int _currentPage;
+  final int itemCount;
+  final int currentPage;
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
-        _slides.length,
+        itemCount,
         (index) => AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           margin: EdgeInsets.symmetric(horizontal: 3.w),
-          width: _currentPage == index ? 20.w : 8.w,
+          width: currentPage == index ? 20.w : 8.h,
           height: 8.h,
           decoration: BoxDecoration(
-            color: _currentPage == index
-                ? colorScheme.onTertiaryFixed
+            color: currentPage == index
+                ? theme.colorScheme.onTertiaryFixed
                 : AppColors.lightGray,
             borderRadius: BorderRadius.circular(4.r),
           ),
@@ -36,4 +36,3 @@ class CustomSliderIndicator extends StatelessWidget {
     );
   }
 }
-

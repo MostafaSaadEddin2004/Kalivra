@@ -184,7 +184,7 @@ class _SettingsTile extends StatelessWidget {
               ],
             ),
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
           if (trailing == null && onTap != null)
             Icon(
               Icons.chevron_left_rounded,

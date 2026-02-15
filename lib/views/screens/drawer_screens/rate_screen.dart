@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
 /// Rate the app: stars and feedback.
@@ -39,18 +41,14 @@ class RateScreen extends StatelessWidget {
               children: List.generate(5, (i) {
                 return Padding(
                   padding: EdgeInsets.symmetric(horizontal: 4.w),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.star_rounded,
-                      size: 40.r,
-                      color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                    ),
+                  child: CustomIconButton(
+                    icon: Icons.star_rounded,
+                    iconSize: 40.r,
+                    color: isDark ? AppColors.goldLight : AppColors.burgundy,
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('شكراً لتقييمك! (${i + 1} نجوم)'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
+                      CustomSnackBar.show(
+                        context,
+                        'شكراً لتقييمك! (${i + 1} نجوم)',
                       );
                     },
                   ),
@@ -60,12 +58,7 @@ class RateScreen extends StatelessWidget {
             SizedBox(height: 32.h),
             FilledButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('شكراً لتقييمك'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                CustomSnackBar.show(context, 'شكراً لتقييمك');
               },
               style: FilledButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),

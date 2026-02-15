@@ -108,8 +108,6 @@ class _ModeRadioTile extends StatelessWidget {
             children: [
               Radio<String>(
                 value: value,
-                groupValue: groupValue,
-                onChanged: (_) => onChanged(),
                 activeColor: accentColor,
                 fillColor: WidgetStateProperty.resolveWith((states) {
                   if (states.contains(WidgetState.selected)) return accentColor;

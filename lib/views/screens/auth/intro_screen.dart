@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/models/intro_page_model.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/views/widgets/slider_widgets/custom_indicator.dart';
 
 /// Onboarding: 3-page PageView with indicator. What is app, what we offer, join us.
 class IntroScreen extends StatefulWidget {
@@ -16,20 +18,20 @@ class _IntroScreenState extends State<IntroScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  static const List<_IntroPage> _pages = [
-    _IntroPage(
+  static const List<IntroPage> _pages = [
+    IntroPage(
       title: 'ما هو كليفرا؟',
       description:
           'تطبيق كليفرا منصتك الموحدة لشراء مواد البناء والديكور. تصفح العلامات التجارية والمنتجات والعروض، واطلب ما تحتاجه بسهولة.',
       icon: Icons.storefront_rounded,
     ),
-    _IntroPage(
+    IntroPage(
       title: 'ماذا نقدم؟',
       description:
           'تشكيلة واسعة من الدهانات والسيراميك والحديد والأدوات الصحية والكهربائيات. عروض دورية، توصيل سريع، وخدمة عملاء على مدار الساعة.',
       icon: Icons.construction_rounded,
     ),
-    _IntroPage(
+    IntroPage(
       title: 'انضم إلينا',
       description:
           'سجّل الآن واحصل على تجربة تسوق مريحة. تتبع طلباتك، احفظ المفضلة، وادفع بكل أمان. نرحب بك في عائلة كليفرا.',
@@ -43,12 +45,15 @@ class _IntroScreenState extends State<IntroScreen> {
     super.dispose();
   }
 
-  void _onNextOrGetStarted() {
+  void _onNext() {
     if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
       );
+      setState(() {
+        _currentPage++;
+      });
     } else {
       context.go(AppRoutes.login);
     }
@@ -57,12 +62,6 @@ class _IntroScreenState extends State<IntroScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primary = theme.colorScheme.primary;
-    final surfaceColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.2)
-        : AppColors.burgundy.withValues(alpha: 0.08);
-
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -70,7 +69,7 @@ class _IntroScreenState extends State<IntroScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
-                onPageChanged: (index) => setState(() => _currentPage = index),
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
                   final page = _pages[index];
@@ -83,11 +82,13 @@ class _IntroScreenState extends State<IntroScreen> {
                           width: 140.w,
                           height: 140.w,
                           decoration: BoxDecoration(
-                            color: surfaceColor,
+                            color: theme.colorScheme.onSecondaryFixed,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: primary.withValues(alpha: 0.2),
+                                color: theme.colorScheme.secondary.withValues(
+                                  alpha: 0.2,
+                                ),
                                 blurRadius: 24.r,
                                 offset: Offset(0, 8.h),
                               ),
@@ -96,25 +97,19 @@ class _IntroScreenState extends State<IntroScreen> {
                           child: Icon(
                             page.icon,
                             size: 64.r,
-                            color: primary,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                         SizedBox(height: 40.h),
                         Text(
                           page.title,
-                          style: theme.textTheme.headlineMedium?.copyWith(
-                            color: isDark ? AppColors.offWhite : AppColors.burgundy,
-                            fontWeight: FontWeight.w800,
-                          ),
+                          style: theme.textTheme.headlineMedium,
                           textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 16.h),
                         Text(
                           page.description,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: isDark ? AppColors.taupe : AppColors.black,
-                            height: 1.5,
-                          ),
+                          style: theme.textTheme.bodyLarge,
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -124,64 +119,27 @@ class _IntroScreenState extends State<IntroScreen> {
               ),
             ),
             SizedBox(height: 24.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                _pages.length,
-                (index) => AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: EdgeInsets.symmetric(horizontal: 4.w),
-                  width: _currentPage == index ? 24.w : 8.w,
-                  height: 8.h,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? primary
-                        : (isDark ? AppColors.taupe : AppColors.lightGray)
-                            .withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(4.r),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 32.h),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _onNextOrGetStarted,
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    elevation: 0,
+              padding: EdgeInsets.symmetric(horizontal: 40.w,vertical: 16.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomIndicator(
+                    itemCount: _pages.length,
+                    currentPage: _currentPage,
                   ),
-                  child: Text(
-                    _currentPage < _pages.length - 1 ? 'التالي' : 'ابدأ',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: AppColors.offWhite,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  CustomIconButton(
+                    onPressed: _onNext,
+                    icon: Icons.arrow_forward_rounded,
+                    backgroundColor: theme.colorScheme.onTertiaryFixed,
+                    color: theme.colorScheme.secondaryFixed,
                   ),
-                ),
+                ],
               ),
             ),
-            SizedBox(height: 20.h),
           ],
         ),
       ),
     );
   }
-}
-
-class _IntroPage {
-  const _IntroPage({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-  final String title;
-  final String description;
-  final IconData icon;
 }

@@ -3,11 +3,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
-import '../../widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/services/referral_repository.dart';
+import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/views/widgets/profile/referral_qr_card.dart';
 
-/// My Account: profile info, contact details, address, and actions.
-class AccountScreen extends StatelessWidget {
-  const AccountScreen({super.key});
+class Profile extends StatefulWidget {
+  const Profile({super.key});
+
+  @override
+  State<Profile> createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  late final Future<String> _referralCodeFuture;
+  bool _referralCardExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _referralCodeFuture = ReferralRepository().getMyReferralCode();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +78,58 @@ class AccountScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 28.h),
+          FutureBuilder<String>(
+            future: _referralCodeFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14.r),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(24.w),
+                    child: Center(
+                      child: SizedBox(
+                        width: 32.w,
+                        height: 32.h,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              final code = snapshot.data ?? '';
+              if (code.isEmpty) return const SizedBox.shrink();
+              final primary = theme.colorScheme.primary;
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () => setState(() => _referralCardExpanded = !_referralCardExpanded),
+                  borderRadius: BorderRadius.circular(20.r),
+                  child: AnimatedCrossFade(
+                    firstChild: _ReferralCardCollapsed(
+                      primary: primary,
+                      isDark: isDark,
+                      theme: theme,
+                    ),
+                    secondChild: ReferralQrCard(referralCode: code),
+                    crossFadeState: _referralCardExpanded
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 280),
+                    firstCurve: Curves.decelerate,
+                    secondCurve: Curves.easeInOut,
+                    sizeCurve: Curves.easeInOut,
+                  ),
+                ),
+              );
+            },
+          ),
+          SizedBox(height: 16.h),
           _SectionCard(
             title: 'معلومات الحساب',
             children: [
@@ -94,6 +161,76 @@ class AccountScreen extends StatelessWidget {
           ),
           SizedBox(height: 24.h),
         ],
+      ),
+    );
+  }
+}
+
+/// Collapsed state: QR icon, title, and description (tap to expand).
+class _ReferralCardCollapsed extends StatelessWidget {
+  const _ReferralCardCollapsed({
+    required this.primary,
+    required this.isDark,
+    required this.theme,
+  });
+
+  final Color primary;
+  final bool isDark;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20.r),
+        side: BorderSide(
+          color: primary.withValues(alpha: 0.25),
+          width: 1.5,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(24.w),
+        child: Row(
+          children: [
+            Icon(
+              Icons.qr_code_2_rounded,
+              size: 40.r,
+              color: primary,
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'كود الدعوة',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: isDark ? AppColors.offWhite : AppColors.black,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    'شارك هذا الكود أو المسح مع الأصدقاء ليحصلوا على خصم عند التسجيل، وتستفيد أنت أيضاً',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      height: 1.35,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.expand_more_rounded,
+              size: 28.r,
+              color: primary,
+            ),
+          ],
+        ),
       ),
     );
   }

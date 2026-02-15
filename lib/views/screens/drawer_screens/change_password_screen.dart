@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
 /// Change password: current, new, confirm. Update button + Forgot password → OTP.
@@ -32,13 +34,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   void _update() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('تم تحديث كلمة المرور'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    CustomSnackBar.show(context, 'تم تحديث كلمة المرور');
     context.pop();
   }
 
@@ -81,19 +77,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       hint: '••••••••',
                       icon: Icons.lock_outline_rounded,
                       obscureText: _obscureCurrent,
-                      suffix: IconButton(
-                        icon: Icon(
-                          _obscureCurrent ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
+                      suffix: CustomIconButton(
+                        icon: _obscureCurrent
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        iconSize: 22.r,
+                        color: labelColor,
+                        onPressed: () =>
+                            setState(() => _obscureCurrent = !_obscureCurrent),
                       ),
                       borderColor: borderColor,
                       fillColor: fillColor,
                       labelColor: labelColor,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'أدخل كلمة المرور الحالية' : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'أدخل كلمة المرور الحالية'
+                          : null,
                     ),
                     SizedBox(height: 20.h),
                     _buildField(
@@ -102,19 +100,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       hint: '••••••••',
                       icon: Icons.lock_rounded,
                       obscureText: _obscureNew,
-                      suffix: IconButton(
-                        icon: Icon(
-                          _obscureNew ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        onPressed: () => setState(() => _obscureNew = !_obscureNew),
+                      suffix: CustomIconButton(
+                        icon: _obscureNew
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        iconSize: 22.r,
+                        color: labelColor,
+                        onPressed: () =>
+                            setState(() => _obscureNew = !_obscureNew),
                       ),
                       borderColor: borderColor,
                       fillColor: fillColor,
                       labelColor: labelColor,
                       validator: (v) {
-                        if (v == null || v.length < 6) return 'كلمة المرور 6 أحرف على الأقل';
+                        if (v == null || v.length < 6) {
+                          return 'كلمة المرور 6 أحرف على الأقل';
+                        }
                         return null;
                       },
                     ),
@@ -125,19 +126,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       hint: '••••••••',
                       icon: Icons.lock_rounded,
                       obscureText: _obscureConfirm,
-                      suffix: IconButton(
-                        icon: Icon(
-                          _obscureConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                      suffix: CustomIconButton(
+                        icon: _obscureConfirm
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        iconSize: 22.r,
+                        color: labelColor,
+                        onPressed: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
                       ),
                       borderColor: borderColor,
                       fillColor: fillColor,
                       labelColor: labelColor,
                       validator: (v) {
-                        if (v != _newController.text) return 'غير متطابقة مع كلمة المرور الجديدة';
+                        if (v != _newController.text) {
+                          return 'غير متطابقة مع كلمة المرور الجديدة';
+                        }
                         return null;
                       },
                     ),
@@ -168,7 +172,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             Center(
               child: TextButton.icon(
                 onPressed: _forgotPassword,
-                icon: Icon(Icons.help_outline_rounded, size: 20.r, color: isDark ? AppColors.goldLight : AppColors.burgundy),
+                icon: Icon(
+                  Icons.help_outline_rounded,
+                  size: 20.r,
+                  color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                ),
                 label: Text(
                   'نسيت كلمة المرور؟',
                   style: theme.textTheme.titleMedium?.copyWith(
@@ -246,9 +254,12 @@ class OtpOnboardingArgs {
     required this.phone,
     this.name,
     this.password,
+    this.referralCode,
   });
   final OtpScreenMode mode;
   final String phone;
   final String? name;
   final String? password;
+  /// Code of the person who referred this user (for referrer discount).
+  final String? referralCode;
 }

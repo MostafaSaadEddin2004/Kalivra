@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
 /// Onboarding step 1: Enter phone number → send code via WhatsApp → next.
@@ -55,12 +56,9 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
     Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تم إرسال رمز التحقق إلى ${_phoneController.text} عبر واتساب'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
+      CustomSnackBar.show(
+        context,
+        'تم إرسال رمز التحقق إلى ${_phoneController.text} عبر واتساب',
       );
       context.push(
         AppRoutes.otpVerify,

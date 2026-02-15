@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
 /// Set new password after OTP verification (forgot password flow).
@@ -28,13 +30,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('تم تحديث كلمة المرور بنجاح'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
-    );
+    CustomSnackBar.show(context, 'تم تحديث كلمة المرور بنجاح');
     context.pop();
   }
 
@@ -77,46 +73,52 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    _buildField(
+                    CustomTextField(
                       controller: _newController,
                       label: 'كلمة المرور الجديدة',
                       hint: '••••••••',
                       obscureText: _obscureNew,
-                      suffix: IconButton(
-                        icon: Icon(
-                          _obscureNew ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        onPressed: () => setState(() => _obscureNew = !_obscureNew),
+                      suffix: CustomIconButton(
+                        icon: _obscureNew
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        iconSize: 22.r,
+                        color: labelColor,
+                        onPressed: () =>
+                            setState(() => _obscureNew = !_obscureNew),
                       ),
                       borderColor: borderColor,
                       fillColor: fillColor,
                       labelColor: labelColor,
                       validator: (v) {
-                        if (v == null || v.length < 6) return 'كلمة المرور 6 أحرف على الأقل';
+                        if (v == null || v.length < 6) {
+                          return 'كلمة المرور 6 أحرف على الأقل';
+                        }
                         return null;
                       },
                     ),
                     SizedBox(height: 20.h),
-                    _buildField(
+                    CustomTextField(
                       controller: _confirmController,
                       label: 'تأكيد كلمة المرور',
                       hint: '••••••••',
                       obscureText: _obscureConfirm,
-                      suffix: IconButton(
-                        icon: Icon(
-                          _obscureConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                      suffix: CustomIconButton(
+                        icon: _obscureConfirm
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        iconSize: 22.r,
+                        color: labelColor,
+                        onPressed: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
                       ),
                       borderColor: borderColor,
                       fillColor: fillColor,
                       labelColor: labelColor,
                       validator: (v) {
-                        if (v != _newController.text) return 'غير متطابقة مع كلمة المرور الجديدة';
+                        if (v != _newController.text) {
+                          return 'غير متطابقة مع كلمة المرور الجديدة';
+                        }
                         return null;
                       },
                     ),
@@ -148,18 +150,33 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
       ),
     );
   }
+}
 
-  Widget _buildField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required bool obscureText,
-    required Widget? suffix,
-    required Color borderColor,
-    required Color fillColor,
-    required Color labelColor,
-    String? Function(String?)? validator,
-  }) {
+class CustomTextField extends StatelessWidget {
+  const CustomTextField({
+    super.key,
+    required this.controller,
+    required this.label,
+    required this.hint,
+    required this.obscureText,
+    required this.suffix,
+    required this.borderColor,
+    required this.fillColor,
+    required this.labelColor,
+    required this.validator,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final String hint;
+  final bool obscureText;
+  final Widget? suffix;
+  final Color borderColor;
+  final Color fillColor;
+  final Color labelColor;
+  final String? Function(String?)? validator;
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -219,7 +236,9 @@ class _StepIndicator extends StatelessWidget {
             child: Container(
               height: 2,
               margin: EdgeInsets.symmetric(horizontal: 4.w),
-              color: i ~/ 2 < step ? activeColor : activeColor.withValues(alpha: 0.3),
+              color: i ~/ 2 < step
+                  ? activeColor
+                  : activeColor.withValues(alpha: 0.3),
             ),
           );
         }
@@ -234,7 +253,11 @@ class _StepIndicator extends StatelessWidget {
           ),
           child: Center(
             child: isActive
-                ? Icon(Icons.check_rounded, size: 16.r, color: AppColors.offWhite)
+                ? Icon(
+                    Icons.check_rounded,
+                    size: 16.r,
+                    color: AppColors.offWhite,
+                  )
                 : Text(
                     '$s',
                     style: theme.textTheme.labelMedium?.copyWith(

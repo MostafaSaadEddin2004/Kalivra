@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
 
 class EmptyCartView extends StatelessWidget {
   const EmptyCartView({super.key});
@@ -39,8 +37,7 @@ class EmptyCartView extends StatelessWidget {
               ),
               SizedBox(height: 32.h),
               FilledButton.icon(
-                onPressed: () =>
-                    context.read<NavCubit>().goTo(NavCubit.categories),
+                onPressed: () => Navigator.of(context).pop(),
                 icon: Icon(Icons.storefront_rounded, size: 22.r),
                 label: const Text('تسوق الآن'),
                 style: FilledButton.styleFrom(

@@ -4,16 +4,28 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/product_model.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/views/widgets/product/product_gallery_card.dart';
+import 'package:kalivra/views/widgets/product/product_options_cards.dart';
 
 /// Full product details with add to cart.
-class ProductDetailsScreen extends StatelessWidget {
+class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
 
   final ProductModel product;
 
   @override
+  State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
+}
+
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  int _selectedColorIndex = 0;
+  int _selectedSizeIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primary = theme.colorScheme.primary;
@@ -25,6 +37,10 @@ class ProductDetailsScreen extends StatelessWidget {
     final salePercent = hasSale
         ? ((product.price - product.salePrice!) / product.price * 100).round()
         : 0;
+    final imageUrls = product.effectiveImageUrls;
+    final hasGallery = imageUrls.isNotEmpty;
+    final hasColors = product.colors != null && product.colors!.isNotEmpty;
+    final hasSizes = product.sizes != null && product.sizes!.isNotEmpty;
 
     return Scaffold(
       appBar: const DrawerScreenAppBar(title: 'تفاصيل المنتج'),
@@ -32,22 +48,26 @@ class ProductDetailsScreen extends StatelessWidget {
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
         children: [
           Stack(
+            clipBehavior: Clip.none,
             children: [
-              Container(
-                width: double.infinity,
-                height: 220.h,
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.inventory_2_outlined,
-                    size: 80.r,
-                    color: primary.withValues(alpha: 0.7),
+              if (hasGallery)
+                ProductGalleryCard(imageUrls: imageUrls)
+              else
+                Container(
+                  width: double.infinity,
+                  height: 220.h,
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.inventory_2_outlined,
+                      size: 80.r,
+                      color: primary.withValues(alpha: 0.7),
+                    ),
                   ),
                 ),
-              ),
               if (hasSale)
                 Positioned(
                   top: 12.h,
@@ -100,7 +120,22 @@ class ProductDetailsScreen extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20.h),
+          if (hasColors) ...[
+            ProductColorSelectorCard(
+              colors: product.colors!,
+              selectedIndex: _selectedColorIndex,
+              onSelected: (index) => setState(() => _selectedColorIndex = index),
+            ),
+            SizedBox(height: 16.h),
+          ],
+          if (hasSizes) ...[
+            ProductSizeSelectorCard(
+              sizes: product.sizes!,
+              selectedIndex: _selectedSizeIndex,
+              onSelected: (index) => setState(() => _selectedSizeIndex = index),
+            ),
+            SizedBox(height: 16.h),
+          ],
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -132,12 +167,9 @@ class ProductDetailsScreen extends StatelessWidget {
           FilledButton.icon(
             onPressed: () {
               context.read<CartCubit>().addItem(product);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('تمت إضافة "${product.name}" إلى السلة'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                ),
+              CustomSnackBar.show(
+                context,
+                'تمت إضافة "${product.name}" إلى السلة',
               );
             },
             icon: Icon(Icons.add_shopping_cart_rounded, size: 24.r),

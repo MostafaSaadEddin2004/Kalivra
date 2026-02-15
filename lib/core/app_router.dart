@@ -3,13 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/views/splash_screen.dart';
 import 'package:kalivra/views/screens/home/home_screen.dart';
 import 'package:kalivra/views/screens/drawer_screens/about_screen.dart';
-import 'package:kalivra/views/screens/drawer_screens/account_screen.dart';
+import 'package:kalivra/views/screens/drawer_screens/profile_screens/profile_screen.dart';
 import 'package:kalivra/views/screens/drawer_screens/contact_screen.dart';
-import 'package:kalivra/views/screens/drawer_screens/edit_profile_screen.dart';
+import 'package:kalivra/views/screens/drawer_screens/profile_screens/edit_profile_screen.dart';
 import 'package:kalivra/views/screens/drawer_screens/favorites_screen.dart';
 import 'package:kalivra/models/order_model.dart';
-import 'package:kalivra/views/screens/drawer_screens/order_details_screen.dart';
-import 'package:kalivra/views/screens/drawer_screens/orders_screen.dart';
+import 'package:kalivra/views/screens/drawer_screens/orders_screens/order_details_screen.dart';
+import 'package:kalivra/views/screens/drawer_screens/orders_screens/orders_screen.dart';
 import 'package:kalivra/views/screens/drawer_screens/privacy_screen.dart';
 import 'package:kalivra/views/screens/drawer_screens/rate_screen.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
@@ -27,6 +27,7 @@ import 'package:kalivra/views/screens/home/all_products_screen.dart';
 import 'package:kalivra/views/screens/home/all_sale_products_screen.dart';
 import 'package:kalivra/views/screens/home/all_ads_screen.dart';
 import 'package:kalivra/views/screens/home/ad_details_screen.dart';
+import 'package:kalivra/views/screens/home/cart_screen.dart';
 import 'package:kalivra/views/screens/auth/intro_screen.dart';
 import 'package:kalivra/views/screens/auth/login_screen.dart';
 import 'package:kalivra/views/screens/auth/sign_up_screen.dart';
@@ -67,12 +68,13 @@ abstract class AppRoutes {
   static const String login = '/login';
   static const String signUp = '/sign-up';
   static const String completeProfile = '/complete-profile';
+  static const String cart = '/cart';
 }
 
 abstract class AppRouter {
-  static GoRouter appRouter() {
-    return GoRouter(
-      routes: <RouteBase>[
+  static final GoRouter router = GoRouter(
+    initialLocation: AppRoutes.splash,
+    routes: <RouteBase>[
         GoRoute(
           path: AppRoutes.splash,
           name: 'splash',
@@ -109,7 +111,7 @@ abstract class AppRouter {
             GoRoute(
               path: AppRoutes.account,
               name: 'account',
-              builder: (_, _) => const AccountScreen(),
+              builder: (_, _) => const Profile(),
             ),
             GoRoute(
               path: AppRoutes.editProfile,
@@ -275,9 +277,13 @@ abstract class AppRouter {
                 return AdDetailsScreen(ad: ad);
               },
             ),
+            GoRoute(
+              path: AppRoutes.cart,
+              name: 'cart',
+              builder: (_, _) => const CartScreen(),
+            ),
           ],
         ),
       ],
-    );
-  }
+  );
 }

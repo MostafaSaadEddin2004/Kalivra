@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/data/categories_data.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -22,12 +23,9 @@ class AllSaleProductsScreen extends StatelessWidget {
 
     void addToCart(ProductModel product) {
       context.read<CartCubit>().addItem(product);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تمت إضافة "${product.name}" إلى السلة'),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      CustomSnackBar.show(
+        context,
+        'تمت إضافة "${product.name}" إلى السلة',
       );
     }
 

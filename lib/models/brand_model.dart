@@ -13,9 +13,7 @@ class BrandModel {
 
   final String id;
   final String name;
-  /// Number of shops/stores for this brand.
   final int shopCount;
-  /// List of location names (cities, addresses, or branch names).
   final List<String> locations;
   final String? description;
   final String? imagePath;

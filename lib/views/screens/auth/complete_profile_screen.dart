@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/services/referral_repository.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
@@ -43,8 +44,13 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     super.dispose();
   }
 
-  void _save() {
+  void _save() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final referralCode = widget.args?.referralCode;
+    if (referralCode != null && referralCode.isNotEmpty) {
+      await ReferralRepository().submitReferralCode(referralCode);
+    }
+    if (!mounted) return;
     context.go(AppRoutes.home);
   }
 

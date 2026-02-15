@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/counter_button.dart';
 
 class QuantityCounter extends StatelessWidget {
   const QuantityCounter({
@@ -46,58 +47,39 @@ class QuantityCounter extends StatelessWidget {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final atMax = value >= maxQuantity;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.primary,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            onPressed: value <= 1 ? null : () => onChanged(value - 1),
-            icon: Icon(Icons.remove, size: 18.r),
-            color: AppColors.offWhite,
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            style: IconButton.styleFrom(
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
+    return Row(
+      spacing: 4.w,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CounterButton(
+          icon: Icons.remove_rounded,
+          onTap: () {
+            if (value > 1) onChanged(value - 1);
+          },
+        ),
+        SizedBox(
+          width: 18.w,
+          child: Text(
+            '$value',
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall,
           ),
-          SizedBox(
-            width: 28.w,
-            child: Text(
-              '$value',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.labelSmall?.copyWith(color: AppColors.offWhite),
-            ),
-          ),
-          IconButton(
-            onPressed: () {
-              if (atMax) {
-                _showQuantityLimitDialog(context);
-              } else {
-                onChanged(value + 1);
-              }
-            },
-            icon: Icon(Icons.add, size: 18.r),
-            color: AppColors.offWhite,
-            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            style: IconButton.styleFrom(
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ),
-          ),
-        ],
-      ),
+        ),
+        CounterButton(
+          icon: Icons.add_rounded,
+          onTap: () {
+            if (atMax) {
+              _showQuantityLimitDialog(context);
+            } else {
+              onChanged(value + 1);
+            }
+          },
+        ),
+      ],
     );
   }
 }

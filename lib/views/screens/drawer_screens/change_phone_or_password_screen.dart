@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
 enum ChangePhoneOrPasswordMode { phone, password }
@@ -14,10 +16,12 @@ class ChangePhoneOrPasswordScreen extends StatefulWidget {
   final ChangePhoneOrPasswordMode mode;
 
   @override
-  State<ChangePhoneOrPasswordScreen> createState() => _ChangePhoneOrPasswordScreenState();
+  State<ChangePhoneOrPasswordScreen> createState() =>
+      _ChangePhoneOrPasswordScreenState();
 }
 
-class _ChangePhoneOrPasswordScreenState extends State<ChangePhoneOrPasswordScreen> {
+class _ChangePhoneOrPasswordScreenState
+    extends State<ChangePhoneOrPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -39,16 +43,11 @@ class _ChangePhoneOrPasswordScreenState extends State<ChangePhoneOrPasswordScree
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          widget.mode == ChangePhoneOrPasswordMode.phone
-              ? 'تم إرسال رمز التحقق إلى ${_phoneController.text}'
-              : 'تم تحديث كلمة المرور',
-        ),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-      ),
+    CustomSnackBar.show(
+      context,
+      widget.mode == ChangePhoneOrPasswordMode.phone
+          ? 'تم إرسال رمز التحقق إلى ${_phoneController.text}'
+          : 'تم تحديث كلمة المرور',
     );
     context.pop();
   }
@@ -125,16 +124,18 @@ class _ChangePhoneOrPasswordScreenState extends State<ChangePhoneOrPasswordScree
                         fillColor: fillColor,
                         labelColor: labelColor,
                         obscureText: _obscureNew,
-                        suffix: IconButton(
-                          icon: Icon(
-                            _obscureNew ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                            size: 22.r,
-                            color: labelColor,
-                          ),
-                          onPressed: () => setState(() => _obscureNew = !_obscureNew),
+                        suffix: CustomIconButton(
+                          icon: _obscureNew
+                              ? Icons.visibility_off_rounded
+                              : Icons.visibility_rounded,
+                          iconSize: 22.r,
+                          color: labelColor,
+                          onPressed: () =>
+                              setState(() => _obscureNew = !_obscureNew),
                         ),
                         validator: (v) {
-                          if (v == null || v.length < 6) return 'كلمة المرور 6 أحرف على الأقل';
+                          if (v == null || v.length < 6)
+                            {return 'كلمة المرور 6 أحرف على الأقل';}
                           return null;
                         },
                       ),
@@ -149,16 +150,19 @@ class _ChangePhoneOrPasswordScreenState extends State<ChangePhoneOrPasswordScree
                         fillColor: fillColor,
                         labelColor: labelColor,
                         obscureText: _obscureConfirm,
-                        suffix: IconButton(
-                          icon: Icon(
-                            _obscureConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                            size: 22.r,
-                            color: labelColor,
+                        suffix: CustomIconButton(
+                          icon: _obscureConfirm
+                              ? Icons.visibility_off_rounded
+                              : Icons.visibility_rounded,
+                          iconSize: 22.r,
+                          color: labelColor,
+                          onPressed: () => setState(
+                            () => _obscureConfirm = !_obscureConfirm,
                           ),
-                          onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                         ),
                         validator: (v) {
-                          if (v != _newPasswordController.text) return 'غير متطابقة مع كلمة المرور الجديدة';
+                          if (v != _newPasswordController.text)
+                            {return 'غير متطابقة مع كلمة المرور الجديدة';}
                           return null;
                         },
                       ),

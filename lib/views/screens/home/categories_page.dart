@@ -8,6 +8,7 @@ import 'package:kalivra/data/categories_data.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/category/category_tab_bar.dart';
 import 'package:kalivra/views/widgets/cards/product_card.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 
 class CategoriesPage extends StatefulWidget {
   const CategoriesPage({super.key});
@@ -120,12 +121,9 @@ class _CategoriesPageState extends State<CategoriesPage> {
                       onTap: () => context.push(AppRoutes.productDetails, extra: product),
                       onAddToCart: () {
                         context.read<CartCubit>().addItem(product);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('تمت إضافة "${product.name}" إلى السلة'),
-                            behavior: SnackBarBehavior.floating,
-                            duration: const Duration(seconds: 2),
-                          ),
+                        CustomSnackBar.show(
+                          context,
+                          'تمت إضافة "${product.name}" إلى السلة',
                         );
                       },
                     );

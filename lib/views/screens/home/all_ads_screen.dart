@@ -29,7 +29,7 @@ class AllAdsScreen extends StatelessWidget {
           : ListView.separated(
               padding: EdgeInsets.fromLTRB(16.w, 20.h, 16.w, 24.h),
               itemCount: ads.length,
-              separatorBuilder: (_, __) => SizedBox(height: 16.h),
+              separatorBuilder: (_, _) => SizedBox(height: 16.h),
               itemBuilder: (context, index) {
                 final ad = ads[index];
                 return _AdDetailCard(ad: ad);

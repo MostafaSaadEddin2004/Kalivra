@@ -1,11 +1,10 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/data/ads_data.dart';
 import 'package:kalivra/models/advertisement_model.dart';
 import 'package:kalivra/views/widgets/slider_widgets/ad_card.dart';
-import 'package:kalivra/views/widgets/slider_widgets/custom_slider_indicator.dart';
+import 'package:kalivra/views/widgets/slider_widgets/custom_indicator.dart';
 
 class AdSlider extends StatefulWidget {
   const AdSlider({super.key, this.onAdTap});
@@ -75,7 +74,10 @@ class AdSliderState extends State<AdSlider> {
           ),
         ),
         SizedBox(height: 12.h),
-        CustomSliderIndicator(slides: slides, currentPage: _currentPage),
+        CustomIndicator(
+          itemCount: slides.length,
+          currentPage: _currentPage,
+        ),
       ],
     );
   }

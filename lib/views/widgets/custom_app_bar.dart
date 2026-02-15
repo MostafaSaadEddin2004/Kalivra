@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({
-    super.key,
-    required this.title,
-    required this.onMenuTap,
-  });
+  const CustomAppBar({super.key, required this.onMenuTap, this.onCartTap});
 
-  final String title;
   final VoidCallback onMenuTap;
+  final VoidCallback? onCartTap;
 
   @override
   Size get preferredSize => Size.fromHeight(56.h);
@@ -18,22 +15,32 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // App bar uses theme appBarTheme (burgundy/black bg); foreground = offWhite
     final iconColor = theme.appBarTheme.foregroundColor ?? AppColors.offWhite;
     return AppBar(
       elevation: 0,
       centerTitle: true,
-      leading: IconButton(
-        icon: Icon(Icons.menu_rounded, color: iconColor, size: 28.r),
-        onPressed: onMenuTap,
-        tooltip: 'القائمة',
-      ),
-      title: Text(
-        title,
-        style: theme.textTheme.headlineLarge?.copyWith(
-          color: iconColor,
-          fontWeight: FontWeight.w600,
-        ),
+      leadingWidth: onCartTap != null ? 120.w : null,
+      leading: Row(
+        spacing: 4.w,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CustomIconButton(
+            icon: Icons.menu_rounded,
+            color: iconColor,
+            iconSize: 28.r,
+            onPressed: onMenuTap,
+            tooltip: 'القائمة',
+          ),
+          if (onCartTap != null) ...[
+            CustomIconButton(
+              icon: Icons.shopping_cart_rounded,
+              color: iconColor,
+              iconSize: 26.r,
+              onPressed: onCartTap,
+              tooltip: 'السلة',
+            ),
+          ],
+        ],
       ),
       actions: [
         Padding(
@@ -42,11 +49,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             'assets/images/logo_splash.png',
             height: 28.h,
             fit: BoxFit.contain,
-            errorBuilder: (context, error, stackTrace) => Icon(
-              Icons.store_rounded,
-              size: 28.r,
-              color: iconColor,
-            ),
+            errorBuilder: (context, error, stackTrace) =>
+                Icon(Icons.store_rounded, size: 28.r, color: iconColor),
           ),
         ),
       ],

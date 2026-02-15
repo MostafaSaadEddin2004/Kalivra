@@ -3,7 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/services/referral_repository.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/views/widgets/referral/referral_code_field.dart';
 
 /// Login: phone number + password. Links to sign up.
 class LoginScreen extends StatefulWidget {
@@ -17,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _referralCodeController = TextEditingController();
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -24,17 +28,22 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _phoneController.dispose();
     _passwordController.dispose();
+    _referralCodeController.dispose();
     super.dispose();
   }
 
-  void _login() {
+  void _login() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      context.go(AppRoutes.home);
-    });
+    final referralCode = _referralCodeController.text.trim();
+    await Future.delayed(const Duration(milliseconds: 800));
+    if (!mounted) return;
+    if (referralCode.isNotEmpty) {
+      await ReferralRepository().submitReferralCode(referralCode);
+    }
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+    context.go(AppRoutes.home);
   }
 
   @override
@@ -84,15 +93,38 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'رقم الجوال',
                     hintText: '+963 9XX XXX XXX',
-                    prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
+                    prefixIcon: Icon(
+                      Icons.phone_android_rounded,
+                      size: 22.r,
+                      color: labelColor,
+                    ),
                     filled: true,
                     fillColor: fillColor,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide(color: borderColor)),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide(color: borderColor)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide(color: isDark ? AppColors.goldLight : AppColors.burgundy, width: 1.5)),
-                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: const BorderSide(color: AppColors.red)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(color: borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(color: borderColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.goldLight
+                            : AppColors.burgundy,
+                        width: 1.5,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: const BorderSide(color: AppColors.red),
+                    ),
                     labelStyle: TextStyle(color: labelColor),
-                    hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
+                    hintStyle: TextStyle(
+                      color: labelColor.withValues(alpha: 0.6),
+                    ),
                   ),
                 ),
                 SizedBox(height: 20.h),
@@ -106,30 +138,61 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'كلمة المرور',
                     hintText: '••••••••',
-                    prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                        size: 22.r,
-                        color: labelColor,
-                      ),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    prefixIcon: Icon(
+                      Icons.lock_outline_rounded,
+                      size: 22.r,
+                      color: labelColor,
+                    ),
+                    suffixIcon: CustomIconButton(
+                      icon: _obscurePassword
+                          ? Icons.visibility_off_rounded
+                          : Icons.visibility_rounded,
+                      iconSize: 22.r,
+                      color: labelColor,
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
                     filled: true,
                     fillColor: fillColor,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide(color: borderColor)),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide(color: borderColor)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: BorderSide(color: isDark ? AppColors.goldLight : AppColors.burgundy, width: 1.5)),
-                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14.r), borderSide: const BorderSide(color: AppColors.red)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(color: borderColor),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(color: borderColor),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: BorderSide(
+                        color: isDark
+                            ? AppColors.goldLight
+                            : AppColors.burgundy,
+                        width: 1.5,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                      borderSide: const BorderSide(color: AppColors.red),
+                    ),
                     labelStyle: TextStyle(color: labelColor),
-                    hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
+                    hintStyle: TextStyle(
+                      color: labelColor.withValues(alpha: 0.6),
+                    ),
                   ),
                 ),
                 SizedBox(height: 12.h),
+                ReferralCodeField(
+                  controller: _referralCodeController,
+                  bottomSpacing: 12,
+                ),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () => context.push(AppRoutes.otp, extra: OtpScreenMode.forgotPassword),
+                    onPressed: () => context.push(
+                      AppRoutes.otp,
+                      extra: OtpScreenMode.forgotPassword,
+                    ),
                     child: Text(
                       'نسيت كلمة المرور؟',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -144,11 +207,20 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _isLoading ? null : _login,
                   style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
                     elevation: 0,
                   ),
                   child: _isLoading
-                      ? SizedBox(height: 24.h, width: 24.w, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.offWhite))
+                      ? SizedBox(
+                          height: 24.h,
+                          width: 24.w,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.offWhite,
+                          ),
+                        )
                       : Text(
                           'تسجيل الدخول',
                           style: theme.textTheme.titleMedium?.copyWith(

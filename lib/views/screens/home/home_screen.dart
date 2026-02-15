@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
 import 'package:kalivra/models/nav_item_model.dart';
-import 'package:kalivra/views/screens/home/cart_page.dart';
 import 'package:kalivra/views/screens/home/categories_page.dart';
 import 'package:kalivra/views/screens/home/home_page.dart';
 import 'package:kalivra/views/screens/home/notifications_page.dart';
@@ -23,11 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<NavItemModel> navItems = [
-  NavItemModel(icon: Icons.home_rounded,index: 0,title: 'الرئيسية'),
-  NavItemModel(icon: Icons.category_rounded,index: 1,title: 'التصنيفات'),
-  NavItemModel(icon: Icons.shopping_cart_rounded,index: 2,title: 'السلة'),
-  NavItemModel(icon: Icons.notifications_rounded,index: 3,title: 'الإشعارات'),
-  NavItemModel(icon: Icons.search_rounded,index: 4,title: 'البحث'),
+    NavItemModel(icon: Icons.home_rounded, index: 0, title: 'الرئيسية'),
+    NavItemModel(icon: Icons.category_rounded, index: 1, title: 'التصنيفات'),
+    NavItemModel(
+      icon: Icons.notifications_rounded,
+      index: 2,
+      title: 'الإشعارات',
+    ),
+    NavItemModel(icon: Icons.search_rounded, index: 3, title: 'البحث'),
   ];
 
   @override
@@ -35,29 +39,30 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocProvider(
       create: (_) => NavCubit(),
       child: Directionality(
-          textDirection: TextDirection.rtl,
-          child: BlocBuilder<NavCubit, int>(
+        textDirection: TextDirection.rtl,
+        child: BlocBuilder<NavCubit, int>(
           builder: (context, index) {
             return Scaffold(
               key: _scaffoldKey,
+              extendBody: true,
               appBar: index == NavCubit.search
-                  ? SearchAppBar(
-                      onChanged: (_) {},
-                    )
+                  ? SearchAppBar(onChanged: (_) {})
                   : CustomAppBar(
-                      title: navItems[index].title,
                       onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+                      onCartTap: () => context.pushNamed('cart'),
                     ),
               drawer: const AppDrawer(),
-              body: IndexedStack(
-                index: index,
-                children: const [
-                  HomePage(),
-                  CategoriesPage(),
-                  CartPage(),
-                  NotificationsPage(),
-                  SearchPage(),
-                ],
+              body: Padding(
+                padding: EdgeInsets.only(bottom: 100.h),
+                child: IndexedStack(
+                  index: index,
+                  children: const [
+                    HomePage(),
+                    CategoriesPage(),
+                    NotificationsPage(),
+                    SearchPage(),
+                  ],
+                ),
               ),
               bottomNavigationBar: CustomNavBar(
                 items: navItems,

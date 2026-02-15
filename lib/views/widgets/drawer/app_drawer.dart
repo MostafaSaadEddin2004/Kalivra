@@ -7,7 +7,6 @@ import 'package:kalivra/views/widgets/drawer/drawer_header.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_item.dart';
 import 'package:share_plus/share_plus.dart';
 
-/// Kalivra URL shared when user taps "مشاركة".
 const String kalivraShareUrl = 'https://kalivra.com';
 
 class AppDrawer extends StatelessWidget {

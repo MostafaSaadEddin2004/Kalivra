@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 
 /// OTP screen: enter phone → send code via WhatsApp → enter OTP → verify.
@@ -39,13 +40,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _sendCode() {
     if (_phoneController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('أدخل رقم الجوال'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
+      CustomSnackBar.show(context, 'أدخل رقم الجوال');
       return;
     }
     setState(() {
@@ -59,25 +54,16 @@ class _OtpScreenState extends State<OtpScreen> {
         _isLoading = false;
         _codeSent = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('تم إرسال رمز التحقق إلى ${_phoneController.text} عبر واتساب'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
+      CustomSnackBar.show(
+        context,
+        'تم إرسال رمز التحقق إلى ${_phoneController.text} عبر واتساب',
       );
     });
   }
 
   void _verify() {
     if (_otpController.text.trim().length < 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('أدخل الرمز المكون من 4-6 أرقام'),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-        ),
-      );
+      CustomSnackBar.show(context, 'أدخل الرمز المكون من 4-6 أرقام');
       return;
     }
     setState(() => _isLoading = true);
@@ -88,13 +74,7 @@ class _OtpScreenState extends State<OtpScreen> {
       if (widget.mode == OtpScreenMode.forgotPassword) {
         context.push(AppRoutes.setNewPassword);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('تم تغيير رقم الجوال بنجاح'),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-          ),
-        );
+        CustomSnackBar.show(context, 'تم تغيير رقم الجوال بنجاح');
         context.pop();
       }
     });
