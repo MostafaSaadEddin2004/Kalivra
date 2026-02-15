@@ -28,6 +28,7 @@ import 'package:kalivra/views/screens/home/all_sale_products_screen.dart';
 import 'package:kalivra/views/screens/home/all_ads_screen.dart';
 import 'package:kalivra/views/screens/home/ad_details_screen.dart';
 import 'package:kalivra/views/screens/home/cart_screen.dart';
+import 'package:kalivra/views/screens/checkout/checkout_screen.dart';
 import 'package:kalivra/views/screens/auth/intro_screen.dart';
 import 'package:kalivra/views/screens/auth/login_screen.dart';
 import 'package:kalivra/views/screens/auth/sign_up_screen.dart';
@@ -69,6 +70,7 @@ abstract class AppRoutes {
   static const String signUp = '/sign-up';
   static const String completeProfile = '/complete-profile';
   static const String cart = '/cart';
+  static const String checkout = '/checkout';
 }
 
 abstract class AppRouter {
@@ -281,6 +283,11 @@ abstract class AppRouter {
               path: AppRoutes.cart,
               name: 'cart',
               builder: (_, _) => const CartScreen(),
+            ),
+            GoRoute(
+              path: AppRoutes.checkout,
+              name: 'checkout',
+              builder: (_, _) => const CheckoutScreen(),
             ),
           ],
         ),

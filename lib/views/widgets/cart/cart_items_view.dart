@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/cart_item_model.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/views/widgets/cart/cart_item_card.dart';
 
 class CartItemsView extends StatelessWidget {
@@ -82,7 +83,10 @@ class CartItemsView extends StatelessWidget {
             ],
           ),
         ),
-        CartBottomBar(amount: total, onProceed: () {}),
+        CartBottomBar(
+          amount: total,
+          onProceed: () => context.push(AppRoutes.checkout),
+        ),
       ],
     );
   }
