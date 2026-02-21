@@ -57,15 +57,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsLanguage => 'اللغة';
 
   @override
-  String get settingsNotifications => 'الإشعارات';
-
-  @override
-  String get settingsOrderNotifications => 'إشعارات الطلبات';
-
-  @override
-  String get settingsOffersAndAds => 'العروض والإعلانات';
-
-  @override
   String get settingsAccountSecurity => 'الحساب والأمان';
 
   @override

@@ -11,7 +11,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Settings: theme, language, notifications, account & security.
+/// Settings: theme, language, account & security.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -60,22 +60,6 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () => context.push(AppRoutes.language),
                   );
                 },
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          _SettingsSection(
-            title: l10n.settingsNotifications,
-            children: [
-              _SettingsTile(
-                icon: Icons.notifications_outlined,
-                label: l10n.settingsOrderNotifications,
-                trailing: Switch(value: true, onChanged: (_) {}),
-              ),
-              _SettingsTile(
-                icon: Icons.campaign_outlined,
-                label: l10n.settingsOffersAndAds,
-                trailing: Switch(value: false, onChanged: (_) {}),
               ),
             ],
           ),

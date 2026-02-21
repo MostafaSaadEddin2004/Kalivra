@@ -194,24 +194,6 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get settingsLanguage;
 
-  /// No description provided for @settingsNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Notifications'**
-  String get settingsNotifications;
-
-  /// No description provided for @settingsOrderNotifications.
-  ///
-  /// In en, this message translates to:
-  /// **'Order Notifications'**
-  String get settingsOrderNotifications;
-
-  /// No description provided for @settingsOffersAndAds.
-  ///
-  /// In en, this message translates to:
-  /// **'Offers & Ads'**
-  String get settingsOffersAndAds;
-
   /// No description provided for @settingsAccountSecurity.
   ///
   /// In en, this message translates to:

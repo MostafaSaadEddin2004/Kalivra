@@ -57,15 +57,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguage => 'Language';
 
   @override
-  String get settingsNotifications => 'Notifications';
-
-  @override
-  String get settingsOrderNotifications => 'Order Notifications';
-
-  @override
-  String get settingsOffersAndAds => 'Offers & Ads';
-
-  @override
   String get settingsAccountSecurity => 'Account & Security';
 
   @override
