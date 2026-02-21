@@ -31,10 +31,10 @@ class SettingsScreen extends StatelessWidget {
                 builder: (context, state) {
                   final modeLabel = state is ThemeFetched
                       ? (state.mode == ThemeMode.dark
-                          ? l10n.themeDark
-                          : state.mode == ThemeMode.light
-                              ? l10n.themeLight
-                              : l10n.themeSystem)
+                            ? l10n.themeDark
+                            : state.mode == ThemeMode.light
+                            ? l10n.themeLight
+                            : l10n.themeSystem)
                       : l10n.themeSystem;
                   return _SettingsTile(
                     icon: Icons.dark_mode_rounded,
@@ -48,10 +48,10 @@ class SettingsScreen extends StatelessWidget {
                 builder: (context, state) {
                   final localeLabel = state is LocaleFetched
                       ? (state.useSystemLocale
-                          ? l10n.languageFollowSystem
-                          : (state.locale.languageCode == PrefKeys.arLocaleKey
-                              ? l10n.languageArabic
-                              : l10n.languageEnglish))
+                            ? l10n.languageFollowSystem
+                            : (state.locale.languageCode == PrefKeys.arLocaleKey
+                                  ? l10n.languageArabic
+                                  : l10n.languageEnglish))
                       : l10n.languageFollowSystem;
                   return _SettingsTile(
                     icon: Icons.language_rounded,
@@ -115,7 +115,9 @@ class _SettingsSection extends StatelessWidget {
         ),
         Card(
           elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14.r),
+          ),
           child: Column(children: children),
         ),
       ],
@@ -128,14 +130,12 @@ class _SettingsTile extends StatelessWidget {
     required this.icon,
     required this.label,
     this.subtitle,
-    this.trailing,
     this.onTap,
   });
 
   final IconData icon;
   final String label;
   final String? subtitle;
-  final Widget? trailing;
   final VoidCallback? onTap;
 
   @override
@@ -174,10 +174,9 @@ class _SettingsTile extends StatelessWidget {
               ],
             ),
           ),
-          ?trailing,
-          if (trailing == null && onTap != null)
+          if (onTap != null)
             Icon(
-              Icons.chevron_left_rounded,
+              Icons.chevron_right_rounded,
               size: 24.r,
               color: isDark ? AppColors.taupe : AppColors.burgundy,
             ),
@@ -185,7 +184,7 @@ class _SettingsTile extends StatelessWidget {
       ),
     );
 
-    if (onTap != null && trailing == null) {
+    if (onTap != null) {
       return InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(14.r),

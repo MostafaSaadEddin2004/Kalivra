@@ -26,7 +26,7 @@ class DrawerScreenAppBar extends StatelessWidget implements PreferredSizeWidget 
       elevation: 0,
       centerTitle: true,
       leading: CustomIconButton(
-        icon: Icons.keyboard_arrow_right_rounded,
+        icon: Icons.arrow_back_rounded,
         color: fgColor,
         iconSize: 20.r,
         onPressed: () => context.pop(),
