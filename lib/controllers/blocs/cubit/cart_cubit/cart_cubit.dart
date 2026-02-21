@@ -36,7 +36,7 @@ class CartCubit extends Cubit<CartState> {
     emit(state.copyWith(
       items: list,
       loginRequiredForAdd: false,
-      addSuccessMessage: 'تمت إضافة "${product.name}" إلى السلة',
+      addSuccessProductName: product.name,
     ));
   }
 
@@ -65,8 +65,12 @@ class CartCubit extends Cubit<CartState> {
 
   void clearLoginRequired() => emit(state.copyWith(loginRequiredForAdd: false));
 
-  void clearAddSuccessMessage() =>
-      emit(CartState(items: state.items, loginRequiredForAdd: state.loginRequiredForAdd));
+  void clearAddSuccessMessage() => emit(CartState(
+        items: state.items,
+        loginRequiredForAdd: state.loginRequiredForAdd,
+        addSuccessMessage: null,
+        addSuccessProductName: null,
+      ));
 
   double get subtotal =>
       state.items.fold(0.0, (sum, e) => sum + e.lineTotal);

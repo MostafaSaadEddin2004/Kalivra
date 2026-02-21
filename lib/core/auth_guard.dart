@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 /// Middleware helpers: require login for cart, notifications, etc.
 /// Browsing (products, categories, brands, search) is allowed without login.
@@ -20,8 +21,8 @@ class AuthGuard {
   static bool requireLoginForCart(BuildContext context) {
     if (isLoggedIn(context)) return true;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('يجب تسجيل الدخول لإضافة المنتجات إلى السلة'),
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.loginRequiredForCart),
         behavior: SnackBarBehavior.floating,
       ),
     );

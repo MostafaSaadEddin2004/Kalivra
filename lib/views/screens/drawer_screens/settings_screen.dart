@@ -7,6 +7,7 @@ import 'package:kalivra/controllers/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controllers/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
@@ -16,27 +17,28 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'الإعدادات'),
+      appBar: DrawerScreenAppBar(title: l10n.settingsTitle),
       body: ListView(
         padding: EdgeInsets.all(20.w),
         children: [
           _SettingsSection(
-            title: 'المظهر',
+            title: l10n.settingsAppearance,
             children: [
               BlocBuilder<ThemeBloc, ThemeBlocState>(
                 buildWhen: (prev, curr) => prev != curr,
                 builder: (context, state) {
                   final modeLabel = state is ThemeFetched
                       ? (state.mode == ThemeMode.dark
-                          ? 'الوضع الليلي'
+                          ? l10n.themeDark
                           : state.mode == ThemeMode.light
-                              ? 'الوضع النهاري'
-                              : 'نظام الجهاز')
-                      : 'نظام الجهاز';
+                              ? l10n.themeLight
+                              : l10n.themeSystem)
+                      : l10n.themeSystem;
                   return _SettingsTile(
                     icon: Icons.dark_mode_rounded,
-                    label: 'المظهر',
+                    label: l10n.settingsAppearance,
                     subtitle: modeLabel,
                     onTap: () => context.push(AppRoutes.themeMode),
                   );
@@ -45,11 +47,15 @@ class SettingsScreen extends StatelessWidget {
               BlocBuilder<LocaleBloc, LocaleBlocState>(
                 builder: (context, state) {
                   final localeLabel = state is LocaleFetched
-                      ? (state.locale.languageCode == PrefKeys.arLocaleKey ? 'العربية' : 'English')
-                      : 'العربية';
+                      ? (state.useSystemLocale
+                          ? l10n.languageFollowSystem
+                          : (state.locale.languageCode == PrefKeys.arLocaleKey
+                              ? l10n.languageArabic
+                              : l10n.languageEnglish))
+                      : l10n.languageFollowSystem;
                   return _SettingsTile(
                     icon: Icons.language_rounded,
-                    label: 'اللغة',
+                    label: l10n.settingsLanguage,
                     subtitle: localeLabel,
                     onTap: () => context.push(AppRoutes.language),
                   );
@@ -59,32 +65,32 @@ class SettingsScreen extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           _SettingsSection(
-            title: 'الإشعارات',
+            title: l10n.settingsNotifications,
             children: [
               _SettingsTile(
                 icon: Icons.notifications_outlined,
-                label: 'إشعارات الطلبات',
+                label: l10n.settingsOrderNotifications,
                 trailing: Switch(value: true, onChanged: (_) {}),
               ),
               _SettingsTile(
                 icon: Icons.campaign_outlined,
-                label: 'العروض والإعلانات',
+                label: l10n.settingsOffersAndAds,
                 trailing: Switch(value: false, onChanged: (_) {}),
               ),
             ],
           ),
           SizedBox(height: 16.h),
           _SettingsSection(
-            title: 'الحساب والأمان',
+            title: l10n.settingsAccountSecurity,
             children: [
               _SettingsTile(
                 icon: Icons.lock_outline_rounded,
-                label: 'تغيير كلمة المرور',
+                label: l10n.settingsChangePassword,
                 onTap: () => context.push(AppRoutes.changePassword),
               ),
               _SettingsTile(
                 icon: Icons.phone_android_rounded,
-                label: 'تغيير رقم الجوال',
+                label: l10n.settingsChangePhone,
                 onTap: () => context.push(
                   AppRoutes.otp,
                   extra: OtpScreenMode.changePhone,

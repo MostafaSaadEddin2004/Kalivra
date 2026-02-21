@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +14,13 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/screen_util_config.dart';
 import 'l10n/app_localizations.dart';
+
+Locale _localeFromSystem(ui.Locale systemLocale) {
+  if (systemLocale.languageCode == PrefKeys.arLocaleKey) {
+    return const Locale(PrefKeys.arLocaleKey);
+  }
+  return const Locale(PrefKeys.enLocaleKey);
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,22 +66,22 @@ class Main extends StatelessWidget {
       child: BlocListener<CartCubit, CartState>(
         listenWhen: (prev, curr) =>
             (curr.loginRequiredForAdd && !prev.loginRequiredForAdd) ||
-            (curr.addSuccessMessage != null && curr.addSuccessMessage != prev.addSuccessMessage),
+            (curr.addSuccessProductName != null && curr.addSuccessProductName != prev.addSuccessProductName),
         listener: (context, state) {
           if (state.loginRequiredForAdd) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('يجب تسجيل الدخول لإضافة المنتجات إلى السلة'),
+              SnackBar(
+                content: Text(AppLocalizations.of(context)!.loginRequiredForCart),
                 behavior: SnackBarBehavior.floating,
               ),
             );
             AppRouter.router.push(AppRoutes.login);
             context.read<CartCubit>().clearLoginRequired();
           }
-          if (state.addSuccessMessage != null) {
+          if (state.addSuccessProductName != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.addSuccessMessage!),
+                content: Text(AppLocalizations.of(context)!.addToCartSuccess(state.addSuccessProductName!)),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -100,7 +109,7 @@ class Main extends StatelessWidget {
             ],
             locale: locale is LocaleFetched
                 ? locale.locale
-                : Locale(PrefKeys.arLocaleKey),
+                : _localeFromSystem(ui.PlatformDispatcher.instance.locale),
             routerConfig: AppRouter.router,
             );
           },

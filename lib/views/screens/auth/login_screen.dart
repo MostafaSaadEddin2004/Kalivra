@@ -6,6 +6,7 @@ import 'package:kalivra/controllers/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/services/referral_repository.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
@@ -65,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ApiErrorHandler.showSnackBar(
             context,
             state.error!,
-            fallbackMessage: 'فشل تسجيل الدخول',
+            fallbackMessage: AppLocalizations.of(context)!.loginFailed,
           );
         }
         if (state.token != null && state.token!.isNotEmpty) {
@@ -84,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'تسجيل الدخول',
+                  AppLocalizations.of(context)!.loginTitle,
                   style: theme.textTheme.headlineMedium?.copyWith(
                     color: isDark ? AppColors.offWhite : AppColors.burgundy,
                     fontWeight: FontWeight.w800,
@@ -92,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'أدخل رقم الجوال وكلمة المرور للدخول إلى حسابك',
+                  AppLocalizations.of(context)!.loginHint,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: isDark ? AppColors.taupe : AppColors.burgundy,
                   ),
@@ -102,12 +103,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return 'أدخل رقم الجوال';
-                    if (v.trim().length < 8) return 'رقم غير صالح';
+                    if (v == null || v.trim().isEmpty) return AppLocalizations.of(context)!.enterPhone;
+                    if (v.trim().length < 8) return AppLocalizations.of(context)!.invalidPhoneShort;
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: 'رقم الجوال',
+                    labelText: AppLocalizations.of(context)!.phoneLabel,
                     hintText: '+963 9XX XXX XXX',
                     prefixIcon: Icon(
                       Icons.phone_android_rounded,
@@ -148,11 +149,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _passwordController,
                   obscureText: _obscurePassword,
                   validator: (v) {
-                    if (v == null || v.isEmpty) return 'أدخل كلمة المرور';
+                    if (v == null || v.isEmpty) return AppLocalizations.of(context)!.enterPassword;
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: 'كلمة المرور',
+                    labelText: AppLocalizations.of(context)!.passwordLabel,
                     hintText: '••••••••',
                     prefixIcon: Icon(
                       Icons.lock_outline_rounded,
@@ -210,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       extra: OtpScreenMode.forgotPassword,
                     ),
                     child: Text(
-                      'نسيت كلمة المرور؟',
+                      AppLocalizations.of(context)!.forgotPassword,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: AppColors.burgundy,
                         fontWeight: FontWeight.w600,
@@ -238,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         )
                       : Text(
-                          'تسجيل الدخول',
+                          AppLocalizations.of(context)!.login,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: AppColors.offWhite,
                             fontWeight: FontWeight.w700,
@@ -250,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'ليس لديك حساب؟ ',
+                      AppLocalizations.of(context)!.noAccount,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),
@@ -258,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextButton(
                       onPressed: () => context.go(AppRoutes.signUp),
                       child: Text(
-                        'سجّل الآن',
+                        AppLocalizations.of(context)!.registerNow,
                         style: theme.textTheme.titleSmall?.copyWith(
                           color: AppColors.burgundy,
                           fontWeight: FontWeight.w700,

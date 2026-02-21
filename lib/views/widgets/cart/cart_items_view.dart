@@ -6,6 +6,7 @@ import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/models/cart_item_model.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/cart/cart_item_card.dart';
 
 class CartItemsView extends StatelessWidget {
@@ -45,7 +46,7 @@ class CartItemsView extends StatelessWidget {
                 child: FilledButton.icon(
                   onPressed: () => context.pop(),
                   icon: Icon(Icons.arrow_forward_rounded, size: 22.r),
-                  label: const Text('متابعة التسوق'),
+                  label: Text(AppLocalizations.of(context)!.continueShopping),
                   style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
@@ -63,7 +64,7 @@ class CartItemsView extends StatelessWidget {
                     if (context.mounted) context.pop();
                   },
                   icon: Icon(Icons.delete_outline_rounded, size: 22.r),
-                  label: const Text('تفريغ السلة'),
+                  label: Text(AppLocalizations.of(context)!.emptyCart),
                   style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 14.h),
                     shape: RoundedRectangleBorder(
@@ -149,7 +150,7 @@ class _PriceDetailsSectionState extends State<_PriceDetailsSection> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('تفاصيل السعر', style: textTheme.titleSmall),
+                Text(AppLocalizations.of(context)!.priceDetails, style: textTheme.titleSmall),
                 Icon(
                   _expanded ? Icons.expand_less : Icons.expand_more,
                   color: colorScheme.onTertiaryFixed,
@@ -165,7 +166,7 @@ class _PriceDetailsSectionState extends State<_PriceDetailsSection> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('تفاصيل السعر', style: textTheme.titleSmall),
+                  Text(AppLocalizations.of(context)!.priceDetails, style: textTheme.titleSmall),
                   Icon(
                     Icons.expand_less,
                     color: colorScheme.onTertiaryFixed,
@@ -174,11 +175,11 @@ class _PriceDetailsSectionState extends State<_PriceDetailsSection> {
                 ],
               ),
               SizedBox(height: 12.h),
-              PriceRow(label: 'المجموع الفرعي', value: widget.subtotal),
+              PriceRow(label: AppLocalizations.of(context)!.subtotal, value: widget.subtotal),
               SizedBox(height: 6.h),
-              PriceRow(label: 'الخصم', value: widget.discount),
+              PriceRow(label: AppLocalizations.of(context)!.discount, value: widget.discount),
               SizedBox(height: 6.h),
-              PriceRow(label: 'الضريبة', value: widget.tax),
+              PriceRow(label: AppLocalizations.of(context)!.tax, value: widget.tax),
               SizedBox(height: 8.h),
               Divider(
                 height: 1.h,
@@ -186,7 +187,7 @@ class _PriceDetailsSectionState extends State<_PriceDetailsSection> {
               ),
               SizedBox(height: 8.h),
               PriceRow(
-                label: 'المجموع الكلي',
+                label: AppLocalizations.of(context)!.total,
                 value: widget.grandTotal,
                 bold: true,
               ),
@@ -268,7 +269,7 @@ class CartBottomBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'المبلغ المستحق',
+                    AppLocalizations.of(context)!.amountDue,
                     style: textTheme.displayLarge?.copyWith(
                       color: AppColors.offWhite,
                     ),
@@ -295,7 +296,7 @@ class CartBottomBar extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'متابعة',
+                  AppLocalizations.of(context)!.proceed,
                   style: textTheme.displayLarge?.copyWith(
                     color: colorScheme.primary,
                   ),

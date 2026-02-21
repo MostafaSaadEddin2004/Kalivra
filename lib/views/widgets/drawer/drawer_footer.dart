@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class DrawerFooter extends StatelessWidget {
   const DrawerFooter({super.key});
@@ -23,7 +24,7 @@ class DrawerFooter extends StatelessWidget {
               color: theme.colorScheme.onSecondaryFixed,
             ),
           ),
-          Text('الإصدار 1.0.0', style: theme.textTheme.bodySmall),
+          Text(AppLocalizations.of(context)!.version, style: theme.textTheme.bodySmall),
         ],
       ),
     );

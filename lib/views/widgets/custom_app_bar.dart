@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -29,7 +30,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: iconColor,
             iconSize: 28.r,
             onPressed: onMenuTap,
-            tooltip: 'القائمة',
+            tooltip: AppLocalizations.of(context)!.menu,
           ),
           if (onCartTap != null) ...[
             CustomIconButton(
@@ -37,7 +38,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               color: iconColor,
               iconSize: 26.r,
               onPressed: onCartTap,
-              tooltip: 'السلة',
+              tooltip: AppLocalizations.of(context)!.cart,
             ),
           ],
         ],

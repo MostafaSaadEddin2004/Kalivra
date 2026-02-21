@@ -7,7 +7,8 @@ abstract class PrefKeys {
   static const String darkModeKey = 'dark';
   static const String lightModeKey = 'light';
   static const String systemModeKey = 'system';
-  static const String  localeKey= 'locale';
-  static const String  arLocaleKey= 'ar';
-  static const String  enLocaleKey= 'en';
+  static const String localeKey = 'locale';
+  static const String arLocaleKey = 'ar';
+  static const String enLocaleKey = 'en';
+  static const String systemLocaleKey = 'system';
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_footer.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_header.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_item.dart';
@@ -52,42 +53,42 @@ class AppDrawer extends StatelessWidget {
                 children: [
                   DrawerItem(
                     icon: Icons.person_outline_rounded,
-                    label: 'حسابي',
+                    label: AppLocalizations.of(context)!.drawerMyAccount,
                     onTap: () => _openScreen(context, AppRoutes.account),
                   ),
                   DrawerItem(
                     icon: Icons.receipt_long_outlined,
-                    label: 'طلباتي',
+                    label: AppLocalizations.of(context)!.drawerMyOrders,
                     onTap: () => _openScreen(context, AppRoutes.orders),
                   ),
                   DrawerItem(
                     icon: Icons.favorite_border_rounded,
-                    label: 'المفضلة',
+                    label: AppLocalizations.of(context)!.drawerFavorites,
                     onTap: () => _openScreen(context, AppRoutes.favorites),
                   ),
                   DrawerItem(
                     icon: Icons.settings_outlined,
-                    label: 'الإعدادات',
+                    label: AppLocalizations.of(context)!.drawerSettings,
                     onTap: () => _openScreen(context, AppRoutes.settings),
                   ),
                   DrawerItem(
                     icon: Icons.phone_outlined,
-                    label: 'تواصل معنا',
+                    label: AppLocalizations.of(context)!.drawerContactUs,
                     onTap: () => _openScreen(context, AppRoutes.contact),
                   ),
                   DrawerItem(
                     icon: Icons.info_outline_rounded,
-                    label: 'حول التطبيق',
+                    label: AppLocalizations.of(context)!.drawerAboutApp,
                     onTap: () => _openScreen(context, AppRoutes.about),
                   ),
                   DrawerItem(
                     icon: Icons.privacy_tip_outlined,
-                    label: 'سياسة الخصوصية',
+                    label: AppLocalizations.of(context)!.drawerPrivacyPolicy,
                     onTap: () => _openScreen(context, AppRoutes.privacy),
                   ),
                   DrawerItem(
                     icon: Icons.share_rounded,
-                    label: 'مشاركة',
+                    label: AppLocalizations.of(context)!.drawerShare,
                     onTap: () => _shareApp(context),
                   ),
                   DrawerItem(

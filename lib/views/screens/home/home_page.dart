@@ -6,6 +6,7 @@ import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controllers/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/data/brands_data.dart';
 import 'package:kalivra/models/brand_model.dart';
 import 'package:kalivra/models/product_model.dart';
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
       listener: (context, state) {
         if (state.error != null) {
           ApiErrorHandler.showSnackBar(context, state.error!,
-              fallbackMessage: 'فشل تحميل المنتجات');
+              fallbackMessage: AppLocalizations.of(context)!.loadProductsFailed);
         }
       },
       builder: (context, state) {
@@ -66,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                   ? Skeletonizer(
                       enabled: true,
                       child: ProductsSection(
-                        filteredProducts: _placeholderProducts(6),
+                        filteredProducts: _placeholderProducts(context, 6),
                         onAddToCart: (_) {},
                         onProductTap: (_) {},
                         onShowAllTap: () {},
@@ -96,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                   ? Skeletonizer(
                       enabled: true,
                       child: SalesSection(
-                        saleProducts: _placeholderProducts(4),
+                        saleProducts: _placeholderProducts(context, 4),
                         onAddToCart: (_) {},
                         onProductTap: (_) {},
                         onShowAllTap: () {},
@@ -117,12 +118,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  List<ProductModel> _placeholderProducts(int n) {
+  List<ProductModel> _placeholderProducts(BuildContext context, int n) {
     return List.generate(
       n,
       (i) => ProductModel(
         id: '$i',
-        name: 'منتج',
+        name: AppLocalizations.of(context)!.product,
         categoryId: '1',
         price: 0,
         quantity: 1,

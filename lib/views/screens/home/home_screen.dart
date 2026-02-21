@@ -13,6 +13,7 @@ import 'package:kalivra/views/widgets/nav/custom_nav_bar.dart';
 import 'package:kalivra/views/widgets/drawer/app_drawer.dart';
 import 'package:kalivra/views/widgets/custom_app_bar.dart';
 import 'package:kalivra/views/widgets/search_app_bar.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,16 +25,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<NavItemModel> navItems = [
-    NavItemModel(icon: Icons.home_rounded, index: 0, title: 'الرئيسية'),
-    NavItemModel(icon: Icons.category_rounded, index: 1, title: 'التصنيفات'),
-    NavItemModel(
-      icon: Icons.notifications_rounded,
-      index: 2,
-      title: 'الإشعارات',
-    ),
-    NavItemModel(icon: Icons.search_rounded, index: 3, title: 'البحث'),
-  ];
+  List<NavItemModel> _buildNavItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      NavItemModel(icon: Icons.home_rounded, index: 0, title: l10n.navHome),
+      NavItemModel(icon: Icons.category_rounded, index: 1, title: l10n.navCategories),
+      NavItemModel(icon: Icons.notifications_rounded, index: 2, title: l10n.navNotifications),
+      NavItemModel(icon: Icons.search_rounded, index: 3, title: l10n.navSearch),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             bottomNavigationBar: CustomNavBar(
-              items: navItems,
+              items: _buildNavItems(context),
               currentIndex: index,
               onTap: (i) {
               context.read<NavCubit>().goTo(i);

@@ -5,6 +5,7 @@ sealed class LocaleBlocState {}
 
 final class LocaleFetched extends LocaleBlocState {
   final Locale locale;
+  final bool useSystemLocale;
 
-  LocaleFetched({required this.locale});
+  LocaleFetched({required this.locale, this.useSystemLocale = false});
 }

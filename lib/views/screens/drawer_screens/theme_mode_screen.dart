@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controllers/prefs/pref_keys.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/theme_mode_model.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/views/widgets/selectable_card.dart';
@@ -11,29 +12,32 @@ import 'package:kalivra/views/widgets/selectable_card.dart';
 class ThemeModeScreen extends StatelessWidget {
   const ThemeModeScreen({super.key});
 
-  static const List<ThemeModeModel> _themeModes = [
-    ThemeModeModel(
-      label: 'الوضع الليلي',
-      subtitle: 'Dark mode',
-      icon: Icons.dark_mode_rounded,
-      index: 0,
-      prefValue: PrefKeys.darkModeKey,
-    ),
-    ThemeModeModel(
-      label: 'الوضع النهاري',
-      subtitle: 'Light mode',
-      icon: Icons.light_mode_rounded,
-      index: 1,
-      prefValue: PrefKeys.lightModeKey,
-    ),
-    ThemeModeModel(
-      label: 'نظام الجهاز',
-      subtitle: 'System default',
-      icon: Icons.settings_brightness_rounded,
-      index: 2,
-      prefValue: PrefKeys.systemModeKey,
-    ),
-  ];
+  static List<ThemeModeModel> _themeModes(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      ThemeModeModel(
+        label: l10n.themeDark,
+        subtitle: l10n.themeDarkSubtitle,
+        icon: Icons.dark_mode_rounded,
+        index: 0,
+        prefValue: PrefKeys.darkModeKey,
+      ),
+      ThemeModeModel(
+        label: l10n.themeLight,
+        subtitle: l10n.themeLightSubtitle,
+        icon: Icons.light_mode_rounded,
+        index: 1,
+        prefValue: PrefKeys.lightModeKey,
+      ),
+      ThemeModeModel(
+        label: l10n.themeSystem,
+        subtitle: l10n.themeSystemSubtitle,
+        icon: Icons.settings_brightness_rounded,
+        index: 2,
+        prefValue: PrefKeys.systemModeKey,
+      ),
+    ];
+  }
 
   static String _modeToValue(ThemeMode mode) {
     switch (mode) {
@@ -63,15 +67,16 @@ class ThemeModeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'المظهر'),
+      appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.appearanceTitle),
       body: BlocBuilder<ThemeBloc, ThemeBlocState>(
         builder: (context, state) {
           final currentMode = state is ThemeFetched ? state.mode : ThemeMode.system;
           final currentValue = _modeToValue(currentMode);
+          final themeModes = _themeModes(context);
           return ListView(
             padding: EdgeInsets.all(16.w),
-            children: List.generate(_themeModes.length, (index) {
-              final model = _themeModes[index];
+            children: List.generate(themeModes.length, (index) {
+              final model = themeModes[index];
               final isSelected = model.prefValue == currentValue;
               return SelectableCard(
                 label: model.label,

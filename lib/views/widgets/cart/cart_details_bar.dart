@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/buttons/custom_button.dart';
 import 'package:kalivra/views/widgets/cart/cart_details_row.dart';
 
@@ -46,13 +47,13 @@ class CartDetailsBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CartDetailsRow(label: 'إجمالي المنتجات', value: subtotal.toString()),
+            CartDetailsRow(label: AppLocalizations.of(context)!.productsTotal, value: subtotal.toString()),
             SizedBox(height: 8.h),
-            CartDetailsRow(label: 'تكلفة التوصيل', value: delivery.toString()),
+            CartDetailsRow(label: AppLocalizations.of(context)!.deliveryCost, value: delivery.toString()),
             SizedBox(height: 12.h),
             Divider(height: 1.h),
             SizedBox(height: 12.h),
-            CartDetailsRow(label:  'المجموع الكلي', value: total.toStringAsFixed(0),),
+            CartDetailsRow(label: AppLocalizations.of(context)!.total, value: total.toStringAsFixed(0)),
             SizedBox(height: 12.h),
             CustomButton(onTap: () {}),
           ],

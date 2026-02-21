@@ -6,6 +6,7 @@ import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/widgets/cart/cart_items_view.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/cart/empty_cart_view.dart';
 
 class CartScreen extends StatelessWidget {
@@ -25,10 +26,10 @@ class CartScreen extends StatelessWidget {
               color: Theme.of(context).appBarTheme.foregroundColor ?? AppColors.offWhite,
               iconSize: 28.r,
               onPressed: () => context.pop(),
-              tooltip: 'رجوع',
+              tooltip: AppLocalizations.of(context)!.back,
             ),
             title: Text(
-              'السلة',
+              AppLocalizations.of(context)!.cart,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
