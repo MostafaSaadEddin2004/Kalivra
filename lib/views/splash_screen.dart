@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _goToNext() {
     if (!mounted) return;
-    context.go(AppRoutes.intro);
+    context.go(AppRoutes.home);
   }
 
   @override
@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Expanded(
                 child: Center(
                   child: Image.asset(
-                    'assets/images/logo_splash.png',
+                    'assets/images/light_logo.png',
                     fit: BoxFit.contain,
                     width: 220.w,
                     errorBuilder: (context, error, stackTrace) =>

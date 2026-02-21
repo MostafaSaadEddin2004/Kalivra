@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kalivra/controllers/blocs/cubit/nav_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/nav_cubit/nav_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/notifications_cubit/notifications_cubit.dart';
 import 'package:kalivra/models/nav_item_model.dart';
 import 'package:kalivra/views/screens/home/categories_page.dart';
 import 'package:kalivra/views/screens/home/home_page.dart';
@@ -38,40 +39,42 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => NavCubit(),
-      child: Directionality(
-        textDirection: TextDirection.rtl,
-        child: BlocBuilder<NavCubit, int>(
-          builder: (context, index) {
-            return Scaffold(
-              key: _scaffoldKey,
-              extendBody: true,
-              appBar: index == NavCubit.search
-                  ? SearchAppBar(onChanged: (_) {})
-                  : CustomAppBar(
-                      onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
-                      onCartTap: () => context.pushNamed('cart'),
-                    ),
-              drawer: const AppDrawer(),
-              body: Padding(
-                padding: EdgeInsets.only(bottom: 100.h),
-                child: IndexedStack(
-                  index: index,
-                  children: const [
-                    HomePage(),
-                    CategoriesPage(),
-                    NotificationsPage(),
-                    SearchPage(),
-                  ],
-                ),
+      child: BlocBuilder<NavCubit, int>(
+        builder: (context, index) {
+          return Scaffold(
+            key: _scaffoldKey,
+            extendBody: true,
+            appBar: index == NavCubit.search
+                ? SearchAppBar(onChanged: (_) {})
+                : CustomAppBar(
+                    onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+                    onCartTap: () => context.pushNamed('cart'),
+                  ),
+            drawer: const AppDrawer(),
+            body: Padding(
+              padding: EdgeInsets.only(bottom: 100.h),
+              child: IndexedStack(
+                index: index,
+                children: const [
+                  HomePage(),
+                  CategoriesPage(),
+                  NotificationsPage(),
+                  SearchPage(),
+                ],
               ),
-              bottomNavigationBar: CustomNavBar(
-                items: navItems,
-                currentIndex: index,
-                onTap: (i) => context.read<NavCubit>().goTo(i),
-              ),
-            );
-          },
-        ),
+            ),
+            bottomNavigationBar: CustomNavBar(
+              items: navItems,
+              currentIndex: index,
+              onTap: (i) {
+              context.read<NavCubit>().goTo(i);
+              if (i == NavCubit.notifications) {
+                context.read<NotificationsCubit>().refresh();
+              }
+            },
+            ),
+          );
+        },
       ),
     );
   }

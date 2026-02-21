@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/checkout_cubit/checkout_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/screens/checkout/widgets/checkout_step_indicator.dart';
 import 'package:kalivra/views/screens/checkout/widgets/checkout_bottom_bar.dart';
@@ -62,8 +64,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _placeOrder() {
-    context.read<CartCubit>().clear();
-    if (mounted) context.pop();
+    final cartCubit = context.read<CartCubit>();
+    final total = cartCubit.total;
+    final items = cartCubit.state.items;
+    final body = <String, dynamic>{
+      'grand_total': total,
+      'items': items.map((e) => {'product_id': e.product.id, 'quantity': e.quantity}).toList(),
+    };
+    context.read<CheckoutCubit>().placeOrder(body);
   }
 
   @override
@@ -72,7 +80,27 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final cartCubit = context.read<CartCubit>();
     final total = cartCubit.total;
 
-    return Scaffold(
+    return BlocConsumer<CheckoutCubit, CheckoutState>(
+      listener: (context, state) {
+        if (state.hasError) {
+          ApiErrorHandler.showErrorDialog(
+            context,
+            state.error!,
+            fallbackMessage: 'فشل إتمام الطلب. جرّب مرة أخرى.',
+          );
+          context.read<CheckoutCubit>().reset();
+        }
+        if (state.result != null) {
+          context.read<CartCubit>().clear();
+          if (context.mounted) context.pop();
+          context.read<CheckoutCubit>().reset();
+        }
+      },
+      builder: (context, checkoutState) {
+        final isPlacing = checkoutState.isLoading;
+        return Stack(
+          children: [
+            Scaffold(
       appBar: AppBar(
         elevation: 0,
         leading: CustomIconButton(
@@ -109,10 +137,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           CheckoutBottomBar(
             amount: total,
             isLastStep: _currentIndex == 3,
-            onProceed: _goNext,
+            onProceed: isPlacing ? () {} : _goNext,
           ),
         ],
       ),
+            ),
+            if (isPlacing)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black26,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: AppColors.offWhite,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }

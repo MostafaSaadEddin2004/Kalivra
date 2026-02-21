@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 
 class CheckoutStep extends StatelessWidget {
@@ -13,7 +13,7 @@ class CheckoutStep extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final textColor = isDark ? AppColors.offWhite : AppColors.burgundy;
     final cartCubit = context.read<CartCubit>();
-    final items = cartCubit.state;
+    final items = cartCubit.state.items;
     final subtotal = cartCubit.subtotal;
     final delivery = CartCubit.deliveryCost;
     final total = cartCubit.total;

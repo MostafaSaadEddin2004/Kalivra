@@ -46,8 +46,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         Padding(
           padding: EdgeInsets.only(left: 8.w, right: 8.w),
           child: Image.asset(
-            'assets/images/logo_splash.png',
-            height: 28.h,
+            'assets/images/light_logo.png',
+            height: 20.h,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) =>
                 Icon(Icons.store_rounded, size: 28.r, color: iconColor),

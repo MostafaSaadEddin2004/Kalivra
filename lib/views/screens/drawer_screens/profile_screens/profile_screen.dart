@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controllers/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/services/referral_repository.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/views/widgets/profile/referral_qr_card.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -22,6 +25,7 @@ class _ProfileState extends State<Profile> {
   void initState() {
     super.initState();
     _referralCodeFuture = ReferralRepository().getMyReferralCode();
+    context.read<AuthCubit>().loadProfile();
   }
 
   @override
@@ -34,50 +38,120 @@ class _ProfileState extends State<Profile> {
 
     return Scaffold(
       appBar: const DrawerScreenAppBar(title: 'حسابي'),
-      body: ListView(
-        padding: EdgeInsets.all(20.w),
-        children: [
-          Center(
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 48.r,
-                  backgroundColor: isDark
-                      ? AppColors.burgundy.withValues(alpha: 0.3)
-                      : AppColors.burgundy.withValues(alpha: 0.15),
-                  child: Icon(
-                    Icons.person_rounded,
-                    size: 56.r,
-                    color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                  ),
+      body: BlocBuilder<AuthCubit, AuthState>(
+        builder: (context, authState) {
+          if (authState.token == null || authState.token!.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'سجّل الدخول لعرض الملف الشخصي',
+                      style: textTheme.bodyLarge?.copyWith(color: labelColor),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 24.h),
+                    FilledButton(
+                      onPressed: () => context.go(AppRoutes.login),
+                      child: const Text('تسجيل الدخول'),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 12.h),
-                Text(
-                  'أحمد محمد',
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: valueColor,
-                    fontWeight: FontWeight.w700,
+              ),
+            );
+          }
+
+          final customer = authState.customer;
+          final profileLoading = customer == null && authState.isLoading;
+          final displayName = customer != null
+              ? (customer.name ?? '${customer.firstName ?? ''} ${customer.lastName ?? ''}'.trim())
+              : '---';
+          final memberSince = _formatMemberSince(customer?.createdAt);
+
+          if (profileLoading) {
+            return Skeletonizer(
+              enabled: true,
+              child: ListView(
+                padding: EdgeInsets.all(20.w),
+                children: [
+                  Center(
+                    child: Column(
+                      children: [
+                        CircleAvatar(radius: 48.r),
+                        SizedBox(height: 12.h),
+                        Text('أحمد محمد', style: textTheme.headlineSmall),
+                        Text('عميل منذ 2024', style: textTheme.bodySmall),
+                        SizedBox(height: 8.h),
+                        FilledButton.icon(
+                          onPressed: () {},
+                          icon: Icon(Icons.edit_rounded, size: 18.r),
+                          label: const Text('تعديل الملف الشخصي'),
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Text(
-                  'عميل منذ 2024',
-                  style: textTheme.bodySmall?.copyWith(
-                    color: labelColor,
+                  SizedBox(height: 28.h),
+                  _SectionCard(
+                    title: 'معلومات الحساب',
+                    children: [
+                      _InfoRow(label: 'الاسم', value: '---', icon: Icons.person_outline_rounded),
+                      _InfoRow(label: 'البريد', value: '---', icon: Icons.email_outlined),
+                    ],
                   ),
+                ],
+              ),
+            );
+          }
+
+          return ListView(
+            padding: EdgeInsets.all(20.w),
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 48.r,
+                      backgroundColor: isDark
+                          ? AppColors.burgundy.withValues(alpha: 0.3)
+                          : AppColors.burgundy.withValues(alpha: 0.15),
+                      child: Icon(
+                        Icons.person_rounded,
+                        size: 56.r,
+                        color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                      ),
+                    ),
+                    SizedBox(height: 12.h),
+                    Text(
+                      displayName.isEmpty ? 'حسابي' : displayName,
+                      style: textTheme.headlineSmall?.copyWith(
+                        color: valueColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      memberSince,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: labelColor,
+                      ),
+                    ),
+                    SizedBox(height: 8.h),
+                    FilledButton.icon(
+                      onPressed: () => context.push(AppRoutes.editProfile),
+                      icon: Icon(Icons.edit_rounded, size: 18.r),
+                      label: const Text('تعديل الملف الشخصي'),
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8.h),
-                FilledButton.icon(
-                  onPressed: () => context.push(AppRoutes.editProfile),
-                  icon: Icon(Icons.edit_rounded, size: 18.r),
-                  label: const Text('تعديل الملف الشخصي'),
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 28.h),
+              ),
+              SizedBox(height: 28.h),
           FutureBuilder<String>(
             future: _referralCodeFuture,
             builder: (context, snapshot) {
@@ -133,10 +207,10 @@ class _ProfileState extends State<Profile> {
           _SectionCard(
             title: 'معلومات الحساب',
             children: [
-              _InfoRow(label: 'الاسم الكامل', value: 'أحمد محمد علي', icon: Icons.person_outline_rounded),
-              _InfoRow(label: 'البريد الإلكتروني', value: 'ahmed@example.com', icon: Icons.email_outlined),
-              _InfoRow(label: 'رقم الجوال', value: '+966 5XX XXX XXXX', icon: Icons.phone_android_rounded),
-              _InfoRow(label: 'تاريخ التسجيل', value: 'يناير 2024', icon: Icons.calendar_today_rounded),
+              _InfoRow(label: 'الاسم الكامل', value: displayName.isEmpty ? '---' : displayName, icon: Icons.person_outline_rounded),
+              _InfoRow(label: 'البريد الإلكتروني', value: customer?.email ?? '---', icon: Icons.email_outlined),
+              _InfoRow(label: 'رقم الجوال', value: customer?.phone ?? '---', icon: Icons.phone_android_rounded),
+              _InfoRow(label: 'تاريخ التسجيل', value: memberSince, icon: Icons.calendar_today_rounded),
             ],
           ),
           SizedBox(height: 16.h),
@@ -161,8 +235,19 @@ class _ProfileState extends State<Profile> {
           ),
           SizedBox(height: 24.h),
         ],
+      );
+        },
       ),
     );
+  }
+
+  static String _formatMemberSince(String? createdAt) {
+    if (createdAt == null || createdAt.isEmpty) return '---';
+    try {
+      final d = DateTime.tryParse(createdAt);
+      if (d != null) return 'عميل منذ ${d.year}';
+    } catch (_) {}
+    return '---';
   }
 }
 

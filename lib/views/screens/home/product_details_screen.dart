@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -22,6 +24,26 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedColorIndex = 0;
   int _selectedSizeIndex = 0;
+
+  Future<void> _addToWishlist(BuildContext context, ProductModel product) async {
+    final productId = int.tryParse(product.id);
+    if (productId == null || productId == 0) {
+      if (context.mounted) {
+        ApiErrorHandler.showSnackBar(context, null, fallbackMessage: 'معرّف المنتج غير صالح');
+      }
+      return;
+    }
+    try {
+      await context.read<WishlistCubit>().add(productId);
+      if (context.mounted) {
+        CustomSnackBar.show(context, 'تمت إضافة "${product.name}" إلى المفضلة');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ApiErrorHandler.showSnackBar(context, e, fallbackMessage: 'فشل إضافة المنتج إلى المفضلة');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -163,14 +185,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
           ),
+          SizedBox(height: 16.h),
+          OutlinedButton.icon(
+            onPressed: () => _addToWishlist(context, product),
+            icon: Icon(Icons.favorite_border_rounded, size: 22.r),
+            label: Text(
+              'إضافة إلى المفضلة',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(vertical: 14.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              side: BorderSide(
+                color: isDark ? AppColors.goldLight : AppColors.burgundy,
+              ),
+            ),
+          ),
           SizedBox(height: 24.h),
           FilledButton.icon(
             onPressed: () {
               context.read<CartCubit>().addItem(product);
-              CustomSnackBar.show(
-                context,
-                'تمت إضافة "${product.name}" إلى السلة',
-              );
             },
             icon: Icon(Icons.add_shopping_cart_rounded, size: 24.r),
             label: Text(

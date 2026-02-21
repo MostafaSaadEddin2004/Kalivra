@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controllers/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/services/referral_repository.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
@@ -22,7 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   final _referralCodeController = TextEditingController();
   bool _obscurePassword = true;
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -34,16 +36,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    setState(() => _isLoading = true);
     final referralCode = _referralCodeController.text.trim();
-    await Future.delayed(const Duration(milliseconds: 800));
+    context.read<AuthCubit>().login(
+          _phoneController.text.trim(),
+          _passwordController.text,
+        );
     if (!mounted) return;
     if (referralCode.isNotEmpty) {
       await ReferralRepository().submitReferralCode(referralCode);
     }
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    context.go(AppRoutes.home);
   }
 
   @override
@@ -58,7 +59,22 @@ class _LoginScreenState extends State<LoginScreen> {
         : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
-    return Scaffold(
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state.hasError) {
+          ApiErrorHandler.showSnackBar(
+            context,
+            state.error!,
+            fallbackMessage: 'فشل تسجيل الدخول',
+          );
+        }
+        if (state.token != null && state.token!.isNotEmpty) {
+          context.go(AppRoutes.home);
+        }
+      },
+      builder: (context, authState) {
+        final isLoading = authState.isLoading;
+        return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(24.w, 40.h, 24.w, 32.h),
@@ -204,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 28.h),
                 FilledButton(
-                  onPressed: _isLoading ? null : _login,
+                  onPressed: isLoading ? null : _login,
                   style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     shape: RoundedRectangleBorder(
@@ -212,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: _isLoading
+                  child: isLoading
                       ? SizedBox(
                           height: 24.h,
                           width: 24.w,
@@ -256,6 +272,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }

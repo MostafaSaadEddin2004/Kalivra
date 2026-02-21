@@ -2,9 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/app_interceptor.dart';
 
 const String baseUrl =
-    'https://demo.bagisto.com/bagisto-api-demo-common/api/shop/v1';
+    'https://demo.bagisto.com/bagisto-api-demo-common/api/shop/v1/';
 
-abstract class DioClient {
+class DioClient {
   DioClient({
     String baseUrl = baseUrl,
     Future<String?> Function()? getToken,

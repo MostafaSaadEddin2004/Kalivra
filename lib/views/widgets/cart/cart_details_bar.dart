@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/controllers/blocs/cubit/cart_cubit.dart';
+import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/views/widgets/buttons/custom_button.dart';
 import 'package:kalivra/views/widgets/cart/cart_details_row.dart';
 
