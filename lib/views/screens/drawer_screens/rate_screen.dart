@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
@@ -64,7 +65,7 @@ class RateScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 32.w, vertical: 16.h),
                 minimumSize: Size(double.infinity, 52.h),
               ),
-              child: const Text('إرسال التقييم'),
+              child: Text(AppLocalizations.of(context)!.submitRating),
             ),
           ],
         ),

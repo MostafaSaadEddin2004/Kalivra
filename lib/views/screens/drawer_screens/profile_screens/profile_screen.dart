@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/services/referral_repository.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/views/widgets/profile/referral_qr_card.dart';
@@ -30,6 +31,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -37,7 +39,7 @@ class _ProfileState extends State<Profile> {
     final valueColor = isDark ? AppColors.offWhite : AppColors.black;
 
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'حسابي'),
+      appBar: DrawerScreenAppBar(title: l10n.myAccount),
       body: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, authState) {
           if (authState.token == null || authState.token!.isEmpty) {
@@ -48,14 +50,14 @@ class _ProfileState extends State<Profile> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'سجّل الدخول لعرض الملف الشخصي',
+                      l10n.loginToViewProfile,
                       style: textTheme.bodyLarge?.copyWith(color: labelColor),
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 24.h),
                     FilledButton(
                       onPressed: () => context.go(AppRoutes.login),
-                      child: const Text('تسجيل الدخول'),
+                      child: Text(l10n.signIn),
                     ),
                   ],
                 ),
@@ -81,13 +83,13 @@ class _ProfileState extends State<Profile> {
                       children: [
                         CircleAvatar(radius: 48.r),
                         SizedBox(height: 12.h),
-                        Text('أحمد محمد', style: textTheme.headlineSmall),
-                        Text('عميل منذ 2024', style: textTheme.bodySmall),
+                        Text(displayName.isEmpty ? l10n.myAccount : displayName, style: textTheme.headlineSmall),
+                        Text(memberSince, style: textTheme.bodySmall),
                         SizedBox(height: 8.h),
                         FilledButton.icon(
                           onPressed: () {},
                           icon: Icon(Icons.edit_rounded, size: 18.r),
-                          label: const Text('تعديل الملف الشخصي'),
+                          label: Text(l10n.editProfile),
                           style: FilledButton.styleFrom(
                             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                           ),
@@ -97,10 +99,10 @@ class _ProfileState extends State<Profile> {
                   ),
                   SizedBox(height: 28.h),
                   _SectionCard(
-                    title: 'معلومات الحساب',
+                    title: l10n.accountInfo,
                     children: [
-                      _InfoRow(label: 'الاسم', value: '---', icon: Icons.person_outline_rounded),
-                      _InfoRow(label: 'البريد', value: '---', icon: Icons.email_outlined),
+                      _InfoRow(label: l10n.name, value: '---', icon: Icons.person_outline_rounded),
+                      _InfoRow(label: l10n.email, value: '---', icon: Icons.email_outlined),
                     ],
                   ),
                 ],
@@ -127,7 +129,7 @@ class _ProfileState extends State<Profile> {
                     ),
                     SizedBox(height: 12.h),
                     Text(
-                      displayName.isEmpty ? 'حسابي' : displayName,
+                      displayName.isEmpty ? l10n.myAccount : displayName,
                       style: textTheme.headlineSmall?.copyWith(
                         color: valueColor,
                         fontWeight: FontWeight.w700,
@@ -143,7 +145,7 @@ class _ProfileState extends State<Profile> {
                     FilledButton.icon(
                       onPressed: () => context.push(AppRoutes.editProfile),
                       icon: Icon(Icons.edit_rounded, size: 18.r),
-                      label: const Text('تعديل الملف الشخصي'),
+                      label: Text(l10n.editProfile),
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
                       ),

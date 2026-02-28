@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -28,18 +29,20 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
     super.dispose();
   }
 
-  String get _title {
-    if (widget.args.mode == OtpScreenMode.signUp) return 'التحقق من الرمز';
+  String _title(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (widget.args.mode == OtpScreenMode.signUp) return l10n.verifyCodeTitle;
     return widget.args.mode == OtpScreenMode.forgotPassword
-        ? 'استعادة كلمة المرور'
-        : 'تغيير رقم الجوال';
+        ? l10n.recoverPasswordTitle
+        : l10n.changePhoneOtpTitle;
   }
 
   int get _stepTotal => widget.args.mode == OtpScreenMode.signUp ? 2 : 3;
 
   void _verify() {
+    final l10n = AppLocalizations.of(context)!;
     if (_otpController.text.trim().length < 4) {
-      CustomSnackBar.show(context, 'أدخل الرمز المكون من 4-6 أرقام');
+      CustomSnackBar.show(context, l10n.enterCodeHintSnack);
       return;
     }
     setState(() => _isLoading = true);
@@ -68,8 +71,9 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
         : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: _title),
+      appBar: DrawerScreenAppBar(title: _title(context)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -88,7 +92,7 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'تم إرسال رمز التحقق إلى ${widget.args.phone}',
+                      l10n.otpSentToPhone(widget.args.phone),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),
@@ -96,8 +100,8 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
                     SizedBox(height: 20.h),
                     Text(
                       widget.args.mode == OtpScreenMode.signUp
-                          ? 'أدخل رمز التحقق المرسل إليك على واتساب'
-                          : 'أدخل الرمز المرسل إليك عبر واتساب',
+                          ? l10n.otpCodeHintSignUp
+                          : l10n.otpCodeHintOther,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                         height: 1.4,
@@ -109,7 +113,7 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
                       keyboardType: TextInputType.number,
                       maxLength: 6,
                       decoration: InputDecoration(
-                        labelText: 'رمز التحقق',
+                        labelText: l10n.otpCodeLabel,
                         hintText: '••••',
                         counterText: '',
                         prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
@@ -150,7 +154,7 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
                               )
                             : Icon(Icons.verified_user_rounded, size: 20.r),
                         label: Text(
-                          'تحقق',
+                          l10n.verify,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: AppColors.offWhite,
                             fontWeight: FontWeight.w700,

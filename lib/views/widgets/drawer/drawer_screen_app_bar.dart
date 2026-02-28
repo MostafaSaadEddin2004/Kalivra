@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 
 class DrawerScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -30,7 +31,7 @@ class DrawerScreenAppBar extends StatelessWidget implements PreferredSizeWidget 
         color: fgColor,
         iconSize: 20.r,
         onPressed: () => context.pop(),
-        tooltip: 'رجوع',
+        tooltip: AppLocalizations.of(context)!.back,
       ),
       title: Text(
         title,

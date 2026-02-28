@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class CheckoutStepIndicator extends StatelessWidget {
   const CheckoutStepIndicator({
@@ -12,13 +13,17 @@ class CheckoutStepIndicator extends StatelessWidget {
   final int currentStep;
   final ValueChanged<int>? onStepTap;
 
-  static const _labels = ['العنوان', 'الشحن', 'الدفع', 'إتمام الطلب'];
   static const _icons = [
     Icons.person_outline_rounded,
     Icons.local_shipping_outlined,
     Icons.payment_rounded,
     Icons.shopping_cart_outlined,
   ];
+
+  static List<String> _labels(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [l10n.checkoutStepAddress, l10n.checkoutStepShipping, l10n.checkoutStepPayment, l10n.checkoutStepComplete];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +33,7 @@ class CheckoutStepIndicator extends StatelessWidget {
     final inactiveColor = isDark
         ? AppColors.taupe.withValues(alpha: 0.5)
         : AppColors.burgundy.withValues(alpha: 0.5);
+    final labels = _labels(context);
 
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
@@ -72,7 +78,7 @@ class CheckoutStepIndicator extends StatelessWidget {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  _labels[index],
+                  labels[index],
                   style: theme.textTheme.labelMedium?.copyWith(
                     color: color,
                     fontSize: 11.sp,

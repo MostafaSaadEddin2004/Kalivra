@@ -6,6 +6,7 @@ import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controllers/blocs/cubit/checkout_cubit/checkout_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/screens/checkout/widgets/checkout_step_indicator.dart';
 import 'package:kalivra/views/screens/checkout/widgets/checkout_bottom_bar.dart';
@@ -23,7 +24,6 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   int _currentIndex = 0;
-  static const _stepTitles = ['العنوان', 'الشحن', 'الدفع', 'إتمام الطلب'];
 
   final GlobalKey<AddressStepState> _addressStepKey = GlobalKey<AddressStepState>();
   final GlobalKey<ShippingStepState> _shippingStepKey = GlobalKey<ShippingStepState>();
@@ -48,11 +48,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (!canProceed) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('أكمل البيانات المطلوبة في هذه الخطوة')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.completeStepData)),
       );
       return;
     }
     setState(() => _currentIndex++);
+  }
+
+  String _stepTitle(BuildContext context, int index) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (index) {
+      case 0: return l10n.checkoutStepAddress;
+      case 1: return l10n.checkoutStepShipping;
+      case 2: return l10n.checkoutStepPayment;
+      case 3: return l10n.checkoutStepComplete;
+      default: return l10n.checkoutStepAddress;
+    }
   }
 
   void _goBack() {
@@ -86,7 +97,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ApiErrorHandler.showErrorDialog(
             context,
             state.error!,
-            fallbackMessage: 'فشل إتمام الطلب. جرّب مرة أخرى.',
+            fallbackMessage: AppLocalizations.of(context)!.placeOrderFailed,
           );
           context.read<CheckoutCubit>().reset();
         }
@@ -108,10 +119,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           color: theme.appBarTheme.foregroundColor ?? AppColors.offWhite,
           iconSize: 28.r,
           onPressed: _goBack,
-          tooltip: 'رجوع',
+          tooltip: AppLocalizations.of(context)!.back,
         ),
         title: Text(
-          _stepTitles[_currentIndex],
+          _stepTitle(context, _currentIndex),
           style: theme.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class CustomButton extends StatelessWidget {
   const CustomButton({super.key, required this.onTap});
@@ -20,7 +21,7 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
         ),
         width: double.infinity,
-        child: Text('إتمام الطلب', style: textTheme.displayLarge),
+        child: Text(AppLocalizations.of(context)!.confirmOrder, style: textTheme.displayLarge),
       ),
     );
   }

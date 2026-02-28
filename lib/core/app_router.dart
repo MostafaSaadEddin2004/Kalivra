@@ -30,6 +30,7 @@ import 'package:kalivra/views/screens/home/ad_details_screen.dart';
 import 'package:kalivra/views/screens/home/cart_screen.dart';
 import 'package:kalivra/views/screens/checkout/checkout_screen.dart';
 import 'package:kalivra/views/screens/auth/intro_screen.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/screens/auth/login_screen.dart';
 import 'package:kalivra/views/screens/auth/sign_up_screen.dart';
 import 'package:kalivra/views/screens/auth/complete_profile_screen.dart';
@@ -131,8 +132,8 @@ abstract class AppRouter {
               builder: (context, state) {
                 final order = state.extra as OrderModel?;
                 if (order == null) {
-                  return const Scaffold(
-                    body: Center(child: Text('لا يوجد طلب')),
+                  return Scaffold(
+                    body: Center(child: Text(AppLocalizations.of(context)!.noOrder)),
                   );
                 }
                 return OrderDetailsScreen(order: order);
@@ -175,8 +176,8 @@ abstract class AppRouter {
               builder: (context, state) {
                 final args = state.extra as OtpOnboardingArgs?;
                 if (args == null) {
-                  return const Scaffold(
-                    body: Center(child: Text('خطأ: لم يتم تمرير البيانات')),
+                  return Scaffold(
+                    body: Center(child: Text(AppLocalizations.of(context)!.errorMissingData)),
                   );
                 }
                 return OtpCodeEntryScreen(args: args);

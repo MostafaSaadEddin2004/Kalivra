@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -30,8 +32,8 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    CustomSnackBar.show(context, 'تم تحديث كلمة المرور بنجاح');
-    context.pop();
+    CustomSnackBar.show(context, AppLocalizations.of(context)!.passwordUpdatedSuccess);
+    context.go(AppRoutes.home);
   }
 
   @override
@@ -46,8 +48,9 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
         : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'كلمة المرور الجديدة'),
+      appBar: DrawerScreenAppBar(title: l10n.setNewPasswordTitle),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -66,7 +69,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'أدخل كلمة المرور الجديدة لحسابك',
+                      l10n.setNewPasswordBody,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                         height: 1.4,
@@ -75,7 +78,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                     SizedBox(height: 20.h),
                     CustomTextField(
                       controller: _newController,
-                      label: 'كلمة المرور الجديدة',
+                      label: l10n.newPassword,
                       hint: '••••••••',
                       obscureText: _obscureNew,
                       suffix: CustomIconButton(
@@ -92,7 +95,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                       labelColor: labelColor,
                       validator: (v) {
                         if (v == null || v.length < 6) {
-                          return 'كلمة المرور 6 أحرف على الأقل';
+                          return l10n.passwordMinLength;
                         }
                         return null;
                       },
@@ -100,7 +103,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                     SizedBox(height: 20.h),
                     CustomTextField(
                       controller: _confirmController,
-                      label: 'تأكيد كلمة المرور',
+                      label: l10n.newPasswordConfirm,
                       hint: '••••••••',
                       obscureText: _obscureConfirm,
                       suffix: CustomIconButton(
@@ -117,7 +120,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                       labelColor: labelColor,
                       validator: (v) {
                         if (v != _newController.text) {
-                          return 'غير متطابقة مع كلمة المرور الجديدة';
+                          return l10n.confirmPasswordMismatch;
                         }
                         return null;
                       },
@@ -131,7 +134,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
               onPressed: _submit,
               icon: Icon(Icons.check_rounded, size: 22.r),
               label: Text(
-                'تحديث كلمة المرور',
+                l10n.updatePasswordButton,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: AppColors.offWhite,
                   fontWeight: FontWeight.w700,

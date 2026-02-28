@@ -7,6 +7,7 @@ import 'package:kalivra/controllers/blocs/cubit/wishlist_cubit/wishlist_cubit.da
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/cards/product_card.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -32,16 +33,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'المفضلة'),
+      appBar: DrawerScreenAppBar(title: l10n.favorites),
       body: BlocConsumer<WishlistCubit, WishlistState>(
         listener: (context, state) {
           if (state.hasError) {
             ApiErrorHandler.showSnackBar(context, state.error!,
-                fallbackMessage: 'فشل تحميل المفضلة');
+                fallbackMessage: l10n.loadFavoritesFailed);
           }
         },
         builder: (context, state) {
@@ -56,7 +58,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   child: ProductCard(
                     product: ProductModel(
                       id: '$i',
-                      name: 'منتج',
+                      name: l10n.product,
                       categoryId: '1',
                       price: 0,
                       quantity: 1,
@@ -85,7 +87,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ),
                     SizedBox(height: 20.h),
                     Text(
-                      'قائمة المفضلة فارغة',
+                      l10n.favoritesEmpty,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: isDark ? AppColors.offWhite : AppColors.burgundy,
                         fontWeight: FontWeight.w700,
@@ -94,7 +96,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ),
                     SizedBox(height: 8.h),
                     Text(
-                      'أضف المنتجات إلى المفضلة من خلال زر القلب في صفحة المنتج',
+                      l10n.favoritesPrompt,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.black,
                       ),
@@ -104,7 +106,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     FilledButton.icon(
                       onPressed: () => Navigator.of(context).pop(),
                       icon: Icon(Icons.shopping_bag_rounded, size: 22.r),
-                      label: const Text('تسوق الآن'),
+                      label: Text(l10n.shopNow),
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(
                             horizontal: 28.w, vertical: 14.h),

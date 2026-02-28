@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class ShippingStep extends StatefulWidget {
   const ShippingStep({super.key});
@@ -25,14 +26,15 @@ class ShippingStepState extends State<ShippingStep> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final textColor = isDark ? AppColors.offWhite : AppColors.burgundy;
 
     final methods = [
-      {'title': 'توصيل عادي', 'desc': '5-7 أيام عمل', 'price': '15 ل.س'},
-      {'title': 'توصيل سريع', 'desc': '2-3 أيام عمل', 'price': '30 ل.س'},
-      {'title': 'نفس اليوم', 'desc': 'طلب قبل 12 ظهراً', 'price': '50 ل.س'},
+      {'title': l10n.standardDelivery, 'desc': l10n.standardDeliveryDesc, 'price': '15 ${l10n.currencySYP}'},
+      {'title': l10n.fastDelivery, 'desc': l10n.fastDeliveryDesc, 'price': '30 ${l10n.currencySYP}'},
+      {'title': l10n.sameDayDelivery, 'desc': l10n.sameDayDeliveryDesc, 'price': '50 ${l10n.currencySYP}'},
     ];
 
     return SingleChildScrollView(
@@ -41,7 +43,7 @@ class ShippingStepState extends State<ShippingStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'طريقة الشحن',
+            l10n.shippingMethod,
             style: theme.textTheme.titleMedium?.copyWith(color: textColor),
           ),
           SizedBox(height: 12.h),
@@ -149,7 +151,7 @@ class ShippingStepState extends State<ShippingStep> {
                   Text(
                     _preferredDate != null
                         ? '${_preferredDate!.day}/${_preferredDate!.month}/${_preferredDate!.year}'
-                        : 'اختر التاريخ',
+                        : l10n.chooseDate,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: _preferredDate != null
                           ? textColor
@@ -162,7 +164,7 @@ class ShippingStepState extends State<ShippingStep> {
           ),
           SizedBox(height: 24.h),
           Text(
-            'ملاحظات التوصيل (اختياري)',
+            l10n.deliveryNotes,
             style: theme.textTheme.titleMedium?.copyWith(color: textColor),
           ),
           SizedBox(height: 8.h),
@@ -171,7 +173,7 @@ class ShippingStepState extends State<ShippingStep> {
             maxLines: 3,
             style: TextStyle(color: textColor),
             decoration: InputDecoration(
-              hintText: 'مثال: اترك عند الباب، اتصل عند الوصول...',
+              hintText: l10n.deliveryNotesHint,
               hintStyle: TextStyle(
                 color: textColor.withValues(alpha: 0.5),
                 fontSize: 14.sp,

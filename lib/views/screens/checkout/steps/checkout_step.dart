@@ -3,12 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class CheckoutStep extends StatelessWidget {
   const CheckoutStep({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final textColor = isDark ? AppColors.offWhite : AppColors.burgundy;
@@ -24,7 +26,7 @@ class CheckoutStep extends StatelessWidget {
         Padding(
           padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
           child: Text(
-            'ملخص الطلب',
+            l10n.orderSummary,
             style: theme.textTheme.titleLarge?.copyWith(
               color: textColor,
               fontWeight: FontWeight.bold,
@@ -74,13 +76,13 @@ class CheckoutStep extends StatelessWidget {
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                'الكمية: ${item.quantity}',
+                                l10n.quantityLabel(item.quantity),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: AppColors.taupe,
                                 ),
                               ),
                               Text(
-                                '${item.lineTotal.toStringAsFixed(0)} ل.س',
+                                '${item.lineTotal.toStringAsFixed(0)} ${l10n.currencySYP}',
                                 style: theme.textTheme.labelMedium?.copyWith(
                                   color: textColor,
                                 ),
@@ -111,15 +113,15 @@ class CheckoutStep extends StatelessWidget {
           child: Column(
             children: [
               _SummaryRow(
-                label: 'المجموع الفرعي',
-                value: '${subtotal.toStringAsFixed(0)} ل.س',
+                label: l10n.subtotal,
+                value: '${subtotal.toStringAsFixed(0)} ${l10n.currencySYP}',
                 theme: theme,
                 textColor: textColor,
               ),
               SizedBox(height: 8.h),
               _SummaryRow(
-                label: 'الشحن',
-                value: '${delivery.toStringAsFixed(0)} ل.س',
+                label: l10n.shipping,
+                value: '${delivery.toStringAsFixed(0)} ${l10n.currencySYP}',
                 theme: theme,
                 textColor: textColor,
               ),
@@ -127,8 +129,8 @@ class CheckoutStep extends StatelessWidget {
               Divider(height: 1.h, color: AppColors.taupe.withValues(alpha: 0.4)),
               SizedBox(height: 12.h),
               _SummaryRow(
-                label: 'المجموع الكلي',
-                value: '${total.toStringAsFixed(0)} ل.س',
+                label: l10n.total,
+                value: '${total.toStringAsFixed(0)} ${l10n.currencySYP}',
                 theme: theme,
                 textColor: textColor,
                 bold: true,

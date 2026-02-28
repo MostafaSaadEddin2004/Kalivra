@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/buttons/counter_button.dart';
 
 class QuantityCounter extends StatelessWidget {
@@ -41,7 +42,7 @@ class QuantityCounter extends StatelessWidget {
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('حسناً'),
+            child: Text(AppLocalizations.of(context)!.ok),
           ),
         ],
       ),

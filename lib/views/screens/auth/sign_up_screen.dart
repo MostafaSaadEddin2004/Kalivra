@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/widgets/referral/referral_code_field.dart';
@@ -349,7 +350,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     TextButton(
                       onPressed: () => context.go(AppRoutes.login),
                       child: Text(
-                        'تسجيل الدخول',
+                        AppLocalizations.of(context)!.login,
                         style: theme.textTheme.titleSmall?.copyWith(
                           color: AppColors.burgundy,
                           fontWeight: FontWeight.w700,

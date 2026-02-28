@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class CheckoutBottomBar extends StatelessWidget {
   const CheckoutBottomBar({
@@ -16,6 +17,7 @@ class CheckoutBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -49,13 +51,13 @@ class CheckoutBottomBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'المبلغ المستحق',
+                    l10n.amountDue,
                     style: textTheme.bodySmall?.copyWith(
                       color: AppColors.taupe,
                     ),
                   ),
                   Text(
-                    '${amount.toStringAsFixed(0)} ل.س',
+                    '${amount.toStringAsFixed(0)} ${l10n.currencySYP}',
                     style: textTheme.headlineSmall?.copyWith(
                       color: theme.brightness == Brightness.dark
                           ? AppColors.offWhite

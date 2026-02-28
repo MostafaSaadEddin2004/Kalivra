@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -165,7 +166,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                                 ),
                               )
                             : Icon(Icons.chat_rounded, size: 20.r),
-                        label: const Text('إرسال الرمز عبر واتساب'),
+                        label: Text(AppLocalizations.of(context)!.sendCodeViaWhatsApp),
                         style: FilledButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14.h),
                           shape: RoundedRectangleBorder(

@@ -5,6 +5,7 @@ import 'package:kalivra/controllers/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controllers/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/custom_snack_bar.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
@@ -25,11 +26,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedColorIndex = 0;
   int _selectedSizeIndex = 0;
 
-  Future<void> _addToWishlist(BuildContext context, ProductModel product) async {
+  Future<void> _addToWishlist(BuildContext context, ProductModel product,AppLocalizations l10n) async {
     final productId = int.tryParse(product.id);
     if (productId == null || productId == 0) {
       if (context.mounted) {
-        ApiErrorHandler.showSnackBar(context, null, fallbackMessage: 'معرّف المنتج غير صالح');
+        ApiErrorHandler.showSnackBar(context, null, fallbackMessage: AppLocalizations.of(context)!.invalidProductId);
       }
       return;
     }
@@ -40,7 +41,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       }
     } catch (e) {
       if (context.mounted) {
-        ApiErrorHandler.showSnackBar(context, e, fallbackMessage: 'فشل إضافة المنتج إلى المفضلة');
+        ApiErrorHandler.showSnackBar(context, e, fallbackMessage: AppLocalizations.of(context)!.addToWishlistFailed);
       }
     }
   }
@@ -48,6 +49,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primary = theme.colorScheme.primary;
@@ -65,7 +67,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final hasSizes = product.sizes != null && product.sizes!.isNotEmpty;
 
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'تفاصيل المنتج'),
+      appBar: DrawerScreenAppBar(title: l10n.productDetails),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
         children: [
@@ -125,7 +127,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             children: [
               if (hasSale) ...[
                 Text(
-                  '${product.price.toStringAsFixed(0)} ل.س',
+                  '${product.price.toStringAsFixed(0)} ${l10n.currencySYP}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     decoration: TextDecoration.lineThrough,
                     color: isDark ? AppColors.taupe : AppColors.lightGray,
@@ -134,7 +136,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 SizedBox(width: 12.w),
               ],
               Text(
-                '${displayPrice.toStringAsFixed(0)} ل.س',
+                '${displayPrice.toStringAsFixed(0)} ${l10n.currencySYP}',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   color: isDark ? AppColors.goldLight : AppColors.burgundy,
                   fontWeight: FontWeight.w800,
@@ -170,14 +172,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   _DetailRow(
                     icon: Icons.category_outlined,
-                    label: 'الوحدة',
+                    label: l10n.unit,
                     value: product.unit,
                     isDark: isDark,
                   ),
                   SizedBox(height: 12.h),
                   _DetailRow(
                     icon: Icons.inventory_2_outlined,
-                    label: 'الحد الأقصى للطلب',
+                    label: l10n.maxOrderLimit,
                     value: '${product.quantity} ${product.unit}',
                     isDark: isDark,
                   ),
@@ -187,10 +189,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           ),
           SizedBox(height: 16.h),
           OutlinedButton.icon(
-            onPressed: () => _addToWishlist(context, product),
+            onPressed: () => _addToWishlist(context, product,l10n),
             icon: Icon(Icons.favorite_border_rounded, size: 22.r),
             label: Text(
-              'إضافة إلى المفضلة',
+              l10n.addToWishlist,
               style: theme.textTheme.titleSmall?.copyWith(
                 color: isDark ? AppColors.goldLight : AppColors.burgundy,
                 fontWeight: FontWeight.w600,
@@ -213,7 +215,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             },
             icon: Icon(Icons.add_shopping_cart_rounded, size: 24.r),
             label: Text(
-              'إضافة إلى السلة',
+              l10n.addToCart,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: AppColors.offWhite,
                 fontWeight: FontWeight.w700,

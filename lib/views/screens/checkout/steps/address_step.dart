@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class AddressStep extends StatefulWidget {
   const AddressStep({super.key});
@@ -73,7 +74,7 @@ class AddressStepState extends State<AddressStep> {
   void _saveAddress() {
     if (_formKey.currentState?.validate() ?? false) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم حفظ العنوان')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.addressSaved)),
       );
     }
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/brand_model.dart';
 import 'package:kalivra/views/widgets/cards/brand_card.dart';
 
@@ -18,6 +19,7 @@ class BrandsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
@@ -27,7 +29,7 @@ class BrandsSection extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('العلامات التجارية', style: textTheme.titleMedium),
+              Text(l10n.brandsSection, style: textTheme.titleMedium),
               InkWell(
                 onTap: onShowAllTap,
                 child: Container(
@@ -37,7 +39,7 @@ class BrandsSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8.r),
                   ),
                   child: Text(
-                    'عرض الكل',
+                    l10n.showAll,
                     style: textTheme.bodyMedium?.copyWith(
                       color: AppColors.burgundy,
                     ),

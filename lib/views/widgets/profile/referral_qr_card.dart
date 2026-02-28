@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 /// Displays the user's referral code as a QR code and as text with copy action.
@@ -120,7 +121,7 @@ class ReferralQrCard extends StatelessWidget {
                         Clipboard.setData(ClipboardData(text: referralCode));
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Text('تم نسخ الكود'),
+                            content: Text(AppLocalizations.of(context)!.codeCopied),
                             behavior: SnackBarBehavior.floating,
                             duration: const Duration(seconds: 2),
                           ),

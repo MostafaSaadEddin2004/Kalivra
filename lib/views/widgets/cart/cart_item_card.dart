@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/cart_item_model.dart';
 import 'package:kalivra/views/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/views/widgets/cart/quantity_counter.dart';
@@ -18,6 +19,7 @@ class CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
@@ -96,17 +98,17 @@ class CartItemCard extends StatelessWidget {
                       iconSize: 22.r,
                       color: colorScheme.onError,
                       onPressed: onRemove,
-                      tooltip: 'حذف',
+                      tooltip: l10n.remove,
                     ),
                   ],
                 ),
 
-                Text('الحجم - -', style: textTheme.bodySmall),
+                Text(l10n.sizePlaceholder, style: textTheme.bodySmall),
                 SizedBox(height: 4.h),
-                Text('اللون - -', style: textTheme.bodySmall),
+                Text(l10n.colorPlaceholder, style: textTheme.bodySmall),
                 SizedBox(height: 8.h),
                 Text(
-                  '${item.unitPrice.toStringAsFixed(0)} ل.س',
+                  '${item.unitPrice.toStringAsFixed(0)} ${l10n.currencySYP}',
                   style: textTheme.bodyLarge,
                 ),
               ],

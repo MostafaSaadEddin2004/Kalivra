@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class CartDetailsRow extends StatelessWidget {
   const CartDetailsRow({super.key, required this.label, required this.value});
@@ -8,6 +9,7 @@ class CartDetailsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
     return Row(
@@ -18,7 +20,7 @@ class CartDetailsRow extends StatelessWidget {
           style: textTheme.bodyMedium
         ),
         Text(
-          '$value ل.س',
+          '$value ${l10n.currencySYP}',
           style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
       ],

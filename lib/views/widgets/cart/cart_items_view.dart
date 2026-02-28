@@ -219,7 +219,7 @@ class PriceRow extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: textTheme.bodyMedium),
-        Text('${value.toStringAsFixed(0)} ل.س', style: textTheme.bodyMedium),
+        Text('${value.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}', style: textTheme.bodyMedium),
       ],
     );
   }
@@ -275,7 +275,7 @@ class CartBottomBar extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${amount.toStringAsFixed(0)} ل.س',
+                    '${amount.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
                     style: textTheme.displayLarge?.copyWith(
                       color: AppColors.offWhite,
                     ),

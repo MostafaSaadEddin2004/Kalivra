@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/product_model.dart';
 import 'package:kalivra/views/widgets/buttons/cart_button.dart';
 
@@ -178,7 +179,7 @@ class _PriceBlock extends StatelessWidget {
 
     if (product.salePrice == null) {
       return Text(
-        '${product.price.toStringAsFixed(0)} ل.س',
+        '${product.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w700,
           color: isDark ? AppColors.goldLight : AppColors.burgundy,
@@ -192,7 +193,7 @@ class _PriceBlock extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '${product.price.toStringAsFixed(0)} ل.س',
+          '${product.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
           style: theme.textTheme.bodySmall?.copyWith(
             decoration: TextDecoration.lineThrough,
             color: isDark ? AppColors.taupe.withValues(alpha: 0.8) : AppColors.lightGray,
@@ -201,7 +202,7 @@ class _PriceBlock extends StatelessWidget {
         ),
         SizedBox(height: 2.h),
         Text(
-          '${product.salePrice!.toStringAsFixed(0)} ل.س',
+          '${product.salePrice!.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w700,
             color: isDark ? AppColors.goldLight : AppColors.burgundy,

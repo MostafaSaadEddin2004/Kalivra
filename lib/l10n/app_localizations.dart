@@ -1489,6 +1489,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Join us'**
   String get introTitle3;
+
+  /// No description provided for @showAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Show All'**
+  String get showAll;
+
+  /// No description provided for @emptyCartTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get emptyCartTitle;
+
+  /// No description provided for @emptyCartBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse categories and add products here'**
+  String get emptyCartBody;
+
+  /// No description provided for @brandsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Brands'**
+  String get brandsSection;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @sizePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Size — —'**
+  String get sizePlaceholder;
+
+  /// No description provided for @colorPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Color — —'**
+  String get colorPlaceholder;
+
+  /// No description provided for @currencySYP.
+  ///
+  /// In en, this message translates to:
+  /// **'SYP'**
+  String get currencySYP;
+
+  /// No description provided for @setNewPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get setNewPasswordTitle;
+
+  /// No description provided for @setNewPasswordBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new account password'**
+  String get setNewPasswordBody;
+
+  /// No description provided for @confirmPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not match the new password'**
+  String get confirmPasswordMismatch;
+
+  /// No description provided for @updatePasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Password'**
+  String get updatePasswordButton;
+
+  /// No description provided for @verifyCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Code'**
+  String get verifyCodeTitle;
+
+  /// No description provided for @recoverPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover Password'**
+  String get recoverPasswordTitle;
+
+  /// No description provided for @changePhoneOtpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Phone Number'**
+  String get changePhoneOtpTitle;
+
+  /// No description provided for @enterCodeHintSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 4-6 digit code'**
+  String get enterCodeHintSnack;
+
+  /// No description provided for @otpCodeHintSignUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code sent to you on WhatsApp'**
+  String get otpCodeHintSignUp;
+
+  /// No description provided for @otpCodeHintOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code sent to you via WhatsApp'**
+  String get otpCodeHintOther;
+
+  /// No description provided for @otpCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get otpCodeLabel;
+
+  /// No description provided for @verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// No description provided for @contactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Us'**
+  String get contactTitle;
+
+  /// No description provided for @contactWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re happy to hear from you'**
+  String get contactWelcome;
+
+  /// No description provided for @contactChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'You can reach us through the following channels or send a message'**
+  String get contactChannels;
+
+  /// No description provided for @contactPhoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get contactPhoneTitle;
+
+  /// No description provided for @contactEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get contactEmailTitle;
+
+  /// No description provided for @contactHoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Working Hours'**
+  String get contactHoursTitle;
+
+  /// No description provided for @contactHoursValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Sat - Thu: 9 AM - 9 PM'**
+  String get contactHoursValue;
+
+  /// No description provided for @sendMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a message'**
+  String get sendMessage;
+
+  /// No description provided for @subjectLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get subjectLabel;
+
+  /// No description provided for @messageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get messageLabel;
+
+  /// No description provided for @continueToHomeTest.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to Home (Test)'**
+  String get continueToHomeTest;
+
+  /// No description provided for @otpSentToPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent to {phone}'**
+  String otpSentToPhone(String phone);
 }
 
 class _AppLocalizationsDelegate

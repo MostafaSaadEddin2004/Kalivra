@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class EmptyCartView extends StatelessWidget {
   const EmptyCartView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final isDark = theme.brightness == Brightness.dark;
 
     return CustomScrollView(
       slivers: [
@@ -19,11 +24,11 @@ class EmptyCartView extends StatelessWidget {
               Icon(
                 Icons.shopping_cart_outlined,
                 size: 72.r,
-                color: colorScheme.onSurface,
+                color: isDark ? AppColors.taupe : AppColors.burgundy.withValues(alpha: 0.6),
               ),
               SizedBox(height: 24.h),
               Text(
-                'السلة فارغة',
+                l10n.emptyCartTitle,
                 style: textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -31,7 +36,7 @@ class EmptyCartView extends StatelessWidget {
               ),
               SizedBox(height: 8.h),
               Text(
-                'تصفح التصنيفات وأضف المنتجات هنا',
+                l10n.emptyCartBody,
                 style: textTheme.bodyMedium,
                 textAlign: TextAlign.center,
               ),
@@ -39,7 +44,7 @@ class EmptyCartView extends StatelessWidget {
               FilledButton.icon(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: Icon(Icons.storefront_rounded, size: 22.r),
-                label: const Text('تسوق الآن'),
+                label: Text(l10n.shopNow),
                 style: FilledButton.styleFrom(
                   padding: EdgeInsets.symmetric(
                     horizontal: 28.w,

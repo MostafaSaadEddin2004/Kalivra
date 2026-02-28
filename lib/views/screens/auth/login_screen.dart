@@ -268,6 +268,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
+                SizedBox(height: 16.h),
+                TextButton(
+                  onPressed: () => context.go(AppRoutes.home),
+                  child: Text(
+                    AppLocalizations.of(context)!.continueToHomeTest,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isDark ? AppColors.taupe : AppColors.burgundy,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

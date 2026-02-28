@@ -724,4 +724,106 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get introTitle3 => 'انضم إلينا';
+
+  @override
+  String get showAll => 'عرض الكل';
+
+  @override
+  String get emptyCartTitle => 'السلة فارغة';
+
+  @override
+  String get emptyCartBody => 'تصفح التصنيفات وأضف المنتجات هنا';
+
+  @override
+  String get brandsSection => 'العلامات التجارية';
+
+  @override
+  String get send => 'إرسال';
+
+  @override
+  String get remove => 'حذف';
+
+  @override
+  String get sizePlaceholder => 'الحجم — —';
+
+  @override
+  String get colorPlaceholder => 'اللون — —';
+
+  @override
+  String get currencySYP => 'ل.س';
+
+  @override
+  String get setNewPasswordTitle => 'كلمة المرور الجديدة';
+
+  @override
+  String get setNewPasswordBody => 'أدخل كلمة المرور الجديدة لحسابك';
+
+  @override
+  String get confirmPasswordMismatch => 'غير متطابقة مع كلمة المرور الجديدة';
+
+  @override
+  String get updatePasswordButton => 'تحديث كلمة المرور';
+
+  @override
+  String get verifyCodeTitle => 'التحقق من الرمز';
+
+  @override
+  String get recoverPasswordTitle => 'استعادة كلمة المرور';
+
+  @override
+  String get changePhoneOtpTitle => 'تغيير رقم الجوال';
+
+  @override
+  String get enterCodeHintSnack => 'أدخل الرمز المكون من 4-6 أرقام';
+
+  @override
+  String get otpCodeHintSignUp => 'أدخل رمز التحقق المرسل إليك على واتساب';
+
+  @override
+  String get otpCodeHintOther => 'أدخل الرمز المرسل إليك عبر واتساب';
+
+  @override
+  String get otpCodeLabel => 'رمز التحقق';
+
+  @override
+  String get verify => 'تحقق';
+
+  @override
+  String get contactTitle => 'تواصل معنا';
+
+  @override
+  String get contactWelcome => 'نسعد بتواصلك معنا';
+
+  @override
+  String get contactChannels =>
+      'يمكنك التواصل معنا عبر القنوات التالية أو إرسال رسالة';
+
+  @override
+  String get contactPhoneTitle => 'الهاتف';
+
+  @override
+  String get contactEmailTitle => 'البريد الإلكتروني';
+
+  @override
+  String get contactHoursTitle => 'ساعات العمل';
+
+  @override
+  String get contactHoursValue => 'السبت - الخميس: 9 ص - 9 م';
+
+  @override
+  String get sendMessage => 'أرسل رسالة';
+
+  @override
+  String get subjectLabel => 'الموضوع';
+
+  @override
+  String get messageLabel => 'الرسالة';
+
+  @override
+  String get continueToHomeTest => 'المتابعة للرئيسية (تجربة)';
+
+  @override
+  String otpSentToPhone(String phone) {
+    return 'تم إرسال رمز التحقق إلى $phone';
+  }
 }

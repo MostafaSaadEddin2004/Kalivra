@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controllers/blocs/cubit/notifications_cubit/notifications_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/views/widgets/cards/notification_card.dart';
 
 /// Notifications tab. Login-required check is in [NotificationsCubit].
@@ -85,11 +86,8 @@ class _LoginRequiredPlaceholder extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             Text(
-              'يجب تسجيل الدخول لعرض الإشعارات',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: isDark ? AppColors.offWhite : AppColors.burgundy,
-                fontWeight: FontWeight.w600,
-              ),
+              AppLocalizations.of(context)!.loginRequiredForNotifications,
+              style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 12.h),
@@ -109,7 +107,7 @@ class _LoginRequiredPlaceholder extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
               ),
-              child: const Text('تسجيل الدخول'),
+              child: Text(AppLocalizations.of(context)!.signIn),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
 /// Contact Us: phone, email, and optional form.
@@ -9,16 +10,17 @@ class ContactScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: const DrawerScreenAppBar(title: 'تواصل معنا'),
+      appBar: DrawerScreenAppBar(title: l10n.contactTitle),
       body: ListView(
         padding: EdgeInsets.all(20.w),
         children: [
           Text(
-            'نسعد بتواصلك معنا',
+            l10n.contactWelcome,
             style: theme.textTheme.titleMedium?.copyWith(
               color: isDark ? AppColors.offWhite : AppColors.burgundy,
               fontWeight: FontWeight.w700,
@@ -26,7 +28,7 @@ class ContactScreen extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            'يمكنك التواصل معنا عبر القنوات التالية أو إرسال رسالة',
+            l10n.contactChannels,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: isDark ? AppColors.taupe : AppColors.black,
             ),
@@ -34,27 +36,27 @@ class ContactScreen extends StatelessWidget {
           SizedBox(height: 24.h),
           _ContactCard(
             icon: Icons.phone_rounded,
-            title: 'الهاتف',
+            title: l10n.contactPhoneTitle,
             value: '+966 XX XXX XXXX',
             onTap: () {},
           ),
           SizedBox(height: 12.h),
           _ContactCard(
             icon: Icons.email_rounded,
-            title: 'البريد الإلكتروني',
+            title: l10n.contactEmailTitle,
             value: 'support@kalivra.com',
             onTap: () {},
           ),
           SizedBox(height: 12.h),
           _ContactCard(
             icon: Icons.schedule_rounded,
-            title: 'ساعات العمل',
-            value: 'السبت - الخميس: 9 ص - 9 م',
+            title: l10n.contactHoursTitle,
+            value: l10n.contactHoursValue,
             onTap: null,
           ),
           SizedBox(height: 28.h),
           Text(
-            'أرسل رسالة',
+            l10n.sendMessage,
             style: theme.textTheme.titleSmall?.copyWith(
               color: isDark ? AppColors.goldLight : AppColors.burgundy,
               fontWeight: FontWeight.w700,
@@ -70,7 +72,7 @@ class ContactScreen extends StatelessWidget {
                 children: [
                   TextField(
                     decoration: InputDecoration(
-                      labelText: 'الموضوع',
+                      labelText: l10n.subjectLabel,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
                       filled: true,
                     ),
@@ -79,7 +81,7 @@ class ContactScreen extends StatelessWidget {
                   TextField(
                     maxLines: 4,
                     decoration: InputDecoration(
-                      labelText: 'الرسالة',
+                      labelText: l10n.messageLabel,
                       alignLabelWithHint: true,
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
                       filled: true,
@@ -93,7 +95,7 @@ class ContactScreen extends StatelessWidget {
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 14.h),
                       ),
-                      child: const Text('إرسال'),
+                      child: Text(l10n.send),
                     ),
                   ),
                 ],

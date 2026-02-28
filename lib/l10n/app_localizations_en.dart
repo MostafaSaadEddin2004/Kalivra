@@ -727,4 +727,107 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get introTitle3 => 'Join us';
+
+  @override
+  String get showAll => 'Show All';
+
+  @override
+  String get emptyCartTitle => 'Your cart is empty';
+
+  @override
+  String get emptyCartBody => 'Browse categories and add products here';
+
+  @override
+  String get brandsSection => 'Brands';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get sizePlaceholder => 'Size — —';
+
+  @override
+  String get colorPlaceholder => 'Color — —';
+
+  @override
+  String get currencySYP => 'SYP';
+
+  @override
+  String get setNewPasswordTitle => 'New Password';
+
+  @override
+  String get setNewPasswordBody => 'Enter your new account password';
+
+  @override
+  String get confirmPasswordMismatch => 'Does not match the new password';
+
+  @override
+  String get updatePasswordButton => 'Update Password';
+
+  @override
+  String get verifyCodeTitle => 'Verify Code';
+
+  @override
+  String get recoverPasswordTitle => 'Recover Password';
+
+  @override
+  String get changePhoneOtpTitle => 'Change Phone Number';
+
+  @override
+  String get enterCodeHintSnack => 'Enter the 4-6 digit code';
+
+  @override
+  String get otpCodeHintSignUp =>
+      'Enter the verification code sent to you on WhatsApp';
+
+  @override
+  String get otpCodeHintOther => 'Enter the code sent to you via WhatsApp';
+
+  @override
+  String get otpCodeLabel => 'Verification code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get contactTitle => 'Contact Us';
+
+  @override
+  String get contactWelcome => 'We\'re happy to hear from you';
+
+  @override
+  String get contactChannels =>
+      'You can reach us through the following channels or send a message';
+
+  @override
+  String get contactPhoneTitle => 'Phone';
+
+  @override
+  String get contactEmailTitle => 'Email';
+
+  @override
+  String get contactHoursTitle => 'Working Hours';
+
+  @override
+  String get contactHoursValue => 'Sat - Thu: 9 AM - 9 PM';
+
+  @override
+  String get sendMessage => 'Send a message';
+
+  @override
+  String get subjectLabel => 'Subject';
+
+  @override
+  String get messageLabel => 'Message';
+
+  @override
+  String get continueToHomeTest => 'Continue to Home (Test)';
+
+  @override
+  String otpSentToPhone(String phone) {
+    return 'Verification code sent to $phone';
+  }
 }

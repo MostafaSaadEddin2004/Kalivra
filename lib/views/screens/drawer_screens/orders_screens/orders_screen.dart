@@ -6,6 +6,7 @@ import 'package:kalivra/controllers/blocs/cubit/orders_cubit/orders_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/models/order_model.dart';
 import 'package:kalivra/views/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -198,7 +199,7 @@ class _OrderCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${order.total.toStringAsFixed(0)} ل.س',
+                    '${order.total.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: isDark ? AppColors.goldLight : AppColors.burgundy,
                       fontWeight: FontWeight.w700,
@@ -213,7 +214,7 @@ class _OrderCard extends StatelessWidget {
                   onPressed: () =>
                       context.push(AppRoutes.orderDetails, extra: order),
                   icon: Icon(Icons.visibility_rounded, size: 18.r),
-                  label: const Text('عرض التفاصيل'),
+                  label: Text(AppLocalizations.of(context)!.viewDetails),
                 ),
               ),
             ],
