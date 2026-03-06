@@ -117,6 +117,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get version => 'Version 1.0.0';
 
   @override
+  String get aboutAppDescription =>
+      'Kalivra gives you an easy and secure shopping experience for building and finishing products. Browse categories, order what you need, and track your orders in one place.';
+
+  @override
   String get menu => 'Menu';
 
   @override
@@ -233,6 +237,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signIn => 'Sign In';
+
+  @override
+  String get signOut => 'Sign Out';
 
   @override
   String get all => 'All';
@@ -660,6 +667,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get currentPassword => 'Current Password';
 
   @override
+  String get enterCurrentPassword => 'Enter current password';
+
+  @override
   String get newPassword => 'New Password';
 
   @override
@@ -681,10 +691,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSaved => 'Changes saved';
 
   @override
+  String get changePhoto => 'Change photo';
+
+  @override
+  String get saveChanges => 'Save changes';
+
+  @override
   String get personalInfo => 'Personal Information';
 
   @override
   String get newPhoneSuccess => 'Phone number changed successfully';
+
+  @override
+  String get phoneVerifiedSuccess => 'Phone number verified successfully';
+
+  @override
+  String get confirmPhoneUpdateHint =>
+      'Tap confirm to update the phone number in your account';
+
+  @override
+  String get confirmChangePhone => 'Confirm change';
 
   @override
   String get changePhoneTitle => 'Change Phone Number';
@@ -700,6 +726,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rateTitle => 'Rate';
+
+  @override
+  String get rateQuestion => 'How would you rate your experience with us?';
 
   @override
   String get submitRating => 'Submit Rating';
@@ -824,10 +853,92 @@ class AppLocalizationsEn extends AppLocalizations {
   String get messageLabel => 'Message';
 
   @override
-  String get continueToHomeTest => 'Continue to Home (Test)';
+  String get continueToHomeTest => 'Continue as a guest';
 
   @override
   String otpSentToPhone(String phone) {
     return 'Verification code sent to $phone';
   }
+
+  @override
+  String get searchHint => 'Search for products, categories...';
+
+  @override
+  String get profilePhoto => 'Profile Photo';
+
+  @override
+  String get enterFullNameHint => 'Enter full name';
+
+  @override
+  String get enterEmailShort => 'Enter email';
+
+  @override
+  String get enterAddressShort => 'Enter address';
+
+  @override
+  String get cityAreaStreet => 'City, area, street';
+
+  @override
+  String get enterPostalCodeShort => 'Enter postal code';
+
+  @override
+  String get saveAndContinue => 'Save and continue';
+
+  @override
+  String get verifyPhoneTitle => 'Verify phone number';
+
+  @override
+  String codeSentViaWhatsApp(String phone) {
+    return 'Verification code sent to $phone via WhatsApp';
+  }
+
+  @override
+  String get otpPhoneHintSignUp =>
+      'Enter phone number to receive verification code via WhatsApp';
+
+  @override
+  String get otpPhoneHintForgot =>
+      'Enter the phone number associated with your account to receive the verification code via WhatsApp';
+
+  @override
+  String get otpPhoneHintChange =>
+      'Enter your new phone number to receive the verification code via WhatsApp';
+
+  @override
+  String get introDesc1 =>
+      'Kalivra is your one-stop platform for building materials and decor. Browse brands, products, and offers, and order what you need with ease.';
+
+  @override
+  String get introDesc2 =>
+      'A wide range of paints, ceramics, iron, sanitary and electrical supplies. Regular offers, fast delivery, and 24/7 customer service.';
+
+  @override
+  String get introDesc3 =>
+      'Register now for a smooth shopping experience. Track orders, save favorites, and pay securely. Welcome to the Kalivra family.';
+
+  @override
+  String get closeTooltip => 'Close';
+
+  @override
+  String get orderDetails => 'Order details';
+
+  @override
+  String get shippingAddress => 'Shipping address';
+
+  @override
+  String get noBrands => 'No brands yet';
+
+  @override
+  String get adsTitle => 'Ads';
+
+  @override
+  String get noAds => 'No ads';
+
+  @override
+  String get loginPromptNotifications =>
+      'Sign in or create an account to receive order and offer notifications.';
+
+  @override
+  String get privacyPolicyContent =>
+      'Privacy Policy\n\nLast updated: January 2024\n\nAt Kalivra we respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and share your information when you use our app.\n\n1. Information we collect\nWe collect information you provide when registering or placing orders, such as name, email, phone number, and address. We also automatically collect some technical data to improve app performance.\n\n2. Use of information\nWe use your information to process orders, communicate with you, improve our services, and send offers that may interest you (with your consent).\n\n3. Data protection\nWe apply appropriate security measures to protect your data from unauthorized access or disclosure.\n\n4. Sharing information\nWe do not sell your personal data. We may share information with service partners (e.g. shipping and payment) only as necessary to fulfill your order.\n\n5. Your rights\nYou can request access, correction, or deletion of your data by contacting us.\n\nFor any inquiry: support@kalivra.com';
 }

@@ -2,14 +2,14 @@ import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/app_interceptor.dart';
 
 const String baseUrl =
-    'https://demo.bagisto.com/bagisto-api-demo-common/api/shop/v1/';
+    'https://test1.zedan-world.com/api/';
 
 class DioClient {
   DioClient({
     String baseUrl = baseUrl,
     Future<String?> Function()? getToken,
     bool enableLogging = true,
-    bool logResponseBody = false,
+    bool logResponseBody = true,
     Duration connectTimeout = const Duration(seconds: 30),
     Duration receiveTimeout = const Duration(seconds: 30),
     Duration sendTimeout = const Duration(seconds: 30),
@@ -21,7 +21,6 @@ class DioClient {
             sendTimeout: sendTimeout,
             headers: {
               'Accept': 'application/json',
-              'Content-Type': 'application/json',
             },
           ),
         ) {

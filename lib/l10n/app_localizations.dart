@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Version 1.0.0'**
   String get version;
 
+  /// No description provided for @aboutAppDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Kalivra gives you an easy and secure shopping experience for building and finishing products. Browse categories, order what you need, and track your orders in one place.'**
+  String get aboutAppDescription;
+
   /// No description provided for @menu.
   ///
   /// In en, this message translates to:
@@ -529,6 +535,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign In'**
   String get signIn;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOut;
 
   /// No description provided for @all.
   ///
@@ -1352,6 +1364,12 @@ abstract class AppLocalizations {
   /// **'Current Password'**
   String get currentPassword;
 
+  /// No description provided for @enterCurrentPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter current password'**
+  String get enterCurrentPassword;
+
   /// No description provided for @newPassword.
   ///
   /// In en, this message translates to:
@@ -1394,6 +1412,18 @@ abstract class AppLocalizations {
   /// **'Changes saved'**
   String get profileSaved;
 
+  /// No description provided for @changePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get changePhoto;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
   /// No description provided for @personalInfo.
   ///
   /// In en, this message translates to:
@@ -1405,6 +1435,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Phone number changed successfully'**
   String get newPhoneSuccess;
+
+  /// No description provided for @phoneVerifiedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number verified successfully'**
+  String get phoneVerifiedSuccess;
+
+  /// No description provided for @confirmPhoneUpdateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap confirm to update the phone number in your account'**
+  String get confirmPhoneUpdateHint;
+
+  /// No description provided for @confirmChangePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm change'**
+  String get confirmChangePhone;
 
   /// No description provided for @changePhoneTitle.
   ///
@@ -1435,6 +1483,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rate'**
   String get rateTitle;
+
+  /// No description provided for @rateQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you rate your experience with us?'**
+  String get rateQuestion;
 
   /// No description provided for @submitRating.
   ///
@@ -1679,7 +1733,7 @@ abstract class AppLocalizations {
   /// No description provided for @continueToHomeTest.
   ///
   /// In en, this message translates to:
-  /// **'Continue to Home (Test)'**
+  /// **'Continue as a guest'**
   String get continueToHomeTest;
 
   /// No description provided for @otpSentToPhone.
@@ -1687,6 +1741,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verification code sent to {phone}'**
   String otpSentToPhone(String phone);
+
+  /// No description provided for @searchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for products, categories...'**
+  String get searchHint;
+
+  /// No description provided for @profilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photo'**
+  String get profilePhoto;
+
+  /// No description provided for @enterFullNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter full name'**
+  String get enterFullNameHint;
+
+  /// No description provided for @enterEmailShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email'**
+  String get enterEmailShort;
+
+  /// No description provided for @enterAddressShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter address'**
+  String get enterAddressShort;
+
+  /// No description provided for @cityAreaStreet.
+  ///
+  /// In en, this message translates to:
+  /// **'City, area, street'**
+  String get cityAreaStreet;
+
+  /// No description provided for @enterPostalCodeShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter postal code'**
+  String get enterPostalCodeShort;
+
+  /// No description provided for @saveAndContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and continue'**
+  String get saveAndContinue;
+
+  /// No description provided for @verifyPhoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify phone number'**
+  String get verifyPhoneTitle;
+
+  /// No description provided for @codeSentViaWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent to {phone} via WhatsApp'**
+  String codeSentViaWhatsApp(String phone);
+
+  /// No description provided for @otpPhoneHintSignUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter phone number to receive verification code via WhatsApp'**
+  String get otpPhoneHintSignUp;
+
+  /// No description provided for @otpPhoneHintForgot.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the phone number associated with your account to receive the verification code via WhatsApp'**
+  String get otpPhoneHintForgot;
+
+  /// No description provided for @otpPhoneHintChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your new phone number to receive the verification code via WhatsApp'**
+  String get otpPhoneHintChange;
+
+  /// No description provided for @introDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Kalivra is your one-stop platform for building materials and decor. Browse brands, products, and offers, and order what you need with ease.'**
+  String get introDesc1;
+
+  /// No description provided for @introDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'A wide range of paints, ceramics, iron, sanitary and electrical supplies. Regular offers, fast delivery, and 24/7 customer service.'**
+  String get introDesc2;
+
+  /// No description provided for @introDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Register now for a smooth shopping experience. Track orders, save favorites, and pay securely. Welcome to the Kalivra family.'**
+  String get introDesc3;
+
+  /// No description provided for @closeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get closeTooltip;
+
+  /// No description provided for @orderDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Order details'**
+  String get orderDetails;
+
+  /// No description provided for @shippingAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping address'**
+  String get shippingAddress;
+
+  /// No description provided for @noBrands.
+  ///
+  /// In en, this message translates to:
+  /// **'No brands yet'**
+  String get noBrands;
+
+  /// No description provided for @adsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ads'**
+  String get adsTitle;
+
+  /// No description provided for @noAds.
+  ///
+  /// In en, this message translates to:
+  /// **'No ads'**
+  String get noAds;
+
+  /// No description provided for @loginPromptNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to receive order and offer notifications.'**
+  String get loginPromptNotifications;
+
+  /// No description provided for @privacyPolicyContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy\n\nLast updated: January 2024\n\nAt Kalivra we respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and share your information when you use our app.\n\n1. Information we collect\nWe collect information you provide when registering or placing orders, such as name, email, phone number, and address. We also automatically collect some technical data to improve app performance.\n\n2. Use of information\nWe use your information to process orders, communicate with you, improve our services, and send offers that may interest you (with your consent).\n\n3. Data protection\nWe apply appropriate security measures to protect your data from unauthorized access or disclosure.\n\n4. Sharing information\nWe do not sell your personal data. We may share information with service partners (e.g. shipping and payment) only as necessary to fulfill your order.\n\n5. Your rights\nYou can request access, correction, or deletion of your data by contacting us.\n\nFor any inquiry: support@kalivra.com'**
+  String get privacyPolicyContent;
 }
 
 class _AppLocalizationsDelegate

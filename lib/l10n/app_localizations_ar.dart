@@ -117,6 +117,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get version => 'الإصدار 1.0.0';
 
   @override
+  String get aboutAppDescription =>
+      'تطبيق كليفرة يوفر لك تجربة تسوق سهلة وآمنة لمنتجات البناء والتشطيبات. تصفح التصنيفات، اطلب ما تحتاجه، وتابع طلباتك من مكان واحد.';
+
+  @override
   String get menu => 'القائمة';
 
   @override
@@ -232,6 +236,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get signIn => 'تسجيل الدخول';
+
+  @override
+  String get signOut => 'تسجيل الخروج';
 
   @override
   String get all => 'الكل';
@@ -657,6 +664,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get currentPassword => 'كلمة المرور الحالية';
 
   @override
+  String get enterCurrentPassword => 'أدخل كلمة المرور الحالية';
+
+  @override
   String get newPassword => 'كلمة المرور الجديدة';
 
   @override
@@ -678,10 +688,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileSaved => 'تم حفظ التعديلات';
 
   @override
+  String get changePhoto => 'تغيير الصورة';
+
+  @override
+  String get saveChanges => 'حفظ التعديلات';
+
+  @override
   String get personalInfo => 'معلومات شخصية';
 
   @override
   String get newPhoneSuccess => 'تم تغيير رقم الجوال بنجاح';
+
+  @override
+  String get phoneVerifiedSuccess => 'تم التحقق من رقم الجوال بنجاح';
+
+  @override
+  String get confirmPhoneUpdateHint => 'اضغط تأكيد لتحديث رقم الجوال في حسابك';
+
+  @override
+  String get confirmChangePhone => 'تأكيد تغيير الرقم';
 
   @override
   String get changePhoneTitle => 'تغيير رقم الجوال';
@@ -697,6 +722,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rateTitle => 'تقييم';
+
+  @override
+  String get rateQuestion => 'كيف تقيم تجربتك معنا؟';
 
   @override
   String get submitRating => 'إرسال التقييم';
@@ -820,10 +848,92 @@ class AppLocalizationsAr extends AppLocalizations {
   String get messageLabel => 'الرسالة';
 
   @override
-  String get continueToHomeTest => 'المتابعة للرئيسية (تجربة)';
+  String get continueToHomeTest => 'المتابعة كزائر';
 
   @override
   String otpSentToPhone(String phone) {
     return 'تم إرسال رمز التحقق إلى $phone';
   }
+
+  @override
+  String get searchHint => 'ابحث عن منتجات، تصنيفات...';
+
+  @override
+  String get profilePhoto => 'الصورة الشخصية';
+
+  @override
+  String get enterFullNameHint => 'أدخل الاسم الكامل';
+
+  @override
+  String get enterEmailShort => 'أدخل البريد';
+
+  @override
+  String get enterAddressShort => 'أدخل العنوان';
+
+  @override
+  String get cityAreaStreet => 'المدينة، الحي، الشارع';
+
+  @override
+  String get enterPostalCodeShort => 'أدخل الرمز البريدي';
+
+  @override
+  String get saveAndContinue => 'حفظ والدخول';
+
+  @override
+  String get verifyPhoneTitle => 'التحقق من رقم الجوال';
+
+  @override
+  String codeSentViaWhatsApp(String phone) {
+    return 'تم إرسال رمز التحقق إلى $phone عبر واتساب';
+  }
+
+  @override
+  String get otpPhoneHintSignUp =>
+      'أدخل رقم الجوال لاستلام رمز التحقق عبر واتساب';
+
+  @override
+  String get otpPhoneHintForgot =>
+      'أدخل رقم الجوال المرتبط بحسابك لاستلام رمز التحقق عبر واتساب';
+
+  @override
+  String get otpPhoneHintChange =>
+      'أدخل رقم الجوال الجديد لاستلام رمز التحقق عبر واتساب';
+
+  @override
+  String get introDesc1 =>
+      'تطبيق كليفرا منصتك الموحدة لشراء مواد البناء والديكور. تصفح العلامات التجارية والمنتجات والعروض، واطلب ما تحتاجه بسهولة.';
+
+  @override
+  String get introDesc2 =>
+      'تشكيلة واسعة من الدهانات والسيراميك والحديد والأدوات الصحية والكهربائيات. عروض دورية، توصيل سريع، وخدمة عملاء على مدار الساعة.';
+
+  @override
+  String get introDesc3 =>
+      'سجّل الآن واحصل على تجربة تسوق مريحة. تتبع طلباتك، احفظ المفضلة، وادفع بكل أمان. نرحب بك في عائلة كليفرا.';
+
+  @override
+  String get closeTooltip => 'إغلاق';
+
+  @override
+  String get orderDetails => 'تفاصيل الطلب';
+
+  @override
+  String get shippingAddress => 'عنوان التوصيل';
+
+  @override
+  String get noBrands => 'لا توجد علامات تجارية';
+
+  @override
+  String get adsTitle => 'الإعلانات';
+
+  @override
+  String get noAds => 'لا توجد إعلانات';
+
+  @override
+  String get loginPromptNotifications =>
+      'سجّل الدخول أو أنشئ حساباً لاستلام إشعارات الطلبات والعروض.';
+
+  @override
+  String get privacyPolicyContent =>
+      'سياسة الخصوصية\n\nآخر تحديث: يناير 2024\n\nنحن في كليفرة نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية جمع واستخدام ومشاركة معلوماتك عند استخدام تطبيقنا.\n\n1. المعلومات التي نجمعها\nنجمع المعلومات التي تقدمها عند التسجيل أو الطلب، مثل الاسم، البريد الإلكتروني، رقم الجوال، والعنوان. كما نجمع تلقائياً بعض البيانات التقنية لتحسين أداء التطبيق.\n\n2. استخدام المعلومات\nنستخدم معلوماتك لمعالجة الطلبات، التواصل معك، تحسين خدماتنا، وإرسال عروض قد تهمك (بموافقتك).\n\n3. حماية البيانات\nنطبق إجراءات أمنية مناسبة لحماية بياناتك من الوصول غير المصرح به أو التسريب.\n\n4. مشاركة المعلومات\nلا نبيع بياناتك الشخصية. قد نشارك معلومات مع شركاء الخدمة (مثل الشحن والدفع) فقط بما يلزم لتنفيذ طلبك.\n\n5. حقوقك\nيمكنك طلب الوصول أو التصحيح أو الحذف لبياناتك عبر التواصل معنا.\n\nلأي استفسار: support@kalivra.com';
 }

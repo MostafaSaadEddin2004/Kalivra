@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 /// Adds auth token to outgoing requests.
 class AuthInterceptor extends Interceptor {
@@ -20,9 +21,27 @@ class AuthInterceptor extends Interceptor {
     options.headers['Content-Type'] = 'application/json';
     handler.next(options);
   }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final data = err.response?.data;
+    debugPrint('❌ Dio error: ${err.response?.statusCode} → ${err.message}');
+    debugPrint('📨 Error body: $data');
+    super.onError(err, handler);
+  }
+
+  @override
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    debugPrint(
+      '✅ Response [${response.statusCode}] → ${response.requestOptions.path}',
+    );
+    super.onResponse(response, handler);
+  }
 }
 
-/// Logs request/response and optionally errors.
 class LoggingInterceptor extends Interceptor {
   LoggingInterceptor({this.enabled = true, this.logResponseBody = false});
 
@@ -35,25 +54,21 @@ class LoggingInterceptor extends Interceptor {
       handler.next(options);
       return;
     }
-    // ignore: avoid_print
-    print('→ ${options.method} ${options.uri}');
+    debugPrint('→ API ${options.method} ${options.uri}');
     handler.next(options);
   }
 
   @override
-  void onResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (!enabled) {
       handler.next(response);
       return;
     }
-    // ignore: avoid_print
-    print('← ${response.statusCode} ${response.requestOptions.uri}');
+    final uri = response.requestOptions.uri.toString();
+    debugPrint('← API $uri → ${response.statusCode}');
     if (logResponseBody && response.data != null) {
-      // ignore: avoid_print
-      print(response.data);
+      debugPrint('  DATA: $uri');
+      debugPrint('  ${response.data}');
     }
     handler.next(response);
   }
@@ -61,14 +76,15 @@ class LoggingInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (enabled) {
-      // ignore: avoid_print
-      print('✗ ${err.requestOptions.uri} ${err.message}');
+      debugPrint('✗ API ${err.requestOptions.uri} ${err.message}');
+      if (err.response?.data != null) {
+        debugPrint('  ERROR DATA: ${err.response!.data}');
+      }
     }
     handler.next(err);
   }
 }
 
-/// Maps API error response (e.g. 4xx/5xx) to [ApiException].
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {

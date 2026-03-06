@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kalivra/controllers/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
