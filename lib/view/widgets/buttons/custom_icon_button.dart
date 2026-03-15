@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Custom icon button used across the app instead of [IconButton].
-/// Supports tooltip, size, color, padding, and constraints for use in app bars, forms, and lists.
 class CustomIconButton extends StatelessWidget {
   const CustomIconButton({
     super.key,

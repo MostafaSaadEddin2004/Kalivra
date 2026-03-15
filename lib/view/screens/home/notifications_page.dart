@@ -8,7 +8,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/cards/notification_card.dart';
 
-/// Notifications tab. Login-required check is in [NotificationsCubit].
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});
 

@@ -60,4 +60,3 @@ class SearchPage extends StatelessWidget {
     );
   }
 }
-

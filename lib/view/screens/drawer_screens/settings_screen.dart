@@ -11,7 +11,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Settings: theme, language, account & security.
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 

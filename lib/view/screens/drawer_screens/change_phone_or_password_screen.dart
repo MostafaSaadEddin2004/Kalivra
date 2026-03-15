@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
 enum ChangePhoneOrPasswordMode { phone, password }
 
-/// Single screen for changing phone number or password. Title and fields depend on [mode].
-/// Both flows include phone number input; password mode adds new password + confirm.
 class ChangePhoneOrPasswordScreen extends StatefulWidget {
   const ChangePhoneOrPasswordScreen({super.key, required this.mode});
 
@@ -56,12 +55,6 @@ class _ChangePhoneOrPasswordScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fillColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
-        : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
@@ -91,17 +84,13 @@ class _ChangePhoneOrPasswordScreenState
                       ),
                     ),
                     SizedBox(height: 24.h),
-                    _buildField(
-                      context: context,
+                    AppTextField(
                       controller: _phoneController,
                       label: widget.mode == ChangePhoneOrPasswordMode.phone
                           ? 'رقم الجوال الجديد'
                           : 'رقم الجوال',
                       hint: '+966 5XX XXX XXXX',
-                      icon: Icons.phone_android_rounded,
-                      borderColor: borderColor,
-                      fillColor: fillColor,
-                      labelColor: labelColor,
+                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
                       keyboardType: TextInputType.phone,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
@@ -114,17 +103,13 @@ class _ChangePhoneOrPasswordScreenState
                     ),
                     if (widget.mode == ChangePhoneOrPasswordMode.password) ...[
                       SizedBox(height: 20.h),
-                      _buildField(
-                        context: context,
+                      AppTextField(
                         controller: _newPasswordController,
                         label: 'كلمة المرور الجديدة',
                         hint: '••••••••',
-                        icon: Icons.lock_outline_rounded,
-                        borderColor: borderColor,
-                        fillColor: fillColor,
-                        labelColor: labelColor,
                         obscureText: _obscureNew,
-                        suffix: CustomIconButton(
+                        prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
+                        suffixIcon: CustomIconButton(
                           icon: _obscureNew
                               ? Icons.visibility_off_rounded
                               : Icons.visibility_rounded,
@@ -135,22 +120,18 @@ class _ChangePhoneOrPasswordScreenState
                         ),
                         validator: (v) {
                           if (v == null || v.length < 6)
-                            {return 'كلمة المرور 6 أحرف على الأقل';}
+                            return 'كلمة المرور 6 أحرف على الأقل';
                           return null;
                         },
                       ),
                       SizedBox(height: 20.h),
-                      _buildField(
-                        context: context,
+                      AppTextField(
                         controller: _confirmPasswordController,
                         label: 'تأكيد كلمة المرور',
                         hint: '••••••••',
-                        icon: Icons.lock_rounded,
-                        borderColor: borderColor,
-                        fillColor: fillColor,
-                        labelColor: labelColor,
                         obscureText: _obscureConfirm,
-                        suffix: CustomIconButton(
+                        prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
+                        suffixIcon: CustomIconButton(
                           icon: _obscureConfirm
                               ? Icons.visibility_off_rounded
                               : Icons.visibility_rounded,
@@ -162,7 +143,7 @@ class _ChangePhoneOrPasswordScreenState
                         ),
                         validator: (v) {
                           if (v != _newPasswordController.text)
-                            {return 'غير متطابقة مع كلمة المرور الجديدة';}
+                            return 'غير متطابقة مع كلمة المرور الجديدة';
                           return null;
                         },
                       ),
@@ -194,60 +175,6 @@ class _ChangePhoneOrPasswordScreenState
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required BuildContext context,
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required Color borderColor,
-    required Color fillColor,
-    required Color labelColor,
-    TextInputType? keyboardType,
-    bool obscureText = false,
-    Widget? suffix,
-    String? Function(String?)? validator,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon, size: 22.r, color: labelColor),
-        suffixIcon: suffix,
-        filled: true,
-        fillColor: fillColor,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.red),
-        ),
-        labelStyle: TextStyle(color: labelColor),
-        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
       ),
     );
   }

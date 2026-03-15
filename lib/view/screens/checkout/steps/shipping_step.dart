@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class ShippingStep extends StatefulWidget {
   const ShippingStep({super.key});
@@ -21,7 +22,6 @@ class ShippingStepState extends State<ShippingStep> {
     super.dispose();
   }
 
-  /// Called by parent to validate before allowing proceed to next step.
   bool validateStep() => _preferredDate != null;
 
   @override
@@ -168,33 +168,10 @@ class ShippingStepState extends State<ShippingStep> {
             style: theme.textTheme.titleMedium?.copyWith(color: textColor),
           ),
           SizedBox(height: 8.h),
-          TextField(
+          AppTextField(
             controller: _notesController,
+            hint: l10n.deliveryNotesHint,
             maxLines: 3,
-            style: TextStyle(color: textColor),
-            decoration: InputDecoration(
-              hintText: l10n.deliveryNotesHint,
-              hintStyle: TextStyle(
-                color: textColor.withValues(alpha: 0.5),
-                fontSize: 14.sp,
-              ),
-              filled: true,
-              fillColor: isDark
-                  ? const Color(0xFF1A1918)
-                  : AppColors.offWhite.withValues(alpha: 0.5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(
-                  color: AppColors.taupe.withValues(alpha: 0.4),
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12.r),
-                borderSide: BorderSide(
-                  color: AppColors.taupe.withValues(alpha: 0.4),
-                ),
-              ),
-            ),
           ),
         ],
       ),

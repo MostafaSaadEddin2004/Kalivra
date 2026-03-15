@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/checkout_cubit/checkout_state.dart';
-import 'package:kalivra/core/app_locator.dart';
 import 'package:kalivra/model/services/api/checkout_api_service.dart';
 
 export 'checkout_state.dart';
@@ -8,9 +7,9 @@ export 'checkout_state.dart';
 class CheckoutCubit extends Cubit<CheckoutState> {
   CheckoutCubit() : super(CheckoutState.initial);
 
-  CheckoutApiService get _checkoutService => AppLocator.checkoutApiService;
+  final CheckoutApiService _checkoutService  =CheckoutApiService();
 
-  Future<void> placeOrder(Map<String, dynamic> body) async {
+Future<void> placeOrder(Map<String, dynamic> body) async {
     emit(CheckoutState.loading);
     try {
       final result = await _checkoutService.checkout(body);

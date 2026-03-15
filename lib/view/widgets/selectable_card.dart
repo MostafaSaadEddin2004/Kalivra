@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 
-/// Shared selectable card for settings (theme mode, language, etc.).
-/// Shows label, optional subtitle, optional icon, and check when selected.
 class SelectableCard extends StatelessWidget {
   const SelectableCard({
     super.key,

@@ -8,7 +8,6 @@ import 'package:kalivra/model/language/language_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/view/widgets/selectable_card.dart';
 
-/// Language selection (e.g. Arabic, English).
 class LanguageScreen extends StatelessWidget {
   const LanguageScreen({super.key});
 

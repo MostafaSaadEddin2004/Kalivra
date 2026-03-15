@@ -12,7 +12,6 @@ import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
 import 'package:kalivra/view/widgets/product/product_options_cards.dart';
 
-/// Full product details with add to cart.
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
 
@@ -26,7 +25,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedColorIndex = 0;
   int _selectedSizeIndex = 0;
 
-  Future<void> _addToWishlist(BuildContext context, ProductModel product,AppLocalizations l10n) async {
+void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations l10n) async {
     final productId = int.tryParse(product.id);
     if (productId == null || productId == 0) {
       if (context.mounted) {

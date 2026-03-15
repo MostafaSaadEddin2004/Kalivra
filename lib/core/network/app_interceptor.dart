@@ -1,11 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-/// Adds auth token to outgoing requests.
 class AuthInterceptor extends Interceptor {
   AuthInterceptor({this.getToken});
 
-  /// Returns the current auth token (e.g. from secure storage).
   final Future<String?> Function()? getToken;
 
   @override
@@ -29,17 +27,15 @@ class AuthInterceptor extends Interceptor {
     debugPrint('📨 Error body: $data');
     super.onError(err, handler);
   }
-
+  
   @override
-  void onResponse(
-    Response<dynamic> response,
-    ResponseInterceptorHandler handler,
-  ) {
-    debugPrint(
+  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+     debugPrint(
       '✅ Response [${response.statusCode}] → ${response.requestOptions.path}',
     );
     super.onResponse(response, handler);
   }
+
 }
 
 class LoggingInterceptor extends Interceptor {
@@ -49,7 +45,10 @@ class LoggingInterceptor extends Interceptor {
   final bool logResponseBody;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  void onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) {
     if (!enabled) {
       handler.next(options);
       return;
@@ -59,7 +58,10 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response response,
+    ResponseInterceptorHandler handler,
+  ) {
     if (!enabled) {
       handler.next(response);
       return;
@@ -94,7 +96,6 @@ class ErrorInterceptor extends Interceptor {
         requestOptions: err.requestOptions,
         error: apiException,
         response: err.response,
-        type: err.type,
       ),
     );
   }
@@ -123,7 +124,6 @@ class ErrorInterceptor extends Interceptor {
   }
 }
 
-/// Thrown when the API returns an error (4xx/5xx).
 class ApiException implements Exception {
   const ApiException({
     this.statusCode,

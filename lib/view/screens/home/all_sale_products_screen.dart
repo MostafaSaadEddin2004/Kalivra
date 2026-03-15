@@ -13,7 +13,6 @@ import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-/// Full-screen grid of sale products (products with salePrice). Uses ProductsCubit.
 class AllSaleProductsScreen extends StatefulWidget {
   const AllSaleProductsScreen({super.key});
 
@@ -107,11 +106,6 @@ class _AllSaleProductsScreenState extends State<AllSaleProductsScreen> {
               ],
             );
           }
-
-          void addToCart(ProductModel product) {
-            context.read<CartCubit>().addItem(product);
-          }
-
           return CustomScrollView(
             slivers: [
               _buildSaleBanner(context, theme, isDark),
@@ -131,7 +125,7 @@ class _AllSaleProductsScreenState extends State<AllSaleProductsScreen> {
                         product: product,
                         onTap: () => context.push(
                             AppRoutes.productDetails, extra: product),
-                        onAddToCart: () => addToCart(product),
+                        onAddToCart: () => context.read<CartCubit>().addItem(product),
                       );
                     },
                     childCount: saleProducts.length,

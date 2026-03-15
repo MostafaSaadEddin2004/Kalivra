@@ -5,7 +5,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Full order details: header, status, items, totals, address.
 class OrderDetailsScreen extends StatelessWidget {
   const OrderDetailsScreen({super.key, required this.order});
 

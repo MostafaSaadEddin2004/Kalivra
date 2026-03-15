@@ -1,21 +1,19 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_state.dart';
-import 'package:kalivra/core/auth/token_service.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 
 export 'notifications_state.dart';
 
-/// Holds whether notifications view requires login. Check is in cubit.
 class NotificationsCubit extends Cubit<NotificationsState> {
   NotificationsCubit() : super(const NotificationsState()) {
     _updateLoginRequired();
   }
 
-  void _updateLoginRequired() {
-    final token = TokenService.getTokenSync();
+  Future<void> _updateLoginRequired() async{
+    final token = await LocalStore.getToken();
     final loginRequired = token == null || token.isEmpty;
     emit(NotificationsState(loginRequired: loginRequired));
   }
 
-  /// Call when the tab is shown or when auth may have changed.
-  void refresh() => _updateLoginRequired();
+  Future<void> refresh() => _updateLoginRequired();
 }

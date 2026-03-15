@@ -5,10 +5,10 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/referral/referral_code_field.dart';
 
-/// Sign up: phone, name, password, confirm password. On submit → OTP phone (signup).
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -37,36 +37,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _signUp() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      final referralCode = _referralCodeController.text.trim();
-      context.push(
-        AppRoutes.otp,
-        extra: OtpOnboardingArgs(
-          mode: OtpScreenMode.signUp,
-          phone: _phoneController.text.trim(),
-          name: _nameController.text.trim(),
-          password: _passwordController.text,
-          referralCode: referralCode.isEmpty ? null : referralCode,
-        ),
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fillColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
-        : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
@@ -93,208 +67,89 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
                 SizedBox(height: 32.h),
-                TextFormField(
+                AppTextField(
                   controller: _phoneController,
+                  label: AppLocalizations.of(context)!.phoneLabel,
+                  hint: '+963 9XX XXX XXX',
                   keyboardType: TextInputType.phone,
+                  prefixIcon: Icon(
+                    Icons.phone_android_rounded,
+                    size: 22.r,
+                    color: labelColor,
+                  ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return AppLocalizations.of(context)!.enterPhone;
                     if (v.trim().length < 8) return AppLocalizations.of(context)!.invalidPhoneShort;
                     return null;
                   },
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.phoneLabel,
-                    hintText: '+963 9XX XXX XXX',
-                    prefixIcon: Icon(
-                      Icons.phone_android_rounded,
-                      size: 22.r,
-                      color: labelColor,
-                    ),
-                    filled: true,
-                    fillColor: fillColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(
-                        color: isDark
-                            ? AppColors.goldLight
-                            : AppColors.burgundy,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: const BorderSide(color: AppColors.red),
-                    ),
-                    labelStyle: TextStyle(color: labelColor),
-                    hintStyle: TextStyle(
-                      color: labelColor.withValues(alpha: 0.6),
-                    ),
-                  ),
                 ),
                 SizedBox(height: 20.h),
-                TextFormField(
+                AppTextField(
                   controller: _nameController,
+                  label: AppLocalizations.of(context)!.fullName,
+                  hint: AppLocalizations.of(context)!.enterName,
                   textCapitalization: TextCapitalization.words,
+                  prefixIcon: Icon(
+                    Icons.person_outline_rounded,
+                    size: 22.r,
+                    color: labelColor,
+                  ),
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return AppLocalizations.of(context)!.enterName;
                     return null;
                   },
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.fullName,
-                    hintText: AppLocalizations.of(context)!.enterName,
-                    prefixIcon: Icon(
-                      Icons.person_outline_rounded,
-                      size: 22.r,
-                      color: labelColor,
-                    ),
-                    filled: true,
-                    fillColor: fillColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(
-                        color: isDark
-                            ? AppColors.goldLight
-                            : AppColors.burgundy,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: const BorderSide(color: AppColors.red),
-                    ),
-                    labelStyle: TextStyle(color: labelColor),
-                    hintStyle: TextStyle(
-                      color: labelColor.withValues(alpha: 0.6),
-                    ),
-                  ),
                 ),
                 SizedBox(height: 20.h),
-                TextFormField(
+                AppTextField(
                   controller: _passwordController,
+                  label: AppLocalizations.of(context)!.passwordLabel,
+                  hint: '••••••••',
                   obscureText: _obscurePassword,
+                  prefixIcon: Icon(
+                    Icons.lock_outline_rounded,
+                    size: 22.r,
+                    color: labelColor,
+                  ),
+                  suffixIcon: CustomIconButton(
+                    icon: _obscurePassword
+                        ? Icons.visibility_off_rounded
+                        : Icons.visibility_rounded,
+                    iconSize: 22.r,
+                    color: labelColor,
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
+                  ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return AppLocalizations.of(context)!.enterPassword;
                     if (v.length < 6) return AppLocalizations.of(context)!.passwordMinLength;
                     return null;
                   },
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.passwordLabel,
-                    hintText: '••••••••',
-                    prefixIcon: Icon(
-                      Icons.lock_outline_rounded,
-                      size: 22.r,
-                      color: labelColor,
-                    ),
-                    suffixIcon: CustomIconButton(
-                      icon: _obscurePassword
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                      iconSize: 22.r,
-                      color: labelColor,
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                    filled: true,
-                    fillColor: fillColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(
-                        color: isDark
-                            ? AppColors.goldLight
-                            : AppColors.burgundy,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: const BorderSide(color: AppColors.red),
-                    ),
-                    labelStyle: TextStyle(color: labelColor),
-                    hintStyle: TextStyle(
-                      color: labelColor.withValues(alpha: 0.6),
-                    ),
-                  ),
                 ),
                 SizedBox(height: 20.h),
-
-                TextFormField(
+                AppTextField(
                   controller: _confirmPasswordController,
+                  label: AppLocalizations.of(context)!.confirmPassword,
+                  hint: '••••••••',
                   obscureText: _obscureConfirm,
+                  prefixIcon: Icon(
+                    Icons.lock_outline_rounded,
+                    size: 22.r,
+                    color: labelColor,
+                  ),
+                  suffixIcon: CustomIconButton(
+                    icon: _obscureConfirm
+                        ? Icons.visibility_off_rounded
+                        : Icons.visibility_rounded,
+                    iconSize: 22.r,
+                    color: labelColor,
+                    onPressed: () =>
+                        setState(() => _obscureConfirm = !_obscureConfirm),
+                  ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return AppLocalizations.of(context)!.confirmPasswordRequired;
-                    if (v != _passwordController.text) {
-                      return AppLocalizations.of(context)!.passwordsDoNotMatch;
-                    }
+                    if (v != _passwordController.text) return AppLocalizations.of(context)!.passwordsDoNotMatch;
                     return null;
                   },
-                  decoration: InputDecoration(
-                    labelText: AppLocalizations.of(context)!.confirmPassword,
-                    hintText: '••••••••',
-                    prefixIcon: Icon(
-                      Icons.lock_outline_rounded,
-                      size: 22.r,
-                      color: labelColor,
-                    ),
-                    suffixIcon: CustomIconButton(
-                      icon: _obscureConfirm
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
-                      iconSize: 22.r,
-                      color: labelColor,
-                      onPressed: () =>
-                          setState(() => _obscureConfirm = !_obscureConfirm),
-                    ),
-                    filled: true,
-                    fillColor: fillColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(color: borderColor),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: BorderSide(
-                        color: isDark
-                            ? AppColors.goldLight
-                            : AppColors.burgundy,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                      borderSide: const BorderSide(color: AppColors.red),
-                    ),
-                    labelStyle: TextStyle(color: labelColor),
-                    hintStyle: TextStyle(
-                      color: labelColor.withValues(alpha: 0.6),
-                    ),
-                  ),
                 ),
                 SizedBox(height: 20.h),
                 ReferralCodeField(
@@ -303,7 +158,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 SizedBox(height: 32.h),
                 FilledButton(
-                  onPressed: _isLoading ? null : _signUp,
+                  onPressed:(){},
                   style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     shape: RoundedRectangleBorder(

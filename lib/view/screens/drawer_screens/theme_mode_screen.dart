@@ -8,7 +8,6 @@ import 'package:kalivra/model/theme/theme_mode_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/view/widgets/selectable_card.dart';
 
-/// Theme mode selection: Dark, Light, System.
 class ThemeModeScreen extends StatelessWidget {
   const ThemeModeScreen({super.key});
 

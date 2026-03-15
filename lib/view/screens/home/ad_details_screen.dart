@@ -4,7 +4,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/ad/advertisement_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Single ad details screen with company info. Opened when user taps an ad on home.
 class AdDetailsScreen extends StatelessWidget {
   const AdDetailsScreen({super.key, required this.ad});
 
@@ -25,7 +24,6 @@ class AdDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Promo header card
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(24.w),
@@ -96,7 +94,6 @@ class AdDetailsScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24.h),
-            // Company details card
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(

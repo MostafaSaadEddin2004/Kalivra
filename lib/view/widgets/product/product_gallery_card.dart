@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Displays a single product image from URL or asset path.
 class _ProductImage extends StatelessWidget {
   const _ProductImage({
     required this.imageUrl,
@@ -71,8 +70,6 @@ class _ProductImage extends StatelessWidget {
   }
 }
 
-/// Product image gallery with main view and thumbnail strip.
-/// Uses local state only (no Bloc).
 class ProductGalleryCard extends StatefulWidget {
   const ProductGalleryCard({
     super.key,

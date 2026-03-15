@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -46,7 +47,7 @@ class _IntroScreenState extends State<IntroScreen> {
     super.dispose();
   }
 
-  void _onNext() {
+  void _onNext() async{
     if (_currentPage < _pages(context).length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
@@ -57,6 +58,7 @@ class _IntroScreenState extends State<IntroScreen> {
       });
     } else {
       context.go(AppRoutes.login);
+      await LocalStore.setIntroPass('passed');
     }
   }
 

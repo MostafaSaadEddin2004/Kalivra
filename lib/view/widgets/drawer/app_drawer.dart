@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/auth/token_service.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_footer.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_header.dart';
@@ -20,11 +19,8 @@ class AppDrawer extends StatelessWidget {
     context.push(path);
   }
 
-  Future<void> _shareApp(BuildContext context) {
-    return Share.share(
-      kalivraShareUrl,
-      subject: 'Kalivra',
-    );
+Future<ShareResult> _shareApp(BuildContext context) async {
+    return Share.share(kalivraShareUrl, subject: 'Kalivra');
   }
 
   @override
@@ -33,8 +29,8 @@ class AppDrawer extends StatelessWidget {
     final primary = theme.colorScheme.primary;
     final statusBarBrightness =
         ThemeData.estimateBrightnessForColor(primary) == Brightness.dark
-            ? Brightness.light
-            : Brightness.dark;
+        ? Brightness.light
+        : Brightness.dark;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -49,84 +45,72 @@ class AppDrawer extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-            CustomDrawerHeader(onClose: () => context.pop(context)),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  DrawerItem(
-                    icon: Icons.person_outline_rounded,
-                    label: AppLocalizations.of(context)!.drawerMyAccount,
-                    onTap: () => _openScreen(context, AppRoutes.account),
-                  ),
-                  DrawerItem(
-                    icon: Icons.receipt_long_outlined,
-                    label: AppLocalizations.of(context)!.drawerMyOrders,
-                    onTap: () => _openScreen(context, AppRoutes.orders),
-                  ),
-                  DrawerItem(
-                    icon: Icons.favorite_border_rounded,
-                    label: AppLocalizations.of(context)!.drawerFavorites,
-                    onTap: () => _openScreen(context, AppRoutes.favorites),
-                  ),
-                  DrawerItem(
-                    icon: Icons.settings_outlined,
-                    label: AppLocalizations.of(context)!.drawerSettings,
-                    onTap: () => _openScreen(context, AppRoutes.settings),
-                  ),
-                  DrawerItem(
-                    icon: Icons.phone_outlined,
-                    label: AppLocalizations.of(context)!.drawerContactUs,
-                    onTap: () => _openScreen(context, AppRoutes.contact),
-                  ),
-                  DrawerItem(
-                    icon: Icons.info_outline_rounded,
-                    label: AppLocalizations.of(context)!.drawerAboutApp,
-                    onTap: () => _openScreen(context, AppRoutes.about),
-                  ),
-                  DrawerItem(
-                    icon: Icons.privacy_tip_outlined,
-                    label: AppLocalizations.of(context)!.drawerPrivacyPolicy,
-                    onTap: () => _openScreen(context, AppRoutes.privacy),
-                  ),
-                  DrawerItem(
-                    icon: Icons.share_rounded,
-                    label: AppLocalizations.of(context)!.drawerShare,
-                    onTap: () => _shareApp(context),
-                  ),
-                  DrawerItem(
-                    icon: Icons.star_rounded,
-                    label: AppLocalizations.of(context)!.rateTitle,
-                    onTap: () => _openScreen(context, AppRoutes.rate),
-                  ),
-                  BlocBuilder<AuthCubit, AuthState>(
-                    builder: (context, state) {
-                      final isSignedIn = TokenService.getTokenSync() != null &&
-                          TokenService.getTokenSync()!.isNotEmpty;
-                      final l10n = AppLocalizations.of(context)!;
-                      return DrawerItem(
-                        icon: isSignedIn
-                            ? Icons.logout_rounded
-                            : Icons.login_rounded,
-                        label: isSignedIn ? l10n.signOut : l10n.signIn,
-                        onTap: () {
-                          if (isSignedIn) {
-                            context.read<AuthCubit>().logout();
-                            if (context.mounted) context.pop(context);
-                          } else {
-                            context.pop(context);
-                            if (context.mounted) {
-                              context.go(AppRoutes.login);
-                            }
-                          }
-                        },
-                      );
-                    },
-                  ),
-                  const DrawerFooter(),
-                ],
+              CustomDrawerHeader(onClose: () => context.pop(context)),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    DrawerItem(
+                      icon: Icons.person_outline_rounded,
+                      label: AppLocalizations.of(context)!.drawerMyAccount,
+                      onTap: () => _openScreen(context, AppRoutes.account),
+                    ),
+                    DrawerItem(
+                      icon: Icons.receipt_long_outlined,
+                      label: AppLocalizations.of(context)!.drawerMyOrders,
+                      onTap: () => _openScreen(context, AppRoutes.orders),
+                    ),
+                    DrawerItem(
+                      icon: Icons.favorite_border_rounded,
+                      label: AppLocalizations.of(context)!.drawerFavorites,
+                      onTap: () => _openScreen(context, AppRoutes.favorites),
+                    ),
+                    DrawerItem(
+                      icon: Icons.settings_outlined,
+                      label: AppLocalizations.of(context)!.drawerSettings,
+                      onTap: () => _openScreen(context, AppRoutes.settings),
+                    ),
+                    DrawerItem(
+                      icon: Icons.phone_outlined,
+                      label: AppLocalizations.of(context)!.drawerContactUs,
+                      onTap: () => _openScreen(context, AppRoutes.contact),
+                    ),
+                    DrawerItem(
+                      icon: Icons.info_outline_rounded,
+                      label: AppLocalizations.of(context)!.drawerAboutApp,
+                      onTap: () => _openScreen(context, AppRoutes.about),
+                    ),
+                    DrawerItem(
+                      icon: Icons.privacy_tip_outlined,
+                      label: AppLocalizations.of(context)!.drawerPrivacyPolicy,
+                      onTap: () => _openScreen(context, AppRoutes.privacy),
+                    ),
+                    DrawerItem(
+                      icon: Icons.share_rounded,
+                      label: AppLocalizations.of(context)!.drawerShare,
+                      onTap: () => _shareApp(context),
+                    ),
+                    DrawerItem(
+                      icon: Icons.star_rounded,
+                      label: AppLocalizations.of(context)!.rateTitle,
+                      onTap: () => _openScreen(context, AppRoutes.rate),
+                    ),
+                    BlocBuilder<MiddlewareCubit, MiddlewareState>(
+                      builder: (context, state) {
+                        switch (state) {
+                          case LogOutButton():
+                            return state.button;
+                          case LoginButton():
+                            return state.button;
+                          default:
+                            return const SizedBox.shrink();
+                        }
+                      },
+                    ),
+                    const DrawerFooter(),
+                  ],
+                ),
               ),
-            ),
             ],
           ),
         ),

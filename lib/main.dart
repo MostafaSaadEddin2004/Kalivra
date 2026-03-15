@@ -15,8 +15,6 @@ import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dar
 import 'package:kalivra/controller/blocs/cubit/checkout_cubit/checkout_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
-import 'package:kalivra/core/auth/token_service.dart';
-import 'package:kalivra/core/app_locator.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/screen_util_config.dart';
@@ -28,14 +26,12 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await TokenService.init();
-  await AppLocator.initAsync();
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => ThemeBloc()..add(GetThemeMode())),
         BlocProvider(create: (context) => LocaleBloc()..add(GetLocale())),
-        BlocProvider(create: (context) => AuthCubit()..loadProfileIfToken()),
+        BlocProvider(create: (context) => AuthCubit()..loadProfile()),
         BlocProvider(create: (context) => CartCubit()),
         BlocProvider(create: (context) => ProductsCubit()..loadAll()),
         BlocProvider(create: (context) => OrdersCubit()),

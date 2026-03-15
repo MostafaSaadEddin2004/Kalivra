@@ -6,7 +6,6 @@ import 'package:kalivra/model/data/ads_data.dart';
 import 'package:kalivra/model/ad/advertisement_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Full-screen list of all ads (same as those on home) with details.
 class AllAdsScreen extends StatelessWidget {
   const AllAdsScreen({super.key});
 

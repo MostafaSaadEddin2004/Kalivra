@@ -3,10 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Edit profile form: name, email, phone, address. Matches account screen data.
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -46,12 +46,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fillColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
-        : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
@@ -113,26 +107,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               title: l10n.personalInfo,
               icon: Icons.person_outline_rounded,
               children: [
-                _buildField(
-                  context: context,
+                AppTextField(
                   controller: _nameController,
                   label: l10n.fullName,
                   hint: l10n.enterFullNameHint,
-                  icon: Icons.badge_outlined,
-                  borderColor: borderColor,
-                  fillColor: fillColor,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.enterName : null,
+                  prefixIcon: Icon(Icons.badge_outlined, size: 22.r, color: isDark ? AppColors.taupe : AppColors.burgundy),
+                  validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterName : null,
                 ),
                 SizedBox(height: 16.h),
-                _buildField(
-                  context: context,
+                AppTextField(
                   controller: _emailController,
                   label: l10n.email,
                   hint: 'example@email.com',
-                  icon: Icons.email_outlined,
-                  borderColor: borderColor,
-                  fillColor: fillColor,
+                  prefixIcon: Icon(Icons.email_outlined, size: 22.r, color: isDark ? AppColors.taupe : AppColors.burgundy),
                   keyboardType: TextInputType.emailAddress,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return l10n.enterEmailShort;
@@ -141,17 +128,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   },
                 ),
                 SizedBox(height: 16.h),
-                _buildField(
-                  context: context,
+                AppTextField(
                   controller: _phoneController,
                   label: l10n.mobileNumber,
                   hint: '+966 5XX XXX XXXX',
-                  icon: Icons.phone_android_rounded,
-                  borderColor: borderColor,
-                  fillColor: fillColor,
+                  prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: isDark ? AppColors.taupe : AppColors.burgundy),
                   keyboardType: TextInputType.phone,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.enterPhone : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterPhone : null,
                 ),
               ],
             ),
@@ -160,30 +143,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               title: l10n.address,
               icon: Icons.location_on_outlined,
               children: [
-                _buildField(
-                  context: context,
+                AppTextField(
                   controller: _addressController,
                   label: l10n.mainAddress,
                   hint: l10n.cityAreaStreet,
-                  icon: Icons.place_outlined,
-                  borderColor: borderColor,
-                  fillColor: fillColor,
+                  prefixIcon: Icon(Icons.place_outlined, size: 22.r, color: isDark ? AppColors.taupe : AppColors.burgundy),
                   maxLines: 2,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.enterAddressShort : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterAddressShort : null,
                 ),
                 SizedBox(height: 16.h),
-                _buildField(
-                  context: context,
+                AppTextField(
                   controller: _postalController,
                   label: l10n.postalCode,
                   hint: '12345',
-                  icon: Icons.markunread_mailbox_rounded,
-                  borderColor: borderColor,
-                  fillColor: fillColor,
+                  prefixIcon: Icon(Icons.markunread_mailbox_rounded, size: 22.r, color: isDark ? AppColors.taupe : AppColors.burgundy),
                   keyboardType: TextInputType.number,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? l10n.enterPostalCodeShort : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterPostalCodeShort : null,
                 ),
               ],
             ),
@@ -208,62 +183,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required BuildContext context,
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required Color borderColor,
-    required Color fillColor,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
-
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(
-          icon,
-          size: 22.r,
-          color: labelColor,
-        ),
-        filled: true,
-        fillColor: fillColor,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.red),
-        ),
-        labelStyle: TextStyle(color: labelColor),
-        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
       ),
     );
   }

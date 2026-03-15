@@ -5,8 +5,8 @@ import 'package:kalivra/model/order/shipment_api_model.dart';
 import 'package:kalivra/model/order/transaction_api_model.dart';
 
 class OrderApiService {
-  OrderApiService(this._client);
-  final DioClient _client;
+  OrderApiService();
+  final DioClient _client = DioClient();
 
   Future<List<OrderApiModel>> getOrders() async {
     final res = await _client.get<Map<String, dynamic>>('orders');

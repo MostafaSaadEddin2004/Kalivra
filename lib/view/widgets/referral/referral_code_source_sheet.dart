@@ -6,8 +6,6 @@ import 'package:kalivra/view/screens/qr_scan_screen.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-/// Shows a bottom sheet with two options: pick QR from gallery or scan with camera.
-/// Requests camera/photo permissions when needed. Calls [onCode] with the decoded string.
 void showReferralCodeSourceSheet(
   BuildContext context, {
   required void Function(String code) onCode,

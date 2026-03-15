@@ -7,9 +7,9 @@ import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/referral_repository.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// After signup OTP: complete profile (photo, location, name, email, phone, address, postal).
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key, this.args});
 
@@ -60,13 +60,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fillColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
-        : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
+    final l10n = AppLocalizations.of(context)!;
 
     return PopScopeExitApp(
       child: Scaffold(
@@ -123,72 +118,52 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               ),
             ),
             SizedBox(height: 28.h),
-            _buildField(
-              context: context,
+            AppTextField(
               controller: _nameController,
-              label: AppLocalizations.of(context)!.fullName,
-              hint: AppLocalizations.of(context)!.enterFullNameHint,
-              icon: Icons.badge_outlined,
-              borderColor: borderColor,
-              fillColor: fillColor,
-              labelColor: labelColor,
-              validator: (v) => (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterName : null,
+              label: l10n.fullName,
+              hint: l10n.enterFullNameHint,
+              prefixIcon: Icon(Icons.badge_outlined, size: 22.r, color: labelColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterName : null,
             ),
             SizedBox(height: 16.h),
-            _buildField(
-              context: context,
+            AppTextField(
               controller: _emailController,
-              label: AppLocalizations.of(context)!.emailRequired,
+              label: l10n.emailRequired,
               hint: 'example@email.com',
-              icon: Icons.email_outlined,
-              borderColor: borderColor,
-              fillColor: fillColor,
-              labelColor: labelColor,
+              prefixIcon: Icon(Icons.email_outlined, size: 22.r, color: labelColor),
               keyboardType: TextInputType.emailAddress,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return AppLocalizations.of(context)!.enterEmailShort;
-                if (!v.contains('@')) return AppLocalizations.of(context)!.invalidEmail;
+                if (v == null || v.trim().isEmpty) return l10n.enterEmailShort;
+                if (!v.contains('@')) return l10n.invalidEmail;
                 return null;
               },
             ),
             SizedBox(height: 16.h),
-            _buildField(
-              context: context,
+            AppTextField(
               controller: _phoneController,
-              label: AppLocalizations.of(context)!.mobileNumber,
+              label: l10n.mobileNumber,
               hint: '+963 9XX XXX XXX',
-              icon: Icons.phone_android_rounded,
-              borderColor: borderColor,
-              fillColor: fillColor,
-              labelColor: labelColor,
+              prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
               keyboardType: TextInputType.phone,
-              validator: (v) => (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPhone : null,
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterPhone : null,
             ),
             SizedBox(height: 16.h),
-            _buildField(
-              context: context,
+            AppTextField(
               controller: _addressController,
-              label: AppLocalizations.of(context)!.addressOrLocation,
-              hint: AppLocalizations.of(context)!.cityAreaStreet,
-              icon: Icons.location_on_outlined,
-              borderColor: borderColor,
-              fillColor: fillColor,
-              labelColor: labelColor,
+              label: l10n.addressOrLocation,
+              hint: l10n.cityAreaStreet,
+              prefixIcon: Icon(Icons.location_on_outlined, size: 22.r, color: labelColor),
               maxLines: 2,
-              validator: (v) => (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterAddressShort : null,
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterAddressShort : null,
             ),
             SizedBox(height: 16.h),
-            _buildField(
-              context: context,
+            AppTextField(
               controller: _postalController,
-              label: AppLocalizations.of(context)!.postalCode,
+              label: l10n.postalCode,
               hint: '12345',
-              icon: Icons.markunread_mailbox_rounded,
-              borderColor: borderColor,
-              fillColor: fillColor,
-              labelColor: labelColor,
+              prefixIcon: Icon(Icons.markunread_mailbox_rounded, size: 22.r, color: labelColor),
               keyboardType: TextInputType.number,
-              validator: (v) => (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPostalCodeShort : null,
+              validator: (v) => (v == null || v.trim().isEmpty) ? l10n.enterPostalCodeShort : null,
             ),
             SizedBox(height: 32.h),
             FilledButton.icon(
@@ -211,42 +186,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         ),
       ),
     ),
-    );
-  }
-
-  Widget _buildField({
-    required BuildContext context,
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required Color borderColor,
-    required Color fillColor,
-    required Color labelColor,
-    TextInputType? keyboardType,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon, size: 22.r, color: labelColor),
-        filled: true,
-        fillColor: fillColor,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: borderColor)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: borderColor)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: BorderSide(color: isDark ? AppColors.goldLight : AppColors.burgundy, width: 1.5)),
-        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r), borderSide: const BorderSide(color: AppColors.red)),
-        labelStyle: TextStyle(color: labelColor),
-        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-      ),
     );
   }
 }

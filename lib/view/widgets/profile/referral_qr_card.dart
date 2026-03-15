@@ -5,8 +5,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-/// Displays the user's referral code as a QR code and as text with copy action.
-/// The [referralCode] should come from the server API.
 class ReferralQrCard extends StatelessWidget {
   const ReferralQrCard({
     super.key,

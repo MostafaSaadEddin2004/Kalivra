@@ -4,7 +4,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Brand details: name, shops count, locations, then products and sale products.
 class BrandDetailsScreen extends StatelessWidget {
   const BrandDetailsScreen({super.key, required this.brand});
 
@@ -19,17 +18,11 @@ class BrandDetailsScreen extends StatelessWidget {
         ? AppColors.burgundy.withValues(alpha: 0.15)
         : AppColors.burgundy.withValues(alpha: 0.06);
 
-
-    // void addToCart(ProductModel product) {
-    //   context.read<CartCubit>().addItem(product);
-    // }
-
     return Scaffold(
       appBar: DrawerScreenAppBar(title: brand.name),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
         children: [
-          // Brand header
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(20.w),
@@ -77,7 +70,6 @@ class BrandDetailsScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20.h),
-          // Details card: shops, locations, phone, website
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
@@ -127,46 +119,6 @@ class BrandDetailsScreen extends StatelessWidget {
             ),
           ),
           SizedBox(height: 24.h),
-          // Products section (all brand products)
-          // ProductsSection(
-          //   filteredProducts: brandProducts,
-          //   onAddToCart: (p) => addToCart(p),
-          //   onProductTap: (p) => context.push(AppRoutes.productDetails, extra: p),
-          // ),
-          // if (brandProducts.isEmpty)
-          //   Padding(
-          //     padding: EdgeInsets.symmetric(vertical: 16.h),
-          //     child: Center(
-          //       child: Text(
-          //         'لا توجد منتجات لهذه العلامة حالياً',
-          //         style: theme.textTheme.bodyMedium?.copyWith(
-          //           color: isDark ? AppColors.taupe : AppColors.burgundy,
-          //         ),
-          //       ),
-          //     ),
-          //   )
-          // else
-          //   SizedBox(height: 24.h),
-          // // Sale products section (brand products on sale)
-          // SalesSection(
-          //   saleProducts: brandSaleProducts,
-          //   onAddToCart: (p) => addToCart(p),
-          //   onProductTap: (p) => context.push(AppRoutes.productDetails, extra: p),
-          // ),
-          // if (brandSaleProducts.isEmpty)
-          //   Padding(
-          //     padding: EdgeInsets.symmetric(vertical: 16.h),
-          //     child: Center(
-          //       child: Text(
-          //         'لا توجد عروض لهذه العلامة حالياً',
-          //         style: theme.textTheme.bodyMedium?.copyWith(
-          //           color: isDark ? AppColors.taupe : AppColors.burgundy,
-          //         ),
-          //       ),
-          //     ),
-          //   )
-          // else
-          //   SizedBox(height: 16.h),
         ],
       ),
     );

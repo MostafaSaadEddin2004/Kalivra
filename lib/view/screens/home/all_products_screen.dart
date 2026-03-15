@@ -82,7 +82,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               ),
             );
           }
-
           if (products.isEmpty) {
             return Center(
               child: Text(
@@ -93,11 +92,6 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
               ),
             );
           }
-
-          void addToCart(ProductModel product) {
-            context.read<CartCubit>().addItem(product);
-          }
-
           return CustomScrollView(
             slivers: [
               SliverPadding(
@@ -116,7 +110,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                         product: product,
                         onTap: () =>
                             context.push(AppRoutes.productDetails, extra: product),
-                        onAddToCart: () => addToCart(product),
+                        onAddToCart: () => context.read<CartCubit>().addItem(product),
                       );
                     },
                     childCount: products.length,

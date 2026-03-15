@@ -26,14 +26,14 @@ class CartApiService {
     return res;
   }
 
-  Future<void> updateItem(int itemId, int quantity) async {
+Future<void> updateItem(int itemId, int quantity) async {
     await _client.put<Map<String, dynamic>>(
       'cart/items/$itemId',
       data: {'quantity': quantity},
     );
   }
 
-  Future<void> removeItem(int itemId) async {
+Future<void> removeItem(int itemId) async {
     await _client.delete<Map<String, dynamic>>('cart/items/$itemId');
   }
 }

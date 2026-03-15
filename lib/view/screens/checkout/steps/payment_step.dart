@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 
-/// Payment type: cash on delivery or e-payment (Shamcash, Syriatel Cash, MTN Cash).
 enum PaymentType { cashOnDelivery, ePayment }
 
-/// e-Payment method options in Syria.
 enum EPaymentMethod { shamcash, syriatelCash, mtnCash }
 
 class PaymentStep extends StatefulWidget {
@@ -30,49 +29,9 @@ class PaymentStepState extends State<PaymentStep> {
     super.dispose();
   }
 
-  /// Called by parent to validate before allowing proceed to next step.
   bool validateStep() {
     if (_paymentType == PaymentType.cashOnDelivery) return true;
     return _formKey.currentState?.validate() ?? false;
-  }
-
-  InputDecoration _inputDecoration(
-    BuildContext context, {
-    required String label,
-    required String hint,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final borderColor = AppColors.offWhite.withValues(alpha: isDark ? 0.6 : 0.8);
-    final fillColor = isDark
-        ? const Color(0xFF1A1918)
-        : AppColors.offWhite.withValues(alpha: 0.5);
-    final labelColor = isDark ? AppColors.offWhite : AppColors.burgundy;
-
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      filled: true,
-      fillColor: fillColor,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: borderColor),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: borderColor),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: AppColors.offWhite, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppColors.red),
-      ),
-      labelStyle: TextStyle(color: labelColor),
-      hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-    );
   }
 
   @override
@@ -138,31 +97,23 @@ class PaymentStepState extends State<PaymentStep> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  TextFormField(
+                  AppTextField(
                     controller: _phoneController,
+                    label: l10n.walletPhoneLabel,
+                    hint: '09XXXXXXXX',
                     keyboardType: TextInputType.phone,
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return l10n.required;
                       if (v.trim().length < 8) return l10n.invalidPhone;
                       return null;
                     },
-                    decoration: _inputDecoration(
-                      context,
-                      label: l10n.walletPhoneLabel,
-                      hint: '09XXXXXXXX',
-                    ),
-                    style: TextStyle(color: textColor),
                   ),
                   SizedBox(height: 16.h),
-                  TextFormField(
+                  AppTextField(
                     controller: _nameController,
+                    label: l10n.walletNameLabel,
+                    hint: l10n.walletNameHint,
                     textCapitalization: TextCapitalization.words,
-                    decoration: _inputDecoration(
-                      context,
-                      label: l10n.walletNameLabel,
-                      hint: l10n.walletNameHint,
-                    ),
-                    style: TextStyle(color: textColor),
                   ),
                 ],
               ),

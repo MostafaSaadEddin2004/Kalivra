@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_state.dart';
-import 'package:kalivra/core/app_locator.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/model/services/api/category_api_service.dart';
 import 'package:kalivra/model/services/api/mappers/category_mapper.dart';
@@ -12,10 +11,10 @@ export 'products_state.dart';
 class ProductsCubit extends Cubit<ProductsState> {
   ProductsCubit() : super(ProductsState.initial);
 
-  CategoryApiService get _categoryService => AppLocator.categoryApiService;
-  ProductApiService get _productService => AppLocator.productApiService;
+  final CategoryApiService  _categoryService = CategoryApiService();
+  final ProductApiService  _productService = ProductApiService();
 
-  Future<void> loadCategories() async {
+Future<void> loadCategories() async {
     emit(ProductsState.categoriesLoading);
     try {
       final list = await _categoryService.getCategories();
@@ -26,7 +25,7 @@ class ProductsCubit extends Cubit<ProductsState> {
     }
   }
 
-  Future<void> loadProducts({int? categoryId}) async {
+Future<void> loadProducts({int? categoryId}) async {
     emit(ProductsState.productsLoading);
     try {
       final list = await _productService.getProducts(categoryId: categoryId);
@@ -37,7 +36,7 @@ class ProductsCubit extends Cubit<ProductsState> {
     }
   }
 
-  Future<void> loadAll() async {
+Future<void> loadAll() async {
     emit(ProductsState.loading);
     try {
       final categories = await _categoryService.getCategories();

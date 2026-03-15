@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// Full-screen QR/barcode scanner. Pops with the scanned string on success.
 class QrScanScreen extends StatefulWidget {
   const QrScanScreen({super.key});
 
@@ -121,7 +120,6 @@ class _CornerAccentPainter extends CustomPainter {
     final h = size.height;
     final l = cornerLength;
 
-    // Top-left
     canvas.drawPath(
       Path()
         ..moveTo(0, l)
@@ -129,7 +127,6 @@ class _CornerAccentPainter extends CustomPainter {
         ..lineTo(l, 0),
       paint,
     );
-    // Top-right
     canvas.drawPath(
       Path()
         ..moveTo(w - l, 0)
@@ -137,7 +134,6 @@ class _CornerAccentPainter extends CustomPainter {
         ..lineTo(w, l),
       paint,
     );
-    // Bottom-right
     canvas.drawPath(
       Path()
         ..moveTo(w, h - l)
@@ -145,7 +141,6 @@ class _CornerAccentPainter extends CustomPainter {
         ..lineTo(w - l, h),
       paint,
     );
-    // Bottom-left
     canvas.drawPath(
       Path()
         ..moveTo(l, h)

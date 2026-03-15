@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_state.dart';
-import 'package:kalivra/core/app_locator.dart';
 import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/model/services/api/mappers/order_mapper.dart';
 import 'package:kalivra/model/services/api/order_api_service.dart';
@@ -10,9 +9,9 @@ export 'orders_state.dart';
 class OrdersCubit extends Cubit<OrdersState> {
   OrdersCubit() : super(OrdersState.initial);
 
-  OrderApiService get _orderService => AppLocator.orderApiService;
+  final OrderApiService  _orderService = OrderApiService();
 
-  Future<void> loadOrders() async {
+Future<void> loadOrders() async {
     emit(OrdersState.loading);
     try {
       final list = await _orderService.getOrders();

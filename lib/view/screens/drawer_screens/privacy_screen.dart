@@ -4,7 +4,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Privacy policy: scrollable text.
 class PrivacyScreen extends StatelessWidget {
   const PrivacyScreen({super.key});
 

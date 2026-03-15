@@ -1,26 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_state.dart';
-import 'package:kalivra/core/auth/token_service.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/model/cart/cart_item_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
 
 export 'cart_state.dart';
 
-/// Manages cart state. Add-to-cart requires login; check is done in cubit.
 class CartCubit extends Cubit<CartState> {
   CartCubit() : super(const CartState());
 
-  /// Fixed delivery cost. Can be made configurable (e.g. from API) later.
   static const double deliveryCost = 15.0;
 
-  bool get _isLoggedIn {
-    final token = TokenService.getTokenSync();
-    return token != null && token.isNotEmpty;
-  }
 
-  void addItem(ProductModel product, {int quantity = 1}) {
+  Future<void> addItem(ProductModel product, {int quantity = 1}) async{
+    final token = await LocalStore.getToken();
     if (quantity < 1) return;
-    if (!_isLoggedIn) {
+    if (token == null || token.isEmpty) {
       emit(state.copyWith(loginRequiredForAdd: true));
       return;
     }

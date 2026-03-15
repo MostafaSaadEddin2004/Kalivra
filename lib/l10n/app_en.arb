@@ -41,6 +41,8 @@
   "languageFollowSystemSubtitle": "Use device language",
 
   "ok": "OK",
+  "yes": "Yes",
+  "no": "No",
   "error": "Error",
   "version": "Version 1.0.0",
   "aboutAppDescription": "Kalivra gives you an easy and secure shopping experience for building and finishing products. Browse categories, order what you need, and track your orders in one place.",

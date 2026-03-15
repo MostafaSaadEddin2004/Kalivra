@@ -9,10 +9,11 @@ import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/referral_repository.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
+import 'package:kalivra/view/widgets/login_phone_email_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/referral/referral_code_field.dart';
 
-/// Login: phone number + password. Links to sign up.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -22,14 +23,15 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _phoneOrEmailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _referralCodeController = TextEditingController();
   bool _obscurePassword = true;
+  bool _loginWithEmail = false;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _phoneOrEmailController.dispose();
     _passwordController.dispose();
     _referralCodeController.dispose();
     super.dispose();
@@ -39,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final referralCode = _referralCodeController.text.trim();
     context.read<AuthCubit>().login(
-      _phoneController.text.trim(),
+      _phoneOrEmailController.text.trim(),
       _passwordController.text,
     );
     if (!mounted) return;
@@ -48,37 +50,42 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fillColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
-        : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
-        if (state.hasError) {
-          ApiErrorHandler.showSnackBar(
-            context,
-            state.error!,
-            fallbackMessage: AppLocalizations.of(context)!.loginFailed,
-          );
-        }
-        if (state.token != null && state.token!.isNotEmpty) {
-          context.go(AppRoutes.home);
+        switch (state) {
+          case AuthFailed():
+            ApiErrorHandler.showSnackBar(
+              context,
+              state.message,
+              fallbackMessage: AppLocalizations.of(context)!.loginFailed,
+            );
+            isLoading = false;
+            break;
+          case AuthSuccessed():
+            isLoading = false;
+          default:
+            isLoading = true;
+            break;
         }
       },
       builder: (context, authState) {
-        final isLoading = authState.isLoading;
         return Scaffold(
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: EdgeInsets.only(left: 24.w,top: 40.h,right: 24.w,bottom: 32.h),
+              padding: EdgeInsets.only(
+                left: 24.w,
+                top: 40.h,
+                right: 24.w,
+                bottom: 32.h,
+              ),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -99,110 +106,43 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    TextFormField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty)
-                          {return AppLocalizations.of(context)!.enterPhone;}
-                        if (v.trim().length < 8)
-                         { return AppLocalizations.of(
-                            context,
-                          )!.invalidPhoneShort;}
-                        return null;
+                    LoginPhoneEmailField(
+                      controller: _phoneOrEmailController,
+                      isEmailMode: _loginWithEmail,
+                      onToggleMode: () {
+                        setState(() {
+                          _loginWithEmail = !_loginWithEmail;
+                          _phoneOrEmailController.clear();
+                        });
                       },
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.phoneLabel,
-                        hintText: '+963 9XX XXX XXX',
-                        prefixIcon: Icon(
-                          Icons.phone_android_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        filled: true,
-                        fillColor: fillColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? AppColors.goldLight
-                                : AppColors.burgundy,
-                            width: 1.5,
-                          ),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: const BorderSide(color: AppColors.red),
-                        ),
-                        labelStyle: TextStyle(color: labelColor),
-                        hintStyle: TextStyle(
-                          color: labelColor.withValues(alpha: 0.6),
-                        ),
-                      ),
                     ),
                     SizedBox(height: 20.h),
-                    TextFormField(
+                    AppTextField(
                       controller: _passwordController,
+                      label: AppLocalizations.of(context)!.passwordLabel,
+                      hint: '••••••••',
                       obscureText: _obscurePassword,
-                      validator: (v) {
-                        if (v == null || v.isEmpty)
-                        {  return AppLocalizations.of(context)!.enterPassword;}
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.passwordLabel,
-                        hintText: '••••••••',
-                        prefixIcon: Icon(
-                          Icons.lock_outline_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                        suffixIcon: CustomIconButton(
-                          icon: _obscurePassword
-                              ? Icons.visibility_off_rounded
-                              : Icons.visibility_rounded,
-                          iconSize: 22.r,
-                          color: labelColor,
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
-                        ),
-                        filled: true,
-                        fillColor: fillColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? AppColors.goldLight
-                                : AppColors.burgundy,
-                            width: 1.5,
-                          ),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14.r),
-                          borderSide: const BorderSide(color: AppColors.red),
-                        ),
-                        labelStyle: TextStyle(color: labelColor),
-                        hintStyle: TextStyle(
-                          color: labelColor.withValues(alpha: 0.6),
+                      prefixIcon: Icon(
+                        Icons.lock_outline_rounded,
+                        size: 22.r,
+                        color: labelColor,
+                      ),
+                      suffixIcon: CustomIconButton(
+                        icon: _obscurePassword
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        iconSize: 22.r,
+                        color: labelColor,
+                        onPressed: () => setState(
+                          () => _obscurePassword = !_obscurePassword,
                         ),
                       ),
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return AppLocalizations.of(context)!.enterPassword;
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(height: 12.h),
                     ReferralCodeField(

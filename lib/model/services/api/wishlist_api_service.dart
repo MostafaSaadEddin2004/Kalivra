@@ -2,8 +2,8 @@ import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/wishlist/wishlist_api_model.dart';
 
 class WishlistApiService {
-  WishlistApiService(this._client);
-  final DioClient _client;
+  WishlistApiService();
+  final DioClient _client = DioClient();
 
   Future<List<WishlistApiModel>> getWishlist() async {
     final res = await _client.get<Map<String, dynamic>>('wishlist');

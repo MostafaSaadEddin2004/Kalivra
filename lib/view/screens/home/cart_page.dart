@@ -23,9 +23,3 @@ class CartPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-

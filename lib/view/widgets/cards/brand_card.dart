@@ -12,7 +12,6 @@ class BrandCard extends StatelessWidget {
 
   final BrandModel brand;
   final VoidCallback? onTap;
-  /// When true, card fills available width (e.g. in grid). When false, uses fixed width for horizontal list.
   final bool expanded;
 
   @override

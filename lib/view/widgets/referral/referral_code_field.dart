@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/referral/referral_code_source_sheet.dart';
 
-/// Expandable referral code section with AnimatedCrossFade.
-/// Collapsed: invite code question row. Expanded: row + text field (scan/gallery icons).
 class ReferralCodeField extends StatefulWidget {
   const ReferralCodeField({
     super.key,
@@ -14,7 +13,6 @@ class ReferralCodeField extends StatefulWidget {
   });
 
   final TextEditingController controller;
-  /// Spacing below the expanded field (e.g. 12 for login, 20 for sign up).
   final double bottomSpacing;
 
   @override
@@ -73,7 +71,6 @@ class _ReferralCodeFieldState extends State<ReferralCodeField> {
     );
   }
 
-  /// Collapsed: single row with invite code question (tap to expand).
   Widget _buildCollapsedHeader(
     BuildContext context,
     ThemeData theme,
@@ -152,44 +149,20 @@ class _ReferralCodeFieldState extends State<ReferralCodeField> {
           ),
         ),
         SizedBox(height: 12.h),
-        TextFormField(
+        AppTextField(
           controller: widget.controller,
+          label: AppLocalizations.of(context)!.inviteCodeLabel,
+          hint: AppLocalizations.of(context)!.inviteCodeHint,
           textCapitalization: TextCapitalization.characters,
-          decoration: InputDecoration(
-            labelText: AppLocalizations.of(context)!.inviteCodeLabel,
-            hintText: AppLocalizations.of(context)!.inviteCodeHint,
-            prefixIcon: IconButton(
-              icon: Icon(
-                Icons.qr_code_scanner_rounded,
-                size: 24.r,
-                color: labelColor,
-              ),
-              onPressed: _openReferralCodeOptions,
+          prefixIcon: IconButton(
+            icon: Icon(
+              Icons.qr_code_scanner_rounded,
+              size: 24.r,
+              color: labelColor,
             ),
-            filled: true,
-            fillColor: fillColor,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: BorderSide(color: borderColor),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: BorderSide(color: borderColor),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: BorderSide(
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                width: 1.5,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14.r),
-              borderSide: const BorderSide(color: AppColors.red),
-            ),
-            labelStyle: TextStyle(color: labelColor),
-            hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
+            onPressed: _openReferralCodeOptions,
           ),
+          borderRadius: 14.r,
         ),
         SizedBox(height: widget.bottomSpacing.h),
       ],

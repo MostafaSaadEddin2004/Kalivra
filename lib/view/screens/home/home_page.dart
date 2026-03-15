@@ -13,7 +13,6 @@ import 'package:kalivra/view/widgets/sections/sales_section.dart';
 import 'package:kalivra/view/widgets/slider_widgets/ad_slider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-/// Home tab: ads (local), brands (local), products & sales from API.
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -23,9 +22,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  void _addToCart(BuildContext context, ProductModel product) {
-    context.read<CartCubit>().addItem(product);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +45,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-            // SliverToBoxAdapter(
-            //   child: BrandsSection(
-            //     onBrandTap: (brand) =>
-            //         context.push(AppRoutes.brandDetails, extra: brand),
-            //     onShowAllTap: () => context.push(AppRoutes.allBrands),
-            //   ),
-            // ),
             SliverToBoxAdapter(child: SizedBox(height: 24.h)),
             SliverToBoxAdapter(
               child: isLoading && products.isEmpty
@@ -74,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                           : state.hasError
                               ? <ProductModel>[]
                               : state.products,
-                      onAddToCart: (p) => _addToCart(context, p),
+                      onAddToCart: (p) => context.read<CartCubit>().addItem(p),
                       onProductTap: (p) =>
                           context.push(AppRoutes.productDetails, extra: p),
                       onShowAllTap: () => context.push(AppRoutes.allProducts),
@@ -100,7 +89,7 @@ class _HomePageState extends State<HomePage> {
                     )
                   : SalesSection(
                       saleProducts: products,
-                      onAddToCart: (p) => _addToCart(context, p),
+                      onAddToCart: (p) => context.read<CartCubit>().addItem(p),
                       onProductTap: (p) =>
                           context.push(AppRoutes.productDetails, extra: p),
                       onShowAllTap: () => context.push(AppRoutes.allSaleProducts),

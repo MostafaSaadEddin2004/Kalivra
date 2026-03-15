@@ -2,8 +2,8 @@ import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
 
 class CategoryApiService {
-  CategoryApiService(this._client);
-  final DioClient _client;
+  CategoryApiService();
+  final DioClient _client = DioClient();
 
   Future<List<CategoryApiModel>> getCategories() async {
     final res = await _client.get<Map<String, dynamic>>('categories');

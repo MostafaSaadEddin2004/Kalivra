@@ -6,7 +6,6 @@ import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Rate the app: stars and feedback.
 class RateScreen extends StatelessWidget {
   const RateScreen({super.key});
 

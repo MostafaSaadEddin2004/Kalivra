@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_state.dart';
-import 'package:kalivra/core/app_locator.dart';
 import 'package:kalivra/model/product/product_api_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/model/services/api/mappers/product_mapper.dart';
@@ -11,9 +10,9 @@ export 'wishlist_state.dart';
 class WishlistCubit extends Cubit<WishlistState> {
   WishlistCubit() : super(WishlistState.initial);
 
-  WishlistApiService get _wishlistService => AppLocator.wishlistApiService;
+  final WishlistApiService _wishlistService =WishlistApiService();
 
-  Future<void> loadWishlist() async {
+Future<void> loadWishlist() async {
     emit(WishlistState.loading);
     try {
       final list = await _wishlistService.getWishlist();
@@ -32,7 +31,7 @@ class WishlistCubit extends Cubit<WishlistState> {
     }
   }
 
-  Future<void> add(int productId) async {
+Future<void> add(int productId) async {
     try {
       await _wishlistService.addToWishlist(productId);
       loadWishlist();
@@ -41,7 +40,7 @@ class WishlistCubit extends Cubit<WishlistState> {
     }
   }
 
-  Future<void> remove(int itemId) async {
+Future<void> remove(int itemId) async {
     try {
       await _wishlistService.removeFromWishlist(itemId);
       loadWishlist();

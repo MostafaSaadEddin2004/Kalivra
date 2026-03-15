@@ -8,9 +8,8 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 
-/// Onboarding step 1: Enter phone number → send code via WhatsApp → next.
-/// For signup, pass [signUpArgs] with phone/name/password; phone is prefilled.
 class OtpPhoneEntryScreen extends StatefulWidget {
   const OtpPhoneEntryScreen({super.key, this.mode, this.signUpArgs});
 
@@ -123,33 +122,12 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    TextFormField(
+                    AppTextField(
                       controller: _phoneController,
+                      label: AppLocalizations.of(context)!.phoneLabel,
+                      hint: '+966 5XX XXX XXXX',
                       keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: AppLocalizations.of(context)!.phoneLabel,
-                        hintText: '+966 5XX XXX XXXX',
-                        prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
-                        filled: true,
-                        fillColor: fillColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(
-                            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                            width: 1.5,
-                          ),
-                        ),
-                        labelStyle: TextStyle(color: labelColor),
-                        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-                      ),
+                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
                       validator: (v) =>
                           (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPhone : null,
                     ),

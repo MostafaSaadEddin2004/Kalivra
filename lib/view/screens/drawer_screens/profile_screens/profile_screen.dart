@@ -41,219 +41,243 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       appBar: DrawerScreenAppBar(title: l10n.myAccount),
       body: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, authState) {
-          if (authState.token == null || authState.token!.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: EdgeInsets.all(24.w),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        bloc: AuthCubit()
+          ..loadProfile()
+          ..checkAuthStatus(context),
+        builder: (context, state) {
+          switch (state) {
+            case UnAuthinticated():
+              return Center(
+                child: Padding(
+                  padding: EdgeInsets.all(24.w),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        state.message,
+                        style: textTheme.bodyLarge?.copyWith(color: labelColor),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 24.h),
+                      FilledButton(
+                        onPressed: () => context.go(AppRoutes.login),
+                        child: Text(l10n.signIn),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            case AuthLoading():
+              return Skeletonizer(
+                enabled: true,
+                child: ListView(
+                  padding: EdgeInsets.all(20.w),
                   children: [
-                    Text(
-                      l10n.loginToViewProfile,
-                      style: textTheme.bodyLarge?.copyWith(color: labelColor),
-                      textAlign: TextAlign.center,
+                    Center(
+                      child: Column(
+                        children: [
+                          CircleAvatar(radius: 48.r),
+                          SizedBox(height: 12.h),
+                          Text('displayName', style: textTheme.headlineSmall),
+                          SizedBox(height: 8.h),
+                          FilledButton.icon(
+                            onPressed: () {},
+                            icon: Icon(Icons.edit_rounded, size: 18.r),
+                            label: Text(l10n.editProfile),
+                            style: FilledButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 20.w,
+                                vertical: 10.h,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(height: 24.h),
-                    FilledButton(
-                      onPressed: () => context.go(AppRoutes.login),
-                      child: Text(l10n.signIn),
+                    SizedBox(height: 28.h),
+                    _SectionCard(
+                      title: l10n.accountInfo,
+                      children: [
+                        _InfoRow(
+                          label: l10n.name,
+                          value: '---',
+                          icon: Icons.person_outline_rounded,
+                        ),
+                        _InfoRow(
+                          label: l10n.email,
+                          value: '---',
+                          icon: Icons.email_outlined,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ),
-            );
-          }
-
-          final customer = authState.customer;
-          final profileLoading = customer == null && authState.isLoading;
-          final displayName = customer != null
-              ? (customer.name ?? '${customer.firstName ?? ''} ${customer.lastName ?? ''}'.trim())
-              : '---';
-          final memberSince = _formatMemberSince(context, customer?.createdAt);
-
-          if (profileLoading) {
-            return Skeletonizer(
-              enabled: true,
-              child: ListView(
+              );
+            case AuthFetchedData():
+              return ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
                   Center(
                     child: Column(
                       children: [
-                        CircleAvatar(radius: 48.r),
+                        CircleAvatar(
+                          radius: 48.r,
+                          backgroundColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.3)
+                              : AppColors.burgundy.withValues(alpha: 0.15),
+                          child: Icon(
+                            Icons.person_rounded,
+                            size: 56.r,
+                            color: isDark
+                                ? AppColors.goldLight
+                                : AppColors.burgundy,
+                          ),
+                        ),
                         SizedBox(height: 12.h),
-                        Text(displayName.isEmpty ? l10n.myAccount : displayName, style: textTheme.headlineSmall),
-                        Text(memberSince, style: textTheme.bodySmall),
+                        Text(
+                          "${state.customer.firstName} ${state.customer.lastName}",
+                          style: textTheme.headlineSmall?.copyWith(
+                            color: valueColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                         SizedBox(height: 8.h),
                         FilledButton.icon(
-                          onPressed: () {},
+                          onPressed: () => context.push(AppRoutes.editProfile),
                           icon: Icon(Icons.edit_rounded, size: 18.r),
                           label: Text(l10n.editProfile),
                           style: FilledButton.styleFrom(
-                            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 10.h,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
                   SizedBox(height: 28.h),
+                  FutureBuilder<String>(
+                    future: _referralCodeFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Card(
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14.r),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(24.w),
+                            child: Center(
+                              child: SizedBox(
+                                width: 32.w,
+                                height: 32.h,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      final code = snapshot.data ?? '';
+                      if (code.isEmpty) return const SizedBox.shrink();
+                      final primary = theme.colorScheme.primary;
+                      return Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => setState(
+                            () =>
+                                _referralCardExpanded = !_referralCardExpanded,
+                          ),
+                          borderRadius: BorderRadius.circular(20.r),
+                          child: AnimatedCrossFade(
+                            firstChild: _ReferralCardCollapsed(
+                              primary: primary,
+                              isDark: isDark,
+                              theme: theme,
+                            ),
+                            secondChild: ReferralQrCard(referralCode: code),
+                            crossFadeState: _referralCardExpanded
+                                ? CrossFadeState.showSecond
+                                : CrossFadeState.showFirst,
+                            duration: const Duration(milliseconds: 280),
+                            firstCurve: Curves.decelerate,
+                            secondCurve: Curves.easeInOut,
+                            sizeCurve: Curves.easeInOut,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 16.h),
                   _SectionCard(
                     title: l10n.accountInfo,
                     children: [
-                      _InfoRow(label: l10n.name, value: '---', icon: Icons.person_outline_rounded),
-                      _InfoRow(label: l10n.email, value: '---', icon: Icons.email_outlined),
+                      _InfoRow(
+                        label: l10n.fullName,
+                        value: state.customer.firstName ?? '---',
+                        icon: Icons.person_outline_rounded,
+                      ),
+                      _InfoRow(
+                        label: l10n.email,
+                        value: state.customer.email ?? '---',
+                        icon: Icons.email_outlined,
+                      ),
+                      _InfoRow(
+                        label: l10n.mobileNumber,
+                        value: state.customer.phone ?? '---',
+                        icon: Icons.phone_android_rounded,
+                      ),
                     ],
                   ),
+                  SizedBox(height: 16.h),
+                  _SectionCard(
+                    title: l10n.address,
+                    children: [
+                      _InfoRow(
+                        label: l10n.mainAddress,
+                        value: 'الرياض، حي النخيل، شارع الملك فهد',
+                        icon: Icons.location_on_outlined,
+                      ),
+                      _InfoRow(
+                        label: l10n.postalCode,
+                        value: '12345',
+                        icon: Icons.markunread_mailbox_rounded,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  _SectionCard(
+                    title: l10n.stats,
+                    children: [
+                      _StatRow(
+                        label: l10n.ordersCount,
+                        value: '12',
+                        icon: Icons.receipt_long_rounded,
+                      ),
+                      _StatRow(
+                        label: l10n.pendingOrders,
+                        value: '2',
+                        icon: Icons.hourglass_top_rounded,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 24.h),
                 ],
-              ),
-            );
-          }
-
-          return ListView(
-            padding: EdgeInsets.all(20.w),
-            children: [
-              Center(
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 48.r,
-                      backgroundColor: isDark
-                          ? AppColors.burgundy.withValues(alpha: 0.3)
-                          : AppColors.burgundy.withValues(alpha: 0.15),
-                      child: Icon(
-                        Icons.person_rounded,
-                        size: 56.r,
-                        color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                      ),
-                    ),
-                    SizedBox(height: 12.h),
-                    Text(
-                      displayName.isEmpty ? l10n.myAccount : displayName,
-                      style: textTheme.headlineSmall?.copyWith(
-                        color: valueColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      memberSince,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: labelColor,
-                      ),
-                    ),
-                    SizedBox(height: 8.h),
-                    FilledButton.icon(
-                      onPressed: () => context.push(AppRoutes.editProfile),
-                      icon: Icon(Icons.edit_rounded, size: 18.r),
-                      label: Text(l10n.editProfile),
-                      style: FilledButton.styleFrom(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 28.h),
-          FutureBuilder<String>(
-            future: _referralCodeFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Card(
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(24.w),
-                    child: Center(
-                      child: SizedBox(
-                        width: 32.w,
-                        height: 32.h,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              }
-              final code = snapshot.data ?? '';
-              if (code.isEmpty) return const SizedBox.shrink();
-              final primary = theme.colorScheme.primary;
-              return Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () => setState(() => _referralCardExpanded = !_referralCardExpanded),
-                  borderRadius: BorderRadius.circular(20.r),
-                  child: AnimatedCrossFade(
-                    firstChild: _ReferralCardCollapsed(
-                      primary: primary,
-                      isDark: isDark,
-                      theme: theme,
-                    ),
-                    secondChild: ReferralQrCard(referralCode: code),
-                    crossFadeState: _referralCardExpanded
-                        ? CrossFadeState.showSecond
-                        : CrossFadeState.showFirst,
-                    duration: const Duration(milliseconds: 280),
-                    firstCurve: Curves.decelerate,
-                    secondCurve: Curves.easeInOut,
-                    sizeCurve: Curves.easeInOut,
-                  ),
-                ),
               );
-            },
-          ),
-          SizedBox(height: 16.h),
-          _SectionCard(
-            title: l10n.accountInfo,
-            children: [
-              _InfoRow(label: l10n.fullName, value: displayName.isEmpty ? '---' : displayName, icon: Icons.person_outline_rounded),
-              _InfoRow(label: l10n.email, value: customer?.email ?? '---', icon: Icons.email_outlined),
-              _InfoRow(label: l10n.mobileNumber, value: customer?.phone ?? '---', icon: Icons.phone_android_rounded),
-              _InfoRow(label: l10n.joinDate, value: memberSince, icon: Icons.calendar_today_rounded),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          _SectionCard(
-            title: l10n.address,
-            children: [
-              _InfoRow(
-                label: l10n.mainAddress,
-                value: 'الرياض، حي النخيل، شارع الملك فهد',
-                icon: Icons.location_on_outlined,
-              ),
-              _InfoRow(label: l10n.postalCode, value: '12345', icon: Icons.markunread_mailbox_rounded),
-            ],
-          ),
-          SizedBox(height: 16.h),
-          _SectionCard(
-            title: l10n.stats,
-            children: [
-              _StatRow(label: l10n.ordersCount, value: '12', icon: Icons.receipt_long_rounded),
-              _StatRow(label: l10n.pendingOrders, value: '2', icon: Icons.hourglass_top_rounded),
-            ],
-          ),
-          SizedBox(height: 24.h),
-        ],
-      );
+            case AuthFailed():
+              return Center(child: Text(state.message));
+            default:
+              return const SizedBox.shrink();
+          }
         },
       ),
     );
   }
-
-  static String _formatMemberSince(BuildContext context, String? createdAt) {
-    if (createdAt == null || createdAt.isEmpty) return '---';
-    try {
-      final d = DateTime.tryParse(createdAt);
-      if (d != null) return AppLocalizations.of(context)!.memberSince(d.year);
-    } catch (_) {}
-    return '---';
-  }
 }
 
-/// Collapsed state: QR icon, title, and description (tap to expand).
 class _ReferralCardCollapsed extends StatelessWidget {
   const _ReferralCardCollapsed({
     required this.primary,
@@ -271,20 +295,13 @@ class _ReferralCardCollapsed extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.r),
-        side: BorderSide(
-          color: primary.withValues(alpha: 0.25),
-          width: 1.5,
-        ),
+        side: BorderSide(color: primary.withValues(alpha: 0.25), width: 1.5),
       ),
       child: Padding(
         padding: EdgeInsets.all(24.w),
         child: Row(
           children: [
-            Icon(
-              Icons.qr_code_2_rounded,
-              size: 40.r,
-              color: primary,
-            ),
+            Icon(Icons.qr_code_2_rounded, size: 40.r, color: primary),
             SizedBox(width: 16.w),
             Expanded(
               child: Column(
@@ -311,11 +328,7 @@ class _ReferralCardCollapsed extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
-              Icons.expand_more_rounded,
-              size: 28.r,
-              color: primary,
-            ),
+            Icon(Icons.expand_more_rounded, size: 28.r, color: primary),
           ],
         ),
       ),
@@ -428,7 +441,11 @@ class _StatRow extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 12.h),
       child: Row(
         children: [
-          Icon(icon, size: 22.r, color: isDark ? AppColors.goldLight : AppColors.burgundy),
+          Icon(
+            icon,
+            size: 22.r,
+            color: isDark ? AppColors.goldLight : AppColors.burgundy,
+          ),
           SizedBox(width: 12.w),
           Expanded(
             child: Text(

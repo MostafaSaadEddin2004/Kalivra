@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Change password: current, new, confirm. Update button + Forgot password → OTP.
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
 
@@ -48,12 +48,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fillColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
-        : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
@@ -73,13 +67,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildField(
+                    AppTextField(
                       controller: _currentController,
                       label: l10n.currentPassword,
                       hint: '••••••••',
-                      icon: Icons.lock_outline_rounded,
                       obscureText: _obscureCurrent,
-                      suffix: CustomIconButton(
+                      prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
+                      suffixIcon: CustomIconButton(
                         icon: _obscureCurrent
                             ? Icons.visibility_off_rounded
                             : Icons.visibility_rounded,
@@ -88,21 +82,19 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         onPressed: () =>
                             setState(() => _obscureCurrent = !_obscureCurrent),
                       ),
-                      borderColor: borderColor,
-                      fillColor: fillColor,
-                      labelColor: labelColor,
+                      borderRadius: 12.r,
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? l10n.enterCurrentPassword
                           : null,
                     ),
                     SizedBox(height: 20.h),
-                    _buildField(
+                    AppTextField(
                       controller: _newController,
                       label: l10n.newPassword,
                       hint: '••••••••',
-                      icon: Icons.lock_rounded,
                       obscureText: _obscureNew,
-                      suffix: CustomIconButton(
+                      prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
+                      suffixIcon: CustomIconButton(
                         icon: _obscureNew
                             ? Icons.visibility_off_rounded
                             : Icons.visibility_rounded,
@@ -111,9 +103,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         onPressed: () =>
                             setState(() => _obscureNew = !_obscureNew),
                       ),
-                      borderColor: borderColor,
-                      fillColor: fillColor,
-                      labelColor: labelColor,
+                      borderRadius: 12.r,
                       validator: (v) {
                         if (v == null || v.length < 6) {
                           return l10n.passwordMinLength;
@@ -122,13 +112,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       },
                     ),
                     SizedBox(height: 20.h),
-                    _buildField(
+                    AppTextField(
                       controller: _confirmController,
                       label: l10n.newPasswordConfirm,
                       hint: '••••••••',
-                      icon: Icons.lock_rounded,
                       obscureText: _obscureConfirm,
-                      suffix: CustomIconButton(
+                      prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
+                      suffixIcon: CustomIconButton(
                         icon: _obscureConfirm
                             ? Icons.visibility_off_rounded
                             : Icons.visibility_rounded,
@@ -137,10 +127,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         onPressed: () =>
                             setState(() => _obscureConfirm = !_obscureConfirm),
                       ),
-                      borderColor: borderColor,
-                      fillColor: fillColor,
-                      labelColor: labelColor,
+                      borderRadius: 12.r,
                       validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return l10n.confirmPasswordRequired;
+                        }
                         if (v != _newController.text) {
                           return l10n.confirmPasswordMismatch;
                         }
@@ -193,63 +184,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
     );
   }
-
-  Widget _buildField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    required bool obscureText,
-    required Widget? suffix,
-    required Color borderColor,
-    required Color fillColor,
-    required Color labelColor,
-    String? Function(String?)? validator,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return TextFormField(
-      controller: controller,
-      obscureText: obscureText,
-      validator: validator,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon, size: 22.r, color: labelColor),
-        suffixIcon: suffix,
-        filled: true,
-        fillColor: fillColor,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(color: borderColor),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: BorderSide(
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-            width: 1.5,
-          ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-          borderSide: const BorderSide(color: AppColors.red),
-        ),
-        labelStyle: TextStyle(color: labelColor),
-        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-      ),
-    );
-  }
 }
 
-/// Mode for OTP onboarding: forgot password, change phone, or sign up.
 enum OtpScreenMode { forgotPassword, changePhone, signUp }
 
-/// Passed from step 1 (phone) to step 2 (OTP) and step 3 (confirm).
 class OtpOnboardingArgs {
   const OtpOnboardingArgs({
     required this.mode,
@@ -262,6 +200,5 @@ class OtpOnboardingArgs {
   final String phone;
   final String? name;
   final String? password;
-  /// Code of the person who referred this user (for referrer discount).
   final String? referralCode;
 }

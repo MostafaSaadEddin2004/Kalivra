@@ -2,8 +2,8 @@ import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/product/product_api_model.dart';
 
 class ProductApiService {
-  ProductApiService(this._client);
-  final DioClient _client;
+  ProductApiService();
+  final DioClient _client  = DioClient();
 
   Future<List<ProductApiModel>> getProducts({
     int? categoryId,

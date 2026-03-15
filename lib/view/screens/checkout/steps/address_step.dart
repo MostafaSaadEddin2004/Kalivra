@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class AddressStep extends StatefulWidget {
   const AddressStep({super.key});
@@ -36,40 +37,7 @@ class AddressStepState extends State<AddressStep> {
     super.dispose();
   }
 
-  InputDecoration _decoration(BuildContext context, String label, String hint) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final borderColor = AppColors.offWhite.withValues(alpha: isDark ? 0.6 : 0.8);
-    final fillColor = isDark
-        ? const Color(0xFF1A1918)
-        : AppColors.offWhite.withValues(alpha: 0.5);
-    final labelColor = isDark ? AppColors.offWhite : AppColors.burgundy;
-
-    return InputDecoration(
-      labelText: label,
-      hintText: hint,
-      filled: true,
-      fillColor: fillColor,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: borderColor),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: borderColor),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: BorderSide(color: AppColors.offWhite, width: 1.5),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.r),
-        borderSide: const BorderSide(color: AppColors.red),
-      ),
-      labelStyle: TextStyle(color: labelColor),
-      hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-    );
-  }
+  static const String _required = 'مطلوب';
 
   void _saveAddress() {
     if (_formKey.currentState?.validate() ?? false) {
@@ -79,14 +47,11 @@ class AddressStepState extends State<AddressStep> {
     }
   }
 
-  /// Called by parent to validate before allowing proceed to next step.
   bool validateStep() => _formKey.currentState?.validate() ?? false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.offWhite : AppColors.burgundy;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
@@ -95,89 +60,79 @@ class AddressStepState extends State<AddressStep> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextFormField(
+            AppTextField(
               controller: _firstNameController,
+              label: 'الاسم الأول*',
+              hint: 'الاسم الأول',
               textCapitalization: TextCapitalization.words,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration: _decoration(context, 'الاسم الأول*', 'الاسم الأول'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _lastNameController,
+              label: 'الاسم الأخير*',
+              hint: 'الاسم الأخير',
               textCapitalization: TextCapitalization.words,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration: _decoration(context, 'الاسم الأخير*', 'الاسم الأخير'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _emailController,
+              label: 'البريد الإلكتروني*',
+              hint: 'example@email.com',
               keyboardType: TextInputType.emailAddress,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'مطلوب';
+                if (v == null || v.trim().isEmpty) return _required;
                 if (!v.contains('@')) return 'أدخل بريداً إلكترونياً صالحاً';
                 return null;
               },
-              decoration:
-                  _decoration(context, 'البريد الإلكتروني*', 'example@email.com'),
-              style: TextStyle(color: textColor),
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _companyController,
+              label: 'اسم الشركة',
+              hint: 'اسم الشركة',
               textCapitalization: TextCapitalization.words,
-              decoration: _decoration(context, 'اسم الشركة', 'اسم الشركة'),
-              style: TextStyle(color: textColor),
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _phoneController,
+              label: 'الهاتف*',
+              hint: 'الهاتف',
               keyboardType: TextInputType.phone,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration: _decoration(context, 'الهاتف*', 'الهاتف'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _streetController,
+              label: 'الشارع*',
+              hint: 'عنوان الشارع',
               textCapitalization: TextCapitalization.words,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration:
-                  _decoration(context, 'الشارع*', 'عنوان الشارع'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _zipController,
+              label: 'الرمز البريدي*',
+              hint: 'الرمز البريدي',
               keyboardType: TextInputType.streetAddress,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration: _decoration(
-                  context, 'الرمز البريدي*', 'الرمز البريدي'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _stateController,
+              label: 'المحافظة*',
+              hint: 'المحافظة',
               textCapitalization: TextCapitalization.words,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration: _decoration(context, 'المحافظة*', 'المحافظة'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
-            TextFormField(
+            AppTextField(
               controller: _cityController,
+              label: 'المدينة*',
+              hint: 'المدينة',
               textCapitalization: TextCapitalization.words,
-              validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? 'مطلوب' : null,
-              decoration: _decoration(context, 'المدينة*', 'المدينة'),
-              style: TextStyle(color: textColor),
+              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 24.h),
             SizedBox(

@@ -2,11 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import '../../widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Contact Us: phone, email, and optional form.
-class ContactScreen extends StatelessWidget {
+class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
+
+  @override
+  State<ContactScreen> createState() => _ContactScreenState();
+}
+
+class _ContactScreenState extends State<ContactScreen> {
+  final _subjectController = TextEditingController();
+  final _messageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _subjectController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,22 +85,15 @@ class ContactScreen extends StatelessWidget {
               padding: EdgeInsets.all(16.w),
               child: Column(
                 children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: l10n.subjectLabel,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
-                      filled: true,
-                    ),
+                  AppTextField(
+                    controller: _subjectController,
+                    label: l10n.subjectLabel,
                   ),
                   SizedBox(height: 12.h),
-                  TextField(
+                  AppTextField(
+                    controller: _messageController,
+                    label: l10n.messageLabel,
                     maxLines: 4,
-                    decoration: InputDecoration(
-                      labelText: l10n.messageLabel,
-                      alignLabelWithHint: true,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.r)),
-                      filled: true,
-                    ),
                   ),
                   SizedBox(height: 16.h),
                   SizedBox(

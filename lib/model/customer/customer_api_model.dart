@@ -1,4 +1,3 @@
-/// GET /api/shop/v1/customers/profile – customer profile.
 class CustomerApiModel {
   const CustomerApiModel({
     required this.id,

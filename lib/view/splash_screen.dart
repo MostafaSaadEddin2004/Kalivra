@@ -41,8 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
                     'assets/images/light_logo.png',
                     fit: BoxFit.contain,
                     width: 220.w,
-                    errorBuilder: (context, error, stackTrace) =>
-                        _buildFallbackLogo(context),
                   ),
                 ),
               ),
@@ -52,33 +50,4 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     ),
     );
-  }
-
-  Widget _buildFallbackLogo(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          'K',
-          style: TextStyle(
-            fontSize: 72.sp,
-            fontWeight: FontWeight.bold,
-            color: colorScheme.secondary,
-            height: 1,
-          ),
-        ),
-        SizedBox(height: 12.h),
-        Text(
-          'Kalivra',
-          style: TextStyle(
-            fontSize: 28.sp,
-            letterSpacing: 2,
-            color: colorScheme.onSurface,
-            fontWeight: FontWeight.w300,
-          ),
-        ),
-      ],
-    );
-  }
-}
+  }}

@@ -16,7 +16,7 @@ class QuantityCounter extends StatelessWidget {
   final int maxQuantity;
   final void Function(int) onChanged;
 
-  Future<void> _showQuantityLimitDialog(BuildContext context) async {
+void _showQuantityLimitDialog(BuildContext context) async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     await showDialog<void>(
       context: context,

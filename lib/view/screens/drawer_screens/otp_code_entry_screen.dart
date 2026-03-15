@@ -8,8 +8,8 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 
-/// Onboarding step 2: Enter verification code → verify → next (step 3).
 class OtpCodeEntryScreen extends StatefulWidget {
   const OtpCodeEntryScreen({super.key, required this.args});
 
@@ -110,35 +110,13 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    TextFormField(
+                    AppTextField(
                       controller: _otpController,
+                      label: l10n.otpCodeLabel,
+                      hint: '••••',
                       keyboardType: TextInputType.number,
                       maxLength: 6,
-                      decoration: InputDecoration(
-                        labelText: l10n.otpCodeLabel,
-                        hintText: '••••',
-                        counterText: '',
-                        prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
-                        filled: true,
-                        fillColor: fillColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(
-                            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                            width: 1.5,
-                          ),
-                        ),
-                        labelStyle: TextStyle(color: labelColor),
-                        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-                      ),
+                      prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
                     ),
                     SizedBox(height: 20.h),
                     SizedBox(

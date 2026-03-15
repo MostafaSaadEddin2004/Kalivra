@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 
-/// OTP screen: enter phone → send code via WhatsApp → enter OTP → verify.
-/// Mode: forgotPassword (then go to set new password) or changePhone (then done).
 class OtpScreen extends StatefulWidget {
   const OtpScreen({super.key, required this.mode});
 
@@ -47,7 +47,6 @@ class _OtpScreenState extends State<OtpScreen> {
       _isLoading = true;
       _codeSent = false;
     });
-    // Simulate API call
     Future.delayed(const Duration(milliseconds: 800), () {
       if (!mounted) return;
       setState(() {
@@ -67,7 +66,6 @@ class _OtpScreenState extends State<OtpScreen> {
       return;
     }
     setState(() => _isLoading = true);
-    // Simulate verification
     Future.delayed(const Duration(milliseconds: 600), () {
       if (!mounted) return;
       setState(() => _isLoading = false);
@@ -119,35 +117,14 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                     ),
                     SizedBox(height: 20.h),
-                    TextFormField(
+                    AppTextField(
                       controller: _phoneController,
+                      label: AppLocalizations.of(context)!.phoneLabel,
+                      hint: '+966 5XX XXX XXXX',
                       keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        labelText: 'رقم الجوال',
-                        hintText: '+966 5XX XXX XXXX',
-                        prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
-                        filled: true,
-                        fillColor: fillColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(color: borderColor),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide(
-                            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                            width: 1.5,
-                          ),
-                        ),
-                        labelStyle: TextStyle(color: labelColor),
-                        hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-                      ),
+                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
                       validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? 'أدخل رقم الجوال' : null,
+                          (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPhone : null,
                     ),
                     SizedBox(height: 16.h),
                     SizedBox(
@@ -174,7 +151,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                     ),
-                    if (_codeSent) ...[
+                      if (_codeSent) ...[
                       SizedBox(height: 24.h),
                       Divider(color: isDark ? AppColors.taupe.withValues(alpha: 0.3) : AppColors.burgundy.withValues(alpha: 0.3)),
                       SizedBox(height: 20.h),
@@ -186,35 +163,13 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      TextFormField(
+                      AppTextField(
                         controller: _otpController,
+                        label: 'رمز التحقق',
+                        hint: '••••',
                         keyboardType: TextInputType.number,
                         maxLength: 6,
-                        decoration: InputDecoration(
-                          labelText: 'رمز التحقق',
-                          hintText: '••••',
-                          counterText: '',
-                          prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
-                          filled: true,
-                          fillColor: fillColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: borderColor),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(color: borderColor),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                            borderSide: BorderSide(
-                              color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                              width: 1.5,
-                            ),
-                          ),
-                          labelStyle: TextStyle(color: labelColor),
-                          hintStyle: TextStyle(color: labelColor.withValues(alpha: 0.6)),
-                        ),
+                        prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
                       ),
                       SizedBox(height: 16.h),
                       SizedBox(

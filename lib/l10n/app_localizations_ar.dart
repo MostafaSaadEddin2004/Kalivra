@@ -111,6 +111,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ok => 'حسناً';
 
   @override
+  String get yes => 'نعم';
+
+  @override
+  String get no => 'لا';
+
+  @override
   String get error => 'خطأ';
 
   @override

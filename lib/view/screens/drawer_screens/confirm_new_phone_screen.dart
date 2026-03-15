@@ -6,7 +6,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
-/// Onboarding step 3 for change phone: show verified number and confirm.
 class ConfirmNewPhoneScreen extends StatelessWidget {
   const ConfirmNewPhoneScreen({super.key, required this.phone});
 

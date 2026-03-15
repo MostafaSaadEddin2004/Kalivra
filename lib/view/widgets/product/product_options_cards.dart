@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/product/product_model.dart';
 
-/// Card section to select one color from [ProductColorOption] list.
 class ProductColorSelectorCard extends StatelessWidget {
   const ProductColorSelectorCard({
     super.key,
@@ -130,7 +129,6 @@ class ProductColorSelectorCard extends StatelessWidget {
   }
 }
 
-/// Card section to select one size from a list of size labels.
 class ProductSizeSelectorCard extends StatelessWidget {
   const ProductSizeSelectorCard({
     super.key,
