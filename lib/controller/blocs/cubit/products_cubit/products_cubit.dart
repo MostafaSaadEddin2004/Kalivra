@@ -1,61 +1,43 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_state.dart';
-import 'package:kalivra/model/product/product_model.dart';
-import 'package:kalivra/model/services/api/category_api_service.dart';
-import 'package:kalivra/model/services/api/mappers/category_mapper.dart';
-import 'package:kalivra/model/services/api/mappers/product_mapper.dart';
 import 'package:kalivra/model/services/api/product_api_service.dart';
 
 export 'products_state.dart';
 
 class ProductsCubit extends Cubit<ProductsState> {
-  ProductsCubit() : super(ProductsState.initial);
+  ProductsCubit() : super(ProductsLoading());
 
-  final CategoryApiService  _categoryService = CategoryApiService();
   final ProductApiService  _productService = ProductApiService();
 
-Future<void> loadCategories() async {
-    emit(ProductsState.categoriesLoading);
-    try {
-      final list = await _categoryService.getCategories();
-      final categories = list.map(CategoryMapper.fromApi).toList();
-      emit(ProductsState.categoriesLoaded(categories));
-    } catch (e, st) {
-      emit(ProductsState.categoriesFailed(e, st));
-    }
-  }
+  
 
 Future<void> loadProducts({int? categoryId}) async {
-    emit(ProductsState.productsLoading);
+    emit(ProductsLoading());
     try {
-      final list = await _productService.getProducts(categoryId: categoryId);
-      final products = list.map(ProductMapper.fromApi).toList();
-      emit(ProductsState.productsLoaded(products));
-    } catch (e, st) {
-      emit(ProductsState.productsFailed(e, st));
+      final products = await _productService.getProducts(categoryId: categoryId);
+      emit(ProductsLoaded(products: products));
+    } catch (e) {
+      emit(ProductsFailed(message: e.toString()));
     }
   }
 
 Future<void> loadAll() async {
-    emit(ProductsState.loading);
+     emit(ProductsLoading());
     try {
-      final categories = await _categoryService.getCategories();
       final products = await _productService.getProducts();
-      emit(ProductsState.loaded(
-        categories: categories.map(CategoryMapper.fromApi).toList(),
-        products: products.map(ProductMapper.fromApi).toList(),
-      ));
-    } catch (e, st) {
-      emit(ProductsState.failed(e, st));
+    emit(ProductsLoaded(products: products));
+    } catch (e) {
+       emit(ProductsFailed(message: e.toString()));
     }
   }
 
-  Future<ProductModel?> loadProductById(int id) async {
+  Future<void> loadProductById(int productId) async {
+   emit(ProductsLoading());
     try {
-      final api = await _productService.getProductById(id);
-      return api != null ? ProductMapper.fromApi(api) : null;
-    } catch (_) {
-      return null;
+      final product = await _productService.getProductById(productId);
+    emit(OneProductLoaded(product: product));
+    } catch (e) {
+       emit(ProductsFailed(message: e.toString()));
     }
   }
 }

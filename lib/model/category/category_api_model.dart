@@ -1,4 +1,3 @@
-/// GET /api/shop/v1/categories – product categories.
 class CategoryApiModel {
   const CategoryApiModel({
     required this.id,

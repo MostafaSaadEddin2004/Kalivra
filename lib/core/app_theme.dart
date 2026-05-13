@@ -193,7 +193,6 @@ class AppTheme {
       fontWeight: FontWeight.normal,
     ),
   );
-
   static TextTheme get _darkTextTheme => TextTheme(
     headlineLarge: TextStyle(
       color: AppColors.offWhite,

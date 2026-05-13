@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/app_interceptor.dart';
 
-const String baseUrl =
-    'https://test1.zedan-world.com/api/';
+const String baseUrl = "http://192.168.10.19/kalivra-bag-ecommerce.test/public/api/";
 
 class DioClient {
   DioClient({

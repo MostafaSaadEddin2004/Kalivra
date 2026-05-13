@@ -60,7 +60,7 @@ class _ProfileState extends State<Profile> {
                       ),
                       SizedBox(height: 24.h),
                       FilledButton(
-                        onPressed: () => context.go(AppRoutes.login),
+                        onPressed: () => AppRouter.openScreen(context, AppRoutes.login),
                         child: Text(l10n.signIn),
                       ),
                     ],
@@ -238,12 +238,22 @@ class _ProfileState extends State<Profile> {
                     children: [
                       _InfoRow(
                         label: l10n.mainAddress,
-                        value: 'الرياض، حي النخيل، شارع الملك فهد',
+                        value: state.customer.address ?? '—',
                         icon: Icons.location_on_outlined,
                       ),
                       _InfoRow(
+                        label: l10n.profileCity,
+                        value: state.customer.city ?? '—',
+                        icon: Icons.location_city_outlined,
+                      ),
+                      _InfoRow(
+                        label: l10n.profileCountry,
+                        value: state.customer.country ?? '—',
+                        icon: Icons.public_outlined,
+                      ),
+                      _InfoRow(
                         label: l10n.postalCode,
-                        value: '12345',
+                        value: state.customer.postalCode ?? '—',
                         icon: Icons.markunread_mailbox_rounded,
                       ),
                     ],

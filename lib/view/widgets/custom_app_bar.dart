@@ -32,7 +32,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             onPressed: onMenuTap,
             tooltip: AppLocalizations.of(context)!.menu,
           ),
-          if (onCartTap != null) ...[
+       
             CustomIconButton(
               icon: Icons.shopping_cart_rounded,
               color: iconColor,
@@ -40,7 +40,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: onCartTap,
               tooltip: AppLocalizations.of(context)!.cart,
             ),
-          ],
         ],
       ),
       actions: [

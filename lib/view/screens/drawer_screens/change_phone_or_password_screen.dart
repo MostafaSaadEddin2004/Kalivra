@@ -120,7 +120,7 @@ class _ChangePhoneOrPasswordScreenState
                         ),
                         validator: (v) {
                           if (v == null || v.length < 6)
-                            return 'كلمة المرور 6 أحرف على الأقل';
+                          {  return 'كلمة المرور 6 أحرف على الأقل';}
                           return null;
                         },
                       ),
@@ -143,7 +143,7 @@ class _ChangePhoneOrPasswordScreenState
                         ),
                         validator: (v) {
                           if (v != _newPasswordController.text)
-                            return 'غير متطابقة مع كلمة المرور الجديدة';
+                            {return 'غير متطابقة مع كلمة المرور الجديدة';}
                           return null;
                         },
                       ),

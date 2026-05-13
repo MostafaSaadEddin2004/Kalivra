@@ -1,25 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/buttons/cart_button.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({
-    super.key,
-    required this.product,
-    this.onTap,
-    this.onAddToCart,
-    this.isFavorite = false,
-    this.onFavorite,
-  });
+  const ProductCard({super.key, required this.product});
 
   final ProductModel product;
-  final VoidCallback? onTap;
-  final VoidCallback? onAddToCart;
-  final bool isFavorite;
-  final VoidCallback? onFavorite;
 
   @override
   Widget build(BuildContext context) {
@@ -33,11 +25,9 @@ class ProductCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: InkWell(
-        onTap: onTap,
+        onTap: () => context.push(AppRoutes.productDetails, extra: product),
         borderRadius: BorderRadius.circular(16.r),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -58,12 +48,15 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (product.salePrice != null)
+                if (product.price != null)
                   Positioned(
                     top: 8.h,
                     right: 8.w,
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.w,
+                        vertical: 4.h,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.goldDark,
                         borderRadius: BorderRadius.circular(8.r),
@@ -91,12 +84,14 @@ class ProductCard extends StatelessWidget {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: onFavorite,
+                      onTap: () {},
                       borderRadius: BorderRadius.circular(20.r),
                       child: Container(
                         padding: EdgeInsets.all(6.r),
                         decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor.withValues(alpha: 0.9),
+                          color: theme.scaffoldBackgroundColor.withValues(
+                            alpha: 0.9,
+                          ),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -107,9 +102,8 @@ class ProductCard extends StatelessWidget {
                           ],
                         ),
                         child: Icon(
-                          isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          Icons.favorite_border_rounded,
                           size: 22.r,
-                          color: isFavorite ? AppColors.red : (isDark ? AppColors.taupe : AppColors.burgundy),
                         ),
                       ),
                     ),
@@ -122,7 +116,7 @@ class ProductCard extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 8.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                   mainAxisSize: MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       product.name,
@@ -140,11 +134,11 @@ class ProductCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        _PriceBlock(
-                          product: product,
-                          isDark: isDark,
+                        _PriceBlock(product: product, isDark: isDark),
+                        CardButton(
+                          onTap: () =>
+                              context.read<CartCubit>().addItem(product),
                         ),
-                        CardButton(onTap: onAddToCart),
                       ],
                     ),
                   ],
@@ -158,17 +152,15 @@ class ProductCard extends StatelessWidget {
   }
 
   String _salePercent() {
-    if (product.salePrice == null) return '';
-    final p = ((product.price - product.salePrice!) / product.price * 100).round();
+    if (product.price == null) return '';
+    final p = ((product.price! - product.price!) / product.price! * 100)
+        .round();
     return '-$p%';
   }
 }
 
 class _PriceBlock extends StatelessWidget {
-  const _PriceBlock({
-    required this.product,
-    required this.isDark,
-  });
+  const _PriceBlock({required this.product, required this.isDark});
 
   final ProductModel product;
   final bool isDark;
@@ -177,9 +169,10 @@ class _PriceBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    if (product.salePrice == null) {
+    if (product.price
+     == null) {
       return Text(
-        '${product.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
+        '${product.price.toString()} ${product.currencyOptions?.symbol}',
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w700,
           color: isDark ? AppColors.goldLight : AppColors.burgundy,
@@ -193,16 +186,18 @@ class _PriceBlock extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '${product.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
+          '${product.price.toString()} ${product.currencyOptions?.symbol}',
           style: theme.textTheme.bodySmall?.copyWith(
             decoration: TextDecoration.lineThrough,
-            color: isDark ? AppColors.taupe.withValues(alpha: 0.8) : AppColors.lightGray,
+            color: isDark
+                ? AppColors.taupe.withValues(alpha: 0.8)
+                : AppColors.lightGray,
             fontSize: 12.sp,
           ),
         ),
         SizedBox(height: 2.h),
         Text(
-          '${product.salePrice!.toStringAsFixed(0)} ${AppLocalizations.of(context)!.currencySYP}',
+          '${product.price.toString()} ${product.currencyOptions?.symbol}',
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w700,
             color: isDark ? AppColors.goldLight : AppColors.burgundy,

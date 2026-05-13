@@ -5,11 +5,9 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -32,98 +30,73 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
     return Scaffold(
       appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.myOrders),
-      body: BlocConsumer<OrdersCubit, OrdersState>(
-        listener: (context, state) {
-          if (state.hasError) {
-            ApiErrorHandler.showSnackBar(
-              context,
-              state.error!,
-              fallbackMessage: AppLocalizations.of(context)!.loadOrdersFailed,
-            );
-          }
-        },
+      body: BlocBuilder<OrdersCubit, OrdersState>(
         builder: (context, state) {
-          if (state.isLoading && state.orders.isEmpty) {
-            return Skeletonizer(
-              enabled: true,
-              child: ListView.builder(
+          switch (state) {
+            case OrdersLoaded():
+              final orders = state.orders;
+              if (orders.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.receipt_long_outlined,
+                        size: 80.r,
+                        color: isDark
+                            ? AppColors.taupe.withValues(alpha: 0.6)
+                            : AppColors.burgundy.withValues(alpha: 0.5),
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        AppLocalizations.of(context)!.noOrders,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: isDark
+                              ? AppColors.offWhite
+                              : AppColors.burgundy,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        AppLocalizations.of(context)!.ordersPrompt,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDark ? AppColors.taupe : AppColors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return ListView.separated(
+                padding: EdgeInsets.all(20.w),
+                itemCount: orders.length,
+                separatorBuilder: (_, _) => SizedBox(height: 12.h),
+                itemBuilder: (context, index) {
+                  return _OrderCard(order: orders[index]);
+                },
+              );
+            case OrdersFailed():
+              return Center(child: Text(state.message));
+            default:
+              return ListView.separated(
                 padding: EdgeInsets.all(20.w),
                 itemCount: 4,
-                itemBuilder: (_, i) => Padding(
-                  padding: EdgeInsets.only(bottom: 12.h),
-                  child: Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                width: 80,
-                                height: 20,
-                                color: Colors.grey,
-                              ),
-                              Container(
-                                width: 60,
-                                height: 20,
-                                color: Colors.grey,
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 8.h),
-                          Container(width: 120, height: 16, color: Colors.grey),
-                          SizedBox(height: 8.h),
-                          Container(width: 60, height: 16, color: Colors.grey),
-                        ],
-                      ),
+                separatorBuilder: (_, _) => SizedBox(height: 12.h),
+                itemBuilder: (context, index) {
+                  return _OrderCard(
+                    order: OrderModel(
+                      id: '0',
+                      date: 'date',
+                      status: 'status',
+                      subtotal: 00,
+                      deliveryCost: 00,
+                      total: 0,
+                      items: [],
                     ),
-                  ),
-                ),
-              ),
-            );
+                  );
+                },
+              );
           }
-          final orders = state.orders;
-          if (orders.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.receipt_long_outlined,
-                    size: 80.r,
-                    color: isDark
-                        ? AppColors.taupe.withValues(alpha: 0.6)
-                        : AppColors.burgundy.withValues(alpha: 0.5),
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    AppLocalizations.of(context)!.noOrders,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: isDark ? AppColors.offWhite : AppColors.burgundy,
-                    ),
-                  ),
-                  SizedBox(height: 8.h),
-                  Text(
-                    AppLocalizations.of(context)!.ordersPrompt,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? AppColors.taupe : AppColors.black,
-                    ),
-                  ),
-                ],
-              ), 
-            );
-          }
-          return ListView.separated(
-            padding: EdgeInsets.all(20.w),
-            itemCount: orders.length,
-            separatorBuilder: (_, _) => SizedBox(height: 12.h),
-            itemBuilder: (context, index) {
-              final order = orders[index];
-              return _OrderCard(order: order);
-            },
-          );
         },
       ),
     );

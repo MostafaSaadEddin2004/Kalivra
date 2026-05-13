@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
-import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
-import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
 import 'package:kalivra/view/widgets/product/product_options_cards.dart';
@@ -25,25 +22,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedColorIndex = 0;
   int _selectedSizeIndex = 0;
 
-void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations l10n) async {
-    final productId = int.tryParse(product.id);
-    if (productId == null || productId == 0) {
-      if (context.mounted) {
-        ApiErrorHandler.showSnackBar(context, null, fallbackMessage: AppLocalizations.of(context)!.invalidProductId);
-      }
-      return;
-    }
-    try {
-      await context.read<WishlistCubit>().add(productId);
-      if (context.mounted) {
-        CustomSnackBar.show(context, 'تمت إضافة "${product.name}" إلى المفضلة');
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ApiErrorHandler.showSnackBar(context, e, fallbackMessage: AppLocalizations.of(context)!.addToWishlistFailed);
-      }
-    }
-  }
+  // void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations l10n) async {
+  //     final productId = int.tryParse(product.id);
+  //     if (productId == null || productId == 0) {
+  //       if (context.mounted) {
+  //         ApiErrorHandler.showSnackBar(context, null, fallbackMessage: AppLocalizations.of(context)!.invalidProductId);
+  //       }
+  //       return;
+  //     }
+  //     try {
+  //       await context.read<WishlistCubit>().add(productId);
+  //       if (context.mounted) {
+  //         CustomSnackBar.show(context, 'تمت إضافة "${product.name}" إلى المفضلة');
+  //       }
+  //     } catch (e) {
+  //       if (context.mounted) {
+  //         ApiErrorHandler.showSnackBar(context, e, fallbackMessage: AppLocalizations.of(context)!.addToWishlistFailed);
+  //       }
+  //     }
+  //   }
 
   @override
   Widget build(BuildContext context) {
@@ -51,19 +48,14 @@ void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations 
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primary = theme.colorScheme.primary;
-    final surfaceColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.15)
-        : AppColors.burgundy.withValues(alpha: 0.06);
-    final displayPrice = product.salePrice ?? product.price;
-    final hasSale = product.salePrice != null;
-    final salePercent = hasSale
-        ? ((product.price - product.salePrice!) / product.price * 100).round()
-        : 0;
-    final imageUrls = product.effectiveImageUrls;
-    final hasGallery = imageUrls.isNotEmpty;
-    final hasColors = product.colors != null && product.colors!.isNotEmpty;
-    final hasSizes = product.sizes != null && product.sizes!.isNotEmpty;
+    final colorOptions = product.selectableColors;
+    final sizeLabels = product.selectableSizes;
+    final colorIndex = colorOptions.isEmpty
+        ? 0
+        : _selectedColorIndex.clamp(0, colorOptions.length - 1);
+    final sizeIndex = sizeLabels.isEmpty
+        ? 0
+        : _selectedSizeIndex.clamp(0, sizeLabels.length - 1);
 
     return Scaffold(
       appBar: DrawerScreenAppBar(title: l10n.productDetails),
@@ -73,41 +65,20 @@ void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations 
           Stack(
             clipBehavior: Clip.none,
             children: [
-              if (hasGallery)
-                ProductGalleryCard(imageUrls: imageUrls)
+              if (product.displayImageUrls.isNotEmpty)
+                ProductGalleryCard(imageUrls: product.displayImageUrls)
               else
                 Container(
                   width: double.infinity,
                   height: 220.h,
                   decoration: BoxDecoration(
-                    color: surfaceColor,
+                    color: theme.colorScheme.onSecondaryFixed,
                     borderRadius: BorderRadius.circular(16.r),
                   ),
-                  child: Center(
-                    child: Icon(
-                      Icons.inventory_2_outlined,
-                      size: 80.r,
-                      color: primary.withValues(alpha: 0.7),
-                    ),
-                  ),
-                ),
-              if (hasSale)
-                Positioned(
-                  top: 12.h,
-                  right: 12.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                    decoration: BoxDecoration(
-                      color: AppColors.goldDark,
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Text(
-                      '-$salePercent%',
-                      style: theme.textTheme.labelMedium?.copyWith(
-                        color: AppColors.offWhite,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                  child: Image.network(
+                    product.baseImage?.largeImageUrl ?? '',
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
                 ),
             ],
@@ -115,46 +86,38 @@ void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations 
           SizedBox(height: 20.h),
           Text(
             product.name,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: isDark ? AppColors.offWhite : AppColors.black,
-              fontWeight: FontWeight.w800,
-            ),
+            style: theme.textTheme.headlineSmall
           ),
           SizedBox(height: 12.h),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              if (hasSale) ...[
-                Text(
-                  '${product.price.toStringAsFixed(0)} ${l10n.currencySYP}',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    decoration: TextDecoration.lineThrough,
-                    color: isDark ? AppColors.taupe : AppColors.lightGray,
-                  ),
-                ),
-                SizedBox(width: 12.w),
-              ],
+              // if (hasSale) ...[
+              //   Text(
+              //     '${product.price} ${product.currencyOptions?.symbol}',
+              //     style: theme.textTheme.bodyMedium
+              //   ),
+              //   SizedBox(width: 12.w),
+              // ],
               Text(
-                '${displayPrice.toStringAsFixed(0)} ${l10n.currencySYP}',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                  fontWeight: FontWeight.w800,
-                ),
+                '${product.price} ${product.currencyOptions?.symbol}',
+                style: theme.textTheme.headlineSmall
               ),
             ],
           ),
-          if (hasColors) ...[
+          if (product.hasSelectableColors) ...[
             ProductColorSelectorCard(
-              colors: product.colors!,
-              selectedIndex: _selectedColorIndex,
-              onSelected: (index) => setState(() => _selectedColorIndex = index),
+              colors: colorOptions,
+              selectedIndex: colorIndex,
+              onSelected: (index) =>
+                  setState(() => _selectedColorIndex = index),
             ),
             SizedBox(height: 16.h),
           ],
-          if (hasSizes) ...[
+          if (product.hasSelectableSizes) ...[
             ProductSizeSelectorCard(
-              sizes: product.sizes!,
-              selectedIndex: _selectedSizeIndex,
+              sizes: sizeLabels,
+              selectedIndex: sizeIndex,
               onSelected: (index) => setState(() => _selectedSizeIndex = index),
             ),
             SizedBox(height: 16.h),
@@ -172,14 +135,14 @@ void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations 
                   _DetailRow(
                     icon: Icons.category_outlined,
                     label: l10n.unit,
-                    value: product.unit,
+                    value: product.name,
                     isDark: isDark,
                   ),
                   SizedBox(height: 12.h),
                   _DetailRow(
                     icon: Icons.inventory_2_outlined,
                     label: l10n.maxOrderLimit,
-                    value: '${product.quantity} ${product.unit}',
+                    value: '${product.name} ${product.name}',
                     isDark: isDark,
                   ),
                 ],
@@ -188,7 +151,7 @@ void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations 
           ),
           SizedBox(height: 16.h),
           OutlinedButton.icon(
-            onPressed: () => _addToWishlist(context, product,l10n),
+            onPressed: () {},
             icon: Icon(Icons.favorite_border_rounded, size: 22.r),
             label: Text(
               l10n.addToWishlist,

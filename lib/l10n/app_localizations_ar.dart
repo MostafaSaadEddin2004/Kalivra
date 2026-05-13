@@ -33,6 +33,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerFavorites => 'المفضلة';
 
   @override
+  String get drawerAssociationLinkRequest => 'طلب الربط بالجمعية';
+
+  @override
   String get drawerSettings => 'الإعدادات';
 
   @override
@@ -345,7 +348,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get name => 'الاسم';
 
   @override
-  String get email => 'البريد';
+  String get email => 'البريد الإلكتروني';
 
   @override
   String get fullName => 'الاسم الكامل';
@@ -627,6 +630,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterName => 'أدخل اسمك';
 
   @override
+  String get enterFirstName => 'أدخل الاسم الأول';
+
+  @override
+  String get enterLastName => 'أدخل الاسم الأخير';
+
+  @override
+  String get enterEmail => 'أدخل البريد الإلكتروني';
+
+  @override
   String get passwordMinLength => 'كلمة المرور 6 أحرف على الأقل';
 
   @override
@@ -692,6 +704,33 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profileSaved => 'تم حفظ التعديلات';
+
+  @override
+  String get profileImageTooLarge => 'يجب أن يكون حجم الصورة 5 ميجابايت أو أقل';
+
+  @override
+  String get profileCity => 'المدينة';
+
+  @override
+  String get profileCountry => 'الدولة';
+
+  @override
+  String get genderLabel => 'الجنس';
+
+  @override
+  String get dateOfBirthLabel => 'تاريخ الميلاد';
+
+  @override
+  String get dateOfBirthHint => 'YYYY-MM-DD (اختياري)';
+
+  @override
+  String get genderMale => 'ذكر';
+
+  @override
+  String get genderFemale => 'أنثى';
+
+  @override
+  String get genderOther => 'آخر';
 
   @override
   String get changePhoto => 'تغيير الصورة';
@@ -884,6 +923,131 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get saveAndContinue => 'حفظ والدخول';
+
+  @override
+  String get associationLinkRequestTitle => 'طلب الربط بالجمعية';
+
+  @override
+  String get associationLinkRequestHint =>
+      'أدخل بياناتك الشخصية ومعلومات العضوية كما تعرفها لإرسال طلب ربط حسابك بالجمعية.';
+
+  @override
+  String get associationLinkPersonalSection => 'البيانات الشخصية';
+
+  @override
+  String get associationLinkContactSection => 'معلومات الاتصال والعنوان';
+
+  @override
+  String get associationLinkMembershipSection => 'معلومات العضوية';
+
+  @override
+  String get associationLinkAttachmentsSection => 'الوثائق والمرفقات';
+
+  @override
+  String get associationLinkFirstName => 'اسم الشخص';
+
+  @override
+  String get associationLinkKunya => 'الكنية';
+
+  @override
+  String get associationLinkFatherName => 'اسم الأب';
+
+  @override
+  String get associationLinkMotherName => 'اسم الأم';
+
+  @override
+  String get associationLinkGovernorate => 'المحافظة';
+
+  @override
+  String get associationLinkCity => 'المدينة';
+
+  @override
+  String get associationLinkTown => 'البلدة';
+
+  @override
+  String get associationLinkVillage => 'القرية';
+
+  @override
+  String get associationLinkStreet => 'الشارع';
+
+  @override
+  String get associationLinkBuilding => 'البناء';
+
+  @override
+  String get associationLinkPermanentAddress => 'العنوان الدائم';
+
+  @override
+  String get associationLinkMobile => 'رقم الخلوي المستخدم';
+
+  @override
+  String get associationLinkWhatsApp => 'رقم الواتساب';
+
+  @override
+  String get associationLinkEmail => 'البريد الإلكتروني';
+
+  @override
+  String get associationLinkMembershipNumber => 'رقم العضوية';
+
+  @override
+  String get associationLinkPriorityNumber => 'رقم الأفضلية';
+
+  @override
+  String get associationLinkProjectName => 'اسم المشروع';
+
+  @override
+  String get associationLinkHousingUnit => 'الوحدة السكنية المخصصة';
+
+  @override
+  String get associationLinkTotalPayments => 'مجموع المدفوعات';
+
+  @override
+  String get associationLinkAttachmentDescription => 'اسم / وصف الوثيقة';
+
+  @override
+  String get associationLinkEnterFirstName => 'يرجى إدخال الاسم';
+
+  @override
+  String get associationLinkUnsupportedFileType => 'نوع الملف غير مدعوم';
+
+  @override
+  String get associationLinkFileTooLarge => 'حجم الملف كبير جداً';
+
+  @override
+  String get associationLinkAddAttachment => 'إضافة ملف';
+
+  @override
+  String get associationLinkDeleteAttachment => 'حذف';
+
+  @override
+  String get associationLinkSaveDraft => 'حفظ مؤقت';
+
+  @override
+  String get associationLinkDraftSaved => 'تم حفظ المسودة';
+
+  @override
+  String get associationLinkResubmit => 'إعادة تقديم';
+
+  @override
+  String get associationLinkSubmit => 'إرسال الطلب';
+
+  @override
+  String get associationLinkRequestSubmitted => 'تم إرسال طلبك بنجاح';
+
+  @override
+  String get associationLinkPhoneMustMatchAccount =>
+      'رقم الهاتف يجب أن يطابق رقم حسابك';
+
+  @override
+  String get associationLinkIncompleteWarning =>
+      'بعض الحقول غير مكتملة. يمكنك المتابعة بالحد الأدنى من البيانات.';
+
+  @override
+  String get associationLinkSubmittedLocked =>
+      'تم إرسال الطلب وهو قيد المعالجة ولا يمكن تعديله.';
+
+  @override
+  String get associationLinkNoAttachments =>
+      'لم تتم إضافة مرفقات بعد. يُنصح بإرفاق وثائق داعمة.';
 
   @override
   String get verifyPhoneTitle => 'التحقق من رقم الجوال';

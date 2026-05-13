@@ -10,7 +10,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/referral_repository.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
-import 'package:kalivra/view/widgets/login_phone_email_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/referral/referral_code_field.dart';
 
@@ -23,15 +22,14 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneOrEmailController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _referralCodeController = TextEditingController();
   bool _obscurePassword = true;
-  bool _loginWithEmail = false;
 
   @override
   void dispose() {
-    _phoneOrEmailController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _referralCodeController.dispose();
     super.dispose();
@@ -41,7 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final referralCode = _referralCodeController.text.trim();
     context.read<AuthCubit>().login(
-      _phoneOrEmailController.text.trim(),
+      _emailController.text.trim(),
       _passwordController.text,
     );
     if (!mounted) return;
@@ -106,14 +104,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    LoginPhoneEmailField(
-                      controller: _phoneOrEmailController,
-                      isEmailMode: _loginWithEmail,
-                      onToggleMode: () {
-                        setState(() {
-                          _loginWithEmail = !_loginWithEmail;
-                          _phoneOrEmailController.clear();
-                        });
+                    AppTextField(
+                      controller: _emailController,
+                      label: AppLocalizations.of(context)!.email,
+                      hint: AppLocalizations.of(context)!.emailHint,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) {
+                          return AppLocalizations.of(context)!.enterEmailShort;
+                        }
+                        final emailValid = RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        ).hasMatch(v.trim());
+                        if (!emailValid) {
+                          return AppLocalizations.of(context)!.invalidEmail;
+                        }
+                        return null;
                       },
                     ),
                     SizedBox(height: 20.h),
@@ -122,11 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       label: AppLocalizations.of(context)!.passwordLabel,
                       hint: '••••••••',
                       obscureText: _obscurePassword,
-                      prefixIcon: Icon(
-                        Icons.lock_outline_rounded,
-                        size: 22.r,
-                        color: labelColor,
-                      ),
+
                       suffixIcon: CustomIconButton(
                         icon: _obscurePassword
                             ? Icons.visibility_off_rounded

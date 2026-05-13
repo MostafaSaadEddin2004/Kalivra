@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'Favorites'**
   String get drawerFavorites;
 
+  /// No description provided for @drawerAssociationLinkRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Association Link Request'**
+  String get drawerAssociationLinkRequest;
+
   /// No description provided for @drawerSettings.
   ///
   /// In en, this message translates to:
@@ -1292,6 +1298,24 @@ abstract class AppLocalizations {
   /// **'Enter your name'**
   String get enterName;
 
+  /// No description provided for @enterFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter first name'**
+  String get enterFirstName;
+
+  /// No description provided for @enterLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter last name'**
+  String get enterLastName;
+
+  /// No description provided for @enterEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email'**
+  String get enterEmail;
+
   /// No description provided for @passwordMinLength.
   ///
   /// In en, this message translates to:
@@ -1423,6 +1447,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Changes saved'**
   String get profileSaved;
+
+  /// No description provided for @profileImageTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Image must be 5 MB or smaller'**
+  String get profileImageTooLarge;
+
+  /// No description provided for @profileCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get profileCity;
+
+  /// No description provided for @profileCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get profileCountry;
+
+  /// No description provided for @genderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Gender'**
+  String get genderLabel;
+
+  /// No description provided for @dateOfBirthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of birth'**
+  String get dateOfBirthLabel;
+
+  /// No description provided for @dateOfBirthHint.
+  ///
+  /// In en, this message translates to:
+  /// **'YYYY-MM-DD (optional)'**
+  String get dateOfBirthHint;
+
+  /// No description provided for @genderMale.
+  ///
+  /// In en, this message translates to:
+  /// **'Male'**
+  String get genderMale;
+
+  /// No description provided for @genderFemale.
+  ///
+  /// In en, this message translates to:
+  /// **'Female'**
+  String get genderFemale;
+
+  /// No description provided for @genderOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get genderOther;
 
   /// No description provided for @changePhoto.
   ///
@@ -1801,6 +1879,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save and continue'**
   String get saveAndContinue;
+
+  /// No description provided for @associationLinkRequestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Association Linking Request'**
+  String get associationLinkRequestTitle;
+
+  /// No description provided for @associationLinkRequestHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your personal and membership details as you know them to request linking your account with the association.'**
+  String get associationLinkRequestHint;
+
+  /// No description provided for @associationLinkPersonalSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Information'**
+  String get associationLinkPersonalSection;
+
+  /// No description provided for @associationLinkContactSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact and Address'**
+  String get associationLinkContactSection;
+
+  /// No description provided for @associationLinkMembershipSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership Information'**
+  String get associationLinkMembershipSection;
+
+  /// No description provided for @associationLinkAttachmentsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents and Attachments'**
+  String get associationLinkAttachmentsSection;
+
+  /// No description provided for @associationLinkFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name'**
+  String get associationLinkFirstName;
+
+  /// No description provided for @associationLinkKunya.
+  ///
+  /// In en, this message translates to:
+  /// **'Family / Kunya Name'**
+  String get associationLinkKunya;
+
+  /// No description provided for @associationLinkFatherName.
+  ///
+  /// In en, this message translates to:
+  /// **'Father\'s Name'**
+  String get associationLinkFatherName;
+
+  /// No description provided for @associationLinkMotherName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother\'s Name'**
+  String get associationLinkMotherName;
+
+  /// No description provided for @associationLinkGovernorate.
+  ///
+  /// In en, this message translates to:
+  /// **'Governorate'**
+  String get associationLinkGovernorate;
+
+  /// No description provided for @associationLinkCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get associationLinkCity;
+
+  /// No description provided for @associationLinkTown.
+  ///
+  /// In en, this message translates to:
+  /// **'Town'**
+  String get associationLinkTown;
+
+  /// No description provided for @associationLinkVillage.
+  ///
+  /// In en, this message translates to:
+  /// **'Village'**
+  String get associationLinkVillage;
+
+  /// No description provided for @associationLinkStreet.
+  ///
+  /// In en, this message translates to:
+  /// **'Street'**
+  String get associationLinkStreet;
+
+  /// No description provided for @associationLinkBuilding.
+  ///
+  /// In en, this message translates to:
+  /// **'Building'**
+  String get associationLinkBuilding;
+
+  /// No description provided for @associationLinkPermanentAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent Address'**
+  String get associationLinkPermanentAddress;
+
+  /// No description provided for @associationLinkMobile.
+  ///
+  /// In en, this message translates to:
+  /// **'Mobile Number'**
+  String get associationLinkMobile;
+
+  /// No description provided for @associationLinkWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp Number'**
+  String get associationLinkWhatsApp;
+
+  /// No description provided for @associationLinkEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get associationLinkEmail;
+
+  /// No description provided for @associationLinkMembershipNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership Number'**
+  String get associationLinkMembershipNumber;
+
+  /// No description provided for @associationLinkPriorityNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Number'**
+  String get associationLinkPriorityNumber;
+
+  /// No description provided for @associationLinkProjectName.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Name'**
+  String get associationLinkProjectName;
+
+  /// No description provided for @associationLinkHousingUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned Housing Unit'**
+  String get associationLinkHousingUnit;
+
+  /// No description provided for @associationLinkTotalPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Payments'**
+  String get associationLinkTotalPayments;
+
+  /// No description provided for @associationLinkAttachmentDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Document Name / Description'**
+  String get associationLinkAttachmentDescription;
+
+  /// No description provided for @associationLinkEnterFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your name'**
+  String get associationLinkEnterFirstName;
+
+  /// No description provided for @associationLinkUnsupportedFileType.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported file type'**
+  String get associationLinkUnsupportedFileType;
+
+  /// No description provided for @associationLinkFileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File is too large'**
+  String get associationLinkFileTooLarge;
+
+  /// No description provided for @associationLinkAddAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add File'**
+  String get associationLinkAddAttachment;
+
+  /// No description provided for @associationLinkDeleteAttachment.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get associationLinkDeleteAttachment;
+
+  /// No description provided for @associationLinkSaveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Draft'**
+  String get associationLinkSaveDraft;
+
+  /// No description provided for @associationLinkDraftSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft saved'**
+  String get associationLinkDraftSaved;
+
+  /// No description provided for @associationLinkResubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Resubmit'**
+  String get associationLinkResubmit;
+
+  /// No description provided for @associationLinkSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Request'**
+  String get associationLinkSubmit;
+
+  /// No description provided for @associationLinkRequestSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request was submitted successfully'**
+  String get associationLinkRequestSubmitted;
+
+  /// No description provided for @associationLinkPhoneMustMatchAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'The phone number must match your account number'**
+  String get associationLinkPhoneMustMatchAccount;
+
+  /// No description provided for @associationLinkIncompleteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Some fields are incomplete. You can continue with the minimum required data.'**
+  String get associationLinkIncompleteWarning;
+
+  /// No description provided for @associationLinkSubmittedLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'The request was submitted and is under review. It can no longer be edited.'**
+  String get associationLinkSubmittedLocked;
+
+  /// No description provided for @associationLinkNoAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'No attachments added yet. Supporting documents are recommended.'**
+  String get associationLinkNoAttachments;
 
   /// No description provided for @verifyPhoneTitle.
   ///

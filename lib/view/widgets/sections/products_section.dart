@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProductsSection extends StatelessWidget {
-  const ProductsSection({
-    super.key,
-    required List<ProductModel> filteredProducts,
-    this.onAddToCart,
-    this.onProductTap,
-    this.onShowAllTap,
-  }) : _filteredProducts = filteredProducts;
-
-  final List<ProductModel> _filteredProducts;
-  final void Function(ProductModel product)? onAddToCart;
-  final void Function(ProductModel product)? onProductTap;
-  final VoidCallback? onShowAllTap;
+  const ProductsSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +28,7 @@ class ProductsSection extends StatelessWidget {
             children: [
               Text(l10n.products, style: textTheme.titleMedium),
               InkWell(
-                onTap: onShowAllTap,
+                onTap: () => context.push(AppRoutes.allProducts),
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
                   decoration: BoxDecoration(
@@ -55,27 +49,59 @@ class ProductsSection extends StatelessWidget {
         SizedBox(height: 12.h),
         SizedBox(
           height: 220.h,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16.w),
-            clipBehavior: Clip.none,
-            itemCount: _filteredProducts.length,
-            itemBuilder: (context, index) {
-              final product = _filteredProducts[index];
-              return Padding(
-                padding: EdgeInsets.only(left: 12.w),
-                child: SizedBox(
-                  width: 160.w,
-                  height: 220.h,
-                  child: ProductCard(
-                    product: product,
-                    onTap: onProductTap != null ? () => onProductTap!(product) : null,
-                    onAddToCart: onAddToCart != null
-                        ? () => onAddToCart!(product)
-                        : null,
-                  ),
-                ),
-              );
+          child: BlocBuilder<ProductsCubit, ProductsState>(
+            bloc: ProductsCubit()..loadProducts(),
+            builder: (context, state) {
+              switch (state) {
+                case ProductsLoading():
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    clipBehavior: Clip.none,
+                    itemCount: 2,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(left: 12.w),
+                        child: SizedBox(
+                          width: 160.w,
+                          height: 220.h,
+                          child: Skeletonizer(
+                            child: ProductCard(
+                              product: ProductModel(
+                                id: 0,
+                                sku: 'sku',
+                                type: 'type',
+                                name: 'name',
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                case ProductsLoaded():
+                  final products = state.products;
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    clipBehavior: Clip.none,
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.only(left: 12.w),
+                        child: SizedBox(
+                          width: 160.w,
+                          height: 220.h,
+                          child: ProductCard(product: products[index]),
+                        ),
+                      );
+                    },
+                  );
+                case ProductsFailed():
+                  return Center(child: Text(state.message));
+                default:
+                  return const SizedBox.shrink();
+              }
             },
           ),
         ),

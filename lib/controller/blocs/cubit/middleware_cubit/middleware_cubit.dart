@@ -12,9 +12,9 @@ import 'package:kalivra/view/widgets/drawer/drawer_item.dart';
 part 'middleware_state.dart';
 
 class MiddlewareCubit extends Cubit<MiddlewareState> {
-  MiddlewareCubit() : super(MiddlewareFetched(screen:SplashScreen()));
+  MiddlewareCubit() : super(MiddlewareFetched(screen: SplashScreen()));
 
-   Future<void> fetchScreen(BuildContext context) async {
+  Future<void> fetchScreen(BuildContext context) async {
     final intro = await LocalStore.getIntroPass();
     if (intro != null) {
       emit(MiddlewareFetched(screen: IntroScreen()));
@@ -35,7 +35,13 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
         context.pushNamed(screenName);
       }
     } else {
-      showDialog(context: context, builder: (context) => ConfirmDialog(message: 'هلأنت متأكد من الهاب لصفحة تسجيل الدخول؟',title: 'تسجيل الدخول',));
+      showDialog(
+        context: context,
+        builder: (context) => ConfirmDialog(
+          message: 'يجب عليك تسجيل الدخول للمتابعة.',
+          title: 'تسجيل الدخول',
+        ),
+      );
     }
   }
 
@@ -44,14 +50,21 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
     if (token != null && token.isNotEmpty) {
       emit(
         LogOutButton(
-          button:DrawerItem(icon: Icons.logout_rounded,label: 'تسجيل الخروج',onTap: () =>   context.read<AuthCubit>().logout(),) 
+          button: DrawerItem(
+            icon: Icons.logout_rounded,
+            label: 'تسجيل الخروج',
+            onTap: () => context.read<AuthCubit>().logout(),
+          ),
         ),
       );
     } else {
       emit(
         LoginButton(
-          button:DrawerItem(icon: Icons.login_rounded,label: 'تسجيل الدخول',onTap: () => context.pushNamed(AppRoutes.login),) ,
-        
+          button: DrawerItem(
+            icon: Icons.login_rounded,
+            label: 'تسجيل الدخول',
+            onTap: () => context.go(AppRoutes.login),
+          ),
         ),
       );
     }

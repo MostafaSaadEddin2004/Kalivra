@@ -18,18 +18,29 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
-  final _nameController = TextEditingController();
+  final _countryCodeController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _referralCodeController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
-  bool _isLoading = false;
+  bool isLoading = false;
+  @override
+  void initState() {
+    super.initState();
+    _countryCodeController.text = '+963';
+  }
 
   @override
   void dispose() {
     _phoneController.dispose();
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _emailController.dispose();
+    _lastNameController.dispose();
+    _countryCodeController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _referralCodeController.dispose();
@@ -45,7 +56,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-         padding: EdgeInsets.only(left: 24.w,top: 40.h,right: 24.w,bottom: 32.h),
+          padding: EdgeInsets.only(
+            left: 24.w,
+            top: 40.h,
+            right: 24.w,
+            bottom: 32.h,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -65,50 +81,89 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     color: isDark ? AppColors.taupe : AppColors.burgundy,
                   ),
                 ),
-                SizedBox(height: 32.h),
+                SizedBox(height: 20.h),
                 AppTextField(
-                  controller: _phoneController,
-                  label: AppLocalizations.of(context)!.phoneLabel,
-                  hint: '+963 9XX XXX XXX',
-                  keyboardType: TextInputType.phone,
-                  prefixIcon: Icon(
-                    Icons.phone_android_rounded,
-                    size: 22.r,
-                    color: labelColor,
-                  ),
+                  controller: _firstNameController,
+                  label: AppLocalizations.of(context)!.firstName,
+                  hint: AppLocalizations.of(context)!.enterFirstName,
+                  textCapitalization: TextCapitalization.words,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return AppLocalizations.of(context)!.enterPhone;
-                    if (v.trim().length < 8) return AppLocalizations.of(context)!.invalidPhoneShort;
+                    if (v == null || v.trim().isEmpty) {
+                      return AppLocalizations.of(context)!.enterFirstName;
+                    }
                     return null;
                   },
                 ),
                 SizedBox(height: 20.h),
                 AppTextField(
-                  controller: _nameController,
-                  label: AppLocalizations.of(context)!.fullName,
-                  hint: AppLocalizations.of(context)!.enterName,
+                  controller: _lastNameController,
+                  label: AppLocalizations.of(context)!.lastName,
+                  hint: AppLocalizations.of(context)!.enterLastName,
                   textCapitalization: TextCapitalization.words,
-                  prefixIcon: Icon(
-                    Icons.person_outline_rounded,
-                    size: 22.r,
-                    color: labelColor,
-                  ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) return AppLocalizations.of(context)!.enterName;
+                    if (v == null || v.trim().isEmpty) {
+                      return AppLocalizations.of(context)!.enterLastName;
+                    }
                     return null;
                   },
                 ),
+                SizedBox(height: 20.h),
+                AppTextField(
+                  controller: _emailController,
+                  label: AppLocalizations.of(context)!.email,
+                  hint: AppLocalizations.of(context)!.enterEmail,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return AppLocalizations.of(context)!.enterEmail;
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20.h),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: AppTextField(
+                        textDirection: TextDirection.ltr,
+                        controller: _phoneController,
+                        label: AppLocalizations.of(context)!.phoneLabel,
+                        hint: '9xx xxx xxx',
+                        keyboardType: TextInputType.phone,
+                        maxLength: 9,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return AppLocalizations.of(context)!.enterPhone;
+                          }
+                          if (v.trim().length < 8) {
+                            return AppLocalizations.of(
+                              context,
+                            )!.invalidPhoneShort;
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    SizedBox(
+                      width: 75.w,
+                      child: AppTextField(
+                        textDirection: TextDirection.ltr,
+                        enabled: false,
+                        controller: _countryCodeController,
+                        keyboardType: TextInputType.phone,
+                      ),
+                    ),
+                  ],
+                ),
+
                 SizedBox(height: 20.h),
                 AppTextField(
                   controller: _passwordController,
                   label: AppLocalizations.of(context)!.passwordLabel,
-                  hint: '••••••••',
+                  hint: '********',
                   obscureText: _obscurePassword,
-                  prefixIcon: Icon(
-                    Icons.lock_outline_rounded,
-                    size: 22.r,
-                    color: labelColor,
-                  ),
                   suffixIcon: CustomIconButton(
                     icon: _obscurePassword
                         ? Icons.visibility_off_rounded
@@ -119,22 +174,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppLocalizations.of(context)!.enterPassword;
-                    if (v.length < 6) return AppLocalizations.of(context)!.passwordMinLength;
-                    return null;
+                    if (v == null || v.isEmpty)
+{                      return AppLocalizations.of(context)!.enterPassword;
+}                    if (v.length < 6)
+{                      return AppLocalizations.of(context)!.passwordMinLength;
+}                    return null;
                   },
                 ),
                 SizedBox(height: 20.h),
                 AppTextField(
                   controller: _confirmPasswordController,
                   label: AppLocalizations.of(context)!.confirmPassword,
-                  hint: '••••••••',
+                  hint: '********',
                   obscureText: _obscureConfirm,
-                  prefixIcon: Icon(
-                    Icons.lock_outline_rounded,
-                    size: 22.r,
-                    color: labelColor,
-                  ),
                   suffixIcon: CustomIconButton(
                     icon: _obscureConfirm
                         ? Icons.visibility_off_rounded
@@ -145,9 +197,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         setState(() => _obscureConfirm = !_obscureConfirm),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty) return AppLocalizations.of(context)!.confirmPasswordRequired;
-                    if (v != _passwordController.text) return AppLocalizations.of(context)!.passwordsDoNotMatch;
-                    return null;
+                    if (v == null || v.isEmpty)
+                    {  return AppLocalizations.of(
+                        context,
+                      )!.confirmPasswordRequired;}
+                    if (v != _passwordController.text)
+{                      return AppLocalizations.of(context)!.passwordsDoNotMatch;
+}                    return null;
                   },
                 ),
                 SizedBox(height: 20.h),
@@ -157,7 +213,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 SizedBox(height: 32.h),
                 FilledButton(
-                  onPressed:(){},
+                  onPressed: () {},
                   style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 16.h),
                     shape: RoundedRectangleBorder(
@@ -165,7 +221,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: _isLoading
+                  child: isLoading
                       ? SizedBox(
                           height: 24.h,
                           width: 24.w,

@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
-import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
-import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/network/api_error_handler.dart';
-import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/model/brand/brand_model.dart';
+import 'package:kalivra/view/widgets/sections/brands_section.dart';
 import 'package:kalivra/view/widgets/sections/products_section.dart';
 import 'package:kalivra/view/widgets/sections/sales_section.dart';
 import 'package:kalivra/view/widgets/slider_widgets/ad_slider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,98 +14,131 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
+  final List<BrandModel> brands = [
+    BrandModel(id: '0', name: 'name 0', shopCount: 1, locations: ['location']),
+    BrandModel(
+      id: '1',
+      name: 'name 1',
+      shopCount: 2,
+      locations: ['location 1', 'location 2'],
+    ),
+    BrandModel(
+      id: '2',
+      name: 'name 2',
+      shopCount: 3,
+      locations: ['location 1', 'location 2', 'location 3'],
+    ),
+    BrandModel(
+      id: '3',
+      name: 'name 3',
+      shopCount: 4,
+      locations: ['location 1', 'location 2', 'location 3', 'location 4'],
+    ),
+    BrandModel(
+      id: '4',
+      name: 'name 4',
+      shopCount: 5,
+      locations: [
+        'location 1',
+        'location 2',
+        'location 3',
+        'location 4',
+        'location 5',
+      ],
+    ),
+    BrandModel(
+      id: '5',
+      name: 'name 5',
+      shopCount: 6,
+      locations: [
+        'location 1',
+        'location 2',
+        'location 3',
+        'location 4',
+        'location 5',
+        'location 6',
+      ],
+    ),
+    BrandModel(
+      id: '6',
+      name: 'name 6',
+      shopCount: 7,
+      locations: [
+        'location 1',
+        'location 2',
+        'location 3',
+        'location 4',
+        'location 5',
+        'location 6',
+        'location 7',
+      ],
+    ),
+    BrandModel(
+      id: '7',
+      name: 'name 7',
+      shopCount: 8,
+      locations: [
+        'location 1',
+        'location 2',
+        'location 3',
+        'location 4',
+        'location 5',
+        'location 6',
+        'location 7',
+        'location 8',
+      ],
+    ),
+    BrandModel(
+      id: '8',
+      name: 'name 8',
+      shopCount: 9,
+      locations: [
+        'location 1',
+        'location 2',
+        'location 3',
+        'location 4',
+        'location 5',
+        'location 6',
+        'location 7',
+        'location 8',
+        'location 9',
+      ],
+    ),
+    BrandModel(
+      id: '9',
+      name: 'name 9',
+      shopCount: 10,
+      locations: [
+        'location 1',
+        'location 2',
+        'location 3',
+        'location 4',
+        'location 5',
+        'location 6',
+        'location 7',
+        'location 8',
+        'location 9',
+        'location 10',
+      ],
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProductsCubit, ProductsState>(bloc: ProductsCubit()..loadProducts(),
-      listener: (context, state) {
-        if (state.error != null) {
-          ApiErrorHandler.showSnackBar(context, state.error!,
-              fallbackMessage: AppLocalizations.of(context)!.loadProductsFailed);
-        }
-      },
-      builder: (context, state) {
-        final isLoading = state.isLoading;
-        final products = state.products;
-
-        return CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: SizedBox(height: 8.h)),
-            SliverToBoxAdapter(
-              child: AdSlider(
-                onAdTap: (ad) => context.push(AppRoutes.adDetails, extra: ad),
-              ),
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-            SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-            SliverToBoxAdapter(
-              child: isLoading && products.isEmpty
-                  ? Skeletonizer(
-                      enabled: true,
-                      child: ProductsSection(
-                        filteredProducts: _placeholderProducts(context, 6),
-                        onAddToCart: (_) {},
-                        onProductTap: (_) {},
-                        onShowAllTap: () {},
-                      ),
-                    )
-                  : ProductsSection(
-                      filteredProducts: products.isNotEmpty
-                          ? products
-                          : state.hasError
-                              ? <ProductModel>[]
-                              : state.products,
-                      onAddToCart: (p) => context.read<CartCubit>().addItem(p),
-                      onProductTap: (p) =>
-                          context.push(AppRoutes.productDetails, extra: p),
-                      onShowAllTap: () => context.push(AppRoutes.allProducts),
-                    ),
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-            SliverToBoxAdapter(
-              child: AdSlider(
-                onAdTap: (ad) => context.push(AppRoutes.adDetails, extra: ad),
-              ),
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-            SliverToBoxAdapter(
-              child: isLoading && products.isEmpty
-                  ? Skeletonizer(
-                      enabled: true,
-                      child: SalesSection(
-                        saleProducts: _placeholderProducts(context, 4),
-                        onAddToCart: (_) {},
-                        onProductTap: (_) {},
-                        onShowAllTap: () {},
-                      ),
-                    )
-                  : SalesSection(
-                      saleProducts: products,
-                      onAddToCart: (p) => context.read<CartCubit>().addItem(p),
-                      onProductTap: (p) =>
-                          context.push(AppRoutes.productDetails, extra: p),
-                      onShowAllTap: () => context.push(AppRoutes.allSaleProducts),
-                    ),
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: 16.h)),
-          ],
-        );
-      },
-    );
-  }
-
-  List<ProductModel> _placeholderProducts(BuildContext context, int n) {
-    return List.generate(
-      n,
-      (i) => ProductModel(
-        unit: '',
-        id: '$i',
-        name: AppLocalizations.of(context)!.product,
-        categoryId: '1',
-        price: 0,
-        quantity: 1,
-      ),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(child: SizedBox(height: 8.h)),
+        SliverToBoxAdapter(child: AdSlider()),
+        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+        SliverToBoxAdapter(child: BrandsSection(brands: brands)),
+        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+        SliverToBoxAdapter(child: ProductsSection()),
+        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+        SliverToBoxAdapter(child: AdSlider()),
+        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+        SliverToBoxAdapter(child: SalesSection()),
+        SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+      ],
     );
   }
 }

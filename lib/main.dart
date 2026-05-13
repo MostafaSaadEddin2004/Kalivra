@@ -9,6 +9,7 @@ import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart'
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
@@ -29,6 +30,7 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
+        BlocProvider(create:  (context) => MiddlewareCubit(),),
         BlocProvider(create: (context) => ThemeBloc()..add(GetThemeMode())),
         BlocProvider(create: (context) => LocaleBloc()..add(GetLocale())),
         BlocProvider(create: (context) => AuthCubit()..loadProfile()),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/model/category/category_model.dart';
+import 'package:kalivra/model/category/category_api_model.dart';
 
 class CategoryButton extends StatelessWidget {
   const CategoryButton({
@@ -10,7 +10,7 @@ class CategoryButton extends StatelessWidget {
     required this.onTap,
   });
 
-  final CategoryModel category;
+  final CategoryApiModel category;
   final bool isSelected;
   final VoidCallback onTap;
 
@@ -35,9 +35,10 @@ class CategoryButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                category.icon,
-                size: 20.r,
+              Image.network(
+                category.imageUrl??'',
+                height: 20.h,
+                width: 20.w,
                 color: isSelected
                     ? colorScheme.onPrimaryFixed
                     : colorScheme.onTertiary,

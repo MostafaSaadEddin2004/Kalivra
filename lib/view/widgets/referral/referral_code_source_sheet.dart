@@ -16,7 +16,7 @@ void showReferralCodeSourceSheet(
 
   showModalBottomSheet<void>(
     context: context,
-    backgroundColor: isDark ? AppColors.burgundy.withValues(alpha: 0.95) : Colors.white,
+    backgroundColor: theme.colorScheme.secondaryFixed,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
     ),
@@ -47,8 +47,8 @@ void showReferralCodeSourceSheet(
               SizedBox(height: 24.h),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  child: Icon(Icons.photo_library_rounded, color: theme.colorScheme.primary, size: 26.r),
+                  backgroundColor: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
+                  child: Icon(Icons.photo_library_rounded, color: theme.colorScheme.primaryFixed, size: 26.r),
                 ),
                 title: Text(
                   'من المعرض',
@@ -71,8 +71,8 @@ void showReferralCodeSourceSheet(
               SizedBox(height: 8.h),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  child: Icon(Icons.qr_code_scanner_rounded, color: theme.colorScheme.primary, size: 26.r),
+                  backgroundColor: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
+                  child: Icon(Icons.qr_code_scanner_rounded, color: theme.colorScheme.primaryFixed, size: 26.r),
                 ),
                 title: Text(
                   'مسح بالكاميرا',

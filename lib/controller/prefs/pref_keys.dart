@@ -11,4 +11,6 @@ abstract class PrefKeys {
   static const String arLocaleKey = 'ar';
   static const String enLocaleKey = 'en';
   static const String systemLocaleKey = 'system';
+  static const String associationLinkDraftKey = 'association_link_draft';
+  static const String associationLinkSubmittedKey = 'association_link_submitted';
 }

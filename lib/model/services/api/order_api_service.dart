@@ -1,6 +1,6 @@
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/order/invoice_api_model.dart';
-import 'package:kalivra/model/order/order_api_model.dart';
+import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/model/order/shipment_api_model.dart';
 import 'package:kalivra/model/order/transaction_api_model.dart';
 
@@ -8,24 +8,21 @@ class OrderApiService {
   OrderApiService();
   final DioClient _client = DioClient();
 
-  Future<List<OrderApiModel>> getOrders() async {
+  Future<List<OrderModel>> getOrders() async {
     final res = await _client.get<Map<String, dynamic>>('orders');
     final data = res['data'];
     if (data is List) {
       return data
-          .map((e) => OrderApiModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
           .toList();
     }
     return [];
   }
 
-  Future<OrderApiModel?> getOrderById(int id) async {
-    final res = await _client.get<Map<String, dynamic>>('orders/$id');
+  Future<OrderModel> getOrderById(int categoryId) async {
+    final res = await _client.get<Map<String, dynamic>>('orders/$categoryId');
     final data = res['data'];
-    if (data is Map<String, dynamic>) {
-      return OrderApiModel.fromJson(data);
-    }
-    return null;
+      return OrderModel.fromJson(data);
   }
 
   Future<List<InvoiceApiModel>> getInvoices(int orderId) async {

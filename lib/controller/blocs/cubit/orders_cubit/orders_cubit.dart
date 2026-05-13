@@ -1,33 +1,31 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_state.dart';
-import 'package:kalivra/model/order/order_model.dart';
-import 'package:kalivra/model/services/api/mappers/order_mapper.dart';
 import 'package:kalivra/model/services/api/order_api_service.dart';
 
 export 'orders_state.dart';
 
 class OrdersCubit extends Cubit<OrdersState> {
-  OrdersCubit() : super(OrdersState.initial);
+  OrdersCubit() : super(OrdersLoading());
 
-  final OrderApiService  _orderService = OrderApiService();
+  final OrderApiService _orderService = OrderApiService();
 
-Future<void> loadOrders() async {
-    emit(OrdersState.loading);
+  Future<void> loadOrders() async {
+    emit(OrdersLoading());
     try {
-      final list = await _orderService.getOrders();
-      final orders = list.map(OrderMapper.fromApi).toList();
-      emit(OrdersState.loaded(orders));
-    } catch (e, st) {
-      emit(OrdersState.failed(e, st));
+      final orders = await _orderService.getOrders();
+      emit(OrdersLoaded(orders: orders));
+    } catch (e) {
+      emit(OrdersFailed(message: e.toString()));
     }
   }
 
-  Future<OrderModel?> loadOrderById(int id) async {
+  Future<void> loadOrderById(int categoryId) async {
+    emit(OrdersLoading());
     try {
-      final api = await _orderService.getOrderById(id);
-      return api != null ? OrderMapper.fromApi(api) : null;
-    } catch (_) {
-      return null;
+      final order = await _orderService.getOrderById(categoryId);
+      emit(OneOrderLoaded(order: order));
+    } catch (e) {
+      emit(OrdersFailed(message: e.toString()));
     }
   }
 }

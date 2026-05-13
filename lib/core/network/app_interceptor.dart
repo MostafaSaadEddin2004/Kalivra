@@ -16,7 +16,11 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
     options.headers['Accept'] = 'application/json';
-    options.headers['Content-Type'] = 'application/json';
+    if (options.data is FormData) {
+      options.headers.remove('Content-Type');
+    } else {
+      options.headers['Content-Type'] = 'application/json';
+    }
     handler.next(options);
   }
 
@@ -106,11 +110,12 @@ class ErrorInterceptor extends Interceptor {
 
     String message = err.message ?? 'Unknown error';
     Map<String, dynamic>? errors;
-    if (data is Map<String, dynamic>) {
-      message = data['message'] as String? ?? message;
-      if (data['errors'] != null) {
-        errors = data['errors'] is Map
-            ? Map<String, dynamic>.from(data['errors'] as Map)
+    if (data is Map) {
+      final m = Map<String, dynamic>.from(data);
+      message = m['message'] as String? ?? message;
+      if (m['errors'] != null) {
+        errors = m['errors'] is Map
+            ? Map<String, dynamic>.from(m['errors'] as Map)
             : null;
       }
     }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_state.dart';
@@ -75,24 +76,38 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> updateProfile(
-    String name,
-    String phone,
-    String address,
-    String city,
-    String country,
-  ) {
+  Future<void> updateProfile({
+    required String name,
+    required String email,
+    required String phone,
+    required String address,
+    required String city,
+    required String country,
+    String? postalCode,
+    String? firstName,
+    String? lastName,
+    String? gender,
+    String? dateOfBirth,
+    File? avatarFile,
+  }) async {
     emit(AuthLoading());
     try {
-      final data = _customerApiService.updateProfile(
-        name,
-        phone,
-        address,
-        city,
-        country,
+      await _customerApiService.updateProfile(
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        city: city,
+        country: country,
+        postalCode: postalCode,
+        firstName: firstName,
+        lastName: lastName,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        avatarFile: avatarFile,
       );
       emit(AuthSuccessed(message: 'تم تحديث البيانات بنجاح'));
-      return data;
+      await loadProfile();
     } catch (e) {
       emit(AuthFailed(message: e.toString()));
       throw Exception(e);

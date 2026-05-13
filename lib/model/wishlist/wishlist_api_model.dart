@@ -1,4 +1,3 @@
-/// GET /api/shop/v1/wishlist – wishlist item (product in wishlist).
 class WishlistApiModel {
   const WishlistApiModel({
     required this.id,

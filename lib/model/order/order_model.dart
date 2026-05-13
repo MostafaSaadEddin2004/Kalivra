@@ -1,4 +1,3 @@
-/// Single line item in an order.
 class OrderLineItem {
   const OrderLineItem({
     required this.productName,
@@ -13,9 +12,17 @@ class OrderLineItem {
   final String? imageUrl;
 
   double get total => quantity * unitPrice;
+
+  factory OrderLineItem.fromJson(Map<String, dynamic> json) {
+    return OrderLineItem(
+      productName: json['productName'],
+      quantity: json['quantity'],
+      unitPrice: json['unitPrice'],
+      imageUrl: json['imageUrl'],
+    );
+  }
 }
 
-/// Order summary + line items for order details.
 class OrderModel {
   const OrderModel({
     required this.id,
@@ -38,4 +45,16 @@ class OrderModel {
   final List<OrderLineItem> items;
   final String? shippingAddress;
   final String? paymentMethod;
+
+  factory OrderModel.fromJson(Map<String, dynamic> json) {
+    return OrderModel(
+      id: json['id'],
+      date: json['date'],
+      status: json['status'],
+      subtotal: json['subtotal'],
+      deliveryCost: json['deliveryCost'],
+      total: json['total'],
+      items: json['items'].map((e) => OrderLineItem.fromJson(e)).toList(),
+    );
+  }
 }

@@ -1,4 +1,3 @@
-/// GET /api/shop/v1/customers/addresses – customer address.
 class AddressApiModel {
   const AddressApiModel({
     required this.id,

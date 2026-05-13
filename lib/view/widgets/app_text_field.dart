@@ -23,6 +23,7 @@ class AppTextField extends StatelessWidget {
     this.fillColor,
     this.labelColor,
     this.borderRadius,
+    this.textDirection
   });
 
   final TextEditingController controller;
@@ -43,6 +44,7 @@ class AppTextField extends StatelessWidget {
   final Color? fillColor;
   final Color? labelColor;
   final double? borderRadius;
+  final TextDirection? textDirection;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +58,8 @@ class AppTextField extends StatelessWidget {
     final radius = borderRadius ?? 14.r;
 
     return TextFormField(
+      onEditingComplete: () => FocusScope.of(context).nextFocus(),
+      textDirection: textDirection,
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
@@ -66,6 +70,8 @@ class AppTextField extends StatelessWidget {
       textInputAction: textInputAction,
       textCapitalization: textCapitalization,
       maxLength: maxLength,
+      cursorColor: Theme.of(context).colorScheme.inversePrimary,
+      cursorWidth: .5.w,
       decoration: InputDecoration(
         labelText: this.label,
         hintText: hint,
@@ -76,17 +82,16 @@ class AppTextField extends StatelessWidget {
         fillColor: fill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: border,),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: border,),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
           borderSide: BorderSide(
             color: isDark ? AppColors.goldLight : AppColors.burgundy,
-            width: 1.5,
           ),
         ),
         errorBorder: OutlineInputBorder(

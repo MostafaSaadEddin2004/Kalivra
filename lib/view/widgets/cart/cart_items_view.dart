@@ -35,8 +35,8 @@ class CartItemsView extends StatelessWidget {
                   return CartItemCard(
                     item: item,
                     onQuantityChanged: (q) =>
-                        cartCubit.updateQuantity(item.product.id, q),
-                    onRemove: () => cartCubit.removeItem(item.product.id),
+                        cartCubit.updateQuantity(item.product.id.toString(), q),
+                    onRemove: () => cartCubit.removeItem(item.product.id.toString()),
                   );
                 },
               ),

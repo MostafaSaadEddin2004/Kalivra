@@ -47,12 +47,12 @@ class CheckoutStep extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (item.product.imagePath != null &&
-                            item.product.imagePath!.isNotEmpty)
+                        if (item.product.baseImage!.largeImageUrl != null &&
+                            item.product.baseImage!.largeImageUrl!.isNotEmpty)
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8.r),
                             child: Image.asset(
-                              item.product.imagePath!,
+                              item.product.baseImage!.largeImageUrl!,
                               width: 64.w,
                               height: 64.w,
                               fit: BoxFit.cover,

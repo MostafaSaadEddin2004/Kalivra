@@ -1,11 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/model/ad/advertisement_model.dart';
 
 class AdCard extends StatelessWidget {
-  const AdCard({super.key, required this.slide, this.onTap});
+  const AdCard({super.key, required this.imageUrl, this.onTap});
 
-  final AdvertisementModel slide;
+  final String imageUrl;
   final VoidCallback? onTap;
 
   @override
@@ -17,11 +17,7 @@ class AdCard extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
-          gradient: LinearGradient(
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-            colors: [slide.gradientStart, slide.gradientEnd],
-          ),
+
           boxShadow: [
             BoxShadow(
               color: colorScheme.onSurface.withValues(alpha: 0.12),
@@ -30,11 +26,7 @@ class AdCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Icon(
-          Icons.campaign_rounded,
-          size: 48.r,
-          color: colorScheme.onPrimary.withValues(alpha: 0.5),
-        ),
+        child: CachedNetworkImage(imageUrl: imageUrl,),
       ),
     );
   }

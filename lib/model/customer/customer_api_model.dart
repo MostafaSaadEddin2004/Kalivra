@@ -6,6 +6,10 @@ class CustomerApiModel {
     this.name,
     this.email,
     this.phone,
+    this.address,
+    this.city,
+    this.country,
+    this.postalCode,
     this.gender,
     this.dateOfBirth,
     this.avatar,
@@ -21,6 +25,10 @@ class CustomerApiModel {
   final String? name;
   final String? email;
   final String? phone;
+  final String? address;
+  final String? city;
+  final String? country;
+  final String? postalCode;
   final String? gender;
   final String? dateOfBirth;
   final String? avatar;
@@ -37,6 +45,10 @@ class CustomerApiModel {
       name: json['name'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
+      address: json['address'] as String?,
+      city: json['city'] as String?,
+      country: json['country'] as String?,
+      postalCode: json['postal_code'] as String?,
       gender: json['gender'] as String?,
       dateOfBirth: json['date_of_birth'] as String?,
       avatar: json['avatar'] as String?,

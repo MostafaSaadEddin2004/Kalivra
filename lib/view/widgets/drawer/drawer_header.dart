@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -15,42 +14,31 @@ class CustomDrawerHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
     final topPadding = MediaQuery.paddingOf(context).top;
-    final statusBarBrightness = ThemeData.estimateBrightnessForColor(primary) == Brightness.dark
-        ? Brightness.light
-        : Brightness.dark;
-
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: primary,
-        statusBarIconBrightness: statusBarBrightness,
-        statusBarBrightness: statusBarBrightness,
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.only(
+        top: topPadding + 12.h,
+        bottom: 12.h,
+        left: 16.w,
+        right: 16.w,
       ),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.only(
-          top: topPadding + 12.h,
-          bottom: 12.h,
-          left: 16.w,
-          right: 16.w,
-        ),
-        color: primary,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              AppLocalizations.of(context)!.menu,
-              style: theme.textTheme.headlineLarge,
-            ),
-            const Spacer(),
-            CustomIconButton(
-              icon: Icons.close_rounded,
-              color: AppColors.offWhite,
-              iconSize: 26.r,
-              onPressed: onClose,
-              tooltip: AppLocalizations.of(context)!.closeTooltip,
-            ),
-          ],
-        ),
+      color: primary,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            AppLocalizations.of(context)!.menu,
+            style: theme.textTheme.headlineLarge,
+          ),
+          const Spacer(),
+          CustomIconButton(
+            icon: Icons.close_rounded,
+            color: AppColors.offWhite,
+            iconSize: 26.r,
+            onPressed: onClose,
+            tooltip: AppLocalizations.of(context)!.closeTooltip,
+          ),
+        ],
       ),
     );
   }

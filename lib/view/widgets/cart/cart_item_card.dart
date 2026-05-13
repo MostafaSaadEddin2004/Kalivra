@@ -54,9 +54,9 @@ class CartItemCard extends StatelessWidget {
                   width: 88.w,
                   height: 88.w,
                   color: colorScheme.tertiaryFixed,
-                  child: item.product.imagePath != null
+                  child: item.product.baseImage?.largeImageUrl != null
                       ? Image.asset(
-                          item.product.imagePath!,
+                          item.product.baseImage?.largeImageUrl ?? '',
                           fit: BoxFit.cover,
                           errorBuilder: (_, _, _) => Icon(
                             Icons.inventory_2_outlined,
@@ -73,7 +73,7 @@ class CartItemCard extends StatelessWidget {
               ),
               QuantityCounter(
                 value: item.quantity,
-                maxQuantity: item.product.quantity,
+                maxQuantity: item.product.variants?.qty ?? 0,
                 onChanged: onQuantityChanged,
               ),
             ],

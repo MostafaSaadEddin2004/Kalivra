@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/network/dio_client.dart';
@@ -6,6 +7,14 @@ import 'package:kalivra/model/customer/customer_api_model.dart';
 class CustomerApiService {
   CustomerApiService();
   final DioClient _client = DioClient();
+
+  static const int maxProfileImageBytes = 5 * 1024 * 1024;
+
+  static String basename(String path) {
+    final normalized = path.replaceAll('\\', '/');
+    final i = normalized.lastIndexOf('/');
+    return i >= 0 ? normalized.substring(i + 1) : path;
+  }
 
   Future<CustomerApiModel> getProfile() async {
     final res = await _client.get('customer');
@@ -65,24 +74,64 @@ Future<void> logout() async {
     }
   }
 
-Future<void> updateProfile(
-    String name,
-    String phone,
-    String address,
-    String city,
-    String country,
-  ) async {
-    final Map<String, dynamic> body = {
+  Future<bool> updateProfile({
+    required String name,
+    required String email,
+    required String phone,
+    required String address,
+    required String city,
+    required String country,
+    String? postalCode,
+    String? firstName,
+    String? lastName,
+    String? gender,
+    String? dateOfBirth,
+    File? avatarFile,
+  }) async {
+    if (avatarFile != null) {
+      final length = await avatarFile.length();
+      if (length > maxProfileImageBytes) {
+        throw Exception(
+          'Profile image must be ${maxProfileImageBytes ~/ (1024 * 1024)} MB or smaller.',
+        );
+      }
+    }
+
+    final Map<String, dynamic> fields = {
       'name': name,
+      'email': email,
       'phone': phone,
       'address': address,
       'city': city,
       'country': country,
+      if (postalCode != null && postalCode.trim().isNotEmpty)
+        'postal_code': postalCode.trim(),
+      if (firstName != null && firstName.trim().isNotEmpty)
+        'first_name': firstName.trim(),
+      if (lastName != null && lastName.trim().isNotEmpty)
+        'last_name': lastName.trim(),
+      if (gender != null && gender.trim().isNotEmpty) 'gender': gender.trim(),
+      if (dateOfBirth != null && dateOfBirth.trim().isNotEmpty)
+        'date_of_birth': dateOfBirth.trim(),
     };
+
     try {
-      await _client.put('customer', data: body);
-    } on DioException catch (e) {
-      throw Exception(e);
+      if (avatarFile != null) {
+        final formData = FormData.fromMap({
+          ...fields,
+          'avatar': await MultipartFile.fromFile(
+            avatarFile.path,
+            filename: basename(avatarFile.path),
+          ),
+        });
+        await _client.put('customer', data: formData);
+      } else {
+        await _client.put('customer', data: fields);
+      }
+      return true;
+    } 
+    on DioException catch (e) {
+      return false;
     }
   }
 }

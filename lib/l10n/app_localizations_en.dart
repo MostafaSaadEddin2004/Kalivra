@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerFavorites => 'Favorites';
 
   @override
+  String get drawerAssociationLinkRequest => 'Association Link Request';
+
+  @override
   String get drawerSettings => 'Settings';
 
   @override
@@ -631,6 +634,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterName => 'Enter your name';
 
   @override
+  String get enterFirstName => 'Enter first name';
+
+  @override
+  String get enterLastName => 'Enter last name';
+
+  @override
+  String get enterEmail => 'Enter email';
+
+  @override
   String get passwordMinLength => 'Password must be at least 6 characters';
 
   @override
@@ -695,6 +707,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileSaved => 'Changes saved';
+
+  @override
+  String get profileImageTooLarge => 'Image must be 5 MB or smaller';
+
+  @override
+  String get profileCity => 'City';
+
+  @override
+  String get profileCountry => 'Country';
+
+  @override
+  String get genderLabel => 'Gender';
+
+  @override
+  String get dateOfBirthLabel => 'Date of birth';
+
+  @override
+  String get dateOfBirthHint => 'YYYY-MM-DD (optional)';
+
+  @override
+  String get genderMale => 'Male';
+
+  @override
+  String get genderFemale => 'Female';
+
+  @override
+  String get genderOther => 'Other';
 
   @override
   String get changePhoto => 'Change photo';
@@ -889,6 +928,133 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveAndContinue => 'Save and continue';
+
+  @override
+  String get associationLinkRequestTitle => 'Association Linking Request';
+
+  @override
+  String get associationLinkRequestHint =>
+      'Enter your personal and membership details as you know them to request linking your account with the association.';
+
+  @override
+  String get associationLinkPersonalSection => 'Personal Information';
+
+  @override
+  String get associationLinkContactSection => 'Contact and Address';
+
+  @override
+  String get associationLinkMembershipSection => 'Membership Information';
+
+  @override
+  String get associationLinkAttachmentsSection => 'Documents and Attachments';
+
+  @override
+  String get associationLinkFirstName => 'First Name';
+
+  @override
+  String get associationLinkKunya => 'Family / Kunya Name';
+
+  @override
+  String get associationLinkFatherName => 'Father\'s Name';
+
+  @override
+  String get associationLinkMotherName => 'Mother\'s Name';
+
+  @override
+  String get associationLinkGovernorate => 'Governorate';
+
+  @override
+  String get associationLinkCity => 'City';
+
+  @override
+  String get associationLinkTown => 'Town';
+
+  @override
+  String get associationLinkVillage => 'Village';
+
+  @override
+  String get associationLinkStreet => 'Street';
+
+  @override
+  String get associationLinkBuilding => 'Building';
+
+  @override
+  String get associationLinkPermanentAddress => 'Permanent Address';
+
+  @override
+  String get associationLinkMobile => 'Mobile Number';
+
+  @override
+  String get associationLinkWhatsApp => 'WhatsApp Number';
+
+  @override
+  String get associationLinkEmail => 'Email';
+
+  @override
+  String get associationLinkMembershipNumber => 'Membership Number';
+
+  @override
+  String get associationLinkPriorityNumber => 'Priority Number';
+
+  @override
+  String get associationLinkProjectName => 'Project Name';
+
+  @override
+  String get associationLinkHousingUnit => 'Assigned Housing Unit';
+
+  @override
+  String get associationLinkTotalPayments => 'Total Payments';
+
+  @override
+  String get associationLinkAttachmentDescription =>
+      'Document Name / Description';
+
+  @override
+  String get associationLinkEnterFirstName => 'Please enter your name';
+
+  @override
+  String get associationLinkUnsupportedFileType => 'Unsupported file type';
+
+  @override
+  String get associationLinkFileTooLarge => 'File is too large';
+
+  @override
+  String get associationLinkAddAttachment => 'Add File';
+
+  @override
+  String get associationLinkDeleteAttachment => 'Delete';
+
+  @override
+  String get associationLinkSaveDraft => 'Save Draft';
+
+  @override
+  String get associationLinkDraftSaved => 'Draft saved';
+
+  @override
+  String get associationLinkResubmit => 'Resubmit';
+
+  @override
+  String get associationLinkSubmit => 'Submit Request';
+
+  @override
+  String get associationLinkRequestSubmitted =>
+      'Your request was submitted successfully';
+
+  @override
+  String get associationLinkPhoneMustMatchAccount =>
+      'The phone number must match your account number';
+
+  @override
+  String get associationLinkIncompleteWarning =>
+      'Some fields are incomplete. You can continue with the minimum required data.';
+
+  @override
+  String get associationLinkSubmittedLocked =>
+      'The request was submitted and is under review. It can no longer be edited.';
+
+  @override
+  String get associationLinkNoAttachments =>
+      'No attachments added yet. Supporting documents are recommended.';
 
   @override
   String get verifyPhoneTitle => 'Verify phone number';
