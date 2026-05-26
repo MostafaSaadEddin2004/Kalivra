@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
-import 'package:kalivra/core/pop_scope_exit_app.dart';
+import 'package:go_router/go_router.dart';import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
 import 'package:kalivra/model/nav/nav_item_model.dart';
@@ -53,27 +51,27 @@ class _HomeScreenState extends State<HomeScreen> {
                     onCartTap: () => context.pushNamed('cart'),
                   ),
             drawer: const AppDrawer(),
-            body: Padding(
-              padding: EdgeInsets.only(bottom: 100.h),
-              child: IndexedStack(
-                index: index,
-                children: const [
-                  HomePage(),
-                  CategoriesPage(),
-                  NotificationsPage(),
-                  SearchPage(),
-                ],
-              ),
+            body: IndexedStack(
+              index: index,
+              children: const [
+                HomePage(),
+                CategoriesPage(),
+                NotificationsPage(),
+                SearchPage(),
+              ],
             ),
-            bottomNavigationBar: CustomNavBar(
-              items: _buildNavItems(context),
-              currentIndex: index,
-              onTap: (i) {
-              context.read<NavCubit>().goTo(i);
-              if (i == NavCubit.notifications) {
-                context.read<NotificationsCubit>().refresh();
-              }
-            },
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: CustomNavBar(
+                items: _buildNavItems(context),
+                currentIndex: index,
+                onTap: (i) {
+                  context.read<NavCubit>().goTo(i);
+                  if (i == NavCubit.notifications) {
+                    context.read<NotificationsCubit>().refresh();
+                  }
+                },
+              ),
             ),
           );
         },

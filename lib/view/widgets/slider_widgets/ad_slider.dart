@@ -5,9 +5,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/ads_cubit/ads_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/model/ad/advertisement_model.dart';
+import 'package:kalivra/model/ads_model.dart';
 import 'package:kalivra/view/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/view/widgets/slider_widgets/custom_indicator.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+
+List<({AdsModel carousel, AdsInfoModel slide})> _flattenSlides(List<AdsModel> ads) {
+  final out = <({AdsModel carousel, AdsInfoModel slide})>[];
+  for (final carousel in ads) {
+    for (final slide in carousel.adsInfo) {
+      out.add((carousel: carousel, slide: slide));
+    }
+  }
+  return out;
+}
 
 class AdSlider extends StatefulWidget {
   const AdSlider({super.key});
@@ -18,6 +31,7 @@ class AdSlider extends StatefulWidget {
 
 class AdSliderState extends State<AdSlider> {
   late final PageController _pageController;
+  late final AdsCubit _adsCubit;
   Timer? _timer;
   int _currentPage = 0;
 
@@ -25,13 +39,19 @@ class AdSliderState extends State<AdSlider> {
   void initState() {
     super.initState();
     _pageController = PageController(viewportFraction: 0.92);
+    _adsCubit = AdsCubit()..fetchAds();
     _startAutoPlay();
   }
 
   void _startAutoPlay() {
-    const slideCount = 3;
     _timer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!_pageController.hasClients) return;
+      final state = _adsCubit.state;
+      final slideCount = switch (state) {
+        AdsFetched(:final ads) => _flattenSlides(ads).length,
+        _ => 3,
+      };
+      if (slideCount == 0) return;
       final next = (_currentPage + 1) % slideCount;
       _pageController.animateToPage(
         next,
@@ -44,20 +64,52 @@ class AdSliderState extends State<AdSlider> {
   @override
   void dispose() {
     _timer?.cancel();
+    _adsCubit.close();
     _pageController.dispose();
     super.dispose();
+  }
+
+  Widget _skeletonSlideCard(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16.r),
+          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+        ),
+      ),
+    );
+  }
+
+  void _openDetails(BuildContext context, AdsModel carousel, AdsInfoModel slide) {
+    final title =
+        slide.title.trim().isNotEmpty ? slide.title.trim() : carousel.name;
+    context.push(
+      AppRoutes.adDetails,
+      extra: AdvertisementModel(
+        title: title,
+        subtitle: carousel.name,
+        gradientStart: AppColors.burgundy,
+        gradientEnd: AppColors.goldLight,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdsCubit, AdsState>(
-      bloc: AdsCubit()..fetchAds(),
+      bloc: _adsCubit,
       builder: (context, state) {
         switch (state) {
           case AdsFailed():
+          debugPrint(state.errorMessage);
             return Center(child: Text(state.errorMessage));
           case AdsFetched():
-            final slides = state.ads;
+            final entries = _flattenSlides(state.ads);
+            if (entries.isEmpty) {
+              return const SizedBox.shrink();
+            }
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -67,16 +119,17 @@ class AdSliderState extends State<AdSlider> {
                     controller: _pageController,
                     onPageChanged: (index) =>
                         setState(() => _currentPage = index),
-                    itemCount: slides.length,
+                    itemCount: entries.length,
                     itemBuilder: (context, index) {
-                      final slide = slides[index].adsInfo[index].image;
+                      final item = entries[index];
                       return Padding(
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: AdCard(
-                          imageUrl: slide,
-                          onTap: () => context.push(
-                            AppRoutes.adDetails,
-                            extra: slides[index],
+                          imageUrl: item.slide.image,
+                          onTap: () => _openDetails(
+                            context,
+                            item.carousel,
+                            item.slide,
                           ),
                         ),
                       );
@@ -85,7 +138,7 @@ class AdSliderState extends State<AdSlider> {
                 ),
                 SizedBox(height: 12.h),
                 CustomIndicator(
-                  itemCount: slides.length,
+                  itemCount: entries.length,
                   currentPage: _currentPage,
                 ),
               ],
@@ -105,7 +158,7 @@ class AdSliderState extends State<AdSlider> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: EdgeInsets.symmetric(horizontal: 6.w),
-                          child: AdCard(imageUrl: 'slide', onTap: () {}),
+                          child: _skeletonSlideCard(context),
                         );
                       },
                     ),

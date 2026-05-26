@@ -5,7 +5,7 @@ class CheckoutApiService {
   final DioClient _client = DioClient();
 
   Future<Map<String, dynamic>?> checkout(Map<String, dynamic> body) async {
-    final res = await _client.post<Map<String, dynamic>>('checkout', data: body);
-    return res;
+    final res = await _client.post('checkout', data: body);
+    return res.data;
   }
 }

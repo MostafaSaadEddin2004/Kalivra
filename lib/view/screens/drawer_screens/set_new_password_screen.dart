@@ -75,7 +75,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                     AppTextField(
                       controller: _newController,
                       label: l10n.newPassword,
-                      hint: '••••••••',
+                      hint: '********',
                       obscureText: _obscureNew,
                       prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
                       suffixIcon: CustomIconButton(
@@ -99,7 +99,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
                     AppTextField(
                       controller: _confirmController,
                       label: l10n.newPasswordConfirm,
-                      hint: '••••••••',
+                      hint: '********',
                       obscureText: _obscureConfirm,
                       prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
                       suffixIcon: CustomIconButton(

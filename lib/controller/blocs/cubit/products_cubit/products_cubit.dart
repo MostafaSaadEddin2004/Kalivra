@@ -6,38 +6,45 @@ export 'products_state.dart';
 
 class ProductsCubit extends Cubit<ProductsState> {
   ProductsCubit() : super(ProductsLoading());
+  final ProductApiService _productService = ProductApiService();
 
-  final ProductApiService  _productService = ProductApiService();
-
-  
-
-Future<void> loadProducts({int? categoryId}) async {
+  Future<void> loadProducts() async {
     emit(ProductsLoading());
     try {
-      final products = await _productService.getProducts(categoryId: categoryId);
+      final products = await _productService.getProducts();
       emit(ProductsLoaded(products: products));
     } catch (e) {
       emit(ProductsFailed(message: e.toString()));
     }
   }
 
-Future<void> loadAll() async {
-     emit(ProductsLoading());
+  Future<void> loadAll() async {
+    emit(ProductsLoading());
     try {
       final products = await _productService.getProducts();
-    emit(ProductsLoaded(products: products));
+      emit(ProductsLoaded(products: products));
     } catch (e) {
-       emit(ProductsFailed(message: e.toString()));
+      emit(ProductsFailed(message: e.toString()));
     }
   }
 
   Future<void> loadProductById(int productId) async {
-   emit(ProductsLoading());
+    emit(ProductsLoading());
     try {
       final product = await _productService.getProductById(productId);
-    emit(OneProductLoaded(product: product));
+      emit(OneProductLoaded(product: product));
     } catch (e) {
-       emit(ProductsFailed(message: e.toString()));
+      emit(ProductsFailed(message: e.toString()));
+    }
+  }
+
+  Future<void> loadProductByCategoryId(int productId) async {
+    emit(ProductsLoading());
+    try {
+      final product = await _productService.getProductByCategoryId(productId);
+      emit(ProductsLoaded(products: product));
+    } catch (e) {
+      emit(ProductsFailed(message: e.toString()));
     }
   }
 }

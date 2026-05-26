@@ -11,10 +11,10 @@ class AssociationLinkApiService {
 
   Future<AssociationLinkRequestDraft?> fetchLatestRequest() async {
     try {
-      final res = await _client.get<Map<String, dynamic>>(
+      final res = await _client.get(
         'association-link-requests/latest',
       );
-      final data = res['data'];
+      final data = res.data['data'];
       if (data is Map<String, dynamic>) {
         return AssociationLinkRequestDraft.fromJson(data);
       }
@@ -41,7 +41,7 @@ class AssociationLinkApiService {
       );
     }
 
-    await _client.post<void>(
+    await _client.post(
       'association-link-requests',
       data: FormData.fromMap(fields),
     );

@@ -40,7 +40,21 @@ class _AllSaleProductsScreenState extends State<AllSaleProductsScreen> {
                       delegate: SliverChildBuilderDelegate((context, index) {
                         return Skeletonizer(
                           child: ProductCard(
-                            product: ProductModel(id: 0, sku: 'sku', type: 'type', name: 'name'),
+                            product:ProductModel(
+                              id: 0,
+                              sku: '',
+                              name: '',
+                              urlKey: '',
+                              images: [],
+                              isNew: true,
+                              prices: ProductPrices(regular: PriceDetail(price: '')),
+                              isFeatured: true,
+                              onSale: true,
+                              isSaleable: true,
+                              isWishlist: true,
+                              ratings: ProductRatings(average: '', total: 0),
+                              reviews: ProductReviews(total: 0),
+                            ),
                           ),
                         );
                       }, childCount: 4),

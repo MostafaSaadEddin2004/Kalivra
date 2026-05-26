@@ -30,22 +30,11 @@ class _SplashScreenState extends State<SplashScreen> {
     return PopScopeExitApp(
       child: Scaffold(
       backgroundColor: AppColors.black,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Center(
-                  child: Image.asset(
-                    'assets/images/light_logo.png',
-                    fit: BoxFit.contain,
-                    width: 220.w,
-                  ),
-                ),
-              ),
-            ],
-          ),
+      body: Center(
+        child: Image.asset(
+          'assets/images/light_logo.png',
+          fit: BoxFit.contain,
+          width: 220.w,
         ),
       ),
     ),

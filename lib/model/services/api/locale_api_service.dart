@@ -6,8 +6,8 @@ class LocaleApiService {
   final DioClient _client;
 
   Future<List<LocaleApiModel>> getLocales() async {
-    final res = await _client.get<Map<String, dynamic>>('locales');
-    final data = res['data'];
+    final res = await _client.get('locales');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => LocaleApiModel.fromJson(e as Map<String, dynamic>))

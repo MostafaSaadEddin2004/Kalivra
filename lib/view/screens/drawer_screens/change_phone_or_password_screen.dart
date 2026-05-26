@@ -106,7 +106,7 @@ class _ChangePhoneOrPasswordScreenState
                       AppTextField(
                         controller: _newPasswordController,
                         label: 'كلمة المرور الجديدة',
-                        hint: '••••••••',
+                        hint: '********',
                         obscureText: _obscureNew,
                         prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
                         suffixIcon: CustomIconButton(
@@ -128,7 +128,7 @@ class _ChangePhoneOrPasswordScreenState
                       AppTextField(
                         controller: _confirmPasswordController,
                         label: 'تأكيد كلمة المرور',
-                        hint: '••••••••',
+                        hint: '********',
                         obscureText: _obscureConfirm,
                         prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
                         suffixIcon: CustomIconButton(

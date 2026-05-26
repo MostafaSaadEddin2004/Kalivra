@@ -7,11 +7,9 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/api_error_handler.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/model/services/referral_repository.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
-import 'package:kalivra/view/widgets/referral/referral_code_field.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,19 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     _referralCodeController.dispose();
     super.dispose();
-  }
-
-  void _login() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    final referralCode = _referralCodeController.text.trim();
-    context.read<AuthCubit>().login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
-    if (!mounted) return;
-    if (referralCode.isNotEmpty) {
-      await ReferralRepository().submitReferralCode(referralCode);
-    }
   }
 
   bool isLoading = false;
@@ -126,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     AppTextField(
                       controller: _passwordController,
                       label: AppLocalizations.of(context)!.passwordLabel,
-                      hint: '••••••••',
+                      hint: '********',
                       obscureText: _obscurePassword,
 
                       suffixIcon: CustomIconButton(
@@ -146,11 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 12.h),
-                    ReferralCodeField(
-                      controller: _referralCodeController,
-                      bottomSpacing: 12,
-                    ),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: TextButton(
@@ -169,7 +149,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     SizedBox(height: 28.h),
                     FilledButton(
-                      onPressed: isLoading ? null : _login,
+                      onPressed: isLoading
+                          ? null
+                          : () => context.read<AuthCubit>().login(
+                              _emailController.text.trim(),
+                              _passwordController.text,
+                            ),
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 16.h),
                         shape: RoundedRectangleBorder(

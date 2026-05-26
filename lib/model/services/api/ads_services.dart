@@ -6,7 +6,7 @@ class AdsServices {
 
   Future<List<AdsModel>> getAds() async {
     final res = await _client.get('advertisements');
-    final data = (res['data'] as List)
+    final data = (res.data['data'] as List)
         .map((e) => AdsModel.fromJson(e as Map<String, dynamic>))
         .toList();
 

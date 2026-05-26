@@ -6,8 +6,8 @@ class CountryApiService {
   final DioClient _client;
 
   Future<List<CountryApiModel>> getCountries() async {
-    final res = await _client.get<Map<String, dynamic>>('countries');
-    final data = res['data'];
+    final res = await _client.get('countries');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => CountryApiModel.fromJson(e as Map<String, dynamic>))

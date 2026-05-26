@@ -9,8 +9,8 @@ class OrderApiService {
   final DioClient _client = DioClient();
 
   Future<List<OrderModel>> getOrders() async {
-    final res = await _client.get<Map<String, dynamic>>('orders');
-    final data = res['data'];
+    final res = await _client.get('orders');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
@@ -20,14 +20,14 @@ class OrderApiService {
   }
 
   Future<OrderModel> getOrderById(int categoryId) async {
-    final res = await _client.get<Map<String, dynamic>>('orders/$categoryId');
-    final data = res['data'];
+    final res = await _client.get('orders/$categoryId');
+    final data = res.data['data'];
       return OrderModel.fromJson(data);
   }
 
   Future<List<InvoiceApiModel>> getInvoices(int orderId) async {
-    final res = await _client.get<Map<String, dynamic>>('orders/$orderId/invoices');
-    final data = res['data'];
+    final res = await _client.get('orders/$orderId/invoices');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => InvoiceApiModel.fromJson(e as Map<String, dynamic>))
@@ -37,8 +37,8 @@ class OrderApiService {
   }
 
   Future<List<ShipmentApiModel>> getShipments(int orderId) async {
-    final res = await _client.get<Map<String, dynamic>>('orders/$orderId/shipments');
-    final data = res['data'];
+    final res = await _client.get('orders/$orderId/shipments');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => ShipmentApiModel.fromJson(e as Map<String, dynamic>))
@@ -48,8 +48,8 @@ class OrderApiService {
   }
 
   Future<List<TransactionApiModel>> getTransactions(int orderId) async {
-    final res = await _client.get<Map<String, dynamic>>('orders/$orderId/transactions');
-    final data = res['data'];
+    final res = await _client.get('orders/$orderId/transactions');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => TransactionApiModel.fromJson(e as Map<String, dynamic>))

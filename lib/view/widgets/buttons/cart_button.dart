@@ -18,10 +18,7 @@ class CardButton extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSecondaryFixed,
           borderRadius: BorderRadius.circular(8.r),
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: 8.w,
-          vertical: 6.h,
-        ),
+        padding: EdgeInsets.all(8.w),
         child: Icon(
           Icons.add_shopping_cart_rounded,
           size: 18.r,

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
@@ -18,23 +19,28 @@ class CustomerApiService {
 
   Future<CustomerApiModel> getProfile() async {
     final res = await _client.get('customer');
-    final data = res['data'];
-      return CustomerApiModel.fromJson(data);
+    final data = res.data['data'];
+    return CustomerApiModel.fromJson(data);
   }
 
-  Future<Map<String, dynamic>?> login(String email, String password) async {
-    try {
-      final res = await _client.post(
-        'customer/login',
-        data: {'email': email, 'password': password},
-      );
-      final token = res['data']['token'];
-      if (token != null || token.isNotEmpty) {
-        await LocalStore.setToken(token);
-      }
-      return res;
-    } on DioException catch (e) {
-      throw Exception(e);
+  Future<Response> login(String email, String password) async {
+    final res = await _client.post(
+      'customer/login',
+      data: {'email_or_phone': email, 'password': password},
+    );
+    final token = res.data['data']['token'];
+    if (token != null || token.isNotEmpty) {
+      await LocalStore.setToken(token);
+    }
+    if (res.statusCode! >= 200 || res.statusCode! < 300) {
+            return res;
+    }
+    if(res.statusCode! >=400 || res.statusCode! <500){
+      final errorMessage = res.data['message'];
+      throw Exception(errorMessage);
+    }else{
+      debugPrint(res.data);
+      return res.data;
     }
   }
 
@@ -55,17 +61,17 @@ class CustomerApiService {
 
     try {
       final res = await _client.post('customer/register', data: body);
-      final token = res['data']['token'];
+      final token = res.data['data']['token'];
       if (token != null || token.isNotEmpty) {
         await LocalStore.setToken(token);
       }
-      return res;
+      return res.data;
     } on DioException catch (e) {
       throw Exception(e);
     }
   }
 
-Future<void> logout() async {
+  Future<void> logout() async {
     try {
       await _client.post('customer/logout');
       await LocalStore.removeToken();
@@ -129,8 +135,7 @@ Future<void> logout() async {
         await _client.put('customer', data: fields);
       }
       return true;
-    } 
-    on DioException catch (e) {
+    } on DioException catch (e) {
       return false;
     }
   }

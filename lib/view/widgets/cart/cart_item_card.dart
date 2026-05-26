@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_item_model.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
-import 'package:kalivra/view/widgets/cart/quantity_counter.dart';
 
 class CartItemCard extends StatelessWidget {
   const CartItemCard({
@@ -71,11 +70,11 @@ class CartItemCard extends StatelessWidget {
                         ),
                 ),
               ),
-              QuantityCounter(
-                value: item.quantity,
-                maxQuantity: item.product.variants?.qty ?? 0,
-                onChanged: onQuantityChanged,
-              ),
+              // QuantityCounter(
+              //   value: item.quantity,
+              //   maxQuantity: item.product.variants?.qty ?? 0,
+              //   onChanged: onQuantityChanged,
+              // ),
             ],
           ),
           SizedBox(width: 12.w),

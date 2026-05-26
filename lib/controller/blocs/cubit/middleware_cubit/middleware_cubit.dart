@@ -8,6 +8,7 @@ import 'package:kalivra/view/screens/auth/intro_screen.dart';
 import 'package:kalivra/view/splash_screen.dart';
 import 'package:kalivra/view/widgets/confirm_dialog.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_item.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 part 'middleware_state.dart';
 
@@ -39,7 +40,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
         context: context,
         builder: (context) => ConfirmDialog(
           message: 'يجب عليك تسجيل الدخول للمتابعة.',
-          title: 'تسجيل الدخول',
+          title:  AppLocalizations.of(context)!.signIn,
         ),
       );
     }
@@ -52,7 +53,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
         LogOutButton(
           button: DrawerItem(
             icon: Icons.logout_rounded,
-            label: 'تسجيل الخروج',
+            label: AppLocalizations.of(context)!.signOut,
             onTap: () => context.read<AuthCubit>().logout(),
           ),
         ),
@@ -62,7 +63,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
         LoginButton(
           button: DrawerItem(
             icon: Icons.login_rounded,
-            label: 'تسجيل الدخول',
+            label: AppLocalizations.of(context)!.signIn,
             onTap: () => context.go(AppRoutes.login),
           ),
         ),

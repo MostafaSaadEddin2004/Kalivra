@@ -7,7 +7,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
-import 'package:kalivra/view/widgets/product/product_options_cards.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
@@ -19,8 +18,8 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  int _selectedColorIndex = 0;
-  int _selectedSizeIndex = 0;
+  // int _selectedColorIndex = 0;
+  // int _selectedSizeIndex = 0;
 
   // void _addToWishlist(BuildContext context, ProductModel product,AppLocalizations l10n) async {
   //     final productId = int.tryParse(product.id);
@@ -48,14 +47,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final colorOptions = product.selectableColors;
-    final sizeLabels = product.selectableSizes;
-    final colorIndex = colorOptions.isEmpty
-        ? 0
-        : _selectedColorIndex.clamp(0, colorOptions.length - 1);
-    final sizeIndex = sizeLabels.isEmpty
-        ? 0
-        : _selectedSizeIndex.clamp(0, sizeLabels.length - 1);
+    // final colorOptions = product.selectableColors;
+    // final sizeLabels = product.selectableSizes;
+    // final colorIndex = colorOptions.isEmpty
+    //     ? 0
+    //     : _selectedColorIndex.clamp(0, colorOptions.length - 1);
+    // final sizeIndex = sizeLabels.isEmpty
+    //     ? 0
+    //     : _selectedSizeIndex.clamp(0, sizeLabels.length - 1);
 
     return Scaffold(
       appBar: DrawerScreenAppBar(title: l10n.productDetails),
@@ -65,8 +64,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           Stack(
             clipBehavior: Clip.none,
             children: [
-              if (product.displayImageUrls.isNotEmpty)
-                ProductGalleryCard(imageUrls: product.displayImageUrls)
+              if (product.images.isNotEmpty)
+                ProductGalleryCard(imageUrls: product.images)
               else
                 Container(
                   width: double.infinity,
@@ -100,28 +99,28 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               //   SizedBox(width: 12.w),
               // ],
               Text(
-                '${product.price} ${product.currencyOptions?.symbol}',
+                product.prices.regular.formattedPrice.toString(),
                 style: theme.textTheme.headlineSmall
               ),
             ],
           ),
-          if (product.hasSelectableColors) ...[
-            ProductColorSelectorCard(
-              colors: colorOptions,
-              selectedIndex: colorIndex,
-              onSelected: (index) =>
-                  setState(() => _selectedColorIndex = index),
-            ),
-            SizedBox(height: 16.h),
-          ],
-          if (product.hasSelectableSizes) ...[
-            ProductSizeSelectorCard(
-              sizes: sizeLabels,
-              selectedIndex: sizeIndex,
-              onSelected: (index) => setState(() => _selectedSizeIndex = index),
-            ),
-            SizedBox(height: 16.h),
-          ],
+          // if (product.hasSelectableColors) ...[
+          //   ProductColorSelectorCard(
+          //     colors: colorOptions,
+          //     selectedIndex: colorIndex,
+          //     onSelected: (index) =>
+          //         setState(() => _selectedColorIndex = index),
+          //   ),
+          //   SizedBox(height: 16.h),
+          // ],
+          // if (product.hasSelectableSizes) ...[
+          //   ProductSizeSelectorCard(
+          //     sizes: sizeLabels,
+          //     selectedIndex: sizeIndex,
+          //     onSelected: (index) => setState(() => _selectedSizeIndex = index),
+          //   ),
+          //   SizedBox(height: 16.h),
+          // ],
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(

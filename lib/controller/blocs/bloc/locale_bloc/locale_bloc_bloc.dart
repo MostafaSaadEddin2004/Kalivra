@@ -53,4 +53,11 @@ class LocaleBloc extends Bloc<LocaleBlocEvent, LocaleBlocState> {
       _ => _getSystemLocale(),
     };
   }
+  
+  static bool isArabic(LocaleBlocState state) {
+  if (state is LocaleFetched) {
+    return state.locale.languageCode == PrefKeys.arLocaleKey;
+  }
+  return false;
+}
 }

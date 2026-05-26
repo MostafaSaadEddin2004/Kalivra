@@ -708,6 +708,12 @@ class _AssociationLinkRequestScreenState
                             ),
                             _fieldSpacer(),
                             AppTextField(
+                              controller: _projectNameController,
+                              label: l10n.associationLinkProjectName,
+                              enabled: !_isLocked,
+                            ),
+                            _fieldSpacer(),
+                            AppTextField(
                               controller: _housingUnitController,
                               label: l10n.associationLinkHousingUnit,
                               enabled: !_isLocked,

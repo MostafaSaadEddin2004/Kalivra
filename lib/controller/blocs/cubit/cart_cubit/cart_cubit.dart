@@ -19,7 +19,7 @@ class CartCubit extends Cubit<CartState> {
       emit(state.copyWith(loginRequiredForAdd: true));
       return;
     }
-    final maxQty = product.variants?.qty ?? 0;
+    final maxQty = 5;
     final list = List<CartItem>.from(state.items);
     final index = list.indexWhere((e) => e.product.id == product.id);
     if (index >= 0) {
@@ -48,7 +48,7 @@ class CartCubit extends Cubit<CartState> {
     }
     final list = state.items.map((e) {
       if (e.product.id == int.parse(productId)) {
-        final capped = quantity.clamp(1, e.product.variants?.qty ?? 0);
+        final capped = quantity.clamp(1, 5);
         return e.copyWith(quantity: capped);
       }
       return e;

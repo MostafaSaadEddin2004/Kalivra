@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/model/product/product_model.dart';
 
 class _ProductImage extends StatelessWidget {
   const _ProductImage({
@@ -80,7 +81,7 @@ class ProductGalleryCard extends StatefulWidget {
     this.borderRadius = 20,
   });
 
-  final List<String> imageUrls;
+  final List<ProductImage> imageUrls;
   final double mainHeight;
   final double mainWidth;
   final double thumbnailSize;
@@ -158,7 +159,7 @@ class _ProductGalleryCardState extends State<ProductGalleryCard> {
                   borderRadius: BorderRadius.circular(widget.borderRadius.r),
                 ),
                 child: _ProductImage(
-                  imageUrl: images[index],
+                  imageUrl: images[index].largeImageUrl!,
                   width: widget.mainWidth.w,
                   height: widget.mainHeight.h,
                 ),
@@ -195,7 +196,7 @@ class _ProductGalleryCardState extends State<ProductGalleryCard> {
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: _ProductImage(
-                        imageUrl: images[index],
+                        imageUrl: images[index].largeImageUrl!,
                         width: widget.thumbnailSize.w,
                         height: widget.thumbnailSize.h,
                       ),

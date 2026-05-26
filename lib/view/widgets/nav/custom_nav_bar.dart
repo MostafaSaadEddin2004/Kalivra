@@ -19,7 +19,8 @@ class CustomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0),
       decoration: BoxDecoration(
         color: colorScheme.primary,
         boxShadow: [
@@ -29,24 +30,18 @@ class CustomNavBar extends StatelessWidget {
             offset: Offset(0, 4.h),
           ),
         ],
-        borderRadius: BorderRadius.circular(24.r),
+        borderRadius: BorderRadius.circular(32.r),
       ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(
-              items.length,
-              (index) => NavItem(
-                icon: items[index].icon,
-                title: items[index].title,
-                index: items[index].index,
-                currentIndex: currentIndex,
-                onTap: onTap,
-              ),
-            ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(
+          items.length,
+          (index) => NavItem(
+            icon: items[index].icon,
+            title: items[index].title,
+            index: items[index].index,
+            currentIndex: currentIndex,
+            onTap: onTap,
           ),
         ),
       ),

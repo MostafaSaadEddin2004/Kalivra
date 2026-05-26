@@ -6,8 +6,8 @@ class CartApiService {
   final DioClient _client;
 
   Future<CartApiModel?> getCart() async {
-    final res = await _client.get<Map<String, dynamic>>('cart');
-    final data = res['data'];
+    final res = await _client.get('cart');
+    final data = res.data['data'];
     if (data is Map<String, dynamic>) {
       return CartApiModel.fromJson(data);
     }
@@ -19,21 +19,21 @@ class CartApiService {
     required int quantity,
     Map<String, dynamic>? options,
   }) async {
-    final res = await _client.post<Map<String, dynamic>>(
+    final res = await _client.post(
       'cart/items',
       data: {'product_id': productId, 'quantity': quantity, 'options': options},
     );
-    return res;
+    return res.data;
   }
 
 Future<void> updateItem(int itemId, int quantity) async {
-    await _client.put<Map<String, dynamic>>(
+    await _client.put(
       'cart/items/$itemId',
       data: {'quantity': quantity},
     );
   }
 
 Future<void> removeItem(int itemId) async {
-    await _client.delete<Map<String, dynamic>>('cart/items/$itemId');
+    await _client.delete('cart/items/$itemId');
   }
 }

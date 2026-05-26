@@ -9,7 +9,8 @@ class CategoriesCubit extends Cubit<CategoriesState> {
   CategoriesCubit() : super(CategoriesLoading());
 
   final CategoryApiService _categoryService = CategoryApiService();
-  static int currentCategoryId = 0;
+  static int currentSelectedCategory = 0;
+
   Future<void> loadCategories() async {
     emit(CategoriesLoading());
     try {
@@ -18,9 +19,5 @@ class CategoriesCubit extends Cubit<CategoriesState> {
     } catch (e) {
       emit(CategoriesFailed(message: e.toString()));
     }
-  }
-
-  void changeCategory(int categoryId) {
-   currentCategoryId == categoryId;
   }
 }

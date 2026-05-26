@@ -70,7 +70,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     AppTextField(
                       controller: _currentController,
                       label: l10n.currentPassword,
-                      hint: '••••••••',
+                      hint: '********',
                       obscureText: _obscureCurrent,
                       prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
                       suffixIcon: CustomIconButton(
@@ -91,7 +91,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     AppTextField(
                       controller: _newController,
                       label: l10n.newPassword,
-                      hint: '••••••••',
+                      hint: '********',
                       obscureText: _obscureNew,
                       prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
                       suffixIcon: CustomIconButton(
@@ -115,7 +115,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     AppTextField(
                       controller: _confirmController,
                       label: l10n.newPasswordConfirm,
-                      hint: '••••••••',
+                      hint: '********',
                       obscureText: _obscureConfirm,
                       prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
                       suffixIcon: CustomIconButton(

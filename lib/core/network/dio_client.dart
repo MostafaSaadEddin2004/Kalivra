@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/app_interceptor.dart';
 
-const String baseUrl = "http://192.168.10.19/kalivra-bag-ecommerce.test/public/api/";
+const String baseUrl = "https://test2.kalivra-world.com/api/";
 
 class DioClient {
   DioClient({
@@ -36,69 +36,70 @@ class DioClient {
    final Dio _dio;
 
 
-  Future<T> get<T>(
+  Future<Response> get(
     String path, {
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.get<T>(
+    final response = await _dio.get(
       path,
       queryParameters: queryParameters,
       options: options,
       cancelToken: cancelToken,
     );
-    return response.data as T;
+    return response ;
   }
 
-  Future<T> post<T>(
+  Future<Response> post(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.post<T>(
+    final response = await _dio.post(
       path,
       data: data,
       queryParameters: queryParameters,
       options: options,
       cancelToken: cancelToken,
     );
-    return response.data as T;
+    return response;
   }
 
-  Future<T> put<T>(
+  Future<Response> put(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.put<T>(
+    final response = await _dio.put(
       path,
       data: data,
       queryParameters: queryParameters,
       options: options,
       cancelToken: cancelToken,
     );
-    return response.data as T;
+    return response;
   }
 
-  Future<T> delete<T>(
+  Future<Response> delete(
     String path, {
     dynamic data,
     Map<String, dynamic>? queryParameters,
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.delete<T>(
+    final response = await _dio.delete(
       path,
       data: data,
       queryParameters: queryParameters,
       options: options,
       cancelToken: cancelToken,
     );
-    return response.data as T;
+    return response
+    ;
   }
 }

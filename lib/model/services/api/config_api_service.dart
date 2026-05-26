@@ -6,10 +6,10 @@ class ConfigApiService {
   final DioClient _client;
 
   Future<ConfigurationApiModel?> getConfigurations() async {
-    final res = await _client.get<Map<String, dynamic>>('configurations');
-    if (res['data'] != null) {
-      return ConfigurationApiModel.fromJson(res['data'] as Map<String, dynamic>);
+    final res = await _client.get('configurations');
+    if (res.data['data'] != null) {
+      return ConfigurationApiModel.fromJson(res.data['data'] as Map<String, dynamic>);
     }
-    return ConfigurationApiModel.fromJson(res);
+    return ConfigurationApiModel.fromJson(res.data);
   }
 }

@@ -7,6 +7,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/widgets/buttons/show_all_button.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -27,21 +28,11 @@ class ProductsSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.products, style: textTheme.titleMedium),
-              InkWell(
-                onTap: () => context.push(AppRoutes.allProducts),
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onSecondaryFixed,
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Text(
-                    l10n.showAll,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: AppColors.burgundy,
-                    ),
-                  ),
-                ),
+              ShowAllButton(
+                onShowAllTap: () => context.push(AppRoutes.allProducts),
+                l10n: l10n,
+                textTheme: textTheme,
+                colorScheme: colorScheme,
               ),
             ],
           ),
@@ -53,15 +44,32 @@ class ProductsSection extends StatelessWidget {
             bloc: ProductsCubit()..loadProducts(),
             builder: (context, state) {
               switch (state) {
-                case ProductsLoading():
-                  return ListView.builder(
+                case ProductsFailed():
+                  debugPrint(state.message);
+                  return Center(child: Text(state.message));
+                case ProductsLoaded():
+                  final products = state.products;
+                  return ListView.separated(
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    clipBehavior: Clip.none,
+                    separatorBuilder: (context, index) => SizedBox(width: 8.w),
+                    itemCount: products.length,
+                    itemBuilder: (context, index) {
+                      return SizedBox(
+                        width: 160.w,
+                        height: 220.h,
+                        child: ProductCard(product: products[index]),
+                      );
+                    },
+                  );
+                default:
+                  return ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    separatorBuilder: (context, index) => SizedBox(width: 8.w),
                     itemCount: 2,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(left: 12.w),
+                      return Skeletonizer(
                         child: SizedBox(
                           width: 160.w,
                           height: 220.h,
@@ -69,9 +77,20 @@ class ProductsSection extends StatelessWidget {
                             child: ProductCard(
                               product: ProductModel(
                                 id: 0,
-                                sku: 'sku',
-                                type: 'type',
-                                name: 'name',
+                                sku: '',
+                                name: '',
+                                urlKey: '',
+                                images: [],
+                                isNew: true,
+                                prices: ProductPrices(
+                                  regular: PriceDetail(price: ''),
+                                ),
+                                isFeatured: true,
+                                onSale: true,
+                                isSaleable: true,
+                                isWishlist: true,
+                                ratings: ProductRatings(average: '', total: 0),
+                                reviews: ProductReviews(total: 0),
                               ),
                             ),
                           ),
@@ -79,28 +98,6 @@ class ProductsSection extends StatelessWidget {
                       );
                     },
                   );
-                case ProductsLoaded():
-                  final products = state.products;
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    clipBehavior: Clip.none,
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(left: 12.w),
-                        child: SizedBox(
-                          width: 160.w,
-                          height: 220.h,
-                          child: ProductCard(product: products[index]),
-                        ),
-                      );
-                    },
-                  );
-                case ProductsFailed():
-                  return Center(child: Text(state.message));
-                default:
-                  return const SizedBox.shrink();
               }
             },
           ),

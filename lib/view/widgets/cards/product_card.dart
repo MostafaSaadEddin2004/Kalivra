@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/buttons/cart_button.dart';
+import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product});
@@ -17,11 +19,9 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primary = theme.colorScheme.primary;
     final surfaceColor = isDark
         ? AppColors.burgundy.withValues(alpha: 0.15)
         : AppColors.burgundy.withValues(alpha: 0.06);
-
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
@@ -40,53 +40,20 @@ class ProductCard extends StatelessWidget {
                   height: 110.h,
                   width: double.infinity,
                   color: surfaceColor,
-                  child: Center(
-                    child: Icon(
-                      Icons.inventory_2_outlined,
-                      size: 48.r,
-                      color: primary.withValues(alpha: 0.7),
-                    ),
+                  child: CustomNetworkImage(
+                    imageUrl: product.baseImage?.originalImageUrl,
+                    defaultIcon: Icons.inventory_2_rounded,
                   ),
                 ),
-                if (product.price != null)
-                  Positioned(
-                    top: 8.h,
-                    right: 8.w,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 8.w,
-                        vertical: 4.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.goldDark,
-                        borderRadius: BorderRadius.circular(8.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 4,
-                            offset: const Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        _salePercent(),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: AppColors.offWhite,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11.sp,
-                        ),
-                      ),
-                    ),
-                  ),
                 Positioned(
                   top: 8.h,
-                  left: 8.w,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {},
                       borderRadius: BorderRadius.circular(20.r),
                       child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 8.w),
                         padding: EdgeInsets.all(6.r),
                         decoration: BoxDecoration(
                           color: theme.scaffoldBackgroundColor.withValues(
@@ -101,48 +68,76 @@ class ProductCard extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Icon(
-                          Icons.favorite_border_rounded,
-                          size: 22.r,
-                        ),
+                        child: Icon(Icons.favorite_border_rounded, size: 22.r),
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            Flexible(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(10.w, 10.h, 10.w, 8.h),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      product.name,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: isDark ? AppColors.offWhite : AppColors.black,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14.sp,
-                        height: 1.2,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    SizedBox(height: 8.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        _PriceBlock(product: product, isDark: isDark),
-                        CardButton(
-                          onTap: () =>
-                              context.read<CartCubit>().addItem(product),
+            Container(
+              padding: EdgeInsets.all(8.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        product.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: isDark
+                              ? AppColors.offWhite
+                              : AppColors.black,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14.sp,
+                          height: 1.2,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      if (product.prices.final_?.price != null)
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 8.w,
+                            vertical: 4.h,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.goldDark,
+                            borderRadius: BorderRadius.circular(8.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 4,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            _salePercent(),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 11.sp,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  SizedBox(height: 8.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _PriceBlock(product: product, isDark: isDark),
+                      CardButton(
+                        onTap: () =>
+                            context.read<CartCubit>().addItem(product),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -152,10 +147,18 @@ class ProductCard extends StatelessWidget {
   }
 
   String _salePercent() {
-    if (product.price == null) return '';
-    final p = ((product.price! - product.price!) / product.price! * 100)
-        .round();
-    return '-$p%';
+    final regularStr = product.prices.regular.price;
+    final finalStr = product.prices.final_!.price;
+
+    final regular = double.tryParse(regularStr);
+    final finalP = double.tryParse(finalStr);
+
+    if (regular == null || finalP == null || regular == 0) return '';
+
+    final percent = ((regular - finalP) / regular * 100).round();
+    if (percent <= 0) return '';
+
+    return '-$percent%';
   }
 }
 
@@ -169,10 +172,9 @@ class _PriceBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    if (product.price
-     == null) {
+    if (product.prices.final_?.price == null) {
       return Text(
-        '${product.price.toString()} ${product.currencyOptions?.symbol}',
+        product.prices.regular.formattedPrice.toString(),
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w700,
           color: isDark ? AppColors.goldLight : AppColors.burgundy,
@@ -186,7 +188,7 @@ class _PriceBlock extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          '${product.price.toString()} ${product.currencyOptions?.symbol}',
+          product.prices.regular.formattedPrice.toString(),
           style: theme.textTheme.bodySmall?.copyWith(
             decoration: TextDecoration.lineThrough,
             color: isDark
@@ -197,7 +199,7 @@ class _PriceBlock extends StatelessWidget {
         ),
         SizedBox(height: 2.h),
         Text(
-          '${product.price.toString()} ${product.currencyOptions?.symbol}',
+          product.prices.final_!.formattedPrice.toString(),
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w700,
             color: isDark ? AppColors.goldLight : AppColors.burgundy,

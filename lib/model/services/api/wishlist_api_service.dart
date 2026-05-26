@@ -6,8 +6,8 @@ class WishlistApiService {
   final DioClient _client = DioClient();
 
   Future<List<WishlistApiModel>> getWishlist() async {
-    final res = await _client.get<Map<String, dynamic>>('wishlist');
-    final data = res['data'];
+    final res = await _client.get('wishlist');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => WishlistApiModel.fromJson(e as Map<String, dynamic>))
@@ -17,13 +17,13 @@ class WishlistApiService {
   }
 
   Future<void> addToWishlist(int productId) async {
-    await _client.post<Map<String, dynamic>>(
+    await _client.post(
       'wishlist',
       data: {'product_id': productId},
     );
   }
 
   Future<void> removeFromWishlist(int itemId) async {
-    await _client.delete<Map<String, dynamic>>('wishlist/$itemId');
+    await _client.delete('wishlist/$itemId');
   }
 }

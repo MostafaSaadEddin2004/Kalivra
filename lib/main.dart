@@ -33,9 +33,9 @@ void main() async {
         BlocProvider(create:  (context) => MiddlewareCubit(),),
         BlocProvider(create: (context) => ThemeBloc()..add(GetThemeMode())),
         BlocProvider(create: (context) => LocaleBloc()..add(GetLocale())),
-        BlocProvider(create: (context) => AuthCubit()..loadProfile()),
+        BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => CartCubit()),
-        BlocProvider(create: (context) => ProductsCubit()..loadAll()),
+        BlocProvider(create: (context) => ProductsCubit()),
         BlocProvider(create: (context) => OrdersCubit()),
         BlocProvider(create: (context) => WishlistCubit()),
         BlocProvider(create: (context) => CheckoutCubit()),
@@ -61,39 +61,7 @@ class Main extends StatelessWidget {
         );
       },
       builder: (context, child) => child!,
-      child: BlocListener<CartCubit, CartState>(
-        listenWhen: (prev, curr) =>
-            (curr.loginRequiredForAdd && !prev.loginRequiredForAdd) ||
-            (curr.addSuccessProductName != null &&
-                curr.addSuccessProductName != prev.addSuccessProductName),
-        listener: (context, state) {
-          if (state.loginRequiredForAdd) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.loginRequiredForCart,
-                ),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-            AppRouter.router.push(AppRoutes.login);
-            context.read<CartCubit>().clearLoginRequired();
-          }
-          if (state.addSuccessProductName != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.addToCartSuccess(state.addSuccessProductName!),
-                ),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-            context.read<CartCubit>().clearAddSuccessMessage();
-          }
-        },
-        child: Builder(
+      child: Builder(
           builder: (context) {
             final theme = context.watch<ThemeBloc>().state;
             final locale = context.watch<LocaleBloc>().state;
@@ -120,8 +88,7 @@ class Main extends StatelessWidget {
               routerConfig: AppRouter.router,
             );
           },
-        ),
-      ),
+        )
     );
   }
 }

@@ -8,24 +8,21 @@ class CustomNetworkImage extends StatelessWidget {
     super.key,
     this.imageUrl,
     this.width,
-    this.height,
-    this.defaultIcon,
+    this.height, this.defaultIcon,
   });
 
   final String? imageUrl;
   final double? width;
   final double? height;
-  final String? defaultIcon;
-  
+  final IconData? defaultIcon;
+
   @override
   Widget build(BuildContext context) {
     if (imageUrl == null || imageUrl!.isEmpty) {
-      return Image.asset(
-        defaultIcon ?? 'assets/images/app_logo.png',
-        width: width ?? 50.w,
-        height: height ?? 50.h,
-        fit: BoxFit.contain,
-      );
+      if(defaultIcon == null){return SizedBox();}
+      else{
+        return Icon(defaultIcon, size: 25.r,);
+      }
     } else {
       return CachedNetworkImage(
         imageUrl: imageUrl!,

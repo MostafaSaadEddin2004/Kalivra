@@ -2,15 +2,13 @@ import 'package:kalivra/model/product/product_model.dart';
 
 /// A product in the cart with quantity.
 class CartItem {
-  const CartItem({
-    required this.product,
-    this.quantity = 1,
-  }) : assert(quantity > 0);
+  const CartItem({required this.product, this.quantity = 1})
+    : assert(quantity > 0);
 
   final ProductModel product;
   final int quantity;
 
-  double get unitPrice => product.price ?? 0;
+  double get unitPrice => double.parse(product.prices.regular.price);
 
   double get lineTotal => unitPrice * quantity;
 

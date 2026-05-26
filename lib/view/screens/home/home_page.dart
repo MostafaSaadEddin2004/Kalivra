@@ -127,7 +127,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(child: SizedBox(height: 8.h)),
         SliverToBoxAdapter(child: AdSlider()),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(child: BrandsSection(brands: brands)),

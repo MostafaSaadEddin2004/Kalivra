@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
+import 'package:kalivra/view/widgets/buttons/show_all_button.dart';
 import 'package:kalivra/view/widgets/cards/brand_card.dart';
 
 class BrandsSection extends StatelessWidget {
@@ -30,21 +32,11 @@ class BrandsSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(l10n.brandsSection, style: textTheme.titleMedium),
-              InkWell(
-                onTap: onShowAllTap,
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                  decoration: BoxDecoration(
-                    color: colorScheme.onSecondaryFixed,
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  child: Text(
-                    l10n.showAll,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: AppColors.burgundy,
-                    ),
-                  ),
-                ),
+             ShowAllButton(
+                onShowAllTap: () => context.push(AppRoutes.allBrands),
+                l10n: l10n,
+                textTheme: textTheme,
+                colorScheme: colorScheme,
               ),
             ],
           ),

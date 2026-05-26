@@ -6,8 +6,8 @@ class CategoryApiService {
   final DioClient _client = DioClient();
 
   Future<List<CategoryApiModel>> getCategories() async {
-    final res = await _client.get<Map<String, dynamic>>('categories');
-    final data = res['data'];
+    final res = await _client.get('categories');
+    final data = res.data['data'];
     if (data is List) {
       return data
           .map((e) => CategoryApiModel.fromJson(e as Map<String, dynamic>))
