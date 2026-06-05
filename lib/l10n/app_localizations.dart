@@ -1454,6 +1454,12 @@ abstract class AppLocalizations {
   /// **'Image must be 5 MB or smaller'**
   String get profileImageTooLarge;
 
+  /// No description provided for @profileUnsupportedImageType.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported image type. Please choose a PNG, JPEG, JPG, or SVG image.'**
+  String get profileUnsupportedImageType;
+
   /// No description provided for @profileCity.
   ///
   /// In en, this message translates to:

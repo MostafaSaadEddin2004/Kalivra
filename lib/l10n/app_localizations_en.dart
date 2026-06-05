@@ -712,6 +712,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileImageTooLarge => 'Image must be 5 MB or smaller';
 
   @override
+  String get profileUnsupportedImageType =>
+      'Unsupported image type. Please choose a PNG, JPEG, JPG, or SVG image.';
+
+  @override
   String get profileCity => 'City';
 
   @override

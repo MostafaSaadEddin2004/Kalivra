@@ -709,6 +709,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileImageTooLarge => 'يجب أن يكون حجم الصورة 5 ميجابايت أو أقل';
 
   @override
+  String get profileUnsupportedImageType =>
+      'نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة PNG أو JPEG أو JPG أو SVG.';
+
+  @override
   String get profileCity => 'المدينة';
 
   @override

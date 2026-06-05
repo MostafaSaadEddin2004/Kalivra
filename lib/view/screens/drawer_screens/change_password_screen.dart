@@ -35,7 +35,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   void _update() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    CustomSnackBar.show(context, AppLocalizations.of(context)!.passwordUpdatedSuccess);
+    CustomSnackBar.show(
+      context,
+      AppLocalizations.of(context)!.passwordUpdatedSuccess,
+    );
     context.pop();
   }
 
@@ -72,7 +75,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       label: l10n.currentPassword,
                       hint: '********',
                       obscureText: _obscureCurrent,
-                      prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
+                      prefixIcon: Icon(
+                        Icons.lock_outline_rounded,
+                        size: 22.r,
+                        color: labelColor,
+                      ),
                       suffixIcon: CustomIconButton(
                         icon: _obscureCurrent
                             ? Icons.visibility_off_rounded
@@ -93,7 +100,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       label: l10n.newPassword,
                       hint: '********',
                       obscureText: _obscureNew,
-                      prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
+                      prefixIcon: Icon(
+                        Icons.lock_rounded,
+                        size: 22.r,
+                        color: labelColor,
+                      ),
                       suffixIcon: CustomIconButton(
                         icon: _obscureNew
                             ? Icons.visibility_off_rounded
@@ -117,7 +128,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       label: l10n.newPasswordConfirm,
                       hint: '********',
                       obscureText: _obscureConfirm,
-                      prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
+                      prefixIcon: Icon(
+                        Icons.lock_rounded,
+                        size: 22.r,
+                        color: labelColor,
+                      ),
                       suffixIcon: CustomIconButton(
                         icon: _obscureConfirm
                             ? Icons.visibility_off_rounded
@@ -192,12 +207,16 @@ class OtpOnboardingArgs {
   const OtpOnboardingArgs({
     required this.mode,
     required this.phone,
+    this.email,
+    this.token,
     this.name,
     this.password,
     this.referralCode,
   });
   final OtpScreenMode mode;
   final String phone;
+  final String? email;
+  final String? token;
   final String? name;
   final String? password;
   final String? referralCode;

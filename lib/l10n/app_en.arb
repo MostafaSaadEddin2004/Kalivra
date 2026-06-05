@@ -264,6 +264,7 @@
   "editProfileTitle": "Edit Profile",
   "profileSaved": "Changes saved",
   "profileImageTooLarge": "Image must be 5 MB or smaller",
+  "profileUnsupportedImageType": "Unsupported image type. Please choose a PNG, JPEG, JPG, or SVG image.",
   "profileCity": "City",
   "profileCountry": "Country",
   "genderLabel": "Gender",

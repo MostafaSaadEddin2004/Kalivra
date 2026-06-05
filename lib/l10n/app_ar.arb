@@ -258,6 +258,7 @@
   "editProfileTitle": "تعديل الملف الشخصي",
   "profileSaved": "تم حفظ التعديلات",
   "profileImageTooLarge": "يجب أن يكون حجم الصورة 5 ميجابايت أو أقل",
+  "profileUnsupportedImageType": "نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة PNG أو JPEG أو JPG أو SVG.",
   "profileCity": "المدينة",
   "profileCountry": "الدولة",
   "genderLabel": "الجنس",

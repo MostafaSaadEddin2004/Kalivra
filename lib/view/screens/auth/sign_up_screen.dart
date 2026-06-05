@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -174,11 +176,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty)
-{                      return AppLocalizations.of(context)!.enterPassword;
-}                    if (v.length < 6)
-{                      return AppLocalizations.of(context)!.passwordMinLength;
-}                    return null;
+                    if (v == null || v.isEmpty) {
+                      return AppLocalizations.of(context)!.enterPassword;
+                    }
+                    if (v.length < 6) {
+                      return AppLocalizations.of(context)!.passwordMinLength;
+                    }
+                    return null;
                   },
                 ),
                 SizedBox(height: 20.h),
@@ -197,13 +201,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         setState(() => _obscureConfirm = !_obscureConfirm),
                   ),
                   validator: (v) {
-                    if (v == null || v.isEmpty)
-                    {  return AppLocalizations.of(
+                    if (v == null || v.isEmpty) {
+                      return AppLocalizations.of(
                         context,
-                      )!.confirmPasswordRequired;}
-                    if (v != _passwordController.text)
-{                      return AppLocalizations.of(context)!.passwordsDoNotMatch;
-}                    return null;
+                      )!.confirmPasswordRequired;
+                    }
+                    if (v != _passwordController.text) {
+                      return AppLocalizations.of(context)!.passwordsDoNotMatch;
+                    }
+                    return null;
                   },
                 ),
                 SizedBox(height: 20.h),
@@ -212,31 +218,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   bottomSpacing: 20,
                 ),
                 SizedBox(height: 32.h),
-                FilledButton(
-                  onPressed: () {},
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: isLoading
-                      ? SizedBox(
-                          height: 24.h,
-                          width: 24.w,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.offWhite,
-                          ),
-                        )
-                      : Text(
-                          AppLocalizations.of(context)!.continueVerification,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppColors.offWhite,
-                            fontWeight: FontWeight.w700,
-                          ),
+                BlocConsumer<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    switch (state) {
+                      case AuthLoading():
+                        isLoading = true;
+                      default:
+                        isLoading = false;
+                    }
+                  },
+                  builder: (context, state) {
+                    return FilledButton(
+                      onPressed: () {
+                        context.read<AuthCubit>().register(
+                          context: context,
+                          firstName: _firstNameController.text.toString(),
+                          lastName: _lastNameController.text,
+                          email: _emailController.text,
+                          phone: _phoneController.text,
+                          password: _passwordController.text,
+                          passwordConfirmation: _confirmPasswordController.text,
+                          referralCode: _referralCodeController.text.trim(),
+                        );
+                      },
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.r),
                         ),
+                        elevation: 0,
+                      ),
+                      child: isLoading
+                          ? SizedBox(
+                              height: 24.h,
+                              width: 24.w,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.offWhite,
+                              ),
+                            )
+                          : Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.continueVerification,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: AppColors.offWhite,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                    );
+                  },
                 ),
                 SizedBox(height: 24.h),
                 Row(

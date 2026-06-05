@@ -1,10 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
+import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 
 export 'auth_state.dart';
 
@@ -24,35 +28,89 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> login(String email, String password) async {
+  Future<void> login({
+    required BuildContext context,
+    required String phone,
+    required String password,
+    String? referralCode,
+  }) async {
     emit(AuthLoading());
     try {
-      await _customerApiService.login(email, password);
+      await _customerApiService.login(phone: phone, password: password);
       emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
     } catch (e) {
-      emit(AuthFailed(message: e.toString()));
+      emit(AuthFailed(message: ''));
+      CustomSnackBar.show(context, '');
+      if (e == 'INVALID_CREDENTIALS') {
+        emit(
+          AuthFailed(message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'),
+        );
+        CustomSnackBar.show(
+          context,
+          'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+        );
+      } else if (e == 'EMAIL_NOT_VERIFIED') {
+        context.goNamed(
+          '',
+          extra: {
+            {'email': phone},
+          },
+        );
+        emit(AuthFailed(message: ''));
+      } else {
+        emit(AuthFailed(message: e.toString()));
+        CustomSnackBar.show(context, e.toString());
+      }
     }
   }
 
-  Future<void> register(
-    String name,
-    String email,
-    String phone,
-    String password,
-    String passwordConfirmation,
-  ) async {
+  Future<void> register({
+    required BuildContext context,
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required String password,
+    required String passwordConfirmation,
+    String? referralCode,
+  }) async {
     emit(AuthLoading());
     try {
-      await _customerApiService.register(
-        name,
-        email,
-        phone,
-        password,
-        passwordConfirmation,
+      final data = await _customerApiService.register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+      final token = data?['token']?.toString() ?? await LocalStore.getToken();
+      if (!context.mounted) return;
+      context.go(
+        AppRoutes.completeProfile,
+        extra: OtpOnboardingArgs(
+          mode: OtpScreenMode.signUp,
+          phone: phone,
+          email: email,
+          token: token,
+          name: '$firstName $lastName'.trim(),
+          password: password,
+          referralCode: referralCode,
+        ),
       );
       emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
     } catch (e) {
-      emit(AuthFailed(message: e.toString()));
+      if (e == 'EMAIL_EXISTS') {
+        emit(AuthFailed(message: 'البريد الإلكتروني مستخدم بالفعل.'));
+        CustomSnackBar.show(context, 'البريد الإلكتروني مستخدم بالفعل.');
+      }
+      if (e == 'NUMBER_EXISTS') {
+        emit(AuthFailed(message: 'رقم الهاتف مستخدم بالفعل.'));
+        CustomSnackBar.show(context, 'رقم الهاتف مستخدم بالفعل.');
+      } else {
+        emit(AuthFailed(message: e.toString()));
+        CustomSnackBar.show(context, e.toString());
+      }
     }
   }
 

@@ -148,36 +148,46 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 28.h),
-                    FilledButton(
-                      onPressed: isLoading
-                          ? null
-                          : () => context.read<AuthCubit>().login(
-                              _emailController.text.trim(),
-                              _passwordController.text,
-                            ),
-                      style: FilledButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14.r),
+                    BlocListener<AuthCubit, AuthState>(
+                      listener: (context, state) {
+                        switch (state) {
+                          case AuthLoading():
+                            isLoading = true;
+                          default:
+                            isLoading = false;
+                        }
+                      },
+                      child: FilledButton(
+                        onPressed: () => context.read<AuthCubit>().login(
+                          context: context,
+                          phone: _emailController.text.trim(),
+                          password: _passwordController.text,
+                          referralCode: _referralCodeController.text.trim(),
                         ),
-                        elevation: 0,
+                        style: FilledButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14.r),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: isLoading
+                            ? SizedBox(
+                                height: 24.h,
+                                width: 24.w,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: AppColors.offWhite,
+                                ),
+                              )
+                            : Text(
+                                AppLocalizations.of(context)!.login,
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: AppColors.offWhite,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                       ),
-                      child: isLoading
-                          ? SizedBox(
-                              height: 24.h,
-                              width: 24.w,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.offWhite,
-                              ),
-                            )
-                          : Text(
-                              AppLocalizations.of(context)!.login,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: AppColors.offWhite,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
                     ),
                     SizedBox(height: 24.h),
                     Row(

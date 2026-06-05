@@ -23,52 +23,78 @@ class CustomerApiService {
     return CustomerApiModel.fromJson(data);
   }
 
-  Future<Response> login(String email, String password) async {
+  Future<Response> login({
+    required String phone,
+    required String password,
+    String? referralCode,
+  }) async {
     final res = await _client.post(
       'customer/login',
-      data: {'email_or_phone': email, 'password': password},
+      data: {
+        'whatsapp_number': phone,
+        'password': password,
+        'referral_code_input': referralCode ?? '',
+      },
     );
-    final token = res.data['data']['token'];
-    if (token != null || token.isNotEmpty) {
-      await LocalStore.setToken(token);
-    }
+
     if (res.statusCode! >= 200 || res.statusCode! < 300) {
-            return res;
+      final token = res.data['data']['token'];
+      await LocalStore.setToken(token);
+      return res;
+    }else if (res.statusCode == 403 &&
+        res.data['message'].toLowerCase().contains('Please check your credentials and try again')) {
+      throw 'INVALID_CREDENTIALS';
+    } else if (res.statusCode! == 403 &&
+        res.data['message'].toLowerCase().contains(
+          'Verify your email account first',
+        )) {
+      throw 'EMAIL_NOT_VERIFIED';
     }
-    if(res.statusCode! >=400 || res.statusCode! <500){
-      final errorMessage = res.data['message'];
-      throw Exception(errorMessage);
-    }else{
-      debugPrint(res.data);
-      return res.data;
-    }
+    throw res.data['message'].isNotEmpty
+        ? res.data['message']
+        : 'حدث خطأ غير متوقع';
   }
 
-  Future<Map<String, dynamic>?> register(
-    String name,
-    String email,
-    String phone,
-    String password,
-    String passwordConfirmation,
-  ) async {
+  Future<Map<String, dynamic>?> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required String password,
+    required String passwordConfirmation,
+    String? referralCode,
+  }) async {
     final Map<String, dynamic> body = {
-      'name': name,
+      'first_name': firstName,
+      'last_name': lastName,
       'email': email,
-      'phone': phone,
+      'whatsapp_number': phone,
       'password': password,
       'password_confirmation': passwordConfirmation,
+      'referral_code_input': referralCode ?? '',
     };
 
-    try {
-      final res = await _client.post('customer/register', data: body);
-      final token = res.data['data']['token'];
-      if (token != null || token.isNotEmpty) {
-        await LocalStore.setToken(token);
-      }
+    final res = await _client.post('customer/register', data: body);
+    if (res.statusCode! >= 200 && res.statusCode! < 300) {
+      final token = res.data['token'];
+      debugPrint("Here is the token: $token");
+      await LocalStore.setToken(token);
       return res.data;
-    } on DioException catch (e) {
-      throw Exception(e);
+    } else if (res.statusCode! == 422 &&
+        res.data['message'].toLowerCase().contains(
+          'The email has already been taken',
+        )) {
+      throw 'EMAIL_EXISTS';
+    } else if (res.statusCode! == 422 &&
+        res.data['message'].toLowerCase().contains(
+          'The phone has already been taken',
+        )) {
+      throw 'NUMBER_EXISTS';
     }
+
+    throw res.data['message'].isNotEmpty
+        ? res.data['message']
+        : 'حدث خطأ غير متوقع';
   }
 
   Future<void> logout() async {
