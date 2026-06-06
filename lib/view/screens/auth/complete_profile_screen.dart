@@ -4,11 +4,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
+import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
@@ -65,6 +69,23 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final dotIndex = fileName.lastIndexOf('.');
     if (dotIndex < 0 || dotIndex == fileName.length - 1) return '';
     return fileName.substring(dotIndex + 1).toLowerCase();
+  }
+
+  Future<void> _openAuthOtp() async {
+    final token = widget.args?.token ?? await LocalStore.getToken();
+    if (!mounted) return;
+    context.go(
+      AppRoutes.authOtp,
+      extra: AuthOtpArgs(
+        email: _emailController.text.trim().isNotEmpty
+            ? _emailController.text.trim()
+            : widget.args?.email,
+        phone: _phoneController.text.trim().isNotEmpty
+            ? _phoneController.text.trim()
+            : widget.args?.phone,
+        token: token,
+      ),
+    );
   }
 
   Future<void> _pickProfileImage() async {
@@ -125,6 +146,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         lastName: lastName.isNotEmpty ? lastName : null,
         avatarFile: avatarFile,
       );
+      await _openAuthOtp();
     } catch (_) {
       if (!mounted) return;
       final state = context.read<AuthCubit>().state;
@@ -310,6 +332,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     borderRadius: BorderRadius.circular(14.r),
                   ),
                   elevation: 0,
+                ),
+              ),
+              SizedBox(height: 12.h),
+              TextButton(
+                onPressed: _openAuthOtp,
+                child: Text(
+                  l10n.skipForNow,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppColors.goldLight,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ],

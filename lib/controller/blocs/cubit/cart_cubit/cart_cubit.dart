@@ -10,8 +10,6 @@ class CartCubit extends Cubit<CartState> {
   CartCubit() : super(const CartState());
 
   static const double deliveryCost = 15.0;
-
-
   Future<void> addItem(ProductModel product, {int quantity = 1}) async{
     final token = await LocalStore.getToken();
     if (quantity < 1) return;
@@ -73,4 +71,7 @@ class CartCubit extends Cubit<CartState> {
   double get total => subtotal + deliveryCost;
 
   int get itemCount => state.items.fold(0, (sum, e) => sum + e.quantity);
+  
+  
+
 }

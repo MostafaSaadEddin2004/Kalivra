@@ -14,9 +14,16 @@ class AssociationLinkApiService {
       final res = await _client.get(
         'association-link-requests/latest',
       );
-      final data = res.data['data'];
+      final body = res.data;
+      if (body is! Map) return null;
+      final data = body['data'];
       if (data is Map<String, dynamic>) {
         return AssociationLinkRequestDraft.fromJson(data);
+      }
+      if (data is Map) {
+        return AssociationLinkRequestDraft.fromJson(
+          Map<String, dynamic>.from(data),
+        );
       }
       return null;
     } on DioException {

@@ -20,6 +20,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
+  final _whatsappNumberController = TextEditingController();
   final _countryCodeController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
@@ -39,6 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void dispose() {
     _phoneController.dispose();
+    _whatsappNumberController.dispose();
     _firstNameController.dispose();
     _emailController.dispose();
     _lastNameController.dispose();
@@ -161,6 +163,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
 
                 SizedBox(height: 20.h),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: AppTextField(
+                        textDirection: TextDirection.ltr,
+                        controller: _whatsappNumberController,
+                        label: AppLocalizations.of(
+                          context,
+                        )!.signUpWhatsAppLabel,
+                        hint: AppLocalizations.of(context)!.signUpWhatsAppHint,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 9,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return AppLocalizations.of(
+                              context,
+                            )!.enterWhatsAppNumber;
+                          }
+                          if (v.trim().length < 8) {
+                            return AppLocalizations.of(
+                              context,
+                            )!.invalidWhatsAppShort;
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    SizedBox(
+                      width: 75.w,
+                      child: AppTextField(
+                        textDirection: TextDirection.ltr,
+                        enabled: false,
+                        controller: _countryCodeController,
+                        keyboardType: TextInputType.phone,
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 20.h),
                 AppTextField(
                   controller: _passwordController,
                   label: AppLocalizations.of(context)!.passwordLabel,
@@ -230,12 +274,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   builder: (context, state) {
                     return FilledButton(
                       onPressed: () {
+                        if (!(_formKey.currentState?.validate() ?? false)) {
+                          return;
+                        }
                         context.read<AuthCubit>().register(
                           context: context,
-                          firstName: _firstNameController.text.toString(),
-                          lastName: _lastNameController.text,
-                          email: _emailController.text,
-                          phone: _phoneController.text,
+                          firstName: _firstNameController.text.trim(),
+                          lastName: _lastNameController.text.trim(),
+                          email: _emailController.text.trim(),
+                          phone:
+                              _countryCodeController.text +
+                              _phoneController.text,
+                          whatsappNumber:
+                              _countryCodeController.text +
+                              _whatsappNumberController.text,
+
                           password: _passwordController.text,
                           passwordConfirmation: _confirmPasswordController.text,
                           referralCode: _referralCodeController.text.trim(),

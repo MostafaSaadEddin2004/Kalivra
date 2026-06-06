@@ -153,6 +153,19 @@ class _ProfileState extends State<Profile> {
                             ),
                           ),
                         ),
+                        SizedBox(height: 12.h),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              context.push(AppRoutes.associationMemberProfile),
+                          icon: Icon(Icons.groups_rounded, size: 20.r),
+                          label: Text(l10n.associationPersonalProfileButton),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 12.h,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

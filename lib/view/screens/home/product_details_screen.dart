@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
@@ -86,6 +87,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           Text(
             product.name,
             style: theme.textTheme.headlineSmall
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            product.sku,
+            style: theme.textTheme.headlineSmall
+          ),
+          SizedBox(height: 12.h),
+          Text(
+            htmlToPlainText(product.description),
+            style: theme.textTheme.bodyLarge,
           ),
           SizedBox(height: 12.h),
           Row(

@@ -7,6 +7,7 @@ import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
+import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 
@@ -32,15 +33,12 @@ class AuthCubit extends Cubit<AuthState> {
     required BuildContext context,
     required String phone,
     required String password,
-    String? referralCode,
   }) async {
     emit(AuthLoading());
     try {
       await _customerApiService.login(phone: phone, password: password);
       emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
     } catch (e) {
-      emit(AuthFailed(message: ''));
-      CustomSnackBar.show(context, '');
       if (e == 'INVALID_CREDENTIALS') {
         emit(
           AuthFailed(message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'),
@@ -50,11 +48,11 @@ class AuthCubit extends Cubit<AuthState> {
           'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
         );
       } else if (e == 'EMAIL_NOT_VERIFIED') {
+        final token = await LocalStore.getToken();
+        if (!context.mounted) return;
         context.goNamed(
-          '',
-          extra: {
-            {'email': phone},
-          },
+          AppRoutesName.authOtp,
+          extra: AuthOtpArgs(email: phone, phone: phone, token: token),
         );
         emit(AuthFailed(message: ''));
       } else {
@@ -70,6 +68,7 @@ class AuthCubit extends Cubit<AuthState> {
     required String lastName,
     required String email,
     required String phone,
+    required String whatsappNumber,
     required String password,
     required String passwordConfirmation,
     String? referralCode,
@@ -81,6 +80,7 @@ class AuthCubit extends Cubit<AuthState> {
         lastName: lastName,
         email: email,
         phone: phone,
+        whatsappNumber: whatsappNumber,
         password: password,
         passwordConfirmation: passwordConfirmation,
       );

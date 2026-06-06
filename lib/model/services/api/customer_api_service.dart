@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
@@ -19,40 +19,91 @@ class CustomerApiService {
 
   Future<CustomerApiModel> getProfile() async {
     final res = await _client.get('customer');
-    final data = res.data['data'];
-    return CustomerApiModel.fromJson(data);
+    final raw = res.data['data'];
+    if (raw is! Map) {
+      throw StateError('Invalid customer profile response');
+    }
+    return CustomerApiModel.fromJson(Map<String, dynamic>.from(raw));
   }
 
   Future<Response> login({
     required String phone,
     required String password,
-    String? referralCode,
   }) async {
-    final res = await _client.post(
-      'customer/login',
-      data: {
-        'whatsapp_number': phone,
-        'password': password,
-        'referral_code_input': referralCode ?? '',
-      },
-    );
+    try {
+      final res = await _client.post(
+        'customer/login',
+        data: {
+          'whatsapp_number': phone,
+          'password': password,
+        },
+      );
 
-    if (res.statusCode! >= 200 || res.statusCode! < 300) {
-      final token = res.data['data']['token'];
-      await LocalStore.setToken(token);
-      return res;
-    }else if (res.statusCode == 403 &&
-        res.data['message'].toLowerCase().contains('Please check your credentials and try again')) {
-      throw 'INVALID_CREDENTIALS';
-    } else if (res.statusCode! == 403 &&
-        res.data['message'].toLowerCase().contains(
-          'Verify your email account first',
-        )) {
-      throw 'EMAIL_NOT_VERIFIED';
+      if (res.statusCode != null &&
+          res.statusCode! >= 200 &&
+          res.statusCode! < 300) {
+        final token = _extractToken(res.data);
+        if (token != null && token.isNotEmpty) {
+          await LocalStore.setToken(token);
+        }
+        return res;
+      }
+
+      await _throwLoginFailure(res.statusCode, res.data);
+    } on DioException catch (e) {
+      await _throwLoginFailure(e.response?.statusCode, e.response?.data);
     }
-    throw res.data['message'].isNotEmpty
-        ? res.data['message']
-        : 'حدث خطأ غير متوقع';
+
+    throw 'حدث خطأ غير متوقع';
+  }
+
+  static String? _extractToken(dynamic data) {
+    if (data is! Map) return null;
+    final map = Map<String, dynamic>.from(data);
+    final direct = map['token'];
+    if (direct != null && direct.toString().trim().isNotEmpty) {
+      return direct.toString();
+    }
+    final nested = map['data'];
+    if (nested is Map) {
+      final token = Map<String, dynamic>.from(nested)['token'];
+      if (token != null && token.toString().trim().isNotEmpty) {
+        return token.toString();
+      }
+    }
+    return null;
+  }
+
+  static String _messageFromBody(dynamic data) {
+    if (data is Map) {
+      final message = Map<String, dynamic>.from(data)['message'];
+      if (message != null && message.toString().trim().isNotEmpty) {
+        return message.toString();
+      }
+    }
+    return '';
+  }
+
+  Future<void> _throwLoginFailure(int? statusCode, dynamic data) async {
+    final message = _messageFromBody(data);
+    final normalized = message.toLowerCase();
+
+    if (statusCode == 403) {
+      if (normalized.contains('verify your email') ||
+          normalized.contains('email account first')) {
+        final token = _extractToken(data);
+        if (token != null && token.isNotEmpty) {
+          await LocalStore.setToken(token);
+        }
+        throw 'EMAIL_NOT_VERIFIED';
+      }
+      if (normalized.contains('credentials') ||
+          normalized.contains('check your')) {
+        throw 'INVALID_CREDENTIALS';
+      }
+    }
+
+    throw message.isNotEmpty ? message : 'حدث خطأ غير متوقع';
   }
 
   Future<Map<String, dynamic>?> register({
@@ -60,6 +111,7 @@ class CustomerApiService {
     required String lastName,
     required String email,
     required String phone,
+    required String whatsappNumber,
     required String password,
     required String passwordConfirmation,
     String? referralCode,
@@ -68,7 +120,8 @@ class CustomerApiService {
       'first_name': firstName,
       'last_name': lastName,
       'email': email,
-      'whatsapp_number': phone,
+      'phone': phone,
+      'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,
       'referral_code_input': referralCode ?? '',

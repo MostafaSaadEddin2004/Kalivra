@@ -6,6 +6,7 @@ import 'package:kalivra/view/screens/drawer_screens/about_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/profile_screens/profile_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/contact_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/association_link_request_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_member_profile_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/profile_screens/edit_profile_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/favorites_screen.dart';
 import 'package:kalivra/model/order/order_model.dart';
@@ -32,6 +33,7 @@ import 'package:kalivra/view/screens/home/cart_screen.dart';
 import 'package:kalivra/view/screens/checkout/checkout_screen.dart';
 import 'package:kalivra/view/screens/auth/intro_screen.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
 import 'package:kalivra/view/screens/auth/login_screen.dart';
 import 'package:kalivra/view/screens/auth/sign_up_screen.dart';
 import 'package:kalivra/view/screens/auth/complete_profile_screen.dart';
@@ -70,9 +72,11 @@ abstract class AppRoutes {
   static const String login = '/login';
   static const String signUp = '/sign-up';
   static const String completeProfile = '/complete-profile';
+  static const String authOtp = '/auth-otp';
   static const String cart = '/cart';
   static const String checkout = '/checkout';
   static const String associationLinkRequest = '/association-link-request';
+  static const String associationMemberProfile = '/association-member-profile';
 }
 
 abstract class AppRoutesName {
@@ -106,9 +110,11 @@ abstract class AppRoutesName {
   static const String login = 'login';
   static const String signUp = 'sign-up';
   static const String completeProfile = 'complete-profile';
+  static const String authOtp = 'auth-otp';
   static const String cart = 'cart';
   static const String checkout = 'checkout';
   static const String associationLinkRequest = 'association-link-request';
+  static const String associationMemberProfile = 'association-member-profile';
 }
 
 abstract class AppRouter {
@@ -149,6 +155,21 @@ abstract class AppRouter {
             builder: (context, state) {
               final args = state.extra as OtpOnboardingArgs?;
               return CompleteProfileScreen(args: args);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.authOtp,
+            name: AppRoutesName.authOtp,
+            builder: (context, state) {
+              final args = state.extra as AuthOtpArgs?;
+              if (args == null) {
+                return Scaffold(
+                  body: Center(
+                    child: Text(AppLocalizations.of(context)!.errorMissingData),
+                  ),
+                );
+              }
+              return AuthOtpScreen(args: args);
             },
           ),
           GoRoute(
@@ -349,6 +370,11 @@ abstract class AppRouter {
               final resubmit = state.extra == true;
               return AssociationLinkRequestScreen(resubmit: resubmit);
             },
+          ),
+          GoRoute(
+            path: AppRoutes.associationMemberProfile,
+            name: AppRoutesName.associationMemberProfile,
+            builder: (_, _) => const AssociationMemberProfileScreen(),
           ),
         ],
       ),

@@ -45,11 +45,13 @@ class _LoginScreenState extends State<LoginScreen> {
       listener: (context, state) {
         switch (state) {
           case AuthFailed():
-            ApiErrorHandler.showSnackBar(
-              context,
-              state.message,
-              fallbackMessage: AppLocalizations.of(context)!.loginFailed,
-            );
+            if (state.message.isNotEmpty) {
+              ApiErrorHandler.showSnackBar(
+                context,
+                state.message,
+                fallbackMessage: AppLocalizations.of(context)!.loginFailed,
+              );
+            }
             isLoading = false;
             break;
           case AuthSuccessed():
@@ -162,7 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           context: context,
                           phone: _emailController.text.trim(),
                           password: _passwordController.text,
-                          referralCode: _referralCodeController.text.trim(),
                         ),
                         style: FilledButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 16.h),

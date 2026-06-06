@@ -609,6 +609,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneLabel => 'Phone Number';
 
   @override
+  String get signUpWhatsAppLabel => 'WhatsApp Number';
+
+  @override
+  String get signUpWhatsAppHint => '9xx xxx xxx';
+
+  @override
+  String get enterWhatsAppNumber => 'Enter WhatsApp number';
+
+  @override
+  String get invalidWhatsAppShort => 'Invalid WhatsApp number';
+
+  @override
   String get enterPassword => 'Enter password';
 
   @override
@@ -714,6 +726,20 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileUnsupportedImageType =>
       'Unsupported image type. Please choose a PNG, JPEG, JPG, or SVG image.';
+
+  @override
+  String get skipForNow => 'Skip for now';
+
+  @override
+  String get authOtpTitle => 'Verify account';
+
+  @override
+  String authOtpSentTo(String destination) {
+    return 'Verification code sent to $destination';
+  }
+
+  @override
+  String get yourAccount => 'your account';
 
   @override
   String get profileCity => 'City';
@@ -1120,4 +1146,117 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allCategories => 'All';
+
+  @override
+  String get associationPersonalProfileButton => 'Association Personal Profile';
+
+  @override
+  String get associationMemberProfileTitle => 'Association Member Profile';
+
+  @override
+  String get associationMemberProfileEmpty =>
+      'No linked association profile is available yet. Submit a linking request to connect your account with the association.';
+
+  @override
+  String get associationMemberProfileLinkRequest => 'Submit Linking Request';
+
+  @override
+  String get associationMemberCurrentAddress => 'Current Address';
+
+  @override
+  String get associationMemberMembershipStatus => 'Membership Status';
+
+  @override
+  String get associationMemberPaymentCommitment => 'Payment Commitment';
+
+  @override
+  String get associationMemberPaymentsByYear => 'Payments by Year';
+
+  @override
+  String get associationMemberFinancialSummary => 'Financial Summary';
+
+  @override
+  String get associationMemberTotalAmount => 'Total Amount';
+
+  @override
+  String get associationMemberPaidAmount => 'Paid';
+
+  @override
+  String get associationMemberRemainingInstallments => 'Remaining Installments';
+
+  @override
+  String get associationMemberInstallments => 'Installments';
+
+  @override
+  String get associationMemberOtherPayments => 'Other Payments';
+
+  @override
+  String get associationMemberNotifications => 'Notifications';
+
+  @override
+  String get associationMemberEvents => 'Events';
+
+  @override
+  String get associationMemberMeasurements => 'Measurements';
+
+  @override
+  String get associationMemberAttachments => 'Attachments';
+
+  @override
+  String get associationMemberAmount => 'Amount';
+
+  @override
+  String get associationMemberDate => 'Date';
+
+  @override
+  String get associationMemberStatus => 'Status';
+
+  @override
+  String get associationMemberNotes => 'Notes';
+
+  @override
+  String get associationMemberMethod => 'Method';
+
+  @override
+  String get associationMemberBank => 'Bank';
+
+  @override
+  String get associationMemberReceipt => 'Receipt';
+
+  @override
+  String get associationMemberType => 'Type';
+
+  @override
+  String get associationMemberTitle => 'Title';
+
+  @override
+  String get associationMemberRead => 'Read';
+
+  @override
+  String get associationMemberEvent => 'Event';
+
+  @override
+  String get associationMemberLocation => 'Location';
+
+  @override
+  String get associationMemberValue => 'Value';
+
+  @override
+  String get associationMemberPayment => 'Payment';
+
+  @override
+  String get associationMemberUnread => 'Unread';
+
+  @override
+  String get associationMemberReadStatus => 'Read';
+
+  @override
+  String get associationMemberNoData => 'No data available';
+
+  @override
+  String get associationMemberLoadFailed =>
+      'Failed to load association profile';
+
+  @override
+  String get retry => 'Retry';
 }

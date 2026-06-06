@@ -1250,6 +1250,30 @@ abstract class AppLocalizations {
   /// **'Phone Number'**
   String get phoneLabel;
 
+  /// No description provided for @signUpWhatsAppLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp Number'**
+  String get signUpWhatsAppLabel;
+
+  /// No description provided for @signUpWhatsAppHint.
+  ///
+  /// In en, this message translates to:
+  /// **'9xx xxx xxx'**
+  String get signUpWhatsAppHint;
+
+  /// No description provided for @enterWhatsAppNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter WhatsApp number'**
+  String get enterWhatsAppNumber;
+
+  /// No description provided for @invalidWhatsAppShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid WhatsApp number'**
+  String get invalidWhatsAppShort;
+
   /// No description provided for @enterPassword.
   ///
   /// In en, this message translates to:
@@ -1459,6 +1483,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unsupported image type. Please choose a PNG, JPEG, JPG, or SVG image.'**
   String get profileUnsupportedImageType;
+
+  /// No description provided for @skipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get skipForNow;
+
+  /// No description provided for @authOtpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify account'**
+  String get authOtpTitle;
+
+  /// No description provided for @authOtpSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent to {destination}'**
+  String authOtpSentTo(String destination);
+
+  /// No description provided for @yourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'your account'**
+  String get yourAccount;
 
   /// No description provided for @profileCity.
   ///
@@ -2227,6 +2275,228 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get allCategories;
+
+  /// No description provided for @associationPersonalProfileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Association Personal Profile'**
+  String get associationPersonalProfileButton;
+
+  /// No description provided for @associationMemberProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Association Member Profile'**
+  String get associationMemberProfileTitle;
+
+  /// No description provided for @associationMemberProfileEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No linked association profile is available yet. Submit a linking request to connect your account with the association.'**
+  String get associationMemberProfileEmpty;
+
+  /// No description provided for @associationMemberProfileLinkRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Linking Request'**
+  String get associationMemberProfileLinkRequest;
+
+  /// No description provided for @associationMemberCurrentAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Address'**
+  String get associationMemberCurrentAddress;
+
+  /// No description provided for @associationMemberMembershipStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership Status'**
+  String get associationMemberMembershipStatus;
+
+  /// No description provided for @associationMemberPaymentCommitment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Commitment'**
+  String get associationMemberPaymentCommitment;
+
+  /// No description provided for @associationMemberPaymentsByYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments by Year'**
+  String get associationMemberPaymentsByYear;
+
+  /// No description provided for @associationMemberFinancialSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Summary'**
+  String get associationMemberFinancialSummary;
+
+  /// No description provided for @associationMemberTotalAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Amount'**
+  String get associationMemberTotalAmount;
+
+  /// No description provided for @associationMemberPaidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get associationMemberPaidAmount;
+
+  /// No description provided for @associationMemberRemainingInstallments.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining Installments'**
+  String get associationMemberRemainingInstallments;
+
+  /// No description provided for @associationMemberInstallments.
+  ///
+  /// In en, this message translates to:
+  /// **'Installments'**
+  String get associationMemberInstallments;
+
+  /// No description provided for @associationMemberOtherPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Payments'**
+  String get associationMemberOtherPayments;
+
+  /// No description provided for @associationMemberNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get associationMemberNotifications;
+
+  /// No description provided for @associationMemberEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get associationMemberEvents;
+
+  /// No description provided for @associationMemberMeasurements.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurements'**
+  String get associationMemberMeasurements;
+
+  /// No description provided for @associationMemberAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get associationMemberAttachments;
+
+  /// No description provided for @associationMemberAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get associationMemberAmount;
+
+  /// No description provided for @associationMemberDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get associationMemberDate;
+
+  /// No description provided for @associationMemberStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get associationMemberStatus;
+
+  /// No description provided for @associationMemberNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get associationMemberNotes;
+
+  /// No description provided for @associationMemberMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Method'**
+  String get associationMemberMethod;
+
+  /// No description provided for @associationMemberBank.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get associationMemberBank;
+
+  /// No description provided for @associationMemberReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get associationMemberReceipt;
+
+  /// No description provided for @associationMemberType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get associationMemberType;
+
+  /// No description provided for @associationMemberTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get associationMemberTitle;
+
+  /// No description provided for @associationMemberRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get associationMemberRead;
+
+  /// No description provided for @associationMemberEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Event'**
+  String get associationMemberEvent;
+
+  /// No description provided for @associationMemberLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get associationMemberLocation;
+
+  /// No description provided for @associationMemberValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Value'**
+  String get associationMemberValue;
+
+  /// No description provided for @associationMemberPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment'**
+  String get associationMemberPayment;
+
+  /// No description provided for @associationMemberUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get associationMemberUnread;
+
+  /// No description provided for @associationMemberReadStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get associationMemberReadStatus;
+
+  /// No description provided for @associationMemberNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get associationMemberNoData;
+
+  /// No description provided for @associationMemberLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load association profile'**
+  String get associationMemberLoadFailed;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
 }
 
 class _AppLocalizationsDelegate

@@ -605,6 +605,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get phoneLabel => 'رقم الجوال';
 
   @override
+  String get signUpWhatsAppLabel => 'رقم الواتساب';
+
+  @override
+  String get signUpWhatsAppHint => '9xx xxx xxx';
+
+  @override
+  String get enterWhatsAppNumber => 'أدخل رقم الواتساب';
+
+  @override
+  String get invalidWhatsAppShort => 'رقم واتساب غير صالح';
+
+  @override
   String get enterPassword => 'أدخل كلمة المرور';
 
   @override
@@ -711,6 +723,20 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get profileUnsupportedImageType =>
       'نوع الصورة غير مدعوم. يرجى اختيار صورة بصيغة PNG أو JPEG أو JPG أو SVG.';
+
+  @override
+  String get skipForNow => 'تخطي الآن';
+
+  @override
+  String get authOtpTitle => 'التحقق من الحساب';
+
+  @override
+  String authOtpSentTo(String destination) {
+    return 'تم إرسال رمز التحقق إلى $destination';
+  }
+
+  @override
+  String get yourAccount => 'حسابك';
 
   @override
   String get profileCity => 'المدينة';
@@ -1113,4 +1139,116 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get allCategories => 'الكل';
+
+  @override
+  String get associationPersonalProfileButton => 'ملف الجمعية الشخصي';
+
+  @override
+  String get associationMemberProfileTitle => 'ملف عضو الجمعية';
+
+  @override
+  String get associationMemberProfileEmpty =>
+      'لا يوجد ملف جمعية مرتبط بعد. يمكنك إرسال طلب ربط لربط حسابك بالجمعية.';
+
+  @override
+  String get associationMemberProfileLinkRequest => 'إرسال طلب الربط';
+
+  @override
+  String get associationMemberCurrentAddress => 'العنوان الحالي';
+
+  @override
+  String get associationMemberMembershipStatus => 'حالة العضوية';
+
+  @override
+  String get associationMemberPaymentCommitment => 'التزام الدفع';
+
+  @override
+  String get associationMemberPaymentsByYear => 'المدفوعات حسب السنة';
+
+  @override
+  String get associationMemberFinancialSummary => 'الملخص المالي';
+
+  @override
+  String get associationMemberTotalAmount => 'المبلغ الإجمالي';
+
+  @override
+  String get associationMemberPaidAmount => 'المدفوع';
+
+  @override
+  String get associationMemberRemainingInstallments => 'الأقساط المتبقية';
+
+  @override
+  String get associationMemberInstallments => 'الأقساط';
+
+  @override
+  String get associationMemberOtherPayments => 'مدفوعات أخرى';
+
+  @override
+  String get associationMemberNotifications => 'الإشعارات';
+
+  @override
+  String get associationMemberEvents => 'الفعاليات';
+
+  @override
+  String get associationMemberMeasurements => 'القياسات';
+
+  @override
+  String get associationMemberAttachments => 'المرفقات';
+
+  @override
+  String get associationMemberAmount => 'المبلغ';
+
+  @override
+  String get associationMemberDate => 'التاريخ';
+
+  @override
+  String get associationMemberStatus => 'الحالة';
+
+  @override
+  String get associationMemberNotes => 'ملاحظات';
+
+  @override
+  String get associationMemberMethod => 'طريقة الدفع';
+
+  @override
+  String get associationMemberBank => 'البنك';
+
+  @override
+  String get associationMemberReceipt => 'الإيصال';
+
+  @override
+  String get associationMemberType => 'النوع';
+
+  @override
+  String get associationMemberTitle => 'العنوان';
+
+  @override
+  String get associationMemberRead => 'مقروء';
+
+  @override
+  String get associationMemberEvent => 'الفعالية';
+
+  @override
+  String get associationMemberLocation => 'الموقع';
+
+  @override
+  String get associationMemberValue => 'القيمة';
+
+  @override
+  String get associationMemberPayment => 'الدفعة';
+
+  @override
+  String get associationMemberUnread => 'غير مقروء';
+
+  @override
+  String get associationMemberReadStatus => 'مقروء';
+
+  @override
+  String get associationMemberNoData => 'لا توجد بيانات';
+
+  @override
+  String get associationMemberLoadFailed => 'تعذر تحميل ملف الجمعية';
+
+  @override
+  String get retry => 'إعادة المحاولة';
 }
