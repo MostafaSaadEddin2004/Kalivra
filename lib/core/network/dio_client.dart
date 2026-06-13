@@ -18,7 +18,6 @@ class DioClient {
            connectTimeout: connectTimeout,
            receiveTimeout: receiveTimeout,
            sendTimeout: sendTimeout,
-           headers: {'Accept': 'application/json'},
          ),
        ) {
     _dio.interceptors.addAll([
@@ -48,22 +47,18 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      throw Exception(
-        '${e.response?.statusCode} ${e.response!.data['message'] ?? 'An error occurred'}',
-      );
+      throw e.response!.data['message'];
     }
   }
 
   Future<Response> post(String path, {dynamic data}) async {
-  try {
-    final response = await _dio.post(path, data: data);
-    return response;
-  } on DioException catch (e) {
-    throw Exception(
-        '${e.response?.statusCode} ${e.response!.data['message']}',
-      );
+    try {
+      final response = await _dio.post(path, data: data);
+      return response;
+    } on DioException catch (e) {
+      throw e.response!.data['message'];
+    }
   }
-}
 
   Future<Response> put(
     String path, {
@@ -82,9 +77,7 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      throw Exception(
-        '${e.response?.statusCode} ${e.response!.data['message']}',
-      );
+      throw e.response!.data['message'];
     }
   }
 
@@ -105,9 +98,7 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      throw Exception(
-        '${e.response?.statusCode} ${e.response!.data['message']}',
-      );
+      throw e.response!.data['message'];
     }
   }
 }

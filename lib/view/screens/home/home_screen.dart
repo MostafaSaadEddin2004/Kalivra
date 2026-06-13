@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';import 'package:kalivra/core/pop_scope_exit_app.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/cubit/brand_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
+import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/model/nav/nav_item_model.dart';
 import 'package:kalivra/view/screens/home/categories_page.dart';
 import 'package:kalivra/view/screens/home/home_page.dart';
@@ -29,8 +33,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
     return [
       NavItemModel(icon: Icons.home_rounded, index: 0, title: l10n.navHome),
-      NavItemModel(icon: Icons.category_rounded, index: 1, title: l10n.navCategories),
-      NavItemModel(icon: Icons.notifications_rounded, index: 2, title: l10n.navNotifications),
+      NavItemModel(
+        icon: Icons.category_rounded,
+        index: 1,
+        title: l10n.navCategories,
+      ),
+      NavItemModel(
+        icon: Icons.notifications_rounded,
+        index: 2,
+        title: l10n.navNotifications,
+      ),
       NavItemModel(icon: Icons.search_rounded, index: 3, title: l10n.navSearch),
     ];
   }
@@ -38,49 +50,55 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScopeExitApp(
-      child: BlocProvider(
-      create: (_) => NavCubit(),
-      child: BlocBuilder<NavCubit, int>(
-        builder: (context, index) {
-          return Scaffold(
-            key: _scaffoldKey,
-            extendBody: true,
-            appBar: index == NavCubit.search
-                ? SearchAppBar(onChanged: (_) {})
-                : CustomAppBar(
-                    onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
-                    onCartTap: () => context.pushNamed('cart'),
-                  ),
-            drawer: const AppDrawer(),
-            body: Padding(
-              padding: EdgeInsets.only(bottom: 54.h),
-              child: IndexedStack(
-                index: index,
-                children: const [
-                  HomePage(),
-                  CategoriesPage(),
-                  NotificationsPage(),
-                  SearchPage(),
-                ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => NavCubit()),
+          BlocProvider(create: (context) => CartCubit()),
+          BlocProvider(create: (context) => ProductsCubit()),
+          BlocProvider(create: (context) => BrandCubit()),
+          BlocProvider(create: (context) => NotificationsCubit()),
+        ],
+        child: BlocBuilder<NavCubit, int>(
+          builder: (context, index) {
+            return Scaffold(
+              key: _scaffoldKey,
+              extendBody: true,
+              appBar: index == NavCubit.search
+                  ? SearchAppBar(onChanged: (_) {})
+                  : CustomAppBar(
+                      onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+                      onCartTap: () => context.pushNamed('cart'),
+                    ),
+              drawer: const AppDrawer(),
+              body: Padding(
+                padding: EdgeInsets.only(bottom: 54.h),
+                child: IndexedStack(
+                  index: index,
+                  children: const [
+                    HomePage(),
+                    CategoriesPage(),
+                    NotificationsPage(),
+                    SearchPage(),
+                  ],
+                ),
               ),
-            ),
-            bottomNavigationBar: SafeArea(
-              top: false,
-              child: CustomNavBar(
-                items: _buildNavItems(context),
-                currentIndex: index,
-                onTap: (i) {
-                  context.read<NavCubit>().goTo(i);
-                  if (i == NavCubit.notifications) {
-                    context.read<NotificationsCubit>().refresh();
-                  }
-                },
+              bottomNavigationBar: SafeArea(
+                top: false,
+                child: CustomNavBar(
+                  items: _buildNavItems(context),
+                  currentIndex: index,
+                  onTap: (i) {
+                    context.read<NavCubit>().goTo(i);
+                    if (i == NavCubit.notifications) {
+                      context.read<NotificationsCubit>().refresh();
+                    }
+                  },
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
-    ),
     );
   }
 }

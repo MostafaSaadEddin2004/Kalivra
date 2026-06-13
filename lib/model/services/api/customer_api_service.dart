@@ -25,10 +25,7 @@ class CustomerApiService {
     return CustomerApiModel.fromJson(json);
   }
 
-  Future<void> login({
-    required String phone,
-    required String password,
-  }) async {
+  Future<void> login({required String phone, required String password}) async {
     final res = await _client.post(
       'customer/login',
       data: {'whatsapp_number': phone, 'password': password},
@@ -52,11 +49,11 @@ class CustomerApiService {
     }
 
     if (res.statusCode! == 422 && res.data['message'].contains('registered')) {
-        throw 'ACCOUNT_NOT_FOUND';
+      throw 'ACCOUNT_NOT_FOUND';
     }
-      throw res.data['message'].isNotEmpty
-          ? res.data['message']
-          : 'حدث خطأ غير متوقع';
+    throw res.data['message'].isNotEmpty
+        ? res.data['message']
+        : 'حدث خطأ غير متوقع';
   }
 
   Future<Map<String, dynamic>?> register({
@@ -104,11 +101,17 @@ class CustomerApiService {
   }
 
   Future<void> logout() async {
-    try {
-      await _client.post('customer/logout');
+    final res = await _client.post('customer/logout');
+
+    if (res.statusCode! >= 200 && res.statusCode! < 300) {
       await LocalStore.removeToken();
-    } on DioException catch (e) {
-      throw Exception(e);
+    } else if (res.statusCode! >= 400 && res.statusCode! < 500) {
+      final message = res.data['message'];
+      throw message;
+    } else {
+      throw res.data['message'].isNotEmpty
+          ? res.data['message']
+          : 'حدث خطأ غير متوقع';
     }
   }
 

@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
+import 'package:kalivra/view/widgets/cards/text_slider.dart';
 
 class BrandCard extends StatelessWidget {
-  const BrandCard({
-    super.key,
-    required this.brand,
-    this.onTap,
-    this.expanded = false,
-  });
+  const BrandCard({super.key, required this.brand, this.expanded = false});
 
   final BrandModel brand;
-  final VoidCallback? onTap;
   final bool expanded;
 
   @override
@@ -23,7 +20,7 @@ class BrandCard extends StatelessWidget {
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
       child: InkWell(
-        onTap: onTap,
+        onTap: () => context.push(AppRoutes.brandDetails, extra: brand),
         child: SizedBox(
           width: expanded ? null : 90.w,
           child: Column(
@@ -44,12 +41,10 @@ class BrandCard extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(10.w, 8.h, 10.w, 8.h),
-                child: Text(
-                  brand.name,
-                  style: textTheme.titleSmall,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
+                child: TextSlider(
+                  text: brand.name,
+                  textStyle: textTheme.titleSmall,
+                  sliderSpeed: 20,
                 ),
               ),
             ],

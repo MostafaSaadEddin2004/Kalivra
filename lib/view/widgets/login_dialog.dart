@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
-class ConfirmDialog extends StatelessWidget {
-  const ConfirmDialog({
-    super.key,
-    required this.title,
-    required this.message,
-    required this.onConfirm,
-  });
-
-  final String title;
-  final String message;
-  final VoidCallback onConfirm;
+class GoToLoginDialog extends StatelessWidget {
+  const GoToLoginDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +13,17 @@ class ConfirmDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
-      title: Text(title, style: theme.textTheme.titleLarge),
-      content: Text(message, style: theme.textTheme.bodyMedium),
+      title: Text(l10n.login, style: theme.textTheme.titleLarge),
+      content: Text(
+        l10n.areYouSureYouWantToSignIn,
+        style: theme.textTheme.bodyMedium,
+      ),
       actions: [
         TextButton(onPressed: () => context.pop(), child: Text(l10n.no)),
-        FilledButton(onPressed: onConfirm, child: Text(l10n.yes)),
+        FilledButton(
+          onPressed: () => context.go(AppRoutes.login),
+          child: Text(l10n.login),
+        ),
       ],
       actionsPadding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 16.h),
     );

@@ -7,11 +7,13 @@ class DrawerItem extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.loading,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Widget? loading;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class DrawerItem extends StatelessWidget {
                   textAlign: TextAlign.end,
                 ),
                 const Spacer(),
-                Icon(
+               loading?? Icon(
                   Icons.chevron_right_rounded,
                   size: 22.r,
                   color: theme.colorScheme.onTertiary,

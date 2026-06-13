@@ -31,7 +31,7 @@ class AppTextField extends StatelessWidget {
   final String hint;
   final bool obscureText;
   final TextInputType? keyboardType;
-  final String? Function(String?)? validator;
+  final String? Function(String? value)? validator;
   final void Function(String)? onChanged;
   final Widget? prefixIcon;
   final Widget? suffixIcon;

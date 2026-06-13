@@ -42,6 +42,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
   static const int _thirdCooldownSeconds = 60 * 60;
 
   final _otpController = TextEditingController();
+  final GlobalKey<FormState> _formState = GlobalKey();
   Timer? _cooldownTimer;
   int _secondsRemaining = _initialCooldownSeconds;
   bool _canResend = false;
@@ -131,29 +132,6 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
     }
   }
 
-  void _verify() {
-    final l10n = AppLocalizations.of(context)!;
-    final otp = _otpController.text.trim();
-    final whatsappNumber = widget.args.phone?.trim() ?? '';
-
-    if (otp.length != 6) {
-      CustomSnackBar.show(context, l10n.authOtpCodeLength);
-      return;
-    }
-    if (whatsappNumber.isEmpty) {
-      CustomSnackBar.show(context, l10n.errorMissingData);
-      return;
-    }
-
-    context.read<AuthCubit>().verifyOtp(
-      context: context,
-      otp: otp,
-      whatsappNumber: whatsappNumber,
-      email: widget.args.email?.trim(),
-      token: widget.args.token!,
-    );
-  }
-
   Widget _buildResendSection(
     BuildContext context,
     ThemeData theme,
@@ -209,73 +187,95 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return PopScopeExitApp(
-      child:     Scaffold(
-            appBar: DrawerScreenAppBar(title: l10n.authOtpTitle),
-            body: ListView(
-              padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(20.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        l10n.authOtpSentTo(widget.args.phone.toString()),
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: isDark ? AppColors.taupe : AppColors.burgundy,
-                          height: 1.4,
-                        ),
+      child: Form(
+        key: _formState,
+        child: Scaffold(
+          appBar: DrawerScreenAppBar(title: l10n.authOtpTitle),
+          body: ListView(
+            padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
+            children: [
+              Padding(
+                padding: EdgeInsets.all(20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.authOtpSentTo(widget.args.phone.toString()),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                        height: 1.4,
                       ),
-                      SizedBox(height: 40.h),
-                      AppTextField(
-                        controller: _otpController,
-                        label: l10n.otpCodeLabel,
-                        hint: '••••••',
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        prefixIcon: Icon(
-                          Icons.pin_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 40.h),
+                    AppTextField(
+                      controller: _otpController,
+                      label: l10n.otpCodeLabel,
+                      hint: '••••••',
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      prefixIcon: Icon(
+                        Icons.pin_rounded,
+                        size: 22.r,
+                        color: labelColor,
                       ),
-                      SizedBox(height: 12.h),
-                      _buildResendSection(context, theme, isDark, l10n),
-                      SizedBox(height: 40.h),
-                      BlocListener<AuthCubit, AuthState>(
-                        listener: (context, state) {
-                          switch (state) {
-                            case AuthLoading():
-                              isLoading =true;
-                            case VerifySuccessed():
-                              isLoading =false;
-                            default:
-                              isLoading =false;
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return l10n.errorMissingData;
+                        }
+                        if (value.length != 6) {
+                          return l10n.authOtpCodeLength;
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 12.h),
+                    _buildResendSection(context, theme, isDark, l10n),
+                    SizedBox(height: 40.h),
+                    BlocListener<AuthCubit, AuthState>(
+                      listener: (context, state) {
+                        switch (state) {
+                          case AuthLoading():
+                            isLoading = true;
+                          case VerifySuccessed():
+                            isLoading = false;
+                          default:
+                            isLoading = false;
+                        }
+                      },
+                      child: CustomButton(
+                        onTap: () {
+                          if (_formState.currentState!.validate()) {
+                            context.read<AuthCubit>().verifyOtp(
+                              context: context,
+                              otp: _otpController.text.trim(),
+                              whatsappNumber: widget.args.phone?.trim() ?? '',
+                              email: widget.args.email?.trim(),
+                              token: widget.args.token!,
+                            );
                           }
                         },
-                        child: CustomButton(
-                          onTap: () => _verify(),
-                          title: isLoading
-                              ? SizedBox(
-                                  width: 20.r,
-                                  height: 20.r,
-                                  child: const SpinKitThreeBounce(
-                                    color: AppColors.offWhite,
-                                  ),
-                                )
-                              : Text(
-                                  l10n.verify,
-                                  style: theme.textTheme.displayLarge,
+                        title: isLoading
+                            ? SizedBox(
+                                width: 16.r,
+                                height: 16.r,
+                                child: const SpinKitThreeBounce(
+                                  color: AppColors.offWhite,
                                 ),
-                        ),
+                              )
+                            : Text(
+                                l10n.verify,
+                                style: theme.textTheme.displayLarge,
+                              ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          )
-       
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

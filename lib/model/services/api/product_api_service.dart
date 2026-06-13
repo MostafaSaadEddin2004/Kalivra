@@ -19,7 +19,7 @@ class ProductApiService {
     return ProductModel.fromJson(data);
   }
 
-  Future<List<ProductModel>> getProductByCategoryId(int categoryId) async {
+  Future<List<ProductModel>> getProductsByCategoryId(int categoryId) async {
     final res = await _client.get('products/category/$categoryId');
     final data = res.data['data'];
     return (data as List).map((e) => ProductModel.fromJson(e)).toList();

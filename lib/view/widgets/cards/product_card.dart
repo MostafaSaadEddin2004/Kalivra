@@ -12,12 +12,13 @@ import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/screens/home/product_details_screen.dart';
 import 'package:kalivra/view/widgets/buttons/cart_button.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
-import 'package:marquee/marquee.dart';
+import 'package:kalivra/view/widgets/cards/text_slider.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product});
+  const ProductCard({super.key, required this.product, this.width});
 
   final ProductModel product;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
@@ -32,154 +33,140 @@ class ProductCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      child: InkWell(
-        onTap: () => context.push(AppRoutes.productDetails, extra: product),
-        borderRadius: BorderRadius.circular(16.r),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  height: 110.h,
-                  width: double.infinity,
-                  color: surfaceColor,
-                  child: CustomNetworkImage(
-                    imageUrl: product.baseImage?.originalImageUrl,
-                    defaultIcon: Icons.inventory_2_rounded,
-                  ),
-                ),
-                Positioned(
-                  top: 8.h,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {},
-                      borderRadius: BorderRadius.circular(20.r),
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 8.w),
-                        padding: EdgeInsets.all(6.r),
-                        decoration: BoxDecoration(
-                          color: theme.scaffoldBackgroundColor.withValues(
-                            alpha: 0.9,
-                          ),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
-                              blurRadius: 6,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Icon(Icons.favorite_border_rounded, size: 22.r),
-                      ),
+      child: SizedBox(width: width?? double.infinity,
+        child: InkWell(
+          onTap: () => context.push(AppRoutes.productDetails, extra: product),
+          borderRadius: BorderRadius.circular(16.r),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: 110.h,
+                    width: double.infinity,
+                    color: surfaceColor,
+                    child: CustomNetworkImage(
+                      imageUrl: product.baseImage?.originalImageUrl,
+                      defaultIcon: Icons.inventory_2_rounded,
                     ),
                   ),
-                ),
-                if (product.isNew)
-                  BlocBuilder<LocaleBloc, LocaleBlocState>(
-                    builder: (context, state) {
-                      switch (state) {
-                        case LocaleFetched():
-                          return Positioned(
-                            top: 8.h,
-                            right:
-                                state.locale.languageCode ==
-                                    PrefKeys.arLocaleKey
-                                ? null
-                                : 8.h,
-                            left:
-                                state.locale.languageCode ==
-                                    PrefKeys.arLocaleKey
-                                ? 8.h
-                                : null,
-                            child: ProductBadgeChip(
-                              badge: ProductBadgeData(
-                                label: l10n.productNew,
-                                icon: Icons.fiber_new_rounded,
-                                color: AppColors.goldDark,
-                              ),
-                            ),
-                          );
-                      }
-                    },
-                  ),
-              ],
-            ),
-            Container(
-              padding: EdgeInsets.all(8.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-  height: 20.h,
-  child: product.name.trim().isEmpty
-      ? const SizedBox.shrink()
-      : Marquee(
-          text: product.name,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: isDark ? AppColors.offWhite : AppColors.black,
-            fontWeight: FontWeight.w700,
-            fontSize: 14.sp,
-            height: 1.2,
-          ),
-          blankSpace: 40.w,
-          velocity: 40,
-          startAfter: const Duration(seconds: 2),
-        ),
-),
-                  if (product.prices.final_?.price != null)
-                    Column(
-                      children: [
-                        SizedBox(height: 8.h),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 4.h,
-                          ),
+                  Positioned(
+                    top: 8.h,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {},
+                        borderRadius: BorderRadius.circular(20.r),
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 8.w),
+                          padding: EdgeInsets.all(6.r),
                           decoration: BoxDecoration(
-                            color: AppColors.goldDark,
-                            borderRadius: BorderRadius.circular(8.r),
+                            color: theme.scaffoldBackgroundColor.withValues(
+                              alpha: 0.9,
+                            ),
+                            shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 4,
+                                color: Colors.black.withValues(alpha: 0.08),
+                                blurRadius: 6,
                                 offset: const Offset(0, 1),
                               ),
                             ],
                           ),
-                          child: Text(
-                            _salePercent(),
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.offWhite,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 11.sp,
+                          child: Icon(Icons.favorite_border_rounded, size: 22.r),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (product.isNew)
+                    BlocBuilder<LocaleBloc, LocaleBlocState>(
+                      builder: (context, state) {
+                        switch (state) {
+                          case LocaleFetched():
+                            return Positioned(
+                              top: 8.h,
+                              right:
+                                  state.locale.languageCode ==
+                                      PrefKeys.arLocaleKey
+                                  ? null
+                                  : 8.h,
+                              left:
+                                  state.locale.languageCode ==
+                                      PrefKeys.arLocaleKey
+                                  ? 8.h
+                                  : null,
+                              child: ProductBadgeChip(
+                                badge: ProductBadgeData(
+                                  label: l10n.productNew,
+                                  icon: Icons.fiber_new_rounded,
+                                  color: AppColors.goldDark,
+                                ),
+                              ),
+                            );
+                        }
+                      },
+                    ),
+                ],
+              ),
+              Container(
+                padding: EdgeInsets.all(8.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextSlider(text: product.name,),
+                    if (product.prices.final_?.price != null)
+                      Column(
+                        children: [
+                          SizedBox(height: 8.h),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 8.w,
+                              vertical: 4.h,
                             ),
+                            decoration: BoxDecoration(
+                              color: AppColors.goldDark,
+                              borderRadius: BorderRadius.circular(8.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.15),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              _salePercent(),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: AppColors.offWhite,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11.sp,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    SizedBox(height: 8.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        _PriceBlock(product: product, isDark: isDark),
+                        CardButton(
+                          onTap: () => context.read<CartCubit>().addItem(
+                            product.id.toString(),
                           ),
                         ),
                       ],
                     ),
-                  SizedBox(height: 8.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      _PriceBlock(product: product, isDark: isDark),
-                      CardButton(
-                        onTap: () => context.read<CartCubit>().addItem(
-                          product.id.toString(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

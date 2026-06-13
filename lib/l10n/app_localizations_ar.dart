@@ -1359,4 +1359,17 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get accountNotFound =>
       'الرقم غير موجود، يرجى التأكد من الرقم أو قم بإنشاء حساب.';
+
+  @override
+  String get signOutConfirmation => 'هل أنت متأكد من أنك تريد تسجيل الخروج؟';
+
+  @override
+  String get areYouSureYouWantToSignIn =>
+      'هل أنت متأكد من أنك تريد تسجيل الدخول؟';
+
+  @override
+  String get exitAppConfirmation => 'هل تريد الخروج من التطبيق؟';
+
+  @override
+  String get exitAppTitle => 'الخروج من التطبيق';
 }

@@ -54,18 +54,18 @@ class BrandDetailsScreen extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                if (brand.description != null) ...[
-                  SizedBox(height: 8.h),
-                  Text(
-                    brand.description!,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? AppColors.taupe : AppColors.burgundy,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                // if (brand.description != null) ...[
+                //   SizedBox(height: 8.h),
+                //   Text(
+                //     brand.description!,
+                //     style: theme.textTheme.bodyMedium?.copyWith(
+                //       color: isDark ? AppColors.taupe : AppColors.burgundy,
+                //     ),
+                //     textAlign: TextAlign.center,
+                //     maxLines: 3,
+                //     overflow: TextOverflow.ellipsis,
+                //   ),
+                // ],
               ],
             ),
           ),
@@ -80,44 +80,45 @@ class BrandDetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _DetailRow(
-                    icon: Icons.storefront_outlined,
-                    label: 'عدد الفروع',
-                    value: '${brand.shopCount} فرع',
-                    isDark: isDark,
-                  ),
-                  if (brand.locations.isNotEmpty) ...[
-                    SizedBox(height: 12.h),
-                    _DetailRow(
-                      icon: Icons.location_on_outlined,
-                      label: 'المواقع',
-                      value: brand.locations.join(' • '),
-                      isDark: isDark,
-                      maxLines: 5,
-                    ),
-                  ],
-                  if (brand.phone != null) ...[
-                    SizedBox(height: 12.h),
-                    _DetailRow(
-                      icon: Icons.phone_outlined,
-                      label: 'الهاتف',
-                      value: brand.phone!,
-                      isDark: isDark,
-                    ),
-                  ],
-                  if (brand.website != null) ...[
-                    SizedBox(height: 12.h),
-                    _DetailRow(
-                      icon: Icons.language_outlined,
-                      label: 'الموقع',
-                      value: brand.website!,
-                      isDark: isDark,
-                    ),
-                  ],
+                  // _DetailRow(
+                  //   icon: Icons.storefront_outlined,
+                  //   label: 'عدد الفروع',
+                  //   value: '${brand.shopCount} فرع',
+                  //   isDark: isDark,
+                  // ),
+                  // if (brand.locations.isNotEmpty) ...[
+                  //   SizedBox(height: 12.h),
+                  //   _DetailRow(
+                  //     icon: Icons.location_on_outlined,
+                  //     label: 'المواقع',
+                  //     value: brand.locations.join(' • '),
+                  //     isDark: isDark,
+                  //     maxLines: 5,
+                  //   ),
+                  // ],
+                  // if (brand.phone != null) ...[
+                  //   SizedBox(height: 12.h),
+                  //   _DetailRow(
+                  //     icon: Icons.phone_outlined,
+                  //     label: 'الهاتف',
+                  //     value: brand.phone!,
+                  //     isDark: isDark,
+                  //   ),
+                  // ],
+                  // if (brand.website != null) ...[
+                  //   SizedBox(height: 12.h),
+                  //   _DetailRow(
+                  //     icon: Icons.language_outlined,
+                  //     label: 'الموقع',
+                  //     value: brand.website!,
+                  //     isDark: isDark,
+                  //   ),
+                  // ],
                 ],
               ),
             ),
           ),
+          
           SizedBox(height: 24.h),
         ],
       ),

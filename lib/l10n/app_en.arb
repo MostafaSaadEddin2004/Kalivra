@@ -485,5 +485,9 @@
   "associationMemberLoadFailed": "Failed to load association profile",
   "retry": "Retry",
   "incorrectPassword": "Incorrect password. Please try again.",
-  "accountNotFound" : "Phone number was not found, Please check the phone number or create a new account."
+  "accountNotFound" : "Phone number was not found, Please check the phone number or create a new account.",
+  "signOutConfirmation": "Are you sure you want to sign out?",
+  "areYouSureYouWantToSignIn": "Are you sure you want to sign in?",
+  "exitAppConfirmation": "Do you want to exit the app?",
+  "exitAppTitle": "Exit app"
 }

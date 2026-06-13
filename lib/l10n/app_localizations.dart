@@ -2689,6 +2689,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Phone number was not found, Please check the phone number or create a new account.'**
   String get accountNotFound;
+
+  /// No description provided for @signOutConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out?'**
+  String get signOutConfirmation;
+
+  /// No description provided for @areYouSureYouWantToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign in?'**
+  String get areYouSureYouWantToSignIn;
+
+  /// No description provided for @exitAppConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to exit the app?'**
+  String get exitAppConfirmation;
+
+  /// No description provided for @exitAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit app'**
+  String get exitAppTitle;
 }
 
 class _AppLocalizationsDelegate

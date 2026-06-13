@@ -480,5 +480,9 @@
   "associationMemberLoadFailed": "تعذر تحميل ملف الجمعية",
   "retry": "إعادة المحاولة",
   "incorrectPassword": "كلمة المرور خطأ. يرجى إعادة المحاولة.",
-  "accountNotFound": "الرقم غير موجود، يرجى التأكد من الرقم أو قم بإنشاء حساب."
+  "accountNotFound": "الرقم غير موجود، يرجى التأكد من الرقم أو قم بإنشاء حساب.",
+  "signOutConfirmation": "هل أنت متأكد من أنك تريد تسجيل الخروج؟",
+  "areYouSureYouWantToSignIn": "هل أنت متأكد من أنك تريد تسجيل الدخول؟",
+  "exitAppConfirmation": "هل تريد الخروج من التطبيق؟",
+  "exitAppTitle": "الخروج من التطبيق"
 }

@@ -1367,4 +1367,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get accountNotFound =>
       'Phone number was not found, Please check the phone number or create a new account.';
+
+  @override
+  String get signOutConfirmation => 'Are you sure you want to sign out?';
+
+  @override
+  String get areYouSureYouWantToSignIn => 'Are you sure you want to sign in?';
+
+  @override
+  String get exitAppConfirmation => 'Do you want to exit the app?';
+
+  @override
+  String get exitAppTitle => 'Exit app';
 }
