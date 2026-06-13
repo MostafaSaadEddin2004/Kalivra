@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
+import 'package:kalivra/controller/prefs/pref_keys.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthInterceptor extends Interceptor {
   const AuthInterceptor();
@@ -10,10 +12,23 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    final sp = await SharedPreferences.getInstance();
+    final localeSP = sp.getString(PrefKeys.localeKey);
+    final locale =
+        (localeSP == null ||
+            localeSP.isEmpty ||
+            localeSP == PrefKeys.systemLocaleKey)
+        ? PlatformDispatcher.instance.locale.languageCode ==
+                  PrefKeys.arLocaleKey
+              ? PrefKeys.arLocaleKey
+              : PrefKeys.enLocaleKey
+        : localeSP;
+
     final token = await LocalStore.getToken();
     options.headers.addAll({
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+       'Locale': locale,
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     });
     super.onRequest(options, handler);
