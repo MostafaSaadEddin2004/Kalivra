@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
+import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
 
@@ -18,92 +19,44 @@ class CustomerApiService {
   }
 
   Future<CustomerApiModel> getProfile() async {
-    final res = await _client.get('customer');
-    final raw = res.data['data'];
-    if (raw is! Map) {
-      throw StateError('Invalid customer profile response');
-    }
-    return CustomerApiModel.fromJson(Map<String, dynamic>.from(raw));
+    final res = await _client.get('customer/profile');
+    final json = res.data['data'];
+    debugPrint("Here is the json: $json");
+    return CustomerApiModel.fromJson(json);
   }
 
-  Future<Response> login({
+  Future<void> login({
     required String phone,
     required String password,
   }) async {
-    try {
-      final res = await _client.post(
-        'customer/login',
-        data: {
-          'whatsapp_number': phone,
-          'password': password,
-        },
-      );
+    final res = await _client.post(
+      'customer/login',
+      data: {'whatsapp_number': phone, 'password': password},
+    );
 
-      if (res.statusCode != null &&
-          res.statusCode! >= 200 &&
-          res.statusCode! < 300) {
-        final token = _extractToken(res.data);
-        if (token != null && token.isNotEmpty) {
-          await LocalStore.setToken(token);
-        }
-        return res;
-      }
-
-      await _throwLoginFailure(res.statusCode, res.data);
-    } on DioException catch (e) {
-      await _throwLoginFailure(e.response?.statusCode, e.response?.data);
+    if (res.statusCode! >= 200 && res.statusCode! < 300) {
+      final token = res.data[PrefKeys.tokenKey];
+      await LocalStore.setToken(token);
+      return res.data;
+    }
+    if (res.statusCode! == 422 && res.data['message'].contains('credential')) {
+      throw 'INVALID_CREDENTIALS';
     }
 
-    throw 'حدث خطأ غير متوقع';
-  }
-
-  static String? _extractToken(dynamic data) {
-    if (data is! Map) return null;
-    final map = Map<String, dynamic>.from(data);
-    final direct = map['token'];
-    if (direct != null && direct.toString().trim().isNotEmpty) {
-      return direct.toString();
-    }
-    final nested = map['data'];
-    if (nested is Map) {
-      final token = Map<String, dynamic>.from(nested)['token'];
-      if (token != null && token.toString().trim().isNotEmpty) {
-        return token.toString();
-      }
-    }
-    return null;
-  }
-
-  static String _messageFromBody(dynamic data) {
-    if (data is Map) {
-      final message = Map<String, dynamic>.from(data)['message'];
-      if (message != null && message.toString().trim().isNotEmpty) {
-        return message.toString();
-      }
-    }
-    return '';
-  }
-
-  Future<void> _throwLoginFailure(int? statusCode, dynamic data) async {
-    final message = _messageFromBody(data);
-    final normalized = message.toLowerCase();
-
-    if (statusCode == 403) {
-      if (normalized.contains('verify your email') ||
-          normalized.contains('email account first')) {
-        final token = _extractToken(data);
-        if (token != null && token.isNotEmpty) {
-          await LocalStore.setToken(token);
-        }
-        throw 'EMAIL_NOT_VERIFIED';
-      }
-      if (normalized.contains('credentials') ||
-          normalized.contains('check your')) {
-        throw 'INVALID_CREDENTIALS';
-      }
+    if (res.statusCode! == 403 && res.data['message'].contains('verified')) {
+      throw 'EMAIL_NOT_VERIFIED';
     }
 
-    throw message.isNotEmpty ? message : 'حدث خطأ غير متوقع';
+    if (res.statusCode! == 422 && res.data['message'].contains('incorrect')) {
+      throw 'INCORRECT_PASSWORD';
+    }
+
+    if (res.statusCode! == 422 && res.data['message'].contains('registered')) {
+        throw 'ACCOUNT_NOT_FOUND';
+    }
+      throw res.data['message'].isNotEmpty
+          ? res.data['message']
+          : 'حدث خطأ غير متوقع';
   }
 
   Future<Map<String, dynamic>?> register({
@@ -156,6 +109,67 @@ class CustomerApiService {
       await LocalStore.removeToken();
     } on DioException catch (e) {
       throw Exception(e);
+    }
+  }
+
+  Future<void> verifyOtp({
+    required String otp,
+    required String whatsappNumber,
+    String? email,
+    required String token,
+  }) async {
+    try {
+      final res = await _client.post(
+        'customer/verify',
+        data: {
+          'email': email ?? '',
+          'token': token,
+          'otp': otp,
+          'whatsapp_number': whatsappNumber,
+        },
+      );
+
+      if (res.statusCode! >= 200 && res.statusCode! < 300) {
+        final newToken = res.data['token'];
+        await LocalStore.setToken(newToken);
+      }
+    } on DioException catch (e) {
+      throw '';
+    }
+  }
+
+  Future<void> resendOtp({
+    required String whatsappNumber,
+    String? email,
+    String? token,
+    String purpose = 'login',
+  }) async {
+    try {
+      final res = await _client.post(
+        'customer/resend-otp',
+        data: {
+          'whatsapp_number': whatsappNumber,
+          'email': email ?? '',
+          'token': token ?? '',
+          'purpose': purpose,
+        },
+      );
+
+      if (res.statusCode != null &&
+          res.statusCode! >= 200 &&
+          res.statusCode! < 300) {
+        return;
+      }
+
+      final message = res.data is Map ? res.data['message'] : null;
+      throw message?.toString().isNotEmpty == true
+          ? message.toString()
+          : 'حدث خطأ غير متوقع';
+    } on DioException catch (e) {
+      final message = e.response?.data is Map
+          ? e.response?.data['message']?.toString()
+          : null;
+      throw message?.isNotEmpty == true ? message! : 'حدث خطأ غير متوقع';
     }
   }
 

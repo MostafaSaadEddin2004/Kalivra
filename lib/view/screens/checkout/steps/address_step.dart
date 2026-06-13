@@ -49,6 +49,37 @@ class AddressStepState extends State<AddressStep> {
 
   bool validateStep() => _formKey.currentState?.validate() ?? false;
 
+  Map<String, dynamic> buildAddressesBody() {
+    final billing = {
+      'use_for_shipping': true,
+      'first_name': _firstNameController.text.trim(),
+      'last_name': _lastNameController.text.trim(),
+      'email': _emailController.text.trim(),
+      'address': [_streetController.text.trim()],
+      'city': _cityController.text.trim(),
+      'country': 'SY',
+      'state': _stateController.text.trim(),
+      'postcode': _zipController.text.trim(),
+      'phone': _phoneController.text.trim(),
+      'vat_id': _companyController.text.trim(),
+    };
+
+    return {
+      'billing': billing,
+      'shipping': {
+        'first_name': billing['first_name'],
+        'last_name': billing['last_name'],
+        'email': billing['email'],
+        'address': billing['address'],
+        'city': billing['city'],
+        'country': billing['country'],
+        'state': billing['state'],
+        'postcode': billing['postcode'],
+        'phone': billing['phone'],
+      },
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

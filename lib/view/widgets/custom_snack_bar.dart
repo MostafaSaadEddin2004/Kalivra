@@ -7,7 +7,7 @@ class CustomSnackBar {
   static void show(
     BuildContext context,
     String message, {
-    Duration duration = const Duration(seconds: 2),
+    Duration duration = const Duration(seconds: 5),
   }) {
     final theme = Theme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(

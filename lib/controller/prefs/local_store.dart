@@ -4,18 +4,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 abstract class LocalStore {
   static Future<String?> getToken() async {
     final sp = await SharedPreferences.getInstance();
-    return sp.getString(PrefKeys.accessTokenKey);
+    return sp.getString(PrefKeys.tokenKey);
   }
 
   static Future<void> setToken(String value) async {
     final sp = await SharedPreferences.getInstance();
-    await sp.setString(PrefKeys.accessTokenKey, value);
+    await sp.setString(PrefKeys.tokenKey, value);
     return;
   }
 
   static Future<void> removeToken() async {
     final sp = await SharedPreferences.getInstance();
-    await sp.remove(PrefKeys.accessTokenKey);
+    await sp.remove(PrefKeys.tokenKey);
     return;
   }
 

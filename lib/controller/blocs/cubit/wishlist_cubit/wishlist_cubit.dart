@@ -10,7 +10,7 @@ class WishlistCubit extends Cubit<WishlistState> {
 
   final WishlistApiService _wishlistService =WishlistApiService();
 
-Future<void> loadWishlist() async {
+  Future<void> loadWishlist() async {
     emit(WishlistLoading());
     try {
       final list = await _wishlistService.getWishlist();
@@ -29,8 +29,33 @@ Future<void> loadWishlist() async {
     }
   }
 
+  Future<void> add(int productId) async {
+    await _wishlistService.addToWishlist(productId);
+  }
 
-Future<void> remove(int itemId) async {
+  Future<int?> findWishlistItemId(int productId) async {
+    final list = await _wishlistService.getWishlist();
+    for (final item in list) {
+      if (item.productId == productId) return item.id;
+    }
+    return null;
+  }
+
+  Future<void> toggleWishlist({
+    required int productId,
+    required bool isCurrentlyInWishlist,
+  }) async {
+    if (isCurrentlyInWishlist) {
+      final itemId = await findWishlistItemId(productId);
+      if (itemId != null) {
+        await remove(itemId);
+      }
+    } else {
+      await add(productId);
+    }
+  }
+
+  Future<void> remove(int itemId) async {
     try {
       await _wishlistService.removeFromWishlist(itemId);
       loadWishlist();

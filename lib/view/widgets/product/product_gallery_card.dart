@@ -75,15 +75,15 @@ class ProductGalleryCard extends StatefulWidget {
   const ProductGalleryCard({
     super.key,
     required this.imageUrls,
+    this.mainWidth,
     this.mainHeight = 330,
-    this.mainWidth = 330,
     this.thumbnailSize = 64,
     this.borderRadius = 20,
   });
 
   final List<ProductImage> imageUrls;
+  final double? mainWidth;
   final double mainHeight;
-  final double mainWidth;
   final double thumbnailSize;
   final double borderRadius;
 
@@ -120,13 +120,21 @@ class _ProductGalleryCardState extends State<ProductGalleryCard> {
     );
   }
 
+  String? _imageUrl(ProductImage image) {
+    return image.largeImageUrl ??
+        image.originalImageUrl ??
+        image.mediumImageUrl ??
+        image.smallImageUrl ??
+        '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final images = widget.imageUrls;
     if (images.isEmpty) {
       return SizedBox(
         height: widget.mainHeight.h,
-        width: widget.mainWidth.w,
+        width: widget.mainWidth?.w ?? double.infinity,
         child: Center(
           child: Icon(
             Icons.image_not_supported_outlined,
@@ -137,18 +145,33 @@ class _ProductGalleryCardState extends State<ProductGalleryCard> {
       );
     }
 
+    if (images.length == 1) {
+      return SizedBox(
+        height: widget.mainHeight.h,
+        width: widget.mainWidth?.w ?? double.infinity,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(widget.borderRadius.r),
+          child: _ProductImage(
+            imageUrl: _imageUrl(images.first)!,
+            width: widget.mainWidth?.w ?? double.infinity,
+            height: widget.mainHeight.h,
+          ),
+        ),
+      );
+    }
+
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
 
     return SizedBox(
       height: widget.mainHeight.h + 15.h + widget.thumbnailSize.h,
-      width: widget.mainWidth.w,
+      width: widget.mainWidth?.w ?? double.infinity,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             height: widget.mainHeight.h,
-            width: widget.mainWidth.w,
+            width: widget.mainWidth?.w ?? double.infinity,
             child: PageView.builder(
               controller: _pageController,
               onPageChanged: _onPageChanged,
@@ -159,8 +182,8 @@ class _ProductGalleryCardState extends State<ProductGalleryCard> {
                   borderRadius: BorderRadius.circular(widget.borderRadius.r),
                 ),
                 child: _ProductImage(
-                  imageUrl: images[index].largeImageUrl!,
-                  width: widget.mainWidth.w,
+                  imageUrl: _imageUrl(images[index])!,
+                  width: widget.mainWidth?.w ?? double.infinity,
                   height: widget.mainHeight.h,
                 ),
               ),
@@ -196,7 +219,7 @@ class _ProductGalleryCardState extends State<ProductGalleryCard> {
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: _ProductImage(
-                        imageUrl: images[index].largeImageUrl!,
+                        imageUrl: _imageUrl(images[index])!,
                         width: widget.thumbnailSize.w,
                         height: widget.thumbnailSize.h,
                       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
@@ -303,13 +304,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       child: isLoading
                           ? SizedBox(
-                              height: 24.h,
-                              width: 24.w,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.offWhite,
-                              ),
-                            )
+                                  width: 20.r,
+                                  height: 20.r,
+                                  child: const SpinKitThreeBounce(
+                                    color: AppColors.offWhite,
+                                  ),
+                                )
                           : Text(
                               AppLocalizations.of(
                                 context,

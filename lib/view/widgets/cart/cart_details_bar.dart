@@ -47,15 +47,27 @@ class CartDetailsBar extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CartDetailsRow(label: AppLocalizations.of(context)!.productsTotal, value: subtotal.toString()),
+            CartDetailsRow(
+              label: AppLocalizations.of(context)!.productsTotal,
+              value: subtotal.toString(),
+            ),
             SizedBox(height: 8.h),
-            CartDetailsRow(label: AppLocalizations.of(context)!.deliveryCost, value: delivery.toString()),
+            CartDetailsRow(
+              label: AppLocalizations.of(context)!.deliveryCost,
+              value: delivery.toString(),
+            ),
             SizedBox(height: 12.h),
             Divider(height: 1.h),
             SizedBox(height: 12.h),
-            CartDetailsRow(label: AppLocalizations.of(context)!.total, value: total.toStringAsFixed(0)),
+            CartDetailsRow(
+              label: AppLocalizations.of(context)!.total,
+              value: total.toStringAsFixed(0),
+            ),
             SizedBox(height: 12.h),
-            CustomButton(onTap: () {}),
+            CustomButton(
+              onTap: () {},
+              title: Text(AppLocalizations.of(context)!.confirmOrder,style: theme.textTheme.displayLarge,),
+            ),
           ],
         ),
       ),

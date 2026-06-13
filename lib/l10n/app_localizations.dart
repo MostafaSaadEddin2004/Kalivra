@@ -470,17 +470,143 @@ abstract class AppLocalizations {
   /// **'Max order limit'**
   String get maxOrderLimit;
 
+  /// No description provided for @productOrderInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Order information'**
+  String get productOrderInfo;
+
+  /// No description provided for @unitPiece.
+  ///
+  /// In en, this message translates to:
+  /// **'Piece'**
+  String get unitPiece;
+
+  /// No description provided for @maxOrderLimitValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {count} per order'**
+  String maxOrderLimitValue(int count);
+
   /// No description provided for @addToWishlist.
   ///
   /// In en, this message translates to:
   /// **'Add to Favorites'**
   String get addToWishlist;
 
+  /// No description provided for @removeFromWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from Favorites'**
+  String get removeFromWishlist;
+
+  /// No description provided for @removeFromWishlistSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed \"{productName}\" from favorites'**
+  String removeFromWishlistSuccess(String productName);
+
+  /// No description provided for @removeFromWishlistFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove product from favorites'**
+  String get removeFromWishlistFailed;
+
   /// No description provided for @addToCart.
   ///
   /// In en, this message translates to:
   /// **'Add to Cart'**
   String get addToCart;
+
+  /// No description provided for @productSku.
+  ///
+  /// In en, this message translates to:
+  /// **'SKU'**
+  String get productSku;
+
+  /// No description provided for @productDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get productDescription;
+
+  /// No description provided for @productNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get productNew;
+
+  /// No description provided for @productFeatured.
+  ///
+  /// In en, this message translates to:
+  /// **'Featured'**
+  String get productFeatured;
+
+  /// No description provided for @productOnSale.
+  ///
+  /// In en, this message translates to:
+  /// **'On Sale'**
+  String get productOnSale;
+
+  /// No description provided for @productAvailability.
+  ///
+  /// In en, this message translates to:
+  /// **'Availability'**
+  String get productAvailability;
+
+  /// No description provided for @productAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'In stock'**
+  String get productAvailable;
+
+  /// No description provided for @productOutOfStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Out of stock'**
+  String get productOutOfStock;
+
+  /// No description provided for @productRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Rating'**
+  String get productRating;
+
+  /// No description provided for @productRatingSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating} / 5 ({count})'**
+  String productRatingSummary(String rating, int count);
+
+  /// No description provided for @productReviews.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviews'**
+  String get productReviews;
+
+  /// No description provided for @productReviewsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reviews'**
+  String productReviewsCount(int count);
+
+  /// No description provided for @productMinPriceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting from'**
+  String get productMinPriceLabel;
+
+  /// No description provided for @productInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Product information'**
+  String get productInfo;
+
+  /// No description provided for @productUrlKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Product link'**
+  String get productUrlKey;
 
   /// No description provided for @notificationsWelcomeTitle.
   ///
@@ -1220,6 +1346,18 @@ abstract class AppLocalizations {
   /// **'Sign in failed'**
   String get loginFailed;
 
+  /// No description provided for @loginSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed in successfully'**
+  String get loginSuccess;
+
+  /// No description provided for @invalidLoginCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect WhatsApp number or password'**
+  String get invalidLoginCredentials;
+
   /// No description provided for @loginTitle.
   ///
   /// In en, this message translates to:
@@ -1501,6 +1639,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verification code sent to {destination}'**
   String authOtpSentTo(String destination);
+
+  /// No description provided for @authOtpVerifySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Account verified successfully'**
+  String get authOtpVerifySuccess;
+
+  /// No description provided for @authOtpVerifyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed. Please try again.'**
+  String get authOtpVerifyFailed;
+
+  /// No description provided for @authOtpCodeLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the 6-digit verification code'**
+  String get authOtpCodeLength;
+
+  /// No description provided for @authOtpResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend again in {time}'**
+  String authOtpResendIn(String time);
+
+  /// No description provided for @authOtpResendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get authOtpResendCode;
+
+  /// No description provided for @authOtpResendSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent again'**
+  String get authOtpResendSuccess;
+
+  /// No description provided for @authOtpResendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to resend code. Please try again.'**
+  String get authOtpResendFailed;
 
   /// No description provided for @yourAccount.
   ///
@@ -2497,6 +2677,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retry;
+
+  /// No description provided for @incorrectPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password. Please try again.'**
+  String get incorrectPassword;
+
+  /// No description provided for @accountNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number was not found, Please check the phone number or create a new account.'**
+  String get accountNotFound;
 }
 
 class _AppLocalizationsDelegate

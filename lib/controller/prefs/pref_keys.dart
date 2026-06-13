@@ -1,5 +1,5 @@
 abstract class PrefKeys {
-  static const String accessTokenKey = 'access_token';
+  static const String tokenKey = 'token';
   static const String fcmTokenKey = 'fcm_token';
   static const String introPassKey = 'intro';
   static const String emailVerificationKey = 'email_verification';

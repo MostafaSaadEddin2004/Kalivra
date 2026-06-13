@@ -27,7 +27,6 @@ import 'package:kalivra/view/screens/home/brand_details_screen.dart';
 import 'package:kalivra/view/screens/home/all_brands_screen.dart';
 import 'package:kalivra/view/screens/home/all_products_screen.dart';
 import 'package:kalivra/view/screens/home/all_sale_products_screen.dart';
-import 'package:kalivra/view/screens/home/all_ads_screen.dart';
 import 'package:kalivra/view/screens/home/ad_details_screen.dart';
 import 'package:kalivra/view/screens/home/cart_screen.dart';
 import 'package:kalivra/view/screens/checkout/checkout_screen.dart';
@@ -334,11 +333,6 @@ abstract class AppRouter {
             path: AppRoutes.allSaleProducts,
             name: AppRoutesName.allSaleProducts,
             builder: (_, _) => const AllSaleProductsScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.allAds,
-            name: AppRoutesName.allAds,
-            builder: (_, _) => const AllAdsScreen(),
           ),
           GoRoute(
             path: AppRoutes.adDetails,

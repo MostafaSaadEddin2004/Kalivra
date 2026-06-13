@@ -1,31 +1,41 @@
-import 'package:kalivra/model/cart/cart_item_model.dart';
+import 'package:kalivra/model/cart/cart_api_model.dart';
 
-/// Cart state: items, optional flags and messages for UI (SnackBars).
-class CartState {
-  const CartState({
-    this.items = const [],
-    this.loginRequiredForAdd = false,
-    this.addSuccessMessage,
-    this.addSuccessProductName,
-  });
+abstract class CartState {}
 
-  final List<CartItem> items;
-  final bool loginRequiredForAdd;
-  /// Set by cubit when add-to-cart succeeds; listener shows SnackBar then clears.
-  final String? addSuccessMessage;
-  /// Product name for localized add-to-cart success message.
-  final String? addSuccessProductName;
+final class CartInitial extends CartState {}
 
-  CartState copyWith({
-    List<CartItem>? items,
-    bool? loginRequiredForAdd,
-    String? addSuccessMessage,
-    String? addSuccessProductName,
-  }) =>
-      CartState(
-        items: items ?? this.items,
-        loginRequiredForAdd: loginRequiredForAdd ?? this.loginRequiredForAdd,
-        addSuccessMessage: addSuccessMessage ?? this.addSuccessMessage,
-        addSuccessProductName: addSuccessProductName ?? this.addSuccessProductName,
-      );
+final class CartLoading extends CartState {}
+
+final class CartLoaded extends CartState {
+  final CartApiModel cart;
+
+  CartLoaded({required this.cart});
+}
+
+final class CartLoginRequired extends CartState {}
+
+final class AddToCartSuccessed extends CartState {
+  final String message;
+  final CartApiModel cart;
+
+  AddToCartSuccessed({required this.message, required this.cart});
+}
+
+final class RemoveFromCartSuccessed extends CartState {
+  final String message;
+  final CartApiModel cart;
+
+  RemoveFromCartSuccessed({required this.message, required this.cart});
+}
+
+final class DeleteCartSuccessed extends CartState {
+  final String message;
+
+  DeleteCartSuccessed({required this.message});
+}
+
+final class CartFailure extends CartState {
+  final String message;
+
+  CartFailure({required this.message});
 }

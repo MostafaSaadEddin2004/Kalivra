@@ -1,38 +1,81 @@
+import 'package:kalivra/model/checkout/checkout_summary_model.dart';
+
 abstract class CheckoutState {
   const CheckoutState();
+
   bool get isLoading => false;
   bool get hasError => false;
   Object? get error => null;
   Map<String, dynamic>? get result => null;
-
-  static const CheckoutState initial = _CheckoutInitial();
-  static const CheckoutState loading = _CheckoutLoading();
-  static CheckoutState success(Map<String, dynamic>? r) => _CheckoutSuccess(r);
-  static CheckoutState failed(Object e, [StackTrace? st]) => _CheckoutFailed(e, st);
+  CheckoutSummaryModel? get summary => null;
+  List<CheckoutShippingMethodModel> get shippingMethods => const [];
+  List<CheckoutPaymentMethodModel> get paymentMethods => const [];
+  String? get selectedShippingMethod => null;
+  String? get selectedPaymentMethod => null;
 }
 
-final class _CheckoutInitial extends CheckoutState {
-  const _CheckoutInitial();
+final class CheckoutInitial extends CheckoutState {
+  const CheckoutInitial();
 }
 
-final class _CheckoutLoading extends CheckoutState {
-  const _CheckoutLoading();
+final class CheckoutLoading extends CheckoutState {
+  const CheckoutLoading({
+    this.previous,
+  });
+
+  final CheckoutSummaryModel? previous;
+
   @override
   bool get isLoading => true;
+
+  @override
+  CheckoutSummaryModel? get summary => previous;
 }
 
-final class _CheckoutSuccess extends CheckoutState {
-  _CheckoutSuccess(this.result);
+final class CheckoutLoaded extends CheckoutState {
+  const CheckoutLoaded({
+    required this.summary,
+    this.shippingMethods = const [],
+    this.paymentMethods = const [],
+    this.selectedShippingMethod,
+    this.selectedPaymentMethod,
+  });
+
+  @override
+  final CheckoutSummaryModel summary;
+
+  @override
+  final List<CheckoutShippingMethodModel> shippingMethods;
+
+  @override
+  final List<CheckoutPaymentMethodModel> paymentMethods;
+
+  @override
+  final String? selectedShippingMethod;
+
+  @override
+  final String? selectedPaymentMethod;
+}
+
+final class CheckoutOrderPlaced extends CheckoutState {
+  CheckoutOrderPlaced(this.result);
+
   @override
   final Map<String, dynamic>? result;
 }
 
-final class _CheckoutFailed extends CheckoutState {
-  _CheckoutFailed(this._error, [this.stackTrace]);
+final class CheckoutFailed extends CheckoutState {
+  CheckoutFailed(this._error, [this.previous]);
+
   final Object _error;
-  final StackTrace? stackTrace;
+  final CheckoutSummaryModel? previous;
+
   @override
   bool get hasError => true;
+
   @override
   Object? get error => _error;
+
+  @override
+  CheckoutSummaryModel? get summary => previous;
 }

@@ -201,10 +201,81 @@ class AppLocalizationsAr extends AppLocalizations {
   String get maxOrderLimit => 'الحد الأقصى للطلب';
 
   @override
+  String get productOrderInfo => 'معلومات الطلب';
+
+  @override
+  String get unitPiece => 'قطعة';
+
+  @override
+  String maxOrderLimitValue(int count) {
+    return 'حتى $count لكل طلب';
+  }
+
+  @override
   String get addToWishlist => 'إضافة إلى المفضلة';
 
   @override
+  String get removeFromWishlist => 'إزالة من المفضلة';
+
+  @override
+  String removeFromWishlistSuccess(String productName) {
+    return 'تمت إزالة \"$productName\" من المفضلة';
+  }
+
+  @override
+  String get removeFromWishlistFailed => 'فشل إزالة المنتج من المفضلة';
+
+  @override
   String get addToCart => 'إضافة إلى السلة';
+
+  @override
+  String get productSku => 'رمز المنتج';
+
+  @override
+  String get productDescription => 'الوصف';
+
+  @override
+  String get productNew => 'جديد';
+
+  @override
+  String get productFeatured => 'مميز';
+
+  @override
+  String get productOnSale => 'تخفيض';
+
+  @override
+  String get productAvailability => 'التوفر';
+
+  @override
+  String get productAvailable => 'متوفر';
+
+  @override
+  String get productOutOfStock => 'غير متوفر';
+
+  @override
+  String get productRating => 'التقييم';
+
+  @override
+  String productRatingSummary(String rating, int count) {
+    return '$rating / 5 ($count)';
+  }
+
+  @override
+  String get productReviews => 'المراجعات';
+
+  @override
+  String productReviewsCount(int count) {
+    return '$count مراجعة';
+  }
+
+  @override
+  String get productMinPriceLabel => 'يبدأ من';
+
+  @override
+  String get productInfo => 'معلومات المنتج';
+
+  @override
+  String get productUrlKey => 'رابط المنتج';
 
   @override
   String get notificationsWelcomeTitle => 'مرحباً بك في Kalivra';
@@ -590,6 +661,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginFailed => 'فشل تسجيل الدخول';
 
   @override
+  String get loginSuccess => 'تم تسجيل الدخول بنجاح';
+
+  @override
+  String get invalidLoginCredentials => 'رقم الواتساب أو كلمة المرور غير صحيحة';
+
+  @override
   String get loginTitle => 'تسجيل الدخول';
 
   @override
@@ -734,6 +811,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String authOtpSentTo(String destination) {
     return 'تم إرسال رمز التحقق إلى $destination';
   }
+
+  @override
+  String get authOtpVerifySuccess => 'تم التحقق من الحساب بنجاح';
+
+  @override
+  String get authOtpVerifyFailed => 'فشل التحقق. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get authOtpCodeLength => 'أدخل رمز التحقق المكوّن من 6 أرقام';
+
+  @override
+  String authOtpResendIn(String time) {
+    return 'أعد الإرسال مجدداً خلال $time';
+  }
+
+  @override
+  String get authOtpResendCode => 'إعادة إرسال الرمز';
+
+  @override
+  String get authOtpResendSuccess => 'تم إرسال رمز التحقق مجدداً';
+
+  @override
+  String get authOtpResendFailed =>
+      'فشل إعادة إرسال الرمز. يرجى المحاولة مرة أخرى.';
 
   @override
   String get yourAccount => 'حسابك';
@@ -1251,4 +1352,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get retry => 'إعادة المحاولة';
+
+  @override
+  String get incorrectPassword => 'كلمة المرور خطأ. يرجى إعادة المحاولة.';
+
+  @override
+  String get accountNotFound =>
+      'الرقم غير موجود، يرجى التأكد من الرقم أو قم بإنشاء حساب.';
 }

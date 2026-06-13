@@ -1,27 +1,22 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 
 class AuthInterceptor extends Interceptor {
-  AuthInterceptor({this.getToken});
-
-  final Future<String?> Function()? getToken;
+  const AuthInterceptor();
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final token = await getToken?.call();
-    if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
-    }
-    options.headers['Accept'] = 'application/json';
-    if (options.data is FormData) {
-      options.headers.remove('Content-Type');
-    } else {
-      options.headers['Content-Type'] = 'application/json';
-    }
-    handler.next(options);
+    final token = await LocalStore.getToken();
+    options.headers.addAll({
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    });
+    super.onRequest(options, handler);
   }
 
   @override
@@ -31,15 +26,17 @@ class AuthInterceptor extends Interceptor {
     debugPrint('📨 Error body: $data');
     super.onError(err, handler);
   }
-  
+
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
-     debugPrint(
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    debugPrint(
       '✅ Response [${response.statusCode}] → ${response.requestOptions.path}',
     );
     super.onResponse(response, handler);
   }
-
 }
 
 class LoggingInterceptor extends Interceptor {
@@ -49,10 +46,7 @@ class LoggingInterceptor extends Interceptor {
   final bool logResponseBody;
 
   @override
-  void onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     if (!enabled) {
       handler.next(options);
       return;
@@ -62,10 +56,7 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
-    Response response,
-    ResponseInterceptorHandler handler,
-  ) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     if (!enabled) {
       handler.next(response);
       return;
@@ -94,54 +85,13 @@ class LoggingInterceptor extends Interceptor {
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final apiException = _toApiException(err);
+    final message = err.response!.data['message'] ?? '';
     handler.reject(
       DioException(
         requestOptions: err.requestOptions,
-        error: apiException,
+        error: message,
         response: err.response,
       ),
     );
   }
-
-  ApiException _toApiException(DioException err) {
-    final statusCode = err.response?.statusCode;
-    final data = err.response?.data;
-
-    String message = err.message ?? 'Unknown error';
-    Map<String, dynamic>? errors;
-    if (data is Map) {
-      final m = Map<String, dynamic>.from(data);
-      message = m['message'] as String? ?? message;
-      if (m['errors'] != null) {
-        errors = m['errors'] is Map
-            ? Map<String, dynamic>.from(m['errors'] as Map)
-            : null;
-      }
-    }
-
-    return ApiException(
-      statusCode: statusCode,
-      message: message,
-      errors: errors,
-      response: err.response,
-    );
-  }
-}
-
-class ApiException implements Exception {
-  const ApiException({
-    this.statusCode,
-    required this.message,
-    this.errors,
-    this.response,
-  });
-
-  final int? statusCode;
-  final String message;
-  final Map<String, dynamic>? errors;
-  final Response<dynamic>? response;
-
-  @override
-  String toString() => 'ApiException($statusCode): $message';
 }

@@ -2,19 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/checkout/checkout_summary_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class ShippingStep extends StatefulWidget {
-  const ShippingStep({super.key});
+  const ShippingStep({
+    super.key,
+    required this.methods,
+  });
+
+  final List<CheckoutShippingMethodModel> methods;
 
   @override
   State<ShippingStep> createState() => ShippingStepState();
 }
 
 class ShippingStepState extends State<ShippingStep> {
-  int _selectedMethod = 0;
+  String? _selectedMethodCode;
   DateTime? _preferredDate;
   final _notesController = TextEditingController();
+
+  @override
+  void didUpdateWidget(covariant ShippingStep oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_selectedMethodCode == null && widget.methods.isNotEmpty) {
+      _selectedMethodCode = widget.methods.first.method;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.methods.isNotEmpty) {
+      _selectedMethodCode = widget.methods.first.method;
+    }
+  }
+
+  String? get selectedMethodCode => _selectedMethodCode;
 
   @override
   void dispose() {
@@ -22,7 +46,8 @@ class ShippingStepState extends State<ShippingStep> {
     super.dispose();
   }
 
-  bool validateStep() => _preferredDate != null;
+  bool validateStep() =>
+      _selectedMethodCode != null && _selectedMethodCode!.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +56,18 @@ class ShippingStepState extends State<ShippingStep> {
     final isDark = theme.brightness == Brightness.dark;
     final textColor = isDark ? AppColors.offWhite : AppColors.burgundy;
 
-    final methods = [
-      {'title': l10n.standardDelivery, 'desc': l10n.standardDeliveryDesc, 'price': '15 ${l10n.currencySYP}'},
-      {'title': l10n.fastDelivery, 'desc': l10n.fastDeliveryDesc, 'price': '30 ${l10n.currencySYP}'},
-      {'title': l10n.sameDayDelivery, 'desc': l10n.sameDayDeliveryDesc, 'price': '50 ${l10n.currencySYP}'},
-    ];
+    if (widget.methods.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.w),
+          child: Text(
+            l10n.completeStepData,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(color: textColor),
+          ),
+        ),
+      );
+    }
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
@@ -47,13 +79,12 @@ class ShippingStepState extends State<ShippingStep> {
             style: theme.textTheme.titleMedium?.copyWith(color: textColor),
           ),
           SizedBox(height: 12.h),
-          ...List.generate(methods.length, (i) {
-            final m = methods[i];
-            final selected = _selectedMethod == i;
+          ...widget.methods.map((method) {
+            final selected = _selectedMethodCode == method.method;
             return Padding(
               padding: EdgeInsets.only(bottom: 12.h),
               child: InkWell(
-                onTap: () => setState(() => _selectedMethod = i),
+                onTap: () => setState(() => _selectedMethodCode = method.method),
                 borderRadius: BorderRadius.circular(12.r),
                 child: Container(
                   padding: EdgeInsets.all(16.w),
@@ -86,22 +117,26 @@ class ShippingStepState extends State<ShippingStep> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              m['title']!,
+                              method.title,
                               style: theme.textTheme.titleSmall?.copyWith(
                                 color: textColor,
                               ),
                             ),
-                            Text(
-                              m['desc']!,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: AppColors.taupe,
+                            if (method.description?.isNotEmpty == true)
+                              Text(
+                                method.description!,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: AppColors.taupe,
+                                ),
                               ),
-                            ),
                           ],
                         ),
                       ),
                       Text(
-                        m['price']!,
+                        method.formattedPrice ??
+                            (method.price != null
+                                ? '${method.price!.toStringAsFixed(0)} ${l10n.currencySYP}'
+                                : ''),
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: textColor,
                         ),
@@ -122,7 +157,8 @@ class ShippingStepState extends State<ShippingStep> {
             onTap: () async {
               final date = await showDatePicker(
                 context: context,
-                initialDate: _preferredDate ?? DateTime.now().add(const Duration(days: 3)),
+                initialDate:
+                    _preferredDate ?? DateTime.now().add(const Duration(days: 3)),
                 firstDate: DateTime.now(),
                 lastDate: DateTime.now().add(const Duration(days: 60)),
               );

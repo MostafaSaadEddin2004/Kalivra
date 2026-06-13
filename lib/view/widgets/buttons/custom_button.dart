@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/l10n/app_localizations.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({super.key, required this.onTap});
+  const CustomButton({super.key, required this.onTap, required this.title});
 
   final VoidCallback onTap;
+  final Widget title;
 
   @override
   Widget build(BuildContext context) {
     final  colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     return InkWell(
       onTap: onTap,
       child: Container(
@@ -21,7 +20,7 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
         ),
         width: double.infinity,
-        child: Text(AppLocalizations.of(context)!.confirmOrder, style: textTheme.displayLarge),
+        child: title,
       ),
     );
   }

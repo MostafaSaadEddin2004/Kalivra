@@ -20,6 +20,11 @@ final class AuthFailed extends AuthState {
 
   AuthFailed({required this.message});
 }
+final class VerifySuccessed extends AuthState {
+  final String message;
+
+  VerifySuccessed({required this.message});
+}
 
 final class UnAuthinticated extends AuthState {
   final String message;

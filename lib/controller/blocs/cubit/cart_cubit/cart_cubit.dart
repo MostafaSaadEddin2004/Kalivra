@@ -1,77 +1,175 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
+import 'package:kalivra/model/cart/cart_api_model.dart';
 import 'package:kalivra/model/cart/cart_item_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/model/services/api/cart_api_service.dart';
 
 export 'cart_state.dart';
 
 class CartCubit extends Cubit<CartState> {
-  CartCubit() : super(const CartState());
+  CartCubit() : super(CartInitial());
+
+  final CartApiService _cartService = CartApiService();
+
+  CartApiModel? _cart;
 
   static const double deliveryCost = 15.0;
-  Future<void> addItem(ProductModel product, {int quantity = 1}) async{
-    final token = await LocalStore.getToken();
-    if (quantity < 1) return;
-    if (token == null || token.isEmpty) {
-      emit(state.copyWith(loginRequiredForAdd: true));
-      return;
+
+  CartApiModel? get cart => _cart;
+
+  List<CartItem> get items => _mapCartItems(_cart);
+
+  double get subtotal => _cart?.subTotal ?? 0;
+
+  double get total => _cart?.grandTotal ?? subtotal;
+
+  int get itemCount => _cart?.itemQuantity ?? 0;
+
+  List<CartItem> _mapCartItems(CartApiModel? cart) {
+    final apiItems = cart?.items;
+    if (apiItems == null || apiItems.isEmpty) return const [];
+
+    final mapped = <CartItem>[];
+    for (final apiItem in apiItems) {
+      final productJson = apiItem.product;
+      if (productJson == null) continue;
+      try {
+        mapped.add(
+          CartItem(
+            product: ProductModel.fromJson(productJson),
+            quantity: apiItem.quantity ?? 1,
+            cartItemId: apiItem.id,
+          ),
+        );
+      } catch (_) {}
     }
-    final maxQty = 5;
-    final list = List<CartItem>.from(state.items);
-    final index = list.indexWhere((e) => e.product.id == product.id);
-    if (index >= 0) {
-      final newQty = (list[index].quantity + quantity).clamp(1, maxQty);
-      list[index] = list[index].copyWith(quantity: newQty);
-    } else {
-      list.add(CartItem(product: product, quantity: quantity.clamp(1, maxQty)));
-    }
-    emit(state.copyWith(
-      items: list,
-      loginRequiredForAdd: false,
-      addSuccessProductName: product.name,
-    ));
+    return mapped;
   }
 
-  void removeItem(String productId) {
-    emit(state.copyWith(
-      items: state.items.where((e) => e.product.id != int.parse(productId)).toList(),
-    ));
-  }
-
-  void updateQuantity(String productId, int quantity) {
-    if (quantity < 1) {
-      removeItem(productId);
+  Future<void> _emitLoaded(CartApiModel? cart) async {
+    _cart = cart;
+    if (cart == null || (cart.items?.isEmpty ?? true)) {
+      emit(CartLoaded(cart: cart ?? const CartApiModel()));
       return;
     }
-    final list = state.items.map((e) {
-      if (e.product.id == int.parse(productId)) {
-        final capped = quantity.clamp(1, 5);
-        return e.copyWith(quantity: capped);
+    emit(CartLoaded(cart: cart));
+  }
+
+  Future<void> getCart() async {
+    emit(CartLoading());
+    try {
+      final token = await LocalStore.getToken();
+      if (token == null || token.isEmpty) {
+        _cart = null;
+        emit(CartInitial());
+        return;
       }
-      return e;
-    }).toList();
-    emit(state.copyWith(items: list));
+      final cart = await _cartService.getCart();
+      await _emitLoaded(cart);
+    } catch (e) {
+      emit(CartFailure(message: e.toString()));
+    }
   }
 
-  void clear() => emit(const CartState());
+  Future<void> addItem(String productId, {int quantity = 1}) async {
+    if (quantity < 1) return;
 
-  void clearLoginRequired() => emit(state.copyWith(loginRequiredForAdd: false));
+    final token = await LocalStore.getToken();
+    if (token == null || token.isEmpty) {
+      emit(CartLoginRequired());
+      return;
+    }
 
-  void clearAddSuccessMessage() => emit(CartState(
-        items: state.items,
-        loginRequiredForAdd: state.loginRequiredForAdd,
-        addSuccessMessage: null,
-        addSuccessProductName: null,
-      ));
+    emit(CartLoading());
+    try {
+      final cart = await _cartService.addToCart(
+        productId: int.parse(productId),
+        quantity: quantity.clamp(1, 5),
+      );
+      await _emitLoaded(cart);
+      if (cart != null) {
+        emit(
+          AddToCartSuccessed(
+            message: 'added',
+            cart: cart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(CartFailure(message: e.toString()));
+    }
+  }
 
-  double get subtotal =>
-      state.items.fold(0.0, (sum, e) => sum + e.lineTotal);
+  Future<void> removeCartItem(int cartItemId) async {
+    emit(CartLoading());
+    try {
+      await _cartService.removeCartItem(cartItemId);
+      final cart = await _cartService.getCart();
+      await _emitLoaded(cart);
+      if (cart != null) {
+        emit(
+          RemoveFromCartSuccessed(
+            message: 'removed',
+            cart: cart,
+          ),
+        );
+      }
+    } catch (e) {
+      emit(CartFailure(message: e.toString()));
+    }
+  }
 
-  double get total => subtotal + deliveryCost;
+  Future<void> removeSelectedItems(List<int> cartItemIds) async {
+    if (cartItemIds.isEmpty) {
+      emit(DeleteCartSuccessed(message: 'cleared'));
+      _cart = null;
+      emit(CartLoaded(cart: const CartApiModel()));
+      return;
+    }
 
-  int get itemCount => state.items.fold(0, (sum, e) => sum + e.quantity);
-  
-  
+    emit(CartLoading());
+    try {
+      await _cartService.removeSelectedItems(cartItemIds);
+      final cart = await _cartService.getCart();
+      await _emitLoaded(cart);
+      emit(DeleteCartSuccessed(message: 'cleared'));
+    } catch (e) {
+      emit(CartFailure(message: e.toString()));
+    }
+  }
 
+  Future<void> removeItem(String productId) async {
+    final id = int.parse(productId);
+    final index = items.indexWhere((e) => e.product.id == id);
+    if (index < 0) return;
+
+    final cartItemId = items[index].cartItemId;
+    if (cartItemId != null) {
+      await removeCartItem(cartItemId);
+    }
+  }
+
+  Future<void> updateQuantity(String productId, int quantity) async {
+    if (quantity < 1) {
+      await removeItem(productId);
+    }
+  }
+
+  Future<void> clear() async {
+    final ids = items
+        .map((e) => e.cartItemId)
+        .whereType<int>()
+        .toList();
+    await removeSelectedItems(ids);
+  }
+
+  void clearLoginRequired() {
+    if (_cart != null) {
+      emit(CartLoaded(cart: _cart!));
+    } else {
+      emit(CartInitial());
+    }
+  }
 }

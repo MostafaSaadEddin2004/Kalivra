@@ -2,25 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/checkout/checkout_summary_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
-enum PaymentType { cashOnDelivery, ePayment }
-
-enum EPaymentMethod { shamcash, syriatelCash, mtnCash }
-
 class PaymentStep extends StatefulWidget {
-  const PaymentStep({super.key});
+  const PaymentStep({
+    super.key,
+    required this.methods,
+  });
+
+  final List<CheckoutPaymentMethodModel> methods;
 
   @override
   State<PaymentStep> createState() => PaymentStepState();
 }
 
 class PaymentStepState extends State<PaymentStep> {
-  PaymentType _paymentType = PaymentType.cashOnDelivery;
-  EPaymentMethod _ePaymentMethod = EPaymentMethod.shamcash;
+  String? _selectedMethodCode;
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
   final _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedMethodCode = _initialMethodCode();
+  }
+
+  String? _initialMethodCode() {
+    if (widget.methods.isEmpty) return 'cashondelivery';
+    final cod = widget.methods.firstWhere(
+      (m) => m.method == 'cashondelivery',
+      orElse: () => widget.methods.first,
+    );
+    return cod.method;
+  }
+
+  String get selectedPaymentMethodCode =>
+      _selectedMethodCode ?? 'cashondelivery';
+
+  bool get _requiresWalletDetails {
+    final code = selectedPaymentMethodCode.toLowerCase();
+    return code != 'cashondelivery' && code != 'cash_on_delivery' && code != 'cod';
+  }
 
   @override
   void dispose() {
@@ -30,8 +54,9 @@ class PaymentStepState extends State<PaymentStep> {
   }
 
   bool validateStep() {
-    if (_paymentType == PaymentType.cashOnDelivery) return true;
-    return _formKey.currentState?.validate() ?? false;
+    if (!_requiresWalletDetails) return _selectedMethodCode != null;
+    return (_formKey.currentState?.validate() ?? false) &&
+        _selectedMethodCode != null;
   }
 
   @override
@@ -40,6 +65,14 @@ class PaymentStepState extends State<PaymentStep> {
     final isDark = theme.brightness == Brightness.dark;
     final textColor = isDark ? AppColors.offWhite : AppColors.burgundy;
     final l10n = AppLocalizations.of(context)!;
+    final methods = widget.methods.isNotEmpty
+        ? widget.methods
+        : [
+            const CheckoutPaymentMethodModel(
+              method: 'cashondelivery',
+              title: 'Cash On Delivery',
+            ),
+          ];
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
@@ -54,38 +87,18 @@ class PaymentStepState extends State<PaymentStep> {
             ),
           ),
           SizedBox(height: 20.h),
-          _buildPaymentTypeOption(
-            context: context,
-            type: PaymentType.cashOnDelivery,
-            title: l10n.cashOnDelivery,
-            subtitle: l10n.cashOnDeliverySubtitle,
-            icon: Icons.money_off_csred_rounded,
-            textColor: textColor,
-            isDark: isDark,
-          ),
-          SizedBox(height: 12.h),
-          _buildPaymentTypeOption(
-            context: context,
-            type: PaymentType.ePayment,
-            title: l10n.onlinePayment,
-            subtitle: l10n.onlinePaymentSubtitle,
-            icon: Icons.phone_android_rounded,
-            textColor: textColor,
-            isDark: isDark,
-          ),
-          if (_paymentType == PaymentType.ePayment) ...[
-            SizedBox(height: 24.h),
-            Text(
-              l10n.selectPaymentMethod,
-              style: theme.textTheme.titleMedium?.copyWith(color: textColor),
+          ...methods.map(
+            (method) => Padding(
+              padding: EdgeInsets.only(bottom: 12.h),
+              child: _buildMethodOption(
+                context: context,
+                method: method,
+                textColor: textColor,
+                isDark: isDark,
+              ),
             ),
-            SizedBox(height: 12.h),
-            ...EPaymentMethod.values.map((method) => _buildEMethodOption(
-                  context: context,
-                  method: method,
-                  textColor: textColor,
-                  isDark: isDark,
-                )),
+          ),
+          if (_requiresWalletDetails) ...[
             SizedBox(height: 24.h),
             Text(
               l10n.walletDetails,
@@ -124,18 +137,15 @@ class PaymentStepState extends State<PaymentStep> {
     );
   }
 
-  Widget _buildPaymentTypeOption({
+  Widget _buildMethodOption({
     required BuildContext context,
-    required PaymentType type,
-    required String title,
-    required String subtitle,
-    required IconData icon,
+    required CheckoutPaymentMethodModel method,
     required Color textColor,
     required bool isDark,
   }) {
-    final selected = _paymentType == type;
+    final selected = _selectedMethodCode == method.method;
     return InkWell(
-      onTap: () => setState(() => _paymentType = type),
+      onTap: () => setState(() => _selectedMethodCode = method.method),
       borderRadius: BorderRadius.circular(12.r),
       child: Container(
         padding: EdgeInsets.all(16.w),
@@ -154,11 +164,11 @@ class PaymentStepState extends State<PaymentStep> {
         child: Row(
           children: [
             Icon(
-              icon,
-              size: 28.r,
+              selected ? Icons.check_circle_rounded : Icons.circle_outlined,
               color: selected
                   ? (isDark ? AppColors.goldLight : AppColors.burgundy)
                   : AppColors.taupe,
+              size: 24.r,
             ),
             SizedBox(width: 14.w),
             Expanded(
@@ -166,104 +176,25 @@ class PaymentStepState extends State<PaymentStep> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title,
+                    method.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: textColor,
                           fontWeight: FontWeight.w600,
                         ),
                   ),
-                  SizedBox(height: 4.h),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.taupe,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            if (selected)
-              Icon(
-                Icons.check_circle_rounded,
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                size: 24.r,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEMethodOption({
-    required BuildContext context,
-    required EPaymentMethod method,
-    required Color textColor,
-    required bool isDark,
-  }) {
-    final selected = _ePaymentMethod == method;
-    final l10n = AppLocalizations.of(context)!;
-    final name = switch (method) {
-      EPaymentMethod.shamcash => l10n.paymentShamcash,
-      EPaymentMethod.syriatelCash => l10n.paymentSyriatel,
-      EPaymentMethod.mtnCash => l10n.paymentMtn,
-    };
-    final desc = switch (method) {
-      EPaymentMethod.shamcash => l10n.paymentShamcashDesc,
-      EPaymentMethod.syriatelCash => l10n.paymentSyriatelDesc,
-      EPaymentMethod.mtnCash => l10n.paymentMtnDesc,
-    };
-    return Padding(
-      padding: EdgeInsets.only(bottom: 10.h),
-      child: InkWell(
-        onTap: () => setState(() => _ePaymentMethod = method),
-        borderRadius: BorderRadius.circular(12.r),
-        child: Container(
-          padding: EdgeInsets.all(14.w),
-          decoration: BoxDecoration(
-            color: isDark
-                ? const Color(0xFF252423)
-                : AppColors.offWhite.withValues(alpha: 0.4),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: selected
-                  ? (isDark ? AppColors.goldLight : AppColors.burgundy)
-                  : AppColors.taupe.withValues(alpha: 0.25),
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Row(
-            children: [
-              Icon(
-                selected ? Icons.radio_button_checked : Icons.radio_button_off,
-                color: selected
-                    ? (isDark ? AppColors.goldLight : AppColors.burgundy)
-                    : AppColors.taupe,
-                size: 24.r,
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  if (method.description?.isNotEmpty == true) ...[
+                    SizedBox(height: 4.h),
                     Text(
-                      name,
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: textColor,
-                          ),
-                    ),
-                    SizedBox(height: 2.h),
-                    Text(
-                      desc,
+                      method.description!,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.taupe,
-                            fontSize: 11.sp,
                           ),
                     ),
                   ],
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

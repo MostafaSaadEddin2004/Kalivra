@@ -201,10 +201,82 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maxOrderLimit => 'Max order limit';
 
   @override
+  String get productOrderInfo => 'Order information';
+
+  @override
+  String get unitPiece => 'Piece';
+
+  @override
+  String maxOrderLimitValue(int count) {
+    return 'Up to $count per order';
+  }
+
+  @override
   String get addToWishlist => 'Add to Favorites';
 
   @override
+  String get removeFromWishlist => 'Remove from Favorites';
+
+  @override
+  String removeFromWishlistSuccess(String productName) {
+    return 'Removed \"$productName\" from favorites';
+  }
+
+  @override
+  String get removeFromWishlistFailed =>
+      'Failed to remove product from favorites';
+
+  @override
   String get addToCart => 'Add to Cart';
+
+  @override
+  String get productSku => 'SKU';
+
+  @override
+  String get productDescription => 'Description';
+
+  @override
+  String get productNew => 'New';
+
+  @override
+  String get productFeatured => 'Featured';
+
+  @override
+  String get productOnSale => 'On Sale';
+
+  @override
+  String get productAvailability => 'Availability';
+
+  @override
+  String get productAvailable => 'In stock';
+
+  @override
+  String get productOutOfStock => 'Out of stock';
+
+  @override
+  String get productRating => 'Rating';
+
+  @override
+  String productRatingSummary(String rating, int count) {
+    return '$rating / 5 ($count)';
+  }
+
+  @override
+  String get productReviews => 'Reviews';
+
+  @override
+  String productReviewsCount(int count) {
+    return '$count reviews';
+  }
+
+  @override
+  String get productMinPriceLabel => 'Starting from';
+
+  @override
+  String get productInfo => 'Product information';
+
+  @override
+  String get productUrlKey => 'Product link';
 
   @override
   String get notificationsWelcomeTitle => 'Welcome to Kalivra';
@@ -593,6 +665,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginFailed => 'Sign in failed';
 
   @override
+  String get loginSuccess => 'Signed in successfully';
+
+  @override
+  String get invalidLoginCredentials => 'Incorrect WhatsApp number or password';
+
+  @override
   String get loginTitle => 'Sign In';
 
   @override
@@ -737,6 +815,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String authOtpSentTo(String destination) {
     return 'Verification code sent to $destination';
   }
+
+  @override
+  String get authOtpVerifySuccess => 'Account verified successfully';
+
+  @override
+  String get authOtpVerifyFailed => 'Verification failed. Please try again.';
+
+  @override
+  String get authOtpCodeLength => 'Enter the 6-digit verification code';
+
+  @override
+  String authOtpResendIn(String time) {
+    return 'Resend again in $time';
+  }
+
+  @override
+  String get authOtpResendCode => 'Resend code';
+
+  @override
+  String get authOtpResendSuccess => 'Verification code sent again';
+
+  @override
+  String get authOtpResendFailed => 'Failed to resend code. Please try again.';
 
   @override
   String get yourAccount => 'your account';
@@ -1259,4 +1360,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retry => 'Retry';
+
+  @override
+  String get incorrectPassword => 'Incorrect password. Please try again.';
+
+  @override
+  String get accountNotFound =>
+      'Phone number was not found, Please check the phone number or create a new account.';
 }

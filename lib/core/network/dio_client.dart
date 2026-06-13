@@ -13,18 +13,16 @@ class DioClient {
     Duration receiveTimeout = const Duration(seconds: 30),
     Duration sendTimeout = const Duration(seconds: 30),
   }) : _dio = Dio(
-          BaseOptions(
-            baseUrl: baseUrl,
-            connectTimeout: connectTimeout,
-            receiveTimeout: receiveTimeout,
-            sendTimeout: sendTimeout,
-            headers: {
-              'Accept': 'application/json',
-            },
-          ),
-        ) {
+         BaseOptions(
+           baseUrl: baseUrl,
+           connectTimeout: connectTimeout,
+           receiveTimeout: receiveTimeout,
+           sendTimeout: sendTimeout,
+           headers: {'Accept': 'application/json'},
+         ),
+       ) {
     _dio.interceptors.addAll([
-      AuthInterceptor(getToken: getToken),
+      AuthInterceptor(),
       LoggingInterceptor(
         enabled: enableLogging,
         logResponseBody: logResponseBody,
@@ -33,8 +31,7 @@ class DioClient {
     ]);
   }
 
-   final Dio _dio;
-
+  final Dio _dio;
 
   Future<Response> get(
     String path, {
@@ -42,31 +39,31 @@ class DioClient {
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.get(
-      path,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-    return response ;
+    try {
+      final response = await _dio.get(
+        path,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw Exception(
+        '${e.response?.statusCode} ${e.response!.data['message'] ?? 'An error occurred'}',
+      );
+    }
   }
 
-  Future<Response> post(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-    CancelToken? cancelToken,
-  }) async {
-    final response = await _dio.post(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
+  Future<Response> post(String path, {dynamic data}) async {
+  try {
+    final response = await _dio.post(path, data: data);
     return response;
+  } on DioException catch (e) {
+    throw Exception(
+        '${e.response?.statusCode} ${e.response!.data['message']}',
+      );
   }
+}
 
   Future<Response> put(
     String path, {
@@ -75,14 +72,20 @@ class DioClient {
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.put(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-    return response;
+    try {
+      final response = await _dio.put(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw Exception(
+        '${e.response?.statusCode} ${e.response!.data['message']}',
+      );
+    }
   }
 
   Future<Response> delete(
@@ -92,14 +95,19 @@ class DioClient {
     Options? options,
     CancelToken? cancelToken,
   }) async {
-    final response = await _dio.delete(
-      path,
-      data: data,
-      queryParameters: queryParameters,
-      options: options,
-      cancelToken: cancelToken,
-    );
-    return response
-    ;
+    try {
+      final response = await _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw Exception(
+        '${e.response?.statusCode} ${e.response!.data['message']}',
+      );
+    }
   }
 }

@@ -132,7 +132,7 @@ class ProductCard extends StatelessWidget {
                       _PriceBlock(product: product, isDark: isDark),
                       CardButton(
                         onTap: () =>
-                            context.read<CartCubit>().addItem(product),
+                            context.read<CartCubit>().addItem(product.id.toString()),
                       ),
                     ],
                   ),

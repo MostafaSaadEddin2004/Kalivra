@@ -15,6 +15,7 @@ class ProductModel {
   final ProductPrices prices;
   final ProductRatings ratings;
   final ProductReviews reviews;
+  final ProductVariants? variants;
 
   ProductModel({
     required this.id,
@@ -33,6 +34,7 @@ class ProductModel {
     required this.prices,
     required this.ratings,
     required this.reviews,
+    this.variants,
   });
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -42,9 +44,9 @@ class ProductModel {
       name: json['name'] as String,
       description: json['description'],
       urlKey: json['url_key'],
-      baseImage: ProductImage.fromJson(
-        json['base_image']
-      ),
+      baseImage: json['base_image'] != null
+    ? ProductImage.fromJson(json['base_image'])
+    : null,
       images: (json['images'] as List)
           .map((e) => ProductImage.fromJson(e))
           .toList(),
@@ -55,12 +57,11 @@ class ProductModel {
       isWishlist: json['is_wishlist'] as bool? ?? false,
       minPrice: json['min_price'] as String?,
       prices: ProductPrices.fromJson(json['prices']),
-      ratings: ProductRatings.fromJson(
-        json['ratings']
-      ),
-      reviews: ProductReviews.fromJson(
-        json['reviews']
-      ),
+      ratings: ProductRatings.fromJson(json['ratings']),
+      reviews: ProductReviews.fromJson(json['reviews']),
+      variants: json['variants'] != null
+          ? ProductVariants.fromJson(json['variants'])
+          : null,
     );
   }
 
@@ -121,11 +122,13 @@ class ProductPrices {
   ProductPrices({required this.regular, this.final_});
 
   factory ProductPrices.fromJson(Map<String, dynamic> json) {
-    return ProductPrices(
-      regular: PriceDetail.fromJson(json['regular']),
-      final_: PriceDetail.fromJson(json['final']),
-    );
-  }
+  return ProductPrices(
+    regular: PriceDetail.fromJson(json['regular']),
+    final_: json['final'] != null
+        ? PriceDetail.fromJson(json['final'])
+        : null,
+  );
+}
 
   Map<String, dynamic> toJson() => {
     'regular': regular.toJson(),
@@ -161,7 +164,7 @@ class ProductRatings {
   factory ProductRatings.fromJson(Map<String, dynamic> json) {
     return ProductRatings(
       average: json['average'] ?? '0.0',
-      total: json['total']?? 0,
+      total: json['total'] ?? 0,
     );
   }
 
@@ -174,8 +177,106 @@ class ProductReviews {
   ProductReviews({required this.total});
 
   factory ProductReviews.fromJson(Map<String, dynamic> json) {
-    return ProductReviews(total: json['total']?? 0);
+    return ProductReviews(total: json['total'] ?? 0);
   }
 
   Map<String, dynamic> toJson() => {'total': total};
+}
+
+class ProductVariants {
+  final String measurementType;
+  final List<String> measurementTypes;
+  final List<VariantBySize> variantsBySize;
+
+  ProductVariants({
+    required this.measurementType,
+    required this.measurementTypes,
+    required this.variantsBySize,
+  });
+
+  factory ProductVariants.fromJson(Map<String, dynamic> json) {
+    return ProductVariants(
+      measurementType: json['measurement_type'] ?? '',
+      measurementTypes: List<String>.from(json['measurement_types'] ?? []),
+      variantsBySize: (json['variants_by_size'] as List? ?? [])
+          .map((e) => VariantBySize.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'measurement_type': measurementType,
+    'measurement_types': measurementTypes,
+    'variants_by_size': variantsBySize.map((e) => e.toJson()).toList(),
+  };
+}
+
+class VariantBySize {
+  final int sizeId;
+  final String sizeName;
+  final List<ColorVariant> colors;
+
+  VariantBySize({
+    required this.sizeId,
+    required this.sizeName,
+    required this.colors,
+  });
+
+  factory VariantBySize.fromJson(Map<String, dynamic> json) {
+    return VariantBySize(
+      sizeId: json['size_id'] as int,
+      sizeName: json['size_name'] as String,
+      colors: (json['colors'] as List? ?? [])
+          .map((e) => ColorVariant.fromJson(e))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'size_id': sizeId,
+    'size_name': sizeName,
+    'colors': colors.map((e) => e.toJson()).toList(),
+  };
+}
+
+class ColorVariant {
+  final int colorId;
+  final int parentSizeId;
+  final String colorName;
+  final String? hex;
+  final int variantId;
+  final String sku;
+  final int stockQty;
+
+  ColorVariant({
+    required this.colorId,
+    required this.parentSizeId,
+    required this.colorName,
+    this.hex,
+    required this.variantId,
+    required this.sku,
+    required this.stockQty,
+  });
+
+  factory ColorVariant.fromJson(Map<String, dynamic> json) {
+    return ColorVariant(
+      colorId: json['color_id'] as int,
+      parentSizeId: json['parent_size_id'] as int,
+      colorName: json['color_name'] as String,
+      hex: json['hex'] as String?,
+      variantId: json['variant_id'] as int,
+      sku: json['sku'] as String,
+      stockQty: json['stock_qty'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'color_id': colorId,
+    'parent_size_id': parentSizeId,
+    'color_name': colorName,
+    'hex': hex,
+    'variant_id': variantId,
+    'sku': sku,
+    'stock_qty': stockQty,
+  };
 }

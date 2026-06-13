@@ -35,30 +35,84 @@ class AuthCubit extends Cubit<AuthState> {
     required String password,
   }) async {
     emit(AuthLoading());
+    final l10n = AppLocalizations.of(context)!;
     try {
       await _customerApiService.login(phone: phone, password: password);
-      emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
+      emit(AuthSuccessed(message: l10n.loginSuccess));
+      context.go(AppRoutes.home);
     } catch (e) {
       if (e == 'INVALID_CREDENTIALS') {
-        emit(
-          AuthFailed(message: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'),
-        );
-        CustomSnackBar.show(
-          context,
-          'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
-        );
+        emit(AuthFailed(message: l10n.invalidLoginCredentials));
+        CustomSnackBar.show(context, l10n.invalidLoginCredentials);
       } else if (e == 'EMAIL_NOT_VERIFIED') {
         final token = await LocalStore.getToken();
-        if (!context.mounted) return;
         context.goNamed(
           AppRoutesName.authOtp,
           extra: AuthOtpArgs(email: phone, phone: phone, token: token),
         );
-        emit(AuthFailed(message: ''));
-      } else {
+        emit(AuthFailed(message: 'Email is not verfied.'));
+      } 
+      else if (e == 'INCORRECT_PASSWORD') {
+        emit(AuthFailed(message: l10n.incorrectPassword));
+        CustomSnackBar.show(context, l10n.incorrectPassword);
+      }
+      else if (e == 'ACCOUNT_NOT_FOUND') {
+        emit(AuthFailed(message: l10n.accountNotFound));
+        CustomSnackBar.show(context,l10n.accountNotFound);
+      }
         emit(AuthFailed(message: e.toString()));
         CustomSnackBar.show(context, e.toString());
+      
+    }
+  }
+
+  Future<void> resendOtp({
+    required BuildContext context,
+    required String whatsappNumber,
+    String? email,
+    String? token,
+    String purpose = 'login',
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      final storedToken = token ?? await LocalStore.getToken();
+      await _customerApiService.resendOtp(
+        whatsappNumber: whatsappNumber,
+        email: email,
+        token: storedToken,
+        purpose: purpose,
+      );
+      if (context.mounted) {
+        CustomSnackBar.show(context, l10n.authOtpResendSuccess);
       }
+    } catch (e) {
+     
+      rethrow;
+    }
+  }
+
+  Future<void> verifyOtp({
+    required BuildContext context,
+    required String otp,
+    required String whatsappNumber,
+    String? email,
+    required String token,
+  }) async {
+    emit(AuthLoading());
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      await _customerApiService.verifyOtp(
+        otp: otp,
+        whatsappNumber: whatsappNumber,
+        email: email,
+        token: token,
+      );
+      if (!context.mounted) return;
+      emit(VerifySuccessed(message: l10n.authOtpVerifySuccess));
+      context.go(AppRoutes.home);
+    } catch (e) {
+      emit(AuthFailed(message: e.toString()));
+      
     }
   }
 

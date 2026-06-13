@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
@@ -9,21 +9,61 @@ import 'package:kalivra/view/widgets/cart/cart_items_view.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/cart/empty_cart_view.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
   @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartCubit>().getCart();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final cartCubit = context.read<CartCubit>();
+
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-        final items = state.items;
+        if (state is CartLoading && cartCubit.items.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(
+              elevation: 0,
+              centerTitle: true,
+              leading: CustomIconButton(
+                icon: Icons.arrow_back_rounded,
+                color: Theme.of(context).appBarTheme.foregroundColor ??
+                    AppColors.offWhite,
+                iconSize: 28.r,
+                onPressed: () => context.pop(),
+                tooltip: AppLocalizations.of(context)!.back,
+              ),
+              title: Text(
+                AppLocalizations.of(context)!.cart,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final items = cartCubit.items;
         return Scaffold(
           appBar: AppBar(
             elevation: 0,
             centerTitle: true,
             leading: CustomIconButton(
               icon: Icons.arrow_back_rounded,
-              color: Theme.of(context).appBarTheme.foregroundColor ?? AppColors.offWhite,
+              color: Theme.of(context).appBarTheme.foregroundColor ??
+                  AppColors.offWhite,
               iconSize: 28.r,
               onPressed: () => context.pop(),
               tooltip: AppLocalizations.of(context)!.back,
@@ -31,8 +71,8 @@ class CartScreen extends StatelessWidget {
             title: Text(
               AppLocalizations.of(context)!.cart,
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
           body: items.isEmpty
