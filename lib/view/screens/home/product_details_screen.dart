@@ -31,7 +31,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   void initState() {
     super.initState();
     _isWishlist = widget.product.isWishlist;
-    // trigger load so cubit emits ProductVariantSelected with the first size pre-selected
     context.read<ProductsCubit>().loadProductById(widget.product.id);
   }
 
@@ -76,7 +75,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final viewData = _ProductViewData.fromProduct(product, l10n);
+    final viewData = ProductViewData.fromProduct(product, l10n);
 
     return Scaffold(
       appBar: DrawerScreenAppBar(title: l10n.productDetails),
@@ -88,7 +87,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           return ListView(
             padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
             children: [
-              _GallerySection(
+              GallerySection(
                 galleryImages: _galleryImages,
                 isDark: isDark,
                 isWishlist: _isWishlist,
@@ -96,18 +95,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 onToggleWishlist: _toggleWishlist,
               ),
               SizedBox(height: 20.h),
-              _ProductHeaderSection(
+              ProductHeaderSection(
                 product: product,
                 viewData: viewData,
                 isDark: isDark,
               ),
 
-              // ── Variants section ──────────────────────────────────────
               if (variantState != null &&
                   (variantState.product.variants?.variantsBySize ?? [])
                       .isNotEmpty) ...[
                 SizedBox(height: 16.h),
-                _ProductVariantsSection(
+                ProductVariantsSection(
                   variantState: variantState,
                   isDark: isDark,
                   onSizeSelected: (size) =>
@@ -116,11 +114,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       context.read<ProductsCubit>().selectColor(color),
                 ),
               ],
-              // ─────────────────────────────────────────────────────────
 
               if (viewData.descriptionText.isNotEmpty) ...[
                 SizedBox(height: 16.h),
-                _ProductSectionCard(
+                ProductSectionCard(
                   isDark: isDark,
                   title: l10n.productDescription,
                   icon: Icons.description_outlined,
@@ -135,7 +132,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
               if (viewData.infoEntries.isNotEmpty) ...[
                 SizedBox(height: 16.h),
-                _ProductInfoCard(
+                ProductInfoCard(
                   isDark: isDark,
                   sectionTitle: l10n.productInfo,
                   entries: viewData.infoEntries,
@@ -172,12 +169,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Variant section widget (new)
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ProductVariantsSection extends StatelessWidget {
-  const _ProductVariantsSection({
+class ProductVariantsSection extends StatelessWidget {
+  const ProductVariantsSection({super.key, 
     required this.variantState,
     required this.isDark,
     required this.onSizeSelected,
@@ -198,7 +191,7 @@ class _ProductVariantsSection extends StatelessWidget {
     final selectedColor = variantState.selectedColor;
     final availableColors = variantState.availableColors;
 
-    return _ProductSectionCardShell(
+    return ProductSectionCardShell(
       isDark: isDark,
       title: 'المقاس واللون',
       icon: Icons.style_outlined,
@@ -348,7 +341,6 @@ class _ProductVariantsSection extends StatelessWidget {
               ),
             ],
 
-            // ── Stock info ──────────────────────────────────────────────
             if (selectedColor != null) ...[
               SizedBox(height: 12.h),
               Row(
@@ -375,13 +367,8 @@ class _ProductVariantsSection extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Everything below is unchanged from your original code
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ProductViewData {
-  const _ProductViewData({
+class ProductViewData {
+  const ProductViewData({
     required this.descriptionText,
     required this.regularPrice,
     required this.salePrice,
@@ -394,10 +381,10 @@ class _ProductViewData {
   final String? regularPrice;
   final String? salePrice;
   final bool hasSalePrice;
-  final List<_ProductBadgeData> badges;
-  final List<_ProductSpecEntry> infoEntries;
+  final List<ProductBadgeData> badges;
+  final List<ProductSpecEntry> infoEntries;
 
-  static _ProductViewData fromProduct(
+  static ProductViewData fromProduct(
     ProductModel product,
     AppLocalizations l10n,
   ) {
@@ -416,29 +403,29 @@ class _ProductViewData {
         salePrice.isNotEmpty &&
         salePrice != regularPrice;
 
-    final badges = <_ProductBadgeData>[
+    final badges = <ProductBadgeData>[
       if (product.isNew)
-        _ProductBadgeData(
+        ProductBadgeData(
           label: l10n.productNew,
           icon: Icons.fiber_new_rounded,
           color: AppColors.goldDark,
         ),
       if (product.isFeatured)
-        _ProductBadgeData(
+        ProductBadgeData(
           label: l10n.productFeatured,
           icon: Icons.star_outline_rounded,
           color: AppColors.burgundy,
         ),
       if (product.onSale)
-        _ProductBadgeData(
+        ProductBadgeData(
           label: l10n.productOnSale,
           icon: Icons.local_offer_outlined,
           color: AppColors.red,
         ),
     ];
 
-    final infoEntries = <_ProductSpecEntry>[
-      _ProductSpecEntry(
+    final infoEntries = <ProductSpecEntry>[
+      ProductSpecEntry(
         icon: product.isSaleable
             ? Icons.check_circle_outline_rounded
             : Icons.remove_shopping_cart_outlined,
@@ -448,13 +435,13 @@ class _ProductViewData {
             : l10n.productOutOfStock,
       ),
       if (_hasText(product.minPrice))
-        _ProductSpecEntry(
+        ProductSpecEntry(
           icon: Icons.sell_outlined,
           label: l10n.productMinPriceLabel,
           value: product.minPrice!.trim(),
         ),
       if (product.ratings.total > 0)
-        _ProductSpecEntry(
+        ProductSpecEntry(
           icon: Icons.star_rounded,
           label: l10n.productRating,
           value: l10n.productRatingSummary(
@@ -463,20 +450,20 @@ class _ProductViewData {
           ),
         ),
       if (product.reviews.total > 0)
-        _ProductSpecEntry(
+        ProductSpecEntry(
           icon: Icons.rate_review_outlined,
           label: l10n.productReviews,
           value: l10n.productReviewsCount(product.reviews.total),
         ),
       if (_hasText(product.urlKey))
-        _ProductSpecEntry(
+        ProductSpecEntry(
           icon: Icons.link_outlined,
           label: l10n.productUrlKey,
           value: product.urlKey.trim(),
         ),
     ];
 
-    return _ProductViewData(
+    return ProductViewData(
       descriptionText: descriptionText,
       regularPrice: regularPrice,
       salePrice: salePrice,
@@ -496,8 +483,8 @@ class _ProductViewData {
   }
 }
 
-class _ProductBadgeData {
-  const _ProductBadgeData({
+class ProductBadgeData {
+  const ProductBadgeData({
     required this.label,
     required this.icon,
     required this.color,
@@ -508,8 +495,8 @@ class _ProductBadgeData {
   final Color color;
 }
 
-class _ProductSpecEntry {
-  const _ProductSpecEntry({
+class ProductSpecEntry {
+  const ProductSpecEntry({
     required this.icon,
     required this.label,
     required this.value,
@@ -520,8 +507,8 @@ class _ProductSpecEntry {
   final String value;
 }
 
-class _GallerySection extends StatelessWidget {
-  const _GallerySection({
+class GallerySection extends StatelessWidget {
+  const GallerySection({super.key, 
     required this.galleryImages,
     required this.isDark,
     required this.isWishlist,
@@ -600,15 +587,15 @@ class _GallerySection extends StatelessWidget {
   }
 }
 
-class _ProductHeaderSection extends StatelessWidget {
-  const _ProductHeaderSection({
+class ProductHeaderSection extends StatelessWidget {
+  const ProductHeaderSection({super.key, 
     required this.product,
     required this.viewData,
     required this.isDark,
   });
 
   final ProductModel product;
-  final _ProductViewData viewData;
+  final ProductViewData viewData;
   final bool isDark;
 
   @override
@@ -642,7 +629,7 @@ class _ProductHeaderSection extends StatelessWidget {
               spacing: 8.w,
               runSpacing: 8.h,
               children: viewData.badges
-                  .map((badge) => _ProductBadgeChip(badge: badge))
+                  .map((badge) => ProductBadgeChip(badge: badge))
                   .toList(),
             ),
             SizedBox(height: 12.h),
@@ -655,7 +642,7 @@ class _ProductHeaderSection extends StatelessWidget {
               height: 1.25,
             ),
           ),
-          if (_ProductViewData._hasText(product.sku)) ...[
+          if (ProductViewData._hasText(product.sku)) ...[
             SizedBox(height: 10.h),
             Row(
               children: [
@@ -677,7 +664,7 @@ class _ProductHeaderSection extends StatelessWidget {
           if (viewData.regularPrice != null ||
               viewData.salePrice != null) ...[
             SizedBox(height: 16.h),
-            _ProductPriceBlock(viewData: viewData, isDark: isDark),
+            ProductPriceBlock(viewData: viewData, isDark: isDark),
           ],
         ],
       ),
@@ -685,10 +672,10 @@ class _ProductHeaderSection extends StatelessWidget {
   }
 }
 
-class _ProductBadgeChip extends StatelessWidget {
-  const _ProductBadgeChip({required this.badge});
+class ProductBadgeChip extends StatelessWidget {
+  const ProductBadgeChip({super.key, required this.badge});
 
-  final _ProductBadgeData badge;
+  final ProductBadgeData badge;
 
   @override
   Widget build(BuildContext context) {
@@ -718,10 +705,10 @@ class _ProductBadgeChip extends StatelessWidget {
   }
 }
 
-class _ProductPriceBlock extends StatelessWidget {
-  const _ProductPriceBlock({required this.viewData, required this.isDark});
+class ProductPriceBlock extends StatelessWidget {
+  const ProductPriceBlock({super.key, required this.viewData, required this.isDark});
 
-  final _ProductViewData viewData;
+  final ProductViewData viewData;
   final bool isDark;
 
   @override
@@ -767,8 +754,8 @@ class _ProductPriceBlock extends StatelessWidget {
   }
 }
 
-class _ProductSectionCard extends StatelessWidget {
-  const _ProductSectionCard({
+class ProductSectionCard extends StatelessWidget {
+  const ProductSectionCard({super.key, 
     required this.isDark,
     required this.title,
     required this.icon,
@@ -785,7 +772,7 @@ class _ProductSectionCard extends StatelessWidget {
     final theme = Theme.of(context);
     final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
 
-    return _ProductSectionCardShell(
+    return ProductSectionCardShell(
       isDark: isDark,
       title: title,
       icon: icon,
@@ -798,8 +785,8 @@ class _ProductSectionCard extends StatelessWidget {
   }
 }
 
-class _ProductInfoCard extends StatelessWidget {
-  const _ProductInfoCard({
+class ProductInfoCard extends StatelessWidget {
+  const ProductInfoCard({super.key, 
     required this.isDark,
     required this.sectionTitle,
     required this.entries,
@@ -807,18 +794,18 @@ class _ProductInfoCard extends StatelessWidget {
 
   final bool isDark;
   final String sectionTitle;
-  final List<_ProductSpecEntry> entries;
+  final List<ProductSpecEntry> entries;
 
   @override
   Widget build(BuildContext context) {
-    return _ProductSectionCardShell(
+    return ProductSectionCardShell(
       isDark: isDark,
       title: sectionTitle,
       icon: Icons.info_outline_rounded,
       child: Column(
         children: [
           for (var i = 0; i < entries.length; i++)
-            _ProductSpecListTile(
+            ProductSpecListTile(
               icon: entries[i].icon,
               label: entries[i].label,
               value: entries[i].value,
@@ -831,8 +818,8 @@ class _ProductInfoCard extends StatelessWidget {
   }
 }
 
-class _ProductSectionCardShell extends StatelessWidget {
-  const _ProductSectionCardShell({
+class ProductSectionCardShell extends StatelessWidget {
+  const ProductSectionCardShell({super.key, 
     required this.isDark,
     required this.title,
     required this.icon,
@@ -903,8 +890,8 @@ class _ProductSectionCardShell extends StatelessWidget {
   }
 }
 
-class _ProductSpecListTile extends StatelessWidget {
-  const _ProductSpecListTile({
+class ProductSpecListTile extends StatelessWidget {
+  const ProductSpecListTile({super.key, 
     required this.icon,
     required this.label,
     required this.value,

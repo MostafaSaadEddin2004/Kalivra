@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/screens/home/product_details_screen.dart';
 import 'package:kalivra/view/widgets/buttons/cart_button.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
+import 'package:marquee/marquee.dart';
 
 class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product});
@@ -21,6 +26,8 @@ class ProductCard extends StatelessWidget {
     final surfaceColor = isDark
         ? AppColors.burgundy.withValues(alpha: 0.15)
         : AppColors.burgundy.withValues(alpha: 0.06);
+
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
@@ -72,6 +79,34 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (product.isNew)
+                  BlocBuilder<LocaleBloc, LocaleBlocState>(
+                    builder: (context, state) {
+                      switch (state) {
+                        case LocaleFetched():
+                          return Positioned(
+                            top: 8.h,
+                            right:
+                                state.locale.languageCode ==
+                                    PrefKeys.arLocaleKey
+                                ? null
+                                : 8.h,
+                            left:
+                                state.locale.languageCode ==
+                                    PrefKeys.arLocaleKey
+                                ? 8.h
+                                : null,
+                            child: ProductBadgeChip(
+                              badge: ProductBadgeData(
+                                label: l10n.productNew,
+                                icon: Icons.fiber_new_rounded,
+                                color: AppColors.goldDark,
+                              ),
+                            ),
+                          );
+                      }
+                    },
+                  ),
               ],
             ),
             Container(
@@ -80,23 +115,27 @@ class ProductCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        product.name,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: isDark
-                              ? AppColors.offWhite
-                              : AppColors.black,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14.sp,
-                          height: 1.2,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      if (product.prices.final_?.price != null)
+                  SizedBox(
+  height: 20.h,
+  child: product.name.trim().isEmpty
+      ? const SizedBox.shrink()
+      : Marquee(
+          text: product.name,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: isDark ? AppColors.offWhite : AppColors.black,
+            fontWeight: FontWeight.w700,
+            fontSize: 14.sp,
+            height: 1.2,
+          ),
+          blankSpace: 40.w,
+          velocity: 40,
+          startAfter: const Duration(seconds: 2),
+        ),
+),
+                  if (product.prices.final_?.price != null)
+                    Column(
+                      children: [
+                        SizedBox(height: 8.h),
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: 8.w,
@@ -122,8 +161,8 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                    ],
-                  ),
+                      ],
+                    ),
                   SizedBox(height: 8.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,8 +170,9 @@ class ProductCard extends StatelessWidget {
                     children: [
                       _PriceBlock(product: product, isDark: isDark),
                       CardButton(
-                        onTap: () =>
-                            context.read<CartCubit>().addItem(product.id.toString()),
+                        onTap: () => context.read<CartCubit>().addItem(
+                          product.id.toString(),
+                        ),
                       ),
                     ],
                   ),

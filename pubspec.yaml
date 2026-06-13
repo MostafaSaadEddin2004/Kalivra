@@ -51,6 +51,7 @@ dependencies:
   cached_network_image: ^3.4.1
   html: ^0.15.5
   flutter_spinkit: ^5.2.2
+  marquee: ^2.3.0
 
 dev_dependencies:
   flutter_test:
