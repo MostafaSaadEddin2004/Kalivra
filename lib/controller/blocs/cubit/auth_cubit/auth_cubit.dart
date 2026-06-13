@@ -51,18 +51,15 @@ class AuthCubit extends Cubit<AuthState> {
           extra: AuthOtpArgs(email: phone, phone: phone, token: token),
         );
         emit(AuthFailed(message: 'Email is not verfied.'));
-      } 
-      else if (e == 'INCORRECT_PASSWORD') {
+      } else if (e == 'INCORRECT_PASSWORD') {
         emit(AuthFailed(message: l10n.incorrectPassword));
         CustomSnackBar.show(context, l10n.incorrectPassword);
-      }
-      else if (e == 'ACCOUNT_NOT_FOUND') {
+      } else if (e == 'ACCOUNT_NOT_FOUND') {
         emit(AuthFailed(message: l10n.accountNotFound));
-        CustomSnackBar.show(context,l10n.accountNotFound);
+        CustomSnackBar.show(context, l10n.accountNotFound);
       }
-        emit(AuthFailed(message: e.toString()));
-        CustomSnackBar.show(context, e.toString());
-      
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
     }
   }
 
@@ -86,7 +83,6 @@ class AuthCubit extends Cubit<AuthState> {
         CustomSnackBar.show(context, l10n.authOtpResendSuccess);
       }
     } catch (e) {
-     
       rethrow;
     }
   }
@@ -112,7 +108,6 @@ class AuthCubit extends Cubit<AuthState> {
       context.go(AppRoutes.home);
     } catch (e) {
       emit(AuthFailed(message: e.toString()));
-      
     }
   }
 
@@ -178,11 +173,13 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout({required BuildContext context}) async {
     emit(AuthLoading());
     try {
       await _customerApiService.logout();
       emit(AuthSuccessed(message: 'تم تسجيل الخروج بنجاح'));
+
+      context.go(AppRoutes.login);
     } catch (e) {
       emit(AuthFailed(message: e.toString()));
     }

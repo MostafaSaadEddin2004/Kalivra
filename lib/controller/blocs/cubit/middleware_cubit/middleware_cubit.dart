@@ -72,8 +72,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
                     title: AppLocalizations.of(context)!.signOut,
                     message: AppLocalizations.of(context)!.signOutConfirmation,
                     onConfirm: () {
-                      context.read<AuthCubit>().logout();
-                      context.go(AppRoutes.login);
+                      context.read<AuthCubit>().logout(context: context);
                     },
                   );
                 },
