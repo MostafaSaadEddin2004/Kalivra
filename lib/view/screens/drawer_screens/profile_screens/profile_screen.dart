@@ -218,18 +218,6 @@ class _ProfileState extends State<Profile> {
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        SizedBox(height: 8.h),
-                        FilledButton.icon(
-                          onPressed: () => context.push(AppRoutes.editProfile),
-                          icon: Icon(Icons.edit_rounded, size: 18.r),
-                          label: Text(l10n.editProfile),
-                          style: FilledButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 10.h,
-                            ),
-                          ),
-                        ),
                         SizedBox(height: 12.h),
                         if (state.customer.addressInformation?.officialTown !=
                             null)
@@ -249,7 +237,6 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 28.h),
                   ReferralCard(
                     referralCode: state.customer.referralCode ?? 'KHDD-5DKD9',
                   ),
