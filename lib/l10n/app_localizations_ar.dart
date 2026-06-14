@@ -1372,4 +1372,62 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get exitAppTitle => 'الخروج من التطبيق';
+
+  @override
+  String get associationLinkDraftsTitle => 'مسوداتي';
+
+  @override
+  String get associationLinkNoDrafts => 'لا توجد مسودات محفوظة بعد.';
+
+  @override
+  String get associationLinkNewDraft => 'طلب جديد';
+
+  @override
+  String get associationLinkDraftDeleted => 'تم حذف المسودة.';
+
+  @override
+  String get associationLinkDeleteDraftTitle => 'حذف المسودة';
+
+  @override
+  String get associationLinkDeleteDraftConfirm =>
+      'هل أنت متأكد من حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get associationLinkNoData => 'لا توجد بيانات';
+
+  @override
+  String get associationSubmittedRequestsTitle => 'الطلبات المرسلة';
+
+  @override
+  String get associationNoSubmittedRequests => 'لم تقم بإرسال أي طلبات بعد.';
+
+  @override
+  String get associationRequestNumber => 'طلب';
+
+  @override
+  String get associationRequestCreatedAt => 'تاريخ الإرسال';
+
+  @override
+  String get associationRequestApprovedAt => 'تاريخ القبول';
+
+  @override
+  String get associationRequestViewDocument => 'عرض الوثيقة';
+
+  @override
+  String get associationRequestStatusPending => 'قيد المراجعة';
+
+  @override
+  String get associationRequestStatusApproved => 'مقبول';
+
+  @override
+  String get associationRequestStatusRejected => 'مرفوض';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get draftsScreen => 'المسودات';
+
+  @override
+  String get linkRequestsScreen => 'طلبات الإنضمام';
 }

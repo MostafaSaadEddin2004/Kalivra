@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_drafts_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_submitted_requests_screen.dart';
 import 'package:kalivra/view/splash_screen.dart';
 import 'package:kalivra/view/screens/home/home_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/about_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/profile_screens/profile_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/contact_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_link_request_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_member_profile_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_link_request_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_member_profile_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/profile_screens/edit_profile_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/favorites_screen.dart';
 import 'package:kalivra/model/order/order_model.dart';
@@ -76,6 +78,9 @@ abstract class AppRoutes {
   static const String checkout = '/checkout';
   static const String associationLinkRequest = '/association-link-request';
   static const String associationMemberProfile = '/association-member-profile';
+  static const String associationDrafts = '/association-drafts';
+  static const String associationSubmittedRequests =
+      '/association-submitted-requests';
 }
 
 abstract class AppRoutesName {
@@ -114,6 +119,9 @@ abstract class AppRoutesName {
   static const String checkout = 'checkout';
   static const String associationLinkRequest = 'association-link-request';
   static const String associationMemberProfile = 'association-member-profile';
+  static const String associationDrafts = 'association-drafts';
+  static const String associationSubmittedRequests =
+      'association-submitted-requests';
 }
 
 abstract class AppRouter {
@@ -358,17 +366,28 @@ abstract class AppRouter {
             builder: (_, _) => const CheckoutScreen(),
           ),
           GoRoute(
-            path: AppRoutes.associationLinkRequest,
-            name: AppRoutesName.associationLinkRequest,
-            builder: (_, state) {
-              final resubmit = state.extra == true;
-              return AssociationLinkRequestScreen(resubmit: resubmit);
-            },
-          ),
-          GoRoute(
             path: AppRoutes.associationMemberProfile,
             name: AppRoutesName.associationMemberProfile,
             builder: (_, _) => const AssociationMemberProfileScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationLinkRequest,
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              return AssociationLinkRequestScreen(
+                draftId: extra?['draftId'] as String?,
+                resubmit: extra?['resubmit'] as bool? ?? false,
+              );
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.associationDrafts,
+            builder: (context, state) => const AssociationDraftsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationSubmittedRequests,
+            builder: (context, state) =>
+                const AssociationSubmittedRequestsScreen(),
           ),
         ],
       ),

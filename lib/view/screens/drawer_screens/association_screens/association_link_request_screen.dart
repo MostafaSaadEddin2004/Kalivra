@@ -21,9 +21,19 @@ import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
 class AssociationLinkRequestScreen extends StatefulWidget {
-  const AssociationLinkRequestScreen({super.key, this.resubmit = false});
+  const AssociationLinkRequestScreen({
+    super.key,
+    this.resubmit = false,
+    // When non-null the screen edits an existing local draft instead of
+    // starting a fresh form.
+    this.draftId,
+  });
 
   final bool resubmit;
+
+  /// ID of a local draft to load from [AssociationLinkDraftStore].
+  /// When provided [resubmit] is ignored.
+  final String? draftId;
 
   @override
   State<AssociationLinkRequestScreen> createState() =>
@@ -34,23 +44,15 @@ class _AssociationLinkRequestScreenState
     extends State<AssociationLinkRequestScreen> {
   static const int _maxAttachmentBytes = 15 * 1024 * 1024;
   static const List<String> _allowedExtensions = [
-    'jpg',
-    'jpeg',
-    'png',
-    'gif',
-    'webp',
-    'pdf',
-    'doc',
-    'docx',
-    'mp4',
-    'mov',
-    'avi',
-    'mkv',
+    'jpg', 'jpeg', 'png', 'gif', 'webp',
+    'pdf', 'doc', 'docx',
+    'mp4', 'mov', 'avi', 'mkv',
   ];
 
   final _formKey = GlobalKey<FormState>();
   final _draftStore = AssociationLinkDraftStore();
   final _apiService = AssociationLinkApiService();
+
   final _firstNameController = TextEditingController();
   final _kunyaController = TextEditingController();
   final _fatherNameController = TextEditingController();
@@ -72,10 +74,15 @@ class _AssociationLinkRequestScreenState
   final _totalPaymentsController = TextEditingController();
 
   final List<AssociationLinkAttachment> _attachments = [];
-  final Map<String, TextEditingController> _attachmentDescriptionControllers = {};
+  final Map<String, TextEditingController> _attachmentDescriptionControllers =
+      {};
   final List<void Function()> _draftListeners = [];
   Timer? _draftDebounce;
   String? _accountPhone;
+
+  /// The ID of the draft currently being edited. Null when creating new.
+  String? _currentDraftId;
+
   bool _isLoading = true;
   bool _isSubmitting = false;
   bool _isLocked = false;
@@ -90,8 +97,8 @@ class _AssociationLinkRequestScreenState
   @override
   void dispose() {
     _draftDebounce?.cancel();
-    for (final removeListener in _draftListeners) {
-      removeListener();
+    for (final remove in _draftListeners) {
+      remove();
     }
     _firstNameController.dispose();
     _kunyaController.dispose();
@@ -108,29 +115,19 @@ class _AssociationLinkRequestScreenState
     _projectNameController.dispose();
     _housingUnitController.dispose();
     _totalPaymentsController.dispose();
-    for (final controller in _attachmentDescriptionControllers.values) {
-      controller.dispose();
+    for (final c in _attachmentDescriptionControllers.values) {
+      c.dispose();
     }
     super.dispose();
   }
 
   void _registerDraftListeners() {
     final controllers = [
-      _firstNameController,
-      _kunyaController,
-      _fatherNameController,
-      _motherNameController,
-      _streetController,
-      _buildingController,
-      _permanentAddressController,
-      _mobileController,
-      _whatsAppController,
-      _emailController,
-      _membershipNumberController,
-      _priorityNumberController,
-      _projectNameController,
-      _housingUnitController,
-      _totalPaymentsController,
+      _firstNameController, _kunyaController, _fatherNameController,
+      _motherNameController, _streetController, _buildingController,
+      _permanentAddressController, _mobileController, _whatsAppController,
+      _emailController, _membershipNumberController, _priorityNumberController,
+      _projectNameController, _housingUnitController, _totalPaymentsController,
     ];
 
     for (final controller in controllers) {
@@ -141,6 +138,7 @@ class _AssociationLinkRequestScreenState
   }
 
   Future<void> _bootstrap() async {
+    // Pre-fill phone from authenticated account.
     final authState = context.read<AuthCubit>().state;
     if (authState is AuthFetchedData) {
       _accountPhone = authState.customer.phone;
@@ -149,26 +147,26 @@ class _AssociationLinkRequestScreenState
       }
     }
 
-    final submitted = await _draftStore.isSubmitted();
-    if (!widget.resubmit && submitted) {
-      if (!mounted) return;
-      setState(() {
-        _isLocked = true;
-        _isLoading = false;
-      });
-      return;
-    }
-
-    if (widget.resubmit) {
+    if (widget.draftId != null) {
+      // ── Open an existing local draft ──────────────────────────────────────
+      _currentDraftId = widget.draftId;
+      final entry = await _draftStore.loadDraft(widget.draftId!);
+      if (entry != null) _applyDraft(entry.draft);
+    } else if (widget.resubmit) {
+      // ── Resubmit: pull latest server request ──────────────────────────────
       await _draftStore.clearSubmitted();
       final latest = await _apiService.fetchLatestRequest();
-      if (latest != null) {
-        _applyDraft(latest);
-      }
+      if (latest != null) _applyDraft(latest);
     } else {
-      final draft = await _draftStore.loadDraft();
-      if (draft != null) {
-        _applyDraft(draft);
+      // ── Fresh form: check submitted lock ──────────────────────────────────
+      final submitted = await _draftStore.isSubmitted();
+      if (submitted) {
+        if (!mounted) return;
+        setState(() {
+          _isLocked = true;
+          _isLoading = false;
+        });
+        return;
       }
     }
 
@@ -181,8 +179,7 @@ class _AssociationLinkRequestScreenState
     _kunyaController.text = draft.kunya;
     _fatherNameController.text = draft.fatherName;
     _motherNameController.text = draft.motherName;
-    _selectedGovernorate =
-        draft.governorate.isEmpty ? null : draft.governorate;
+    _selectedGovernorate = draft.governorate.isEmpty ? null : draft.governorate;
     _selectedCity = draft.city.isEmpty ? null : draft.city;
     _selectedTown = draft.town.isEmpty ? null : draft.town;
     _selectedVillage = draft.municipality.isEmpty ? null : draft.municipality;
@@ -228,14 +225,22 @@ class _AssociationLinkRequestScreenState
   void _scheduleDraftSave() {
     if (_isLocked) return;
     _draftDebounce?.cancel();
-    _draftDebounce = Timer(const Duration(milliseconds: 800), () {
-      _draftStore.saveDraft(_currentDraft());
+    _draftDebounce = Timer(const Duration(milliseconds: 800), () async {
+      final entry = await _draftStore.saveDraft(
+        _currentDraft(),
+        id: _currentDraftId,
+      );
+      _currentDraftId = entry.id;
     });
   }
 
   Future<void> _saveDraft() async {
     if (_isLocked) return;
-    await _draftStore.saveDraft(_currentDraft());
+    final entry = await _draftStore.saveDraft(
+      _currentDraft(),
+      id: _currentDraftId,
+    );
+    _currentDraftId = entry.id;
     if (!mounted) return;
     CustomSnackBar.show(
       context,
@@ -244,12 +249,9 @@ class _AssociationLinkRequestScreenState
   }
 
   String _normalizePhone(String value) => value.replaceAll(RegExp(r'\D'), '');
-
   bool _isValidPhone(String value) => _normalizePhone(value).length >= 8;
-
-  bool _isValidEmail(String value) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim());
-  }
+  bool _isValidEmail(String value) =>
+      RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim());
 
   String? _validateRequiredName(String? value, AppLocalizations l10n) {
     if (value == null || value.trim().isEmpty) {
@@ -259,12 +261,8 @@ class _AssociationLinkRequestScreenState
   }
 
   String? _validateRequiredPhone(String? value, AppLocalizations l10n) {
-    if (value == null || value.trim().isEmpty) {
-      return l10n.enterPhone;
-    }
-    if (!_isValidPhone(value)) {
-      return l10n.invalidPhone;
-    }
+    if (value == null || value.trim().isEmpty) return l10n.enterPhone;
+    if (!_isValidPhone(value)) return l10n.invalidPhone;
     final accountPhone = _accountPhone;
     if (accountPhone != null &&
         accountPhone.trim().isNotEmpty &&
@@ -288,32 +286,20 @@ class _AssociationLinkRequestScreenState
 
   bool _hasIncompleteOptionalData() {
     final values = [
-      _kunyaController.text,
-      _fatherNameController.text,
-      _motherNameController.text,
-      _selectedGovernorate ?? '',
-      _selectedCity ?? '',
-      _selectedTown ?? '',
-      _selectedVillage ?? '',
-      _streetController.text,
-      _buildingController.text,
-      _permanentAddressController.text,
-      _whatsAppController.text,
-      _emailController.text,
-      _membershipNumberController.text,
-      _priorityNumberController.text,
-      _projectNameController.text,
-      _housingUnitController.text,
-      _totalPaymentsController.text,
+      _kunyaController.text, _fatherNameController.text,
+      _motherNameController.text, _selectedGovernorate ?? '',
+      _selectedCity ?? '', _selectedTown ?? '', _selectedVillage ?? '',
+      _streetController.text, _buildingController.text,
+      _permanentAddressController.text, _whatsAppController.text,
+      _emailController.text, _membershipNumberController.text,
+      _priorityNumberController.text, _projectNameController.text,
+      _housingUnitController.text, _totalPaymentsController.text,
     ];
-    return values.any((value) => value.trim().isEmpty);
+    return values.any((v) => v.trim().isEmpty);
   }
 
   Future<bool> _confirmIncompleteSubmission(AppLocalizations l10n) async {
-    if (!_hasIncompleteOptionalData() && _attachments.isNotEmpty) {
-      return true;
-    }
-
+    if (!_hasIncompleteOptionalData() && _attachments.isNotEmpty) return true;
     final shouldContinue = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -362,9 +348,7 @@ class _AssociationLinkRequestScreenState
   }
 
   void _onVillageChanged(String? value) {
-    setState(() {
-      _selectedVillage = value;
-    });
+    setState(() => _selectedVillage = value);
     _scheduleDraftSave();
   }
 
@@ -389,22 +373,16 @@ class _AssociationLinkRequestScreenState
         CustomSnackBar.show(context, l10n.associationLinkFileTooLarge);
         continue;
       }
-
       final extension = file.extension?.toLowerCase();
       if (extension == null || !_allowedExtensions.contains(extension)) {
         if (!mounted) return;
         CustomSnackBar.show(context, l10n.associationLinkUnsupportedFileType);
         continue;
       }
-
       setState(() {
-        final id = '${DateTime.now().microsecondsSinceEpoch}_${_attachments.length}';
-        _attachments.add(
-          AssociationLinkAttachment(
-            id: id,
-            file: attachmentFile,
-          ),
-        );
+        final id =
+            '${DateTime.now().microsecondsSinceEpoch}_${_attachments.length}';
+        _attachments.add(AssociationLinkAttachment(id: id, file: attachmentFile));
         _attachmentDescriptionControllers[id] = TextEditingController();
       });
     }
@@ -413,20 +391,17 @@ class _AssociationLinkRequestScreenState
   void _removeAttachment(String id) {
     if (_isLocked) return;
     setState(() {
-      _attachments.removeWhere((attachment) => attachment.id == id);
+      _attachments.removeWhere((a) => a.id == id);
       _attachmentDescriptionControllers.remove(id)?.dispose();
     });
   }
 
   List<AssociationLinkAttachment> _attachmentsWithDescriptions() {
     return _attachments
-        .map(
-          (attachment) => attachment.copyWith(
-            description:
-                _attachmentDescriptionControllers[attachment.id]?.text.trim() ??
-                    '',
-          ),
-        )
+        .map((a) => a.copyWith(
+              description:
+                  _attachmentDescriptionControllers[a.id]?.text.trim() ?? '',
+            ))
         .toList();
   }
 
@@ -434,7 +409,6 @@ class _AssociationLinkRequestScreenState
     if (_isLocked || _isSubmitting) return;
     final l10n = AppLocalizations.of(context)!;
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
     final shouldContinue = await _confirmIncompleteSubmission(l10n);
     if (!shouldContinue || !mounted) return;
 
@@ -444,8 +418,13 @@ class _AssociationLinkRequestScreenState
         draft: _currentDraft(),
         attachments: _attachmentsWithDescriptions(),
       );
-      await _draftStore.clearDraft();
+
+      // Remove the draft from local store once successfully submitted.
+      if (_currentDraftId != null) {
+        await _draftStore.deleteDraft(_currentDraftId!);
+      }
       await _draftStore.markSubmitted();
+
       if (!mounted) return;
       CustomSnackBar.show(context, l10n.associationLinkRequestSubmitted);
       context.pop();
@@ -459,18 +438,13 @@ class _AssociationLinkRequestScreenState
       if (!mounted) return;
       CustomSnackBar.show(context, e.toString());
     } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   Widget _fieldSpacer() => SizedBox(height: 14.h);
 
-  Widget _buildTwoColumnRow({
-    required Widget start,
-    required Widget end,
-  }) {
+  Widget _buildTwoColumnRow({required Widget start, required Widget end}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -528,19 +502,18 @@ class _AssociationLinkRequestScreenState
                             ),
                             child: Text(
                               l10n.associationLinkSubmittedLocked,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: hintColor,
-                              ),
+                              style: theme.textTheme.bodyMedium
+                                  ?.copyWith(color: hintColor),
                             ),
                           )
                         else
                           Text(
                             l10n.associationLinkRequestHint,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: hintColor,
-                            ),
+                            style: theme.textTheme.bodyMedium
+                                ?.copyWith(color: hintColor),
                           ),
                         SizedBox(height: 16.h),
+                        // ── Personal section ─────────────────────────────
                         AssociationFormSection(
                           title: l10n.associationLinkPersonalSection,
                           icon: Icons.person_outline_rounded,
@@ -550,8 +523,8 @@ class _AssociationLinkRequestScreenState
                               label: l10n.associationLinkFirstName,
                               enabled: !_isLocked,
                               textCapitalization: TextCapitalization.words,
-                              validator: (value) =>
-                                  _validateRequiredName(value, l10n),
+                              validator: (v) =>
+                                  _validateRequiredName(v, l10n),
                             ),
                             _fieldSpacer(),
                             AppTextField(
@@ -576,6 +549,7 @@ class _AssociationLinkRequestScreenState
                             ),
                           ],
                         ),
+                        // ── Contact section ──────────────────────────────
                         AssociationFormSection(
                           title: l10n.associationLinkContactSection,
                           icon: Icons.location_on_outlined,
@@ -596,8 +570,7 @@ class _AssociationLinkRequestScreenState
                                 value: _selectedCity,
                                 items: SyrianLocationCatalog.withSavedValue(
                                   SyrianLocationCatalog.cities(
-                                    _selectedGovernorate,
-                                  ),
+                                      _selectedGovernorate),
                                   _selectedCity,
                                 ),
                                 enabled: !_isLocked,
@@ -611,9 +584,7 @@ class _AssociationLinkRequestScreenState
                                 value: _selectedTown,
                                 items: SyrianLocationCatalog.withSavedValue(
                                   SyrianLocationCatalog.towns(
-                                    _selectedGovernorate,
-                                    _selectedCity,
-                                  ),
+                                      _selectedGovernorate, _selectedCity),
                                   _selectedTown,
                                 ),
                                 enabled: !_isLocked,
@@ -624,10 +595,9 @@ class _AssociationLinkRequestScreenState
                                 value: _selectedVillage,
                                 items: SyrianLocationCatalog.withSavedValue(
                                   SyrianLocationCatalog.villages(
-                                    _selectedGovernorate,
-                                    _selectedCity,
-                                    _selectedTown,
-                                  ),
+                                      _selectedGovernorate,
+                                      _selectedCity,
+                                      _selectedTown),
                                   _selectedVillage,
                                 ),
                                 enabled: !_isLocked,
@@ -659,8 +629,8 @@ class _AssociationLinkRequestScreenState
                               label: l10n.associationLinkMobile,
                               enabled: !_isLocked,
                               keyboardType: TextInputType.phone,
-                              validator: (value) =>
-                                  _validateRequiredPhone(value, l10n),
+                              validator: (v) =>
+                                  _validateRequiredPhone(v, l10n),
                             ),
                             _fieldSpacer(),
                             AppTextField(
@@ -668,8 +638,8 @@ class _AssociationLinkRequestScreenState
                               label: l10n.associationLinkWhatsApp,
                               enabled: !_isLocked,
                               keyboardType: TextInputType.phone,
-                              validator: (value) =>
-                                  _validateOptionalPhone(value, l10n),
+                              validator: (v) =>
+                                  _validateOptionalPhone(v, l10n),
                             ),
                             _fieldSpacer(),
                             AppTextField(
@@ -677,11 +647,12 @@ class _AssociationLinkRequestScreenState
                               label: l10n.associationLinkEmail,
                               enabled: !_isLocked,
                               keyboardType: TextInputType.emailAddress,
-                              validator: (value) =>
-                                  _validateOptionalEmail(value, l10n),
+                              validator: (v) =>
+                                  _validateOptionalEmail(v, l10n),
                             ),
                           ],
                         ),
+                        // ── Membership section ───────────────────────────
                         AssociationFormSection(
                           title: l10n.associationLinkMembershipSection,
                           icon: Icons.apartment_outlined,
@@ -708,12 +679,6 @@ class _AssociationLinkRequestScreenState
                             ),
                             _fieldSpacer(),
                             AppTextField(
-                              controller: _projectNameController,
-                              label: l10n.associationLinkProjectName,
-                              enabled: !_isLocked,
-                            ),
-                            _fieldSpacer(),
-                            AppTextField(
                               controller: _housingUnitController,
                               label: l10n.associationLinkHousingUnit,
                               enabled: !_isLocked,
@@ -727,6 +692,7 @@ class _AssociationLinkRequestScreenState
                             ),
                           ],
                         ),
+                        // ── Attachments section ──────────────────────────
                         AssociationFormSection(
                           title: l10n.associationLinkAttachmentsSection,
                           icon: Icons.attach_file_rounded,
@@ -734,9 +700,8 @@ class _AssociationLinkRequestScreenState
                             if (_attachments.isEmpty)
                               Text(
                                 l10n.associationLinkNoAttachments,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: hintColor,
-                                ),
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: hintColor),
                               ),
                             for (final attachment in _attachments) ...[
                               _fieldSpacer(),
@@ -746,7 +711,8 @@ class _AssociationLinkRequestScreenState
                                     _attachmentDescriptionControllers[
                                         attachment.id]!,
                                 enabled: !_isLocked,
-                                onDelete: () => _removeAttachment(attachment.id),
+                                onDelete: () =>
+                                    _removeAttachment(attachment.id),
                               ),
                             ],
                             if (!_isLocked) ...[
@@ -754,7 +720,8 @@ class _AssociationLinkRequestScreenState
                               OutlinedButton.icon(
                                 onPressed: _pickAttachment,
                                 icon: const Icon(Icons.add_rounded),
-                                label: Text(l10n.associationLinkAddAttachment),
+                                label:
+                                    Text(l10n.associationLinkAddAttachment),
                               ),
                             ],
                           ],
@@ -768,7 +735,8 @@ class _AssociationLinkRequestScreenState
                     top: false,
                     child: Container(
                       width: double.infinity,
-                      padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 12.h),
+                      padding:
+                          EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 12.h),
                       decoration: BoxDecoration(
                         color: theme.scaffoldBackgroundColor,
                         boxShadow: [
@@ -786,8 +754,7 @@ class _AssociationLinkRequestScreenState
                                 height: 22.h,
                                 width: 22.w,
                                 child: const CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
+                                    strokeWidth: 2),
                               )
                             : Text(l10n.associationLinkSubmit),
                       ),
@@ -798,6 +765,10 @@ class _AssociationLinkRequestScreenState
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Attachment tile (unchanged from original)
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _AttachmentTile extends StatelessWidget {
   const _AttachmentTile({

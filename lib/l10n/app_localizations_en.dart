@@ -1379,4 +1379,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get exitAppTitle => 'Exit app';
+
+  @override
+  String get associationLinkDraftsTitle => 'My Drafts';
+
+  @override
+  String get associationLinkNoDrafts => 'You have no saved drafts yet.';
+
+  @override
+  String get associationLinkNewDraft => 'New Request';
+
+  @override
+  String get associationLinkDraftDeleted => 'Draft deleted.';
+
+  @override
+  String get associationLinkDeleteDraftTitle => 'Delete Draft';
+
+  @override
+  String get associationLinkDeleteDraftConfirm =>
+      'Are you sure you want to delete this draft? This action cannot be undone.';
+
+  @override
+  String get associationLinkNoData => 'No data';
+
+  @override
+  String get associationSubmittedRequestsTitle => 'Submitted Requests';
+
+  @override
+  String get associationNoSubmittedRequests =>
+      'You haven\'t submitted any requests yet.';
+
+  @override
+  String get associationRequestNumber => 'Request';
+
+  @override
+  String get associationRequestCreatedAt => 'Submitted';
+
+  @override
+  String get associationRequestApprovedAt => 'Approved';
+
+  @override
+  String get associationRequestViewDocument => 'View Document';
+
+  @override
+  String get associationRequestStatusPending => 'Pending';
+
+  @override
+  String get associationRequestStatusApproved => 'Approved';
+
+  @override
+  String get associationRequestStatusRejected => 'Rejected';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get draftsScreen => 'Drafts Screen';
+
+  @override
+  String get linkRequestsScreen => 'Joining requests';
 }

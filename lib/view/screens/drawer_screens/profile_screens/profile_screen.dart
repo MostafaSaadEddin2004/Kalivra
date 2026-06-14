@@ -60,7 +60,8 @@ class _ProfileState extends State<Profile> {
                       ),
                       SizedBox(height: 24.h),
                       FilledButton(
-                        onPressed: () => AppRouter.openScreen(context, AppRoutes.login),
+                        onPressed: () =>
+                            AppRouter.openScreen(context, AppRoutes.login),
                         child: Text(l10n.signIn),
                       ),
                     ],
@@ -159,6 +160,33 @@ class _ProfileState extends State<Profile> {
                               context.push(AppRoutes.associationMemberProfile),
                           icon: Icon(Icons.groups_rounded, size: 20.r),
                           label: Text(l10n.associationPersonalProfileButton),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 12.h,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        OutlinedButton.icon(
+                          onPressed: () =>
+                              context.push(AppRoutes.associationDrafts),
+                          icon: Icon(Icons.drafts_rounded, size: 20.r),
+                          label: Text(l10n.draftsScreen),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                              vertical: 12.h,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        OutlinedButton.icon(
+                          onPressed: () => context.push(
+                            AppRoutes.associationSubmittedRequests,
+                          ),
+                          icon: Icon(Icons.upload_file_rounded, size: 20.r),
+                          label: Text(l10n.linkRequestsScreen),
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               horizontal: 20.w,

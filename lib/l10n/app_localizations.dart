@@ -2713,6 +2713,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exit app'**
   String get exitAppTitle;
+
+  /// No description provided for @associationLinkDraftsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My Drafts'**
+  String get associationLinkDraftsTitle;
+
+  /// No description provided for @associationLinkNoDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no saved drafts yet.'**
+  String get associationLinkNoDrafts;
+
+  /// No description provided for @associationLinkNewDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'New Request'**
+  String get associationLinkNewDraft;
+
+  /// No description provided for @associationLinkDraftDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft deleted.'**
+  String get associationLinkDraftDeleted;
+
+  /// No description provided for @associationLinkDeleteDraftTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Draft'**
+  String get associationLinkDeleteDraftTitle;
+
+  /// No description provided for @associationLinkDeleteDraftConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this draft? This action cannot be undone.'**
+  String get associationLinkDeleteDraftConfirm;
+
+  /// No description provided for @associationLinkNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get associationLinkNoData;
+
+  /// No description provided for @associationSubmittedRequestsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted Requests'**
+  String get associationSubmittedRequestsTitle;
+
+  /// No description provided for @associationNoSubmittedRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t submitted any requests yet.'**
+  String get associationNoSubmittedRequests;
+
+  /// No description provided for @associationRequestNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Request'**
+  String get associationRequestNumber;
+
+  /// No description provided for @associationRequestCreatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get associationRequestCreatedAt;
+
+  /// No description provided for @associationRequestApprovedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get associationRequestApprovedAt;
+
+  /// No description provided for @associationRequestViewDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'View Document'**
+  String get associationRequestViewDocument;
+
+  /// No description provided for @associationRequestStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get associationRequestStatusPending;
+
+  /// No description provided for @associationRequestStatusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get associationRequestStatusApproved;
+
+  /// No description provided for @associationRequestStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get associationRequestStatusRejected;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @draftsScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Drafts Screen'**
+  String get draftsScreen;
+
+  /// No description provided for @linkRequestsScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Joining requests'**
+  String get linkRequestsScreen;
 }
 
 class _AppLocalizationsDelegate

@@ -19,10 +19,12 @@ import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/screen_util_config.dart';
+import 'package:kalivra/model/services/association_link_draft_store.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AssociationLinkDraftStore().migrateLegacyDraft();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -30,7 +32,7 @@ void main() async {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create:  (context) => MiddlewareCubit(),),
+        BlocProvider(create: (context) => MiddlewareCubit()),
         BlocProvider(create: (context) => ThemeBloc()..add(GetThemeMode())),
         BlocProvider(create: (context) => LocaleBloc()..add(GetLocale())),
         BlocProvider(create: (context) => AuthCubit()),
@@ -63,33 +65,33 @@ class Main extends StatelessWidget {
       },
       builder: (context, child) => child!,
       child: Builder(
-          builder: (context) {
-            final theme = context.watch<ThemeBloc>().state;
-            final locale = context.watch<LocaleBloc>().state;
-            return MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              theme: AppTheme.light,
-              darkTheme: AppTheme.dark,
-              themeMode: theme is ThemeFetched ? theme.mode : ThemeMode.system,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: const [
-                Locale(PrefKeys.enLocaleKey),
-                Locale(PrefKeys.arLocaleKey),
-              ],
-              locale: locale is LocaleFetched
-                  ? locale.locale
-                  : LocaleBloc.localeFromSystem(
-                      ui.PlatformDispatcher.instance.locale,
-                    ),
-              routerConfig: AppRouter.router,
-            );
-          },
-        )
+        builder: (context) {
+          final theme = context.watch<ThemeBloc>().state;
+          final locale = context.watch<LocaleBloc>().state;
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: theme is ThemeFetched ? theme.mode : ThemeMode.system,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale(PrefKeys.enLocaleKey),
+              Locale(PrefKeys.arLocaleKey),
+            ],
+            locale: locale is LocaleFetched
+                ? locale.locale
+                : LocaleBloc.localeFromSystem(
+                    ui.PlatformDispatcher.instance.locale,
+                  ),
+            routerConfig: AppRouter.router,
+          );
+        },
+      ),
     );
   }
 }
