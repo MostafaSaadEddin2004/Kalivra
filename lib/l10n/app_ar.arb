@@ -10,7 +10,7 @@
   "drawerMyAccount": "حسابي",
   "drawerMyOrders": "طلباتي",
   "drawerFavorites": "المفضلة",
-  "drawerAssociationLinkRequest": "طلب الربط بالجمعية",
+  "associationLinkRequest": "طلب الربط بالجمعية",
   "drawerSettings": "الإعدادات",
   "drawerContactUs": "تواصل معنا",
   "drawerAboutApp": "حول التطبيق",
@@ -503,5 +503,7 @@
   "associationRequestStatusRejected": "مرفوض",
   "delete": "حذف",
   "draftsScreen": "المسودات",
-  "linkRequestsScreen": "طلبات الإنضمام"
+  "linkRequestsScreen": "طلبات الإنضمام",
+  "whatsappNumber": "رقم الواتساب",
+  "contactInfo": "معلومات الاتصال"
 }

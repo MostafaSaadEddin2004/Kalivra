@@ -6,7 +6,6 @@ import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/model/services/referral_repository.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -19,16 +18,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  late final Future<String> _referralCodeFuture;
-  bool _referralCardExpanded = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _referralCodeFuture = ReferralRepository().getMyReferralCode();
-    context.read<AuthCubit>().loadProfile();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -39,7 +28,94 @@ class _ProfileState extends State<Profile> {
     final valueColor = isDark ? AppColors.offWhite : AppColors.black;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.myAccount),
+      appBar: DrawerScreenAppBar(
+        title: l10n.myAccount,
+        actions: [
+          PopupMenuButton<_ProfileMenuAction>(
+            constraints: BoxConstraints(maxWidth: 200.w),
+            position: PopupMenuPosition.under,
+            icon: const Icon(Icons.menu_rounded),
+            onSelected: (value) {
+              switch (value) {
+                case _ProfileMenuAction.editProfile:
+                  context.push(AppRoutes.editProfile);
+                  break;
+                case _ProfileMenuAction.associationLinkRequest:
+                  context.push(AppRoutes.associationLinkRequest);
+                  break;
+                case _ProfileMenuAction.linkRequests:
+                  context.push(AppRoutes.associationSubmittedRequests);
+                  break;
+
+                case _ProfileMenuAction.drafts:
+                  context.push(AppRoutes.associationDrafts);
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _ProfileMenuAction.editProfile,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.edit_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.editProfile, style: textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _ProfileMenuAction.associationLinkRequest,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.link_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.associationLinkRequest,
+                      style: textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _ProfileMenuAction.linkRequests,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.upload_file_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.linkRequestsScreen, style: textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _ProfileMenuAction.drafts,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.drafts_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.draftsScreen, style: textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: BlocBuilder<AuthCubit, AuthState>(
         bloc: AuthCubit()
           ..loadProfile()
@@ -155,112 +231,65 @@ class _ProfileState extends State<Profile> {
                           ),
                         ),
                         SizedBox(height: 12.h),
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              context.push(AppRoutes.associationMemberProfile),
-                          icon: Icon(Icons.groups_rounded, size: 20.r),
-                          label: Text(l10n.associationPersonalProfileButton),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 12.h,
+                        if (state.customer.addressInformation?.officialTown !=
+                            null)
+                          OutlinedButton.icon(
+                            onPressed: () => context.push(
+                              AppRoutes.associationMemberProfile,
+                            ),
+                            icon: Icon(Icons.groups_rounded, size: 20.r),
+                            label: Text(l10n.associationPersonalProfileButton),
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 20.w,
+                                vertical: 12.h,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 12.h),
-                        OutlinedButton.icon(
-                          onPressed: () =>
-                              context.push(AppRoutes.associationDrafts),
-                          icon: Icon(Icons.drafts_rounded, size: 20.r),
-                          label: Text(l10n.draftsScreen),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 12.h,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        OutlinedButton.icon(
-                          onPressed: () => context.push(
-                            AppRoutes.associationSubmittedRequests,
-                          ),
-                          icon: Icon(Icons.upload_file_rounded, size: 20.r),
-                          label: Text(l10n.linkRequestsScreen),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                              vertical: 12.h,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
                   SizedBox(height: 28.h),
-                  FutureBuilder<String>(
-                    future: _referralCodeFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14.r),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(24.w),
-                            child: Center(
-                              child: SizedBox(
-                                width: 32.w,
-                                height: 32.h,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: theme.colorScheme.primary,
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                      final code = snapshot.data ?? '';
-                      if (code.isEmpty) return const SizedBox.shrink();
-                      final primary = theme.colorScheme.primary;
-                      return Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () => setState(
-                            () =>
-                                _referralCardExpanded = !_referralCardExpanded,
-                          ),
-                          borderRadius: BorderRadius.circular(20.r),
-                          child: AnimatedCrossFade(
-                            firstChild: _ReferralCardCollapsed(
-                              primary: primary,
-                              isDark: isDark,
-                              theme: theme,
-                            ),
-                            secondChild: ReferralQrCard(referralCode: code),
-                            crossFadeState: _referralCardExpanded
-                                ? CrossFadeState.showSecond
-                                : CrossFadeState.showFirst,
-                            duration: const Duration(milliseconds: 280),
-                            firstCurve: Curves.decelerate,
-                            secondCurve: Curves.easeInOut,
-                            sizeCurve: Curves.easeInOut,
-                          ),
-                        ),
-                      );
-                    },
+                  ReferralCard(
+                    referralCode: state.customer.referralCode ?? 'KHDD-5DKD9',
                   ),
                   SizedBox(height: 16.h),
                   _SectionCard(
                     title: l10n.accountInfo,
                     children: [
+                      state.customer.firstName!.isEmpty &&
+                              state.customer.lastName!.isEmpty
+                          ? _InfoRow(
+                              label: l10n.name,
+                              value: state.customer.name ?? '---',
+                              icon: Icons.person_outline_rounded,
+                            )
+                          : SizedBox(),
                       _InfoRow(
                         label: l10n.fullName,
-                        value: state.customer.firstName ?? '---',
+                        value:
+                            state.customer.firstName!.isEmpty &&
+                                state.customer.lastName!.isEmpty
+                            ? '---'
+                            : '${state.customer.firstName} ${state.customer.lastName}',
                         icon: Icons.person_outline_rounded,
                       ),
+                      _InfoRow(
+                        label: l10n.genderLabel,
+                        value: state.customer.gender ?? '---',
+                        icon: Icons.person_pin_outlined,
+                      ),
+                      _InfoRow(
+                        label: l10n.dateOfBirthLabel,
+                        value: state.customer.dateOfBirth ?? '---',
+                        icon: Icons.calendar_month,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  _SectionCard(
+                    title: l10n.contactInfo,
+                    children: [
                       _InfoRow(
                         label: l10n.email,
                         value: state.customer.email ?? '---',
@@ -268,50 +297,13 @@ class _ProfileState extends State<Profile> {
                       ),
                       _InfoRow(
                         label: l10n.mobileNumber,
-                        value: state.customer.phone ?? '---',
+                        value: state.customer.whatsappNumber ?? '---',
                         icon: Icons.phone_android_rounded,
                       ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _SectionCard(
-                    title: l10n.address,
-                    children: [
                       _InfoRow(
-                        label: l10n.mainAddress,
-                        value: state.customer.address ?? '—',
-                        icon: Icons.location_on_outlined,
-                      ),
-                      _InfoRow(
-                        label: l10n.profileCity,
-                        value: state.customer.city ?? '—',
-                        icon: Icons.location_city_outlined,
-                      ),
-                      _InfoRow(
-                        label: l10n.profileCountry,
-                        value: state.customer.country ?? '—',
-                        icon: Icons.public_outlined,
-                      ),
-                      _InfoRow(
-                        label: l10n.postalCode,
-                        value: state.customer.postalCode ?? '—',
-                        icon: Icons.markunread_mailbox_rounded,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16.h),
-                  _SectionCard(
-                    title: l10n.stats,
-                    children: [
-                      _StatRow(
-                        label: l10n.ordersCount,
-                        value: '12',
-                        icon: Icons.receipt_long_rounded,
-                      ),
-                      _StatRow(
-                        label: l10n.pendingOrders,
-                        value: '2',
-                        icon: Icons.hourglass_top_rounded,
+                        label: l10n.whatsappNumber,
+                        value: state.customer.phone ?? '---',
+                        icon: Icons.call,
                       ),
                     ],
                   ),
@@ -349,24 +341,26 @@ class _ReferralCardCollapsed extends StatelessWidget {
         side: BorderSide(color: primary.withValues(alpha: 0.25), width: 1.5),
       ),
       child: Padding(
-        padding: EdgeInsets.all(24.w),
+        padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
-            Icon(Icons.qr_code_2_rounded, size: 40.r, color: primary),
-            SizedBox(width: 16.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+            Flexible(
+              child: Column(spacing: 8.h,
                 children: [
-                  Text(
-                    AppLocalizations.of(context)!.referralCode,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: isDark ? AppColors.offWhite : AppColors.black,
-                      fontWeight: FontWeight.w800,
-                    ),
+                  Row(
+                    spacing: 8.w,
+                    children: [
+                      Icon(Icons.qr_code_2_rounded, size: 24.r, color: primary),
+                      Text(
+                        AppLocalizations.of(context)!.referralCode,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: isDark ? AppColors.offWhite : AppColors.black,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        softWrap: true,
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 6.h),
                   Text(
                     AppLocalizations.of(context)!.referralCodeHint,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -472,57 +466,50 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-class _StatRow extends StatelessWidget {
-  const _StatRow({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
+enum _ProfileMenuAction {
+  editProfile,
+  drafts,
+  linkRequests,
+  associationLinkRequest,
+}
 
-  final String label;
-  final String value;
-  final IconData icon;
+class ReferralCard extends StatefulWidget {
+  const ReferralCard({super.key, required this.referralCode});
+  final String referralCode;
 
+  @override
+  State<ReferralCard> createState() => _ReferralCardState();
+}
+
+bool _referralCardExpanded = false;
+
+class _ReferralCardState extends State<ReferralCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: 12.h),
-      child: Row(
-        children: [
-          Icon(
-            icon,
-            size: 22.r,
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
+    final primary = theme.colorScheme.primary;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () =>
+            setState(() => _referralCardExpanded = !_referralCardExpanded),
+        borderRadius: BorderRadius.circular(20.r),
+        child: AnimatedCrossFade(
+          firstChild: _ReferralCardCollapsed(
+            primary: primary,
+            isDark: isDark,
+            theme: theme,
           ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: isDark ? AppColors.offWhite : AppColors.black,
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.burgundy.withValues(alpha: 0.3)
-                  : AppColors.burgundy.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Text(
-              value,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
+          secondChild: ReferralQrCard(referralCode: widget.referralCode),
+          crossFadeState: _referralCardExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 280),
+          firstCurve: Curves.decelerate,
+          secondCurve: Curves.easeInOut,
+          sizeCurve: Curves.easeInOut,
+        ),
       ),
     );
   }

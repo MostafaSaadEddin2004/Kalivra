@@ -5,7 +5,8 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 
-class DrawerScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
+class DrawerScreenAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
   const DrawerScreenAppBar({
     super.key,
     required this.title,
@@ -21,7 +22,9 @@ class DrawerScreenAppBar extends StatelessWidget implements PreferredSizeWidget 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fgColor = theme.appBarTheme.foregroundColor ?? AppColors.offWhite;
+
+    final fgColor =
+        theme.appBarTheme.foregroundColor ?? AppColors.offWhite;
 
     return AppBar(
       elevation: 0,

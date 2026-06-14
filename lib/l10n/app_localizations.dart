@@ -146,11 +146,11 @@ abstract class AppLocalizations {
   /// **'Favorites'**
   String get drawerFavorites;
 
-  /// No description provided for @drawerAssociationLinkRequest.
+  /// No description provided for @associationLinkRequest.
   ///
   /// In en, this message translates to:
   /// **'Association Link Request'**
-  String get drawerAssociationLinkRequest;
+  String get associationLinkRequest;
 
   /// No description provided for @drawerSettings.
   ///
@@ -2827,6 +2827,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Joining requests'**
   String get linkRequestsScreen;
+
+  /// No description provided for @whatsappNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Whatsapp number'**
+  String get whatsappNumber;
+
+  /// No description provided for @contactInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact info'**
+  String get contactInfo;
 }
 
 class _AppLocalizationsDelegate

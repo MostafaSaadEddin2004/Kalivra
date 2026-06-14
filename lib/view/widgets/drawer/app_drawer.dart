@@ -52,16 +52,6 @@ class AppDrawer extends StatelessWidget {
                         AppRouter.openScreenWithPop(context, AppRoutes.favorites),
                   ),
                   DrawerItem(
-                    icon: Icons.link_rounded,
-                    label: AppLocalizations.of(
-                      context,
-                    )!.drawerAssociationLinkRequest,
-                    onTap: () => AppRouter.openScreenWithPop(
-                      context,
-                      AppRoutes.associationLinkRequest,
-                    ),
-                  ),
-                  DrawerItem(
                     icon: Icons.settings_outlined,
                     label: AppLocalizations.of(context)!.drawerSettings,
                     onTap: () =>

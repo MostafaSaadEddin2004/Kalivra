@@ -34,36 +34,43 @@ class ReferralQrCard extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(24.w),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
             Row(
-              children: [
-                Icon(
-                  Icons.qr_code_2_rounded,
-                  size: 26.r,
-                  color: primary,
-                ),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: Text(
-                    'كود الدعوة',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: isDark ? AppColors.offWhite : AppColors.black,
-                      fontWeight: FontWeight.w800,
-                    ),
+          children: [
+            Flexible(
+              child: Column(spacing: 8.h,
+                children: [
+                  Row(
+                    spacing: 8.w,
+                    children: [
+                      Icon(Icons.qr_code_2_rounded, size: 24.r, color: primary),
+                      Text(
+                        AppLocalizations.of(context)!.referralCode,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: isDark ? AppColors.offWhite : AppColors.black,
+                          fontWeight: FontWeight.w800,
+                        ),
+                        softWrap: true,
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              'شارك هذا الكود أو المسح مع الأصدقاء ليحصلوا على خصم عند التسجيل، وتستفيد أنت أيضاً',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: isDark ? AppColors.taupe : AppColors.burgundy,
-                height: 1.35,
+                  Text(
+                    AppLocalizations.of(context)!.referralCodeHint,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      height: 1.35,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
+            Icon(Icons.expand_less_rounded, size: 28.r, color: primary),
+          ],
+        ),
             SizedBox(height: 24.h),
             Container(
               padding: EdgeInsets.all(20.w),
@@ -112,28 +119,25 @@ class ReferralQrCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(width: 12.w),
-                  Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Clipboard.setData(ClipboardData(text: referralCode));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(AppLocalizations.of(context)!.codeCopied),
-                            behavior: SnackBarBehavior.floating,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                        onCopy?.call();
-                      },
-                      borderRadius: BorderRadius.circular(10.r),
-                      child: Padding(
-                        padding: EdgeInsets.all(8.w),
-                        child: Icon(
-                          Icons.copy_rounded,
-                          size: 22.r,
-                          color: primary,
+                  InkWell(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: referralCode));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(AppLocalizations.of(context)!.codeCopied),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 2),
                         ),
+                      );
+                      onCopy?.call();
+                    },
+                    borderRadius: BorderRadius.circular(10.r),
+                    child: Padding(
+                      padding: EdgeInsets.all(8.w),
+                      child: Icon(
+                        Icons.copy_rounded,
+                        size: 22.r,
+                        color: primary,
                       ),
                     ),
                   ),

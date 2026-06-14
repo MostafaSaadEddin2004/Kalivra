@@ -33,7 +33,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerFavorites => 'المفضلة';
 
   @override
-  String get drawerAssociationLinkRequest => 'طلب الربط بالجمعية';
+  String get associationLinkRequest => 'طلب الربط بالجمعية';
 
   @override
   String get drawerSettings => 'الإعدادات';
@@ -1430,4 +1430,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get linkRequestsScreen => 'طلبات الإنضمام';
+
+  @override
+  String get whatsappNumber => 'رقم الواتساب';
+
+  @override
+  String get contactInfo => 'معلومات الاتصال';
 }

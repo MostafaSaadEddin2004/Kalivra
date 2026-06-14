@@ -33,7 +33,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerFavorites => 'Favorites';
 
   @override
-  String get drawerAssociationLinkRequest => 'Association Link Request';
+  String get associationLinkRequest => 'Association Link Request';
 
   @override
   String get drawerSettings => 'Settings';
@@ -1438,4 +1438,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get linkRequestsScreen => 'Joining requests';
+
+  @override
+  String get whatsappNumber => 'Whatsapp number';
+
+  @override
+  String get contactInfo => 'Contact info';
 }

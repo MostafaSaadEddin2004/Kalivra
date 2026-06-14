@@ -11,7 +11,7 @@
   "drawerMyAccount": "My Account",
   "drawerMyOrders": "My Orders",
   "drawerFavorites": "Favorites",
-  "drawerAssociationLinkRequest": "Association Link Request",
+  "associationLinkRequest": "Association Link Request",
   "drawerSettings": "Settings",
   "drawerContactUs": "Contact Us",
   "drawerAboutApp": "About",
@@ -508,5 +508,7 @@
   "associationRequestStatusRejected": "Rejected",
   "delete": "Delete",
   "draftsScreen": "Drafts Screen",
-  "linkRequestsScreen": "Joining requests"
+  "linkRequestsScreen": "Joining requests",
+  "whatsappNumber": "Whatsapp number",
+  "contactInfo": "Contact info"
 }
