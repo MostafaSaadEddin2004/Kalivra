@@ -34,7 +34,7 @@ class TextSlider extends StatelessWidget {
               blankSpace: 40.w,
               velocity: sliderSpeed ?? 40,
               startAfter: const Duration(seconds: 2),
-              numberOfRounds: 3,
+              numberOfRounds: 3, 
             ),
     );
   }

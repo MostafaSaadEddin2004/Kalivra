@@ -6,8 +6,15 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
+import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/cubit/brand_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/checkout_cubit/checkout_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
@@ -27,6 +34,13 @@ void main() async {
         BlocProvider(create: (context) => ThemeBloc()..add(GetThemeMode())),
         BlocProvider(create: (context) => LocaleBloc()..add(GetLocale())),
         BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => CartCubit()),
+        BlocProvider(create: (context) => ProductsCubit()),
+        BlocProvider(create: (context) => BrandCubit()),
+        BlocProvider(create: (context) => OrdersCubit()),
+        BlocProvider(create: (context) => WishlistCubit()),
+        BlocProvider(create: (context) => CheckoutCubit()),
+        BlocProvider(create: (context) => NotificationsCubit()),
       ],
       child: const Main(),
     ),
