@@ -118,66 +118,10 @@ class BrandDetailsScreen extends StatelessWidget {
               ),
             ),
           ),
-          
+
           SizedBox(height: 24.h),
         ],
       ),
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.isDark,
-    this.maxLines = 1,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-  final bool isDark;
-  final int maxLines;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(
-          icon,
-          size: 22.r,
-          color: isDark ? AppColors.goldLight : AppColors.burgundy,
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: isDark ? AppColors.taupe : AppColors.burgundy,
-                ),
-              ),
-              SizedBox(height: 2.h),
-              Text(
-                value,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: isDark ? AppColors.offWhite : AppColors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: maxLines,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

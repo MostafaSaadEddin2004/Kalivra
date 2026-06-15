@@ -19,6 +19,18 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final authCubit = context.read<AuthCubit>();
+      authCubit
+        ..loadProfile()
+        ..checkAuthStatus(context);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
@@ -38,7 +50,13 @@ class _ProfileState extends State<Profile> {
             onSelected: (value) {
               switch (value) {
                 case _ProfileMenuAction.editProfile:
-                  context.push(AppRoutes.editProfile);
+                  final authState = context.read<AuthCubit>().state;
+                  if (authState is AuthFetchedData) {
+                    context.push(
+                      AppRoutes.editProfile,
+                      extra: authState.customer,
+                    );
+                  }
                   break;
                 case _ProfileMenuAction.associationLinkRequest:
                   context.push(AppRoutes.associationLinkRequest);
@@ -117,9 +135,6 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       body: BlocBuilder<AuthCubit, AuthState>(
-        bloc: AuthCubit()
-          ..loadProfile()
-          ..checkAuthStatus(context),
         builder: (context, state) {
           switch (state) {
             case UnAuthinticated():
@@ -191,6 +206,17 @@ class _ProfileState extends State<Profile> {
                 ),
               );
             case AuthFetchedData():
+              final customer = state.customer;
+              final firstName = customer.firstName ?? '';
+              final lastName = customer.lastName ?? '';
+              final fullName = '$firstName $lastName'.trim();
+              final displayName = fullName.isNotEmpty
+                  ? fullName
+                  : (customer.name?.trim().isNotEmpty == true
+                        ? customer.name!.trim()
+                        : '---');
+              final addressInfo = customer.addressInformation;
+
               return ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
@@ -212,15 +238,14 @@ class _ProfileState extends State<Profile> {
                         ),
                         SizedBox(height: 12.h),
                         Text(
-                          "${state.customer.firstName} ${state.customer.lastName}",
+                          displayName,
                           style: textTheme.headlineSmall?.copyWith(
                             color: valueColor,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         SizedBox(height: 12.h),
-                        if (state.customer.addressInformation?.officialTown !=
-                            null)
+                        if (addressInfo?.officialTown != null)
                           OutlinedButton.icon(
                             onPressed: () => context.push(
                               AppRoutes.associationMemberProfile,
@@ -244,31 +269,26 @@ class _ProfileState extends State<Profile> {
                   _SectionCard(
                     title: l10n.accountInfo,
                     children: [
-                      state.customer.firstName!.isEmpty &&
-                              state.customer.lastName!.isEmpty
+                      firstName.isEmpty && lastName.isEmpty
                           ? _InfoRow(
                               label: l10n.name,
-                              value: state.customer.name ?? '---',
+                              value: customer.name ?? '---',
                               icon: Icons.person_outline_rounded,
                             )
                           : SizedBox(),
                       _InfoRow(
                         label: l10n.fullName,
-                        value:
-                            state.customer.firstName!.isEmpty &&
-                                state.customer.lastName!.isEmpty
-                            ? '---'
-                            : '${state.customer.firstName} ${state.customer.lastName}',
+                        value: fullName.isEmpty ? '---' : fullName,
                         icon: Icons.person_outline_rounded,
                       ),
                       _InfoRow(
                         label: l10n.genderLabel,
-                        value: state.customer.gender ?? '---',
+                        value: customer.gender ?? '---',
                         icon: Icons.person_pin_outlined,
                       ),
                       _InfoRow(
                         label: l10n.dateOfBirthLabel,
-                        value: state.customer.dateOfBirth ?? '---',
+                        value: customer.dateOfBirth ?? '---',
                         icon: Icons.calendar_month,
                       ),
                     ],
@@ -279,17 +299,59 @@ class _ProfileState extends State<Profile> {
                     children: [
                       _InfoRow(
                         label: l10n.email,
-                        value: state.customer.email ?? '---',
+                        value: customer.email ?? '---',
                         icon: Icons.email_outlined,
                       ),
                       _InfoRow(
                         label: l10n.mobileNumber,
-                        value: state.customer.whatsappNumber ?? '---',
+                        value: customer.whatsappNumber ?? '---',
                         icon: Icons.phone_android_rounded,
                       ),
                       _InfoRow(
                         label: l10n.whatsappNumber,
-                        value: state.customer.phone ?? '---',
+                        value: customer.phone ?? '---',
+                        icon: Icons.call,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16.h),
+                  _SectionCard(
+                    title: l10n.userLocationInfo,
+                    children: [
+                      _InfoRow(
+                        label: l10n.associationLinkGovernorate,
+                        value: addressInfo?.officialGovernorate ?? '---',
+                        icon: Icons.email_outlined,
+                      ),
+                      _InfoRow(
+                        label: l10n.profileCity,
+                        value: addressInfo?.officialCity ?? '---',
+                        icon: Icons.phone_android_rounded,
+                      ),
+                      _InfoRow(
+                        label: l10n.associationLinkTown,
+                        value: addressInfo?.officialTown ?? '---',
+                        icon: Icons.call,
+                      ),
+                      _InfoRow(
+                        label: l10n.associationLinkVillage,
+                        value:
+                            addressInfo?.officialMunicipalityVillage ?? '---',
+                        icon: Icons.call,
+                      ),
+                      _InfoRow(
+                        label: l10n.associationLinkStreet,
+                        value: addressInfo?.officialStreet ?? '---',
+                        icon: Icons.phone_android_rounded,
+                      ),
+                      _InfoRow(
+                        label: l10n.associationLinkBuilding,
+                        value: addressInfo?.officialBuilding ?? '---',
+                        icon: Icons.call,
+                      ),
+                      _InfoRow(
+                        label: l10n.associationLinkPermanentAddress,
+                        value: addressInfo?.permanentAddress ?? '---',
                         icon: Icons.call,
                       ),
                     ],
@@ -332,7 +394,8 @@ class _ReferralCardCollapsed extends StatelessWidget {
         child: Row(
           children: [
             Flexible(
-              child: Column(spacing: 8.h,
+              child: Column(
+                spacing: 8.h,
                 children: [
                   Row(
                     spacing: 8.w,

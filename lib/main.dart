@@ -8,7 +8,7 @@ import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart'
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
-import 'package:kalivra/controller/blocs/cubit/cubit/brand_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/brand_cubit/brand_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_cubit.dart';

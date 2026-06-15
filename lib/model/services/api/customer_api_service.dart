@@ -186,8 +186,23 @@ class CustomerApiService {
     String? postalCode,
     String? firstName,
     String? lastName,
+    String? fatherName,
+    String? motherName,
+    String? nationalId,
+    String? whatsappNumber,
     String? gender,
     String? dateOfBirth,
+    int? permanentCapitalId,
+    int? permanentCityId,
+    int? permanentTownId,
+    int? permanentVillageId,
+    String? officialGovernorate,
+    String? officialCity,
+    String? officialTown,
+    String? officialMunicipalityVillage,
+    String? officialStreet,
+    String? officialBuilding,
+    String? permanentAddress,
     File? avatarFile,
   }) async {
     if (avatarFile != null) {
@@ -212,9 +227,36 @@ class CustomerApiService {
         'first_name': firstName.trim(),
       if (lastName != null && lastName.trim().isNotEmpty)
         'last_name': lastName.trim(),
+      if (fatherName != null && fatherName.trim().isNotEmpty)
+        'father_name': fatherName.trim(),
+      if (motherName != null && motherName.trim().isNotEmpty)
+        'mother_name': motherName.trim(),
+      if (nationalId != null && nationalId.trim().isNotEmpty)
+        'national_id': nationalId.trim(),
+      if (whatsappNumber != null && whatsappNumber.trim().isNotEmpty)
+        'whatsapp_number': whatsappNumber.trim(),
       if (gender != null && gender.trim().isNotEmpty) 'gender': gender.trim(),
       if (dateOfBirth != null && dateOfBirth.trim().isNotEmpty)
         'date_of_birth': dateOfBirth.trim(),
+      'permanent_capital_id': ?permanentCapitalId,
+      'permanent_city_id': ?permanentCityId,
+      'permanent_town_id': ?permanentTownId,
+      'permanent_village_id': ?permanentVillageId,
+      if (officialGovernorate != null && officialGovernorate.trim().isNotEmpty)
+        'official_governorate': officialGovernorate.trim(),
+      if (officialCity != null && officialCity.trim().isNotEmpty)
+        'official_city': officialCity.trim(),
+      if (officialTown != null && officialTown.trim().isNotEmpty)
+        'official_town': officialTown.trim(),
+      if (officialMunicipalityVillage != null &&
+          officialMunicipalityVillage.trim().isNotEmpty)
+        'official_municipality_village': officialMunicipalityVillage.trim(),
+      if (officialStreet != null && officialStreet.trim().isNotEmpty)
+        'official_street': officialStreet.trim(),
+      if (officialBuilding != null && officialBuilding.trim().isNotEmpty)
+        'official_building': officialBuilding.trim(),
+      if (permanentAddress != null && permanentAddress.trim().isNotEmpty)
+        'permanent_address': permanentAddress.trim(),
     };
 
     try {

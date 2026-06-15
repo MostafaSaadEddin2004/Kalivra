@@ -1444,4 +1444,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactInfo => 'Contact info';
+
+  @override
+  String get userLocationInfo => 'Location info';
 }

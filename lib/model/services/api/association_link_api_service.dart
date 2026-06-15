@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_link_request_draft.dart';
+import 'package:kalivra/model/association/association_member_profile.dart';
+import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
 
 class AssociationLinkApiService {
@@ -9,7 +11,7 @@ class AssociationLinkApiService {
 
   final DioClient _client = DioClient();
 
-  Future<AssociationLinkRequestDraft?> fetchLatestRequest() async {
+  Future<AssociationLinkRequestDraft?> fetchDraftsRequest() async {
     try {
       final res = await _client.get(
         'association-link-requests/latest',
@@ -28,6 +30,26 @@ class AssociationLinkApiService {
       return null;
     } on DioException {
       return null;
+    }
+  }
+
+  Future<List<AssociationRequestSummary>> fetchRequests() async {
+    try {
+      final res = await _client.get('association-link-requests');
+      final body = res.data;
+      if (body is! Map) return [];
+      final data = body['data'];
+      if (data is! List) return [];
+      return data
+          .whereType<Map>()
+          .map(
+            (e) => AssociationRequestSummary.fromJson(
+              Map<String, dynamic>.from(e),
+            ),
+          )
+          .toList();
+    } on DioException {
+      return [];
     }
   }
 
@@ -52,5 +74,31 @@ class AssociationLinkApiService {
       'association-link-requests',
       data: FormData.fromMap(fields),
     );
+  }
+
+  Future<AssociationMemberProfile?> fetchProfile() async {
+    try {
+      final res = await _client.get('association-member-profile');
+      final body = res.data;
+      if (body is! Map) return null;
+      final data = body['data'];
+      if (data is Map<String, dynamic>) {
+        return AssociationMemberProfile.fromJson(data);
+      }
+      if (data is Map) {
+        return AssociationMemberProfile.fromJson(
+          Map<String, dynamic>.from(data),
+        );
+      }
+    } on DioException catch (e) {
+      final code = e.response?.statusCode;
+      if (code != null && code != 404 && code != 403) {
+        rethrow;
+      }
+    }
+
+    final link = await AssociationLinkApiService().fetchDraftsRequest();
+    if (link == null) return null;
+    return AssociationMemberProfile.fromLinkRequest(link);
   }
 }

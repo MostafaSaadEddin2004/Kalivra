@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/model/customer/customer_api_model.dart';
 import 'package:kalivra/view/screens/drawer_screens/association_screens/association_drafts_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/association_screens/association_submitted_requests_screen.dart';
 import 'package:kalivra/view/splash_screen.dart';
@@ -192,7 +193,13 @@ abstract class AppRouter {
           GoRoute(
             path: AppRoutes.editProfile,
             name: AppRoutesName.editProfile,
-            builder: (_, _) => const EditProfileScreen(),
+            builder: (context, state) {
+              final userInfo = state.extra as CustomerApiModel?;
+              if (userInfo == null) {
+                return const Profile();
+              }
+              return EditProfileScreen(userInfo: userInfo);
+            },
           ),
           GoRoute(
             path: AppRoutes.orders,

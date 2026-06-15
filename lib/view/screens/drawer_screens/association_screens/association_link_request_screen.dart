@@ -155,7 +155,7 @@ class _AssociationLinkRequestScreenState
     } else if (widget.resubmit) {
       // ── Resubmit: pull latest server request ──────────────────────────────
       await _draftStore.clearSubmitted();
-      final latest = await _apiService.fetchLatestRequest();
+      final latest = await _apiService.fetchDraftsRequest();
       if (latest != null) _applyDraft(latest);
     } else {
       // ── Fresh form: check submitted lock ──────────────────────────────────

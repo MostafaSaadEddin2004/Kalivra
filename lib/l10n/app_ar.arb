@@ -505,5 +505,6 @@
   "draftsScreen": "المسودات",
   "linkRequestsScreen": "طلبات الإنضمام",
   "whatsappNumber": "رقم الواتساب",
-  "contactInfo": "معلومات الاتصال"
+  "contactInfo": "معلومات الاتصال",
+  "userLocationInfo": "معلومات الموقع"
 }

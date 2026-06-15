@@ -510,5 +510,6 @@
   "draftsScreen": "Drafts Screen",
   "linkRequestsScreen": "Joining requests",
   "whatsappNumber": "Whatsapp number",
-  "contactInfo": "Contact info"
+  "contactInfo": "Contact info",
+  "userLocationInfo": "Location info"
 }

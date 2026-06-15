@@ -6,7 +6,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
-import 'package:kalivra/model/services/api/association_requests_api_service.dart';
+import 'package:kalivra/model/services/api/association_link_api_service.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
 class AssociationSubmittedRequestsScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class AssociationSubmittedRequestsScreen extends StatefulWidget {
 
 class _AssociationSubmittedRequestsScreenState
     extends State<AssociationSubmittedRequestsScreen> {
-  final _api = AssociationRequestsApiService();
+  final _api = AssociationLinkApiService();
   late Future<List<AssociationRequestSummary>> _requestsFuture;
 
   @override
@@ -37,9 +37,7 @@ class _AssociationSubmittedRequestsScreenState
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(
-        title: l10n.associationSubmittedRequestsTitle,
-      ),
+      appBar: DrawerScreenAppBar(title: l10n.associationSubmittedRequestsTitle),
       body: FutureBuilder<List<AssociationRequestSummary>>(
         future: _requestsFuture,
         builder: (context, snapshot) {
@@ -97,15 +95,13 @@ class _RequestCard extends StatelessWidget {
         ? AppColors.taupe.withValues(alpha: 0.2)
         : AppColors.burgundy.withValues(alpha: 0.12);
 
-    final createdLabel = DateFormat.yMMMd()
-        .add_jm()
-        .format(request.createdAt.toLocal());
+    final createdLabel = DateFormat.yMMMd().add_jm().format(
+      request.createdAt.toLocal(),
+    );
 
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
-      color: isDark
-          ? AppColors.burgundy.withValues(alpha: 0.08)
-          : Colors.white,
+      color: isDark ? AppColors.burgundy.withValues(alpha: 0.08) : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
         side: BorderSide(color: borderColor),
@@ -174,13 +170,14 @@ class _RequestCard extends StatelessWidget {
                       request.documentUrl!.isNotEmpty) ...[
                     SizedBox(height: 8.h),
                     OutlinedButton.icon(
-                      onPressed: () {
-                      },
+                      onPressed: () {},
                       icon: Icon(Icons.open_in_new_rounded, size: 16.r),
                       label: Text(l10n.associationRequestViewDocument),
                       style: OutlinedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 12.w, vertical: 6.h),
+                          horizontal: 12.w,
+                          vertical: 6.h,
+                        ),
                         textStyle: TextStyle(fontSize: 12.sp),
                       ),
                     ),
@@ -289,8 +286,9 @@ class _InfoLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isDark ? AppColors.taupe : AppColors.burgundy.withValues(alpha: 0.7);
+    final color = isDark
+        ? AppColors.taupe
+        : AppColors.burgundy.withValues(alpha: 0.7);
 
     return Row(
       children: [
@@ -299,10 +297,7 @@ class _InfoLine extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: TextStyle(
-              fontSize: 12.sp,
-              color: color,
-            ),
+            style: TextStyle(fontSize: 12.sp, color: color),
           ),
         ),
       ],
@@ -334,8 +329,9 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.inbox_outlined,
               size: 72.r,
-              color: (isDark ? AppColors.taupe : AppColors.burgundy)
-                  .withValues(alpha: 0.4),
+              color: (isDark ? AppColors.taupe : AppColors.burgundy).withValues(
+                alpha: 0.4,
+              ),
             ),
             SizedBox(height: 20.h),
             Text(
@@ -378,8 +374,11 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline_rounded,
-                size: 56.r, color: theme.colorScheme.error),
+            Icon(
+              Icons.error_outline_rounded,
+              size: 56.r,
+              color: theme.colorScheme.error,
+            ),
             SizedBox(height: 16.h),
             Text(
               l10n.associationMemberLoadFailed,

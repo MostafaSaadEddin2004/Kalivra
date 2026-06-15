@@ -7,13 +7,11 @@ class CustomerApiModel {
     this.email,
     this.phone,
     this.whatsappNumber,
-    this.address,
     this.city,
     this.country,
     this.postalCode,
     this.gender,
     this.dateOfBirth,
-    this.avatar,
     this.imageUrl,
     this.status,
     this.isVerified,
@@ -34,13 +32,11 @@ class CustomerApiModel {
   final String? email;
   final String? phone;
   final String? whatsappNumber;
-  final String? address;
   final String? city;
   final String? country;
   final String? postalCode;
   final String? gender;
   final String? dateOfBirth;
-  final String? avatar;
   final String? imageUrl;
   final int? status;
   final bool? isVerified;
@@ -53,7 +49,19 @@ class CustomerApiModel {
   final CustomerContactInformation? contactInformation;
   final CustomerAddressInformation? addressInformation;
 
+  String? get address =>
+      addressInformation?.permanentAddress ??
+      addressInformation?.formattedAddress;
+
+  String? get avatar => imageUrl;
+
   String? get displayImageUrl => imageUrl ?? avatar;
+
+  String? get fatherName => personalInformation?.fatherName;
+
+  String? get motherName => personalInformation?.motherName;
+
+  String? get nationalId => personalInformation?.nationalId;
 
   factory CustomerApiModel.fromJson(Map<String, dynamic> json) {
     final personal = _mapOrNull(
@@ -69,30 +77,23 @@ class CustomerApiModel {
       CustomerAddressInformation.fromJson,
     );
 
-    final imageUrl = _nullableString(json['image_url']) ??
-        personal?.imageUrl ??
-        _nullableString(json['avatar']);
+    final imageUrl = _nullableString(json['image_url']) ?? personal?.imageUrl;
 
     return CustomerApiModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
-      firstName:
-          _nullableString(json['first_name']) ?? personal?.firstName,
+      firstName: _nullableString(json['first_name']) ?? personal?.firstName,
       lastName: _nullableString(json['last_name']) ?? personal?.lastName,
       name: _nullableString(json['name']) ?? personal?.name,
       email: _nullableString(json['email']) ?? contact?.email,
       phone: _nullableString(json['phone']) ?? contact?.phone,
       whatsappNumber:
           _nullableString(json['whatsapp_number']) ?? contact?.whatsappNumber,
-      address: _nullableString(json['address']) ??
-          addressInfo?.permanentAddress ??
-          addressInfo?.formattedAddress,
       city: _nullableString(json['city']) ?? addressInfo?.officialCity,
       country: _nullableString(json['country']),
       postalCode: _nullableString(json['postal_code']),
       gender: _nullableString(json['gender']) ?? personal?.gender,
       dateOfBirth:
           _nullableString(json['date_of_birth']) ?? personal?.dateOfBirth,
-      avatar: imageUrl,
       imageUrl: imageUrl,
       status: _parseStatus(json['status']),
       isVerified: json['is_verified'] as bool?,
@@ -111,6 +112,12 @@ class CustomerApiModel {
     if (value == null) return null;
     final text = value.toString().trim();
     return text.isEmpty ? null : text;
+  }
+
+  static int? _nullableInt(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString().trim());
   }
 
   static int? _parseStatus(dynamic value) {
@@ -182,14 +189,17 @@ class CustomerContactInformation {
     return CustomerContactInformation(
       email: CustomerApiModel._nullableString(json['email']),
       phone: CustomerApiModel._nullableString(json['phone']),
-      whatsappNumber:
-          CustomerApiModel._nullableString(json['whatsapp_number']),
+      whatsappNumber: CustomerApiModel._nullableString(json['whatsapp_number']),
     );
   }
 }
 
 class CustomerAddressInformation {
   const CustomerAddressInformation({
+    this.permanentCapitalId,
+    this.permanentCityId,
+    this.permanentTownId,
+    this.permanentVillageId,
     this.officialGovernorate,
     this.officialCity,
     this.officialTown,
@@ -199,6 +209,10 @@ class CustomerAddressInformation {
     this.permanentAddress,
   });
 
+  final int? permanentCapitalId;
+  final int? permanentCityId;
+  final int? permanentTownId;
+  final int? permanentVillageId;
   final String? officialGovernorate;
   final String? officialCity;
   final String? officialTown;
@@ -221,19 +235,29 @@ class CustomerAddressInformation {
 
   factory CustomerAddressInformation.fromJson(Map<String, dynamic> json) {
     return CustomerAddressInformation(
-      officialGovernorate:
-          CustomerApiModel._nullableString(json['official_governorate']),
+      permanentCapitalId: CustomerApiModel._nullableInt(
+        json['permanent_capital_id'],
+      ),
+      permanentCityId: CustomerApiModel._nullableInt(json['permanent_city_id']),
+      permanentTownId: CustomerApiModel._nullableInt(json['permanent_town_id']),
+      permanentVillageId: CustomerApiModel._nullableInt(
+        json['permanent_village_id'],
+      ),
+      officialGovernorate: CustomerApiModel._nullableString(
+        json['official_governorate'],
+      ),
       officialCity: CustomerApiModel._nullableString(json['official_city']),
       officialTown: CustomerApiModel._nullableString(json['official_town']),
       officialMunicipalityVillage: CustomerApiModel._nullableString(
         json['official_municipality_village'],
       ),
-      officialStreet:
-          CustomerApiModel._nullableString(json['official_street']),
-      officialBuilding:
-          CustomerApiModel._nullableString(json['official_building']),
-      permanentAddress:
-          CustomerApiModel._nullableString(json['permanent_address']),
+      officialStreet: CustomerApiModel._nullableString(json['official_street']),
+      officialBuilding: CustomerApiModel._nullableString(
+        json['official_building'],
+      ),
+      permanentAddress: CustomerApiModel._nullableString(
+        json['permanent_address'],
+      ),
     );
   }
 }

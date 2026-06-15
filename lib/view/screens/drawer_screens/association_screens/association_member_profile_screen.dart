@@ -5,7 +5,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_member_profile.dart';
-import 'package:kalivra/model/services/api/association_member_profile_api_service.dart';
+import 'package:kalivra/model/services/api/association_link_api_service.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
@@ -19,7 +19,7 @@ class AssociationMemberProfileScreen extends StatefulWidget {
 
 class _AssociationMemberProfileScreenState
     extends State<AssociationMemberProfileScreen> {
-  final _api = AssociationMemberProfileApiService();
+  final _api = AssociationLinkApiService();
   late Future<AssociationMemberProfile?> _profileFuture;
   int? _selectedYear;
 
@@ -220,16 +220,16 @@ class _AssociationMemberProfileScreenState
                   rows: filteredInstallments.isEmpty
                       ? const []
                       : filteredInstallments
-                          .map(
-                            (item) => [
-                              item.label,
-                              _formatMoney(item.amount),
-                              item.date,
-                              item.status,
-                              item.notes,
-                            ],
-                          )
-                          .toList(),
+                            .map(
+                              (item) => [
+                                item.label,
+                                _formatMoney(item.amount),
+                                item.date,
+                                item.status,
+                                item.notes,
+                              ],
+                            )
+                            .toList(),
                   headers: [
                     l10n.associationMemberPayment,
                     l10n.associationMemberAmount,
@@ -245,17 +245,17 @@ class _AssociationMemberProfileScreenState
                   rows: filteredOtherPayments.isEmpty
                       ? const []
                       : filteredOtherPayments
-                          .map(
-                            (item) => [
-                              _formatMoney(item.amount),
-                              item.date,
-                              item.method,
-                              item.bank,
-                              item.receipt,
-                              item.notes,
-                            ],
-                          )
-                          .toList(),
+                            .map(
+                              (item) => [
+                                _formatMoney(item.amount),
+                                item.date,
+                                item.method,
+                                item.bank,
+                                item.receipt,
+                                item.notes,
+                              ],
+                            )
+                            .toList(),
                   headers: [
                     l10n.associationMemberAmount,
                     l10n.associationMemberDate,
@@ -333,28 +333,28 @@ class _AssociationMemberProfileScreenState
                           ),
                         ]
                       : profile.attachments
-                          .map(
-                            (item) => ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Icon(
-                                _attachmentIcon(item.type),
-                                color: isDark
-                                    ? AppColors.goldLight
-                                    : AppColors.burgundy,
+                            .map(
+                              (item) => ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Icon(
+                                  _attachmentIcon(item.type),
+                                  color: isDark
+                                      ? AppColors.goldLight
+                                      : AppColors.burgundy,
+                                ),
+                                title: Text(
+                                  item.name.isEmpty ? item.type : item.name,
+                                ),
+                                subtitle: item.url.isEmpty
+                                    ? null
+                                    : Text(
+                                        item.url,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                               ),
-                              title: Text(
-                                item.name.isEmpty ? item.type : item.name,
-                              ),
-                              subtitle: item.url.isEmpty
-                                  ? null
-                                  : Text(
-                                      item.url,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                            ),
-                          )
-                          .toList(),
+                            )
+                            .toList(),
                 ),
               ],
             ),
@@ -405,10 +405,7 @@ class _AssociationMemberProfileScreenState
 }
 
 class _ProfileHeaderCard extends StatelessWidget {
-  const _ProfileHeaderCard({
-    required this.profile,
-    required this.isDark,
-  });
+  const _ProfileHeaderCard({required this.profile, required this.isDark});
 
   final AssociationMemberProfile profile;
   final bool isDark;
@@ -623,9 +620,7 @@ class _SummaryTile extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 10.h),
       child: Row(
         children: [
-          Expanded(
-            child: Text(label, style: theme.textTheme.bodyMedium),
-          ),
+          Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           Text(
             value,
             style: theme.textTheme.titleMedium?.copyWith(
@@ -670,10 +665,9 @@ class _DataSection extends StatelessWidget {
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12.r),
-                color: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerHighest
-                    .withValues(alpha: 0.35),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
               ),
               child: Column(
                 children: List.generate(headers.length, (index) {
@@ -694,9 +688,7 @@ class _DataSection extends StatelessWidget {
                         Expanded(
                           child: Text(
                             cell,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
+                            style: Theme.of(context).textTheme.bodyMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                         ),

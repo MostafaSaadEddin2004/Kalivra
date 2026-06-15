@@ -2839,6 +2839,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Contact info'**
   String get contactInfo;
+
+  /// No description provided for @userLocationInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Location info'**
+  String get userLocationInfo;
 }
 
 class _AppLocalizationsDelegate

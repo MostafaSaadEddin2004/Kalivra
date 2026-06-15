@@ -1436,4 +1436,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get contactInfo => 'معلومات الاتصال';
+
+  @override
+  String get userLocationInfo => 'معلومات الموقع';
 }
