@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -85,8 +84,6 @@ class _AssociationLinkRequestScreenState
   final List<AssociationLinkAttachment> _attachments = [];
   final Map<String, TextEditingController> _attachmentDescriptionControllers =
       {};
-  final List<void Function()> _draftListeners = [];
-  Timer? _draftDebounce;
   String? _accountPhone;
 
   /// The ID of the draft currently being edited. Null when creating new.
@@ -99,16 +96,11 @@ class _AssociationLinkRequestScreenState
   @override
   void initState() {
     super.initState();
-    _registerDraftListeners();
     WidgetsBinding.instance.addPostFrameCallback((_) => _bootstrap());
   }
 
   @override
   void dispose() {
-    _draftDebounce?.cancel();
-    for (final remove in _draftListeners) {
-      remove();
-    }
     _firstNameController.dispose();
     _kunyaController.dispose();
     _fatherNameController.dispose();
@@ -128,32 +120,6 @@ class _AssociationLinkRequestScreenState
       c.dispose();
     }
     super.dispose();
-  }
-
-  void _registerDraftListeners() {
-    final controllers = [
-      _firstNameController,
-      _kunyaController,
-      _fatherNameController,
-      _motherNameController,
-      _streetController,
-      _buildingController,
-      _permanentAddressController,
-      _mobileController,
-      _whatsAppController,
-      _emailController,
-      _membershipNumberController,
-      _priorityNumberController,
-      _projectNameController,
-      _housingUnitController,
-      _totalPaymentsController,
-    ];
-
-    for (final controller in controllers) {
-      void onChanged() => _scheduleDraftSave();
-      controller.addListener(onChanged);
-      _draftListeners.add(() => controller.removeListener(onChanged));
-    }
   }
 
   Future<void> _bootstrap() async {
@@ -239,18 +205,6 @@ class _AssociationLinkRequestScreenState
       housingUnit: _housingUnitController.text.trim(),
       totalPayments: _totalPaymentsController.text.trim(),
     );
-  }
-
-  void _scheduleDraftSave() {
-    if (_isLocked) return;
-    _draftDebounce?.cancel();
-    _draftDebounce = Timer(const Duration(milliseconds: 800), () async {
-      final entry = await _draftStore.saveDraft(
-        _currentDraft(),
-        id: _currentDraftId,
-      );
-      _currentDraftId = entry.id;
-    });
   }
 
   Future<void> _saveDraft() async {
@@ -355,7 +309,6 @@ class _AssociationLinkRequestScreenState
       _selectedTown = null;
       _selectedVillage = null;
     });
-    _scheduleDraftSave();
   }
 
   void _onCityChanged(String? value) {
@@ -364,7 +317,6 @@ class _AssociationLinkRequestScreenState
       _selectedTown = null;
       _selectedVillage = null;
     });
-    _scheduleDraftSave();
   }
 
   void _onTownChanged(String? value) {
@@ -372,12 +324,10 @@ class _AssociationLinkRequestScreenState
       _selectedTown = value;
       _selectedVillage = null;
     });
-    _scheduleDraftSave();
   }
 
   void _onVillageChanged(String? value) {
     setState(() => _selectedVillage = value);
-    _scheduleDraftSave();
   }
 
   Future<void> _pickAttachment() async {

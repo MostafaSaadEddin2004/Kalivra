@@ -30,8 +30,11 @@ class _AssociationMemberProfileScreenState
   }
 
   Future<void> _reload() async {
-    setState(() => _profileFuture = _api.fetchProfile());
-    await _profileFuture;
+    final future = _api.fetchProfile();
+    setState(() {
+      _profileFuture = future;
+    });
+    await future;
   }
 
   @override

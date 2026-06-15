@@ -13,7 +13,7 @@ class AssociationLinkApiService {
 
   Future<AssociationLinkRequestDraft?> fetchDraftsRequests() async {
     try {
-      final res = await _client.get('association-link-requests/latest');
+      final res = await _client.get('customer/association/requests/latest');
       final body = res.data;
       if (body is! Map) return null;
       final data = body['data'];
@@ -26,7 +26,7 @@ class AssociationLinkApiService {
         );
       }
       return null;
-    } on DioException {
+    } catch (_) {
       return null;
     }
   }
@@ -46,7 +46,7 @@ class AssociationLinkApiService {
             ),
           )
           .toList();
-    } on DioException {
+    } catch (_) {
       return [];
     }
   }
@@ -108,11 +108,9 @@ class AssociationLinkApiService {
           Map<String, dynamic>.from(data),
         );
       }
-    } on DioException catch (e) {
-      final code = e.response?.statusCode;
-      if (code != null && code != 404 && code != 403) {
-        rethrow;
-      }
+    } catch (_) {
+      // Fall back to the latest link request when there is no member profile yet
+      // or when the API client returns a transformed error message.
     }
 
     final link = await AssociationLinkApiService().fetchDraftsRequests();

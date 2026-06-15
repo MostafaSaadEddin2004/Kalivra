@@ -28,8 +28,12 @@ class _AssociationSubmittedRequestsScreenState
     _reload();
   }
 
-  void _reload() {
-    setState(() => _requestsFuture = _api.fetchRequests());
+  Future<void> _reload() async {
+    final future = _api.fetchRequests();
+    setState(() {
+      _requestsFuture = future;
+    });
+    await future;
   }
 
   @override
@@ -55,13 +59,13 @@ class _AssociationSubmittedRequestsScreenState
             return _EmptyState(
               onNewRequest: () async {
                 await context.push(AppRoutes.associationLinkRequest);
-                _reload();
+                await _reload();
               },
             );
           }
 
           return RefreshIndicator(
-            onRefresh: () async => _reload(),
+            onRefresh: _reload,
             child: ListView.builder(
               padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
               itemCount: requests.length,

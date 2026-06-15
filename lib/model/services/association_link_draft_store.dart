@@ -15,7 +15,6 @@ class AssociationLinkDraftEntry {
   final AssociationLinkRequestDraft draft;
   final DateTime savedAt;
 
-  /// A human-readable label derived from the draft's content.
   String get label {
     final parts = [
       draft.firstName,
@@ -25,10 +24,10 @@ class AssociationLinkDraftEntry {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'draft': draft.toJson(),
-        'savedAt': savedAt.toIso8601String(),
-      };
+    'id': id,
+    'draft': draft.toJson(),
+    'savedAt': savedAt.toIso8601String(),
+  };
 
   factory AssociationLinkDraftEntry.fromJson(Map<String, dynamic> json) {
     return AssociationLinkDraftEntry(
@@ -36,16 +35,14 @@ class AssociationLinkDraftEntry {
       draft: AssociationLinkRequestDraft.fromJson(
         Map<String, dynamic>.from(json['draft'] as Map),
       ),
-      savedAt: DateTime.tryParse(json['savedAt'] as String? ?? '') ??
-          DateTime.now(),
+      savedAt:
+          DateTime.tryParse(json['savedAt'] as String? ?? '') ?? DateTime.now(),
     );
   }
 }
 
 class AssociationLinkDraftStore {
   static const String _draftsKey = 'association_link_drafts_v2';
-
-  // ── Read ──────────────────────────────────────────────────────────────────
 
   Future<List<AssociationLinkDraftEntry>> loadDrafts() async {
     final prefs = await SharedPreferences.getInstance();
@@ -55,9 +52,12 @@ class AssociationLinkDraftStore {
       final list = jsonDecode(raw) as List<dynamic>;
       return list
           .whereType<Map>()
-          .map((e) => AssociationLinkDraftEntry.fromJson(
-                Map<String, dynamic>.from(e),
-              ))
+          .map(
+            (e) => AssociationLinkDraftEntry.fromJson(
+              Map<String, dynamic>.from(e),
+            ),
+          )
+          .where((entry) => _hasUserDraftContent(entry.draft))
           .toList()
         ..sort((a, b) => b.savedAt.compareTo(a.savedAt));
     } catch (_) {
@@ -74,9 +74,6 @@ class AssociationLinkDraftStore {
     }
   }
 
-  // ── Write ─────────────────────────────────────────────────────────────────
-
-  /// Saves (or updates) a draft. Returns the entry with its ID.
   Future<AssociationLinkDraftEntry> saveDraft(
     AssociationLinkRequestDraft draft, {
     String? id,
@@ -111,8 +108,6 @@ class AssociationLinkDraftStore {
     await prefs.remove(_draftsKey);
   }
 
-  // ── Submitted flag (per draft) ────────────────────────────────────────────
-
   Future<bool> isSubmitted() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(PrefKeys.associationLinkSubmittedKey) ?? false;
@@ -128,30 +123,37 @@ class AssociationLinkDraftStore {
     await prefs.remove(PrefKeys.associationLinkSubmittedKey);
   }
 
-  // ── Private ───────────────────────────────────────────────────────────────
-
   Future<void> _persist(List<AssociationLinkDraftEntry> drafts) async {
     final prefs = await SharedPreferences.getInstance();
+    final displayableDrafts = drafts
+        .where((entry) => _hasUserDraftContent(entry.draft))
+        .toList();
     await prefs.setString(
       _draftsKey,
-      jsonEncode(drafts.map((e) => e.toJson()).toList()),
+      jsonEncode(displayableDrafts.map((e) => e.toJson()).toList()),
     );
   }
 
-  // ── Legacy migration (single draft → multi draft) ─────────────────────────
-  // Call once at app start or inside _bootstrap of the link-request screen.
-  Future<void> migrateLegacyDraft() async {
-    final prefs = await SharedPreferences.getInstance();
-    final legacyKey = PrefKeys.associationLinkDraftKey;
-    final raw = prefs.getString(legacyKey);
-    if (raw == null || raw.isEmpty) return;
-    try {
-      final decoded = jsonDecode(raw) as Map<String, dynamic>;
-      final legacyDraft = AssociationLinkRequestDraft.fromJson(decoded);
-      await saveDraft(legacyDraft);
-      await prefs.remove(legacyKey);
-    } catch (_) {
-      await prefs.remove(legacyKey);
-    }
+  bool _hasUserDraftContent(AssociationLinkRequestDraft draft) {
+    return [
+      draft.firstName,
+      draft.kunya,
+      draft.fatherName,
+      draft.motherName,
+      draft.governorate,
+      draft.city,
+      draft.town,
+      draft.municipality,
+      draft.street,
+      draft.building,
+      draft.permanentAddress,
+      draft.whatsApp,
+      draft.email,
+      draft.membershipNumber,
+      draft.priorityNumber,
+      draft.projectName,
+      draft.housingUnit,
+      draft.totalPayments,
+    ].any((value) => value.trim().isNotEmpty);
   }
 }

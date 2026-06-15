@@ -27,13 +27,17 @@ class _AssociationDraftsScreenState extends State<AssociationDraftsScreen> {
     _reload();
   }
 
-  void _reload() {
-    setState(() => _draftsFuture = _store.loadDrafts());
+  Future<void> _reload() async {
+    final future = _store.loadDrafts();
+    setState(() {
+      _draftsFuture = future;
+    });
+    await future;
   }
 
   Future<void> _deleteDraft(AssociationLinkDraftEntry entry) async {
     await _store.deleteDraft(entry.id);
-    _reload();
+    await _reload();
     if (!mounted) return;
     CustomSnackBar.show(
       context,
@@ -74,7 +78,7 @@ class _AssociationDraftsScreenState extends State<AssociationDraftsScreen> {
       extra: {'draftId': entry.id},
     );
     // Reload in case the draft was submitted (deleted) or updated.
-    _reload();
+    await _reload();
   }
 
   @override
@@ -95,16 +99,11 @@ class _AssociationDraftsScreenState extends State<AssociationDraftsScreen> {
           final drafts = snapshot.data ?? [];
 
           if (drafts.isEmpty) {
-            return _EmptyState(
-              onNewDraft: () async {
-                await context.push(AppRoutes.associationLinkRequest);
-                _reload();
-              },
-            );
+            return const _EmptyState();
           }
 
           return RefreshIndicator(
-            onRefresh: () async => _reload(),
+            onRefresh: _reload,
             child: ListView.builder(
               padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
               itemCount: drafts.length,
@@ -124,7 +123,7 @@ class _AssociationDraftsScreenState extends State<AssociationDraftsScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           await context.push(AppRoutes.associationLinkRequest);
-          _reload();
+          await _reload();
         },
         icon: const Icon(Icons.add_rounded),
         label: Text(AppLocalizations.of(context)!.associationLinkNewDraft),
@@ -155,7 +154,9 @@ class _DraftCard extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final titleColor = isDark ? AppColors.offWhite : AppColors.burgundy;
-    final subtitleColor = isDark ? AppColors.taupe : AppColors.burgundy.withValues(alpha: 0.7);
+    final subtitleColor = isDark
+        ? AppColors.taupe
+        : AppColors.burgundy.withValues(alpha: 0.7);
     final borderColor = isDark
         ? AppColors.taupe.withValues(alpha: 0.2)
         : AppColors.burgundy.withValues(alpha: 0.12);
@@ -166,9 +167,13 @@ class _DraftCard extends StatelessWidget {
       if (entry.draft.membershipNumber.isNotEmpty)
         '${l10n.associationLinkMembershipNumber}: ${entry.draft.membershipNumber}',
     ];
-    final subtitle = parts.isNotEmpty ? parts.join(' · ') : l10n.associationLinkNoData;
+    final subtitle = parts.isNotEmpty
+        ? parts.join(' · ')
+        : l10n.associationLinkNoData;
 
-    final dateLabel = DateFormat.yMMMd().add_jm().format(entry.savedAt.toLocal());
+    final dateLabel = DateFormat.yMMMd().add_jm().format(
+      entry.savedAt.toLocal(),
+    );
 
     return Dismissible(
       key: ValueKey(entry.id),
@@ -181,7 +186,11 @@ class _DraftCard extends StatelessWidget {
         ),
         alignment: Alignment.centerRight,
         padding: EdgeInsets.only(right: 20.w),
-        child: Icon(Icons.delete_outline_rounded, color: Colors.white, size: 28.r),
+        child: Icon(
+          Icons.delete_outline_rounded,
+          color: Colors.white,
+          size: 28.r,
+        ),
       ),
       confirmDismiss: (_) async {
         onDelete();
@@ -285,9 +294,7 @@ class _DraftCard extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.onNewDraft});
-
-  final VoidCallback onNewDraft;
+  const _EmptyState();
 
   @override
   Widget build(BuildContext context) {
@@ -304,22 +311,19 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.drafts_outlined,
               size: 72.r,
-              color: (isDark ? AppColors.taupe : AppColors.burgundy)
-                  .withValues(alpha: 0.4),
+              color: (isDark ? AppColors.taupe : AppColors.burgundy).withValues(
+                alpha: 0.4,
+              ),
             ),
             SizedBox(height: 20.h),
             Text(
-              l10n.associationLinkNoDrafts,
+              l10n.localeName == 'ar'
+                  ? 'لا توجد مسودات مرسلة.'
+                  : 'There are no drafts sent.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: isDark ? AppColors.taupe : AppColors.burgundy,
               ),
-            ),
-            SizedBox(height: 24.h),
-            FilledButton.icon(
-              onPressed: onNewDraft,
-              icon: const Icon(Icons.add_rounded),
-              label: Text(l10n.associationLinkNewDraft),
             ),
           ],
         ),
