@@ -1447,4 +1447,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get userLocationInfo => 'Location info';
+
+  @override
+  String get linkRequestSentSuccessfully =>
+      'Association link request has been sent successfully';
 }

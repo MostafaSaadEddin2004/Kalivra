@@ -47,14 +47,14 @@ class AssociationLinkRequestDraft {
       'kunya': kunya,
       'father_name': fatherName,
       'mother_name': motherName,
-      'governorate': governorate,
-      'city': city,
-      'town': town,
-      'municipality': municipality,
-      'street': street,
-      'building': building,
+      'official_governorate': governorate,
+      'official_city': city,
+      'official_town': town,
+      'official_municipality_village': municipality,
+      'official_street': street,
+      'official_building': building,
       'permanent_address': permanentAddress,
-      'mobile': mobile,
+      'phone': mobile,
       'whatsapp': whatsApp,
       'email': email,
       'membership_number': membershipNumber,
@@ -71,14 +71,24 @@ class AssociationLinkRequestDraft {
       kunya: json['kunya'] as String? ?? '',
       fatherName: json['father_name'] as String? ?? '',
       motherName: json['mother_name'] as String? ?? '',
-      governorate: json['governorate'] as String? ?? '',
-      city: json['city'] as String? ?? '',
-      town: json['town'] as String? ?? '',
-      municipality: json['municipality'] as String? ?? '',
-      street: json['street'] as String? ?? '',
-      building: json['building'] as String? ?? '',
+      governorate:
+          json['official_governorate'] as String? ??
+          json['governorate'] as String? ??
+          '',
+      city: json['official_city'] as String? ?? json['city'] as String? ?? '',
+      town: json['official_town'] as String? ?? json['town'] as String? ?? '',
+      municipality:
+          json['official_municipality_village'] as String? ??
+          json['municipality'] as String? ??
+          '',
+      street:
+          json['official_street'] as String? ?? json['street'] as String? ?? '',
+      building:
+          json['official_building'] as String? ??
+          json['building'] as String? ??
+          '',
       permanentAddress: json['permanent_address'] as String? ?? '',
-      mobile: json['mobile'] as String? ?? '',
+      mobile: json['phone'] as String? ?? json['mobile'] as String? ?? '',
       whatsApp: json['whatsapp'] as String? ?? '',
       email: json['email'] as String? ?? '',
       membershipNumber: json['membership_number'] as String? ?? '',

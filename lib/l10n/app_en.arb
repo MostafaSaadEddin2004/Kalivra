@@ -511,5 +511,6 @@
   "linkRequestsScreen": "Joining requests",
   "whatsappNumber": "Whatsapp number",
   "contactInfo": "Contact info",
-  "userLocationInfo": "Location info"
+  "userLocationInfo": "Location info",
+  "linkRequestSentSuccessfully": "Association link request has been sent successfully"
 }

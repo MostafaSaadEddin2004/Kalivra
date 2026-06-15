@@ -11,11 +11,9 @@ class AssociationLinkApiService {
 
   final DioClient _client = DioClient();
 
-  Future<AssociationLinkRequestDraft?> fetchDraftsRequest() async {
+  Future<AssociationLinkRequestDraft?> fetchDraftsRequests() async {
     try {
-      final res = await _client.get(
-        'association-link-requests/latest',
-      );
+      final res = await _client.get('association-link-requests/latest');
       final body = res.data;
       if (body is! Map) return null;
       final data = body['data'];
@@ -35,7 +33,7 @@ class AssociationLinkApiService {
 
   Future<List<AssociationRequestSummary>> fetchRequests() async {
     try {
-      final res = await _client.get('association-link-requests');
+      final res = await _client.get('customer/association/requests');
       final body = res.data;
       if (body is! Map) return [];
       final data = body['data'];
@@ -55,10 +53,30 @@ class AssociationLinkApiService {
 
   Future<void> submitRequest({
     required AssociationLinkRequestDraft draft,
+    required String fatherName,
+    required String motherName,
+    required String officialGovernorate,
+    required String officialCity,
+    required String officialTown,
+    required String officialMunicipalityVillage,
+    required String officialStreet,
+    required String officialBuilding,
+    required String permanentAddress,
+    required String phone,
     required List<AssociationLinkAttachment> attachments,
   }) async {
     final fields = <String, dynamic>{
       ...draft.toJson(),
+      'father_name': fatherName.trim(),
+      'mother_name': motherName.trim(),
+      'official_governorate': officialGovernorate.trim(),
+      'official_city': officialCity.trim(),
+      'official_town': officialTown.trim(),
+      'official_municipality_village': officialMunicipalityVillage.trim(),
+      'official_street': officialStreet.trim(),
+      'official_building': officialBuilding.trim(),
+      'permanent_address': permanentAddress.trim(),
+      'phone': phone.trim(),
     };
 
     for (var i = 0; i < attachments.length; i++) {
@@ -71,14 +89,14 @@ class AssociationLinkApiService {
     }
 
     await _client.post(
-      'association-link-requests',
+      'customer/association/link-request',
       data: FormData.fromMap(fields),
     );
   }
 
   Future<AssociationMemberProfile?> fetchProfile() async {
     try {
-      final res = await _client.get('association-member-profile');
+      final res = await _client.get('customer/association/member');
       final body = res.data;
       if (body is! Map) return null;
       final data = body['data'];
@@ -97,7 +115,7 @@ class AssociationLinkApiService {
       }
     }
 
-    final link = await AssociationLinkApiService().fetchDraftsRequest();
+    final link = await AssociationLinkApiService().fetchDraftsRequests();
     if (link == null) return null;
     return AssociationMemberProfile.fromLinkRequest(link);
   }

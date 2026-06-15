@@ -1439,4 +1439,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get userLocationInfo => 'معلومات الموقع';
+
+  @override
+  String get linkRequestSentSuccessfully => 'تم إرسال طلب الربط بالجمعية بنجاح';
 }

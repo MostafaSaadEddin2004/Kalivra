@@ -2845,6 +2845,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location info'**
   String get userLocationInfo;
+
+  /// No description provided for @linkRequestSentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Association link request has been sent successfully'**
+  String get linkRequestSentSuccessfully;
 }
 
 class _AppLocalizationsDelegate
