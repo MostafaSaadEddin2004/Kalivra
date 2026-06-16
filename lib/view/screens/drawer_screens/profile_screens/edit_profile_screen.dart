@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
@@ -280,6 +281,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -298,8 +301,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       },
       builder: (context, state) {
-        final busy = state is AuthLoading;
-
         return Scaffold(
           appBar: DrawerScreenAppBar(title: l10n.editProfileTitle),
           body: Form(
@@ -309,7 +310,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Center(
                   child: InkWell(
-                    onTap: busy ? null : _pickAvatar,
+                    onTap: _pickAvatar,
                     borderRadius: BorderRadius.circular(999),
                     child: Stack(
                       clipBehavior: Clip.none,
@@ -450,9 +451,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: Text(l10n.genderOther),
                         ),
                       ],
-                      onChanged: busy
-                          ? null
-                          : (v) => setState(() => _gender = v),
+                      onChanged: (v) => setState(() => _gender = v),
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(
@@ -533,7 +532,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           SyrianLocationCatalog.governorates(),
                           _selectedGovernorate,
                         ),
-                        enabled: !busy,
+                        enabled: !isLoading,
                         onChanged: _onGovernorateChanged,
                       ),
                       end: AssociationDropdownField(
@@ -543,7 +542,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           SyrianLocationCatalog.cities(_selectedGovernorate),
                           _selectedCity,
                         ),
-                        enabled: !busy && _selectedGovernorate != null,
+                        enabled: !isLoading && _selectedGovernorate != null,
                         onChanged: _onCityChanged,
                       ),
                     ),
@@ -559,7 +558,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           _selectedTown,
                         ),
-                        enabled: !busy && _selectedCity != null,
+                        enabled: !isLoading && _selectedCity != null,
                         onChanged: _onTownChanged,
                       ),
                       end: AssociationDropdownField(
@@ -573,7 +572,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                           _selectedVillage,
                         ),
-                        enabled: !busy && _selectedTown != null,
+                        enabled: !isLoading && _selectedTown != null,
                         onChanged: _onVillageChanged,
                       ),
                     ),
@@ -612,31 +611,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ],
                 ),
                 SizedBox(height: 32.h),
-                FilledButton.icon(
-                  onPressed: busy ? null : _save,
-                  icon: busy
-                      ? SizedBox(
-                          height: 22.h,
-                          width: 22.w,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
+                BlocListener<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    switch (state) {
+                      case AuthLoading():
+                        isLoading = true;
+                      default:
+                        isLoading = false;
+                    }
+                  },
+                  child: FilledButton(
+                    onPressed: _save,
+                    style: FilledButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isLoading
+                        ? SpinKitFadingCircle(
                             color: AppColors.offWhite,
-                          ),
-                        )
-                      : Icon(Icons.check_rounded, size: 22.r),
-                  label: Text(
-                    l10n.saveChanges,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: AppColors.offWhite,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14.r),
-                    ),
-                    elevation: 0,
+                            size: 20.r,
+                          )
+                        : Text(
+                            l10n.saveChanges,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
                   ),
                 ),
               ],

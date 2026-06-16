@@ -119,36 +119,13 @@ class ProductCard extends StatelessWidget {
                   children: [
                     TextSlider(text: product.name,),
                     if (product.prices.final_?.price != null)
-                      Column(
-                        children: [
-                          SizedBox(height: 8.h),
-                          Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 8.w,
-                              vertical: 4.h,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.goldDark,
-                              borderRadius: BorderRadius.circular(8.r),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.15),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              _salePercent(),
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: AppColors.offWhite,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 11.sp,
+                      ProductBadgeChip(
+                              badge: ProductBadgeData(
+                                label: _salePercent(),
+                                icon: Icons.percent,
+                                color: AppColors.red,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
                     SizedBox(height: 8.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

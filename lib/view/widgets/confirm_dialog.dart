@@ -25,6 +25,7 @@ class ConfirmDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
+      
       title: Text(title, style: theme.textTheme.titleLarge),
       content: Text(message, style: theme.textTheme.bodyMedium),
       actions: [

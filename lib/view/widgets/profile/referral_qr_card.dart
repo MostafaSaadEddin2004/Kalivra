@@ -3,14 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class ReferralQrCard extends StatelessWidget {
-  const ReferralQrCard({
-    super.key,
-    required this.referralCode,
-    this.onCopy,
-  });
+  const ReferralQrCard({super.key, required this.referralCode, this.onCopy});
 
   final String referralCode;
   final VoidCallback? onCopy;
@@ -28,49 +25,53 @@ class ReferralQrCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.r),
-        side: BorderSide(
-          color: primary.withValues(alpha: 0.25),
-          width: 1.5,
-        ),
+        side: BorderSide(color: primary.withValues(alpha: 0.25), width: 1.5),
       ),
       child: Padding(
         padding: EdgeInsets.all(16.w),
         child: Column(
           children: [
             Row(
-          children: [
-            Flexible(
-              child: Column(spacing: 8.h,
-                children: [
-                  Row(
-                    spacing: 8.w,
+              children: [
+                Flexible(
+                  child: Column(
+                    spacing: 8.h,
                     children: [
-                      Icon(Icons.qr_code_2_rounded, size: 24.r, color: primary),
+                      Row(
+                        spacing: 8.w,
+                        children: [
+                          Icon(
+                            Icons.qr_code_2_rounded,
+                            size: 24.r,
+                            color: primary,
+                          ),
+                          Text(
+                            AppLocalizations.of(context)!.referralCode,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: isDark
+                                  ? AppColors.offWhite
+                                  : AppColors.black,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
                       Text(
-                        AppLocalizations.of(context)!.referralCode,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: isDark ? AppColors.offWhite : AppColors.black,
-                          fontWeight: FontWeight.w800,
+                        AppLocalizations.of(context)!.referralCodeHint,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isDark ? AppColors.taupe : AppColors.burgundy,
+                          height: 1.35,
                         ),
-                        softWrap: true,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
-                  Text(
-                    AppLocalizations.of(context)!.referralCodeHint,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      height: 1.35,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+                ),
+                Icon(Icons.expand_less_rounded, size: 28.r, color: primary),
+              ],
             ),
-            Icon(Icons.expand_less_rounded, size: 28.r, color: primary),
-          ],
-        ),
             SizedBox(height: 24.h),
             Container(
               padding: EdgeInsets.all(20.w),
@@ -122,12 +123,9 @@ class ReferralQrCard extends StatelessWidget {
                   InkWell(
                     onTap: () {
                       Clipboard.setData(ClipboardData(text: referralCode));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(AppLocalizations.of(context)!.codeCopied),
-                          behavior: SnackBarBehavior.floating,
-                          duration: const Duration(seconds: 2),
-                        ),
+                      CustomSnackBar.show(
+                        context,
+                        AppLocalizations.of(context)!.codeCopied,
                       );
                       onCopy?.call();
                     },

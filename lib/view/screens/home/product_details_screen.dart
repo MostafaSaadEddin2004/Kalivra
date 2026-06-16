@@ -680,7 +680,7 @@ class ProductBadgeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 4.h),
       decoration: BoxDecoration(
         color: badge.color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20.r),
@@ -689,13 +689,13 @@ class ProductBadgeChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(badge.icon, size: 14.r, color: badge.color),
+          Icon(badge.icon, size: 12.r, color: badge.color),
           SizedBox(width: 4.w),
           Text(
             badge.label,
             style: TextStyle(
               color: badge.color,
-              fontSize: 12.sp,
+              fontSize: 8.sp,
               fontWeight: FontWeight.w700,
             ),
           ),

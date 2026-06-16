@@ -268,9 +268,9 @@ class CustomerApiService {
             filename: basename(avatarFile.path),
           ),
         });
-        await _client.put('customer', data: formData);
+        await _client.post('customer', data: formData);
       } else {
-        await _client.put('customer', data: fields);
+        await _client.post('customer', data: fields);
       }
       return true;
     } on DioException catch (e) {
