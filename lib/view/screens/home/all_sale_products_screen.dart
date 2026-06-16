@@ -22,7 +22,7 @@ class _AllSaleProductsScreenState extends State<AllSaleProductsScreen> {
     return Scaffold(
       appBar: DrawerScreenAppBar(title: l10n.products),
       body: BlocBuilder<ProductsCubit, ProductsState>(
-        bloc: ProductsCubit()..loadAll(),
+        bloc: ProductsCubit()..loadProducts(),
         builder: (context, state) {
           switch (state) {
             case ProductsLoading():

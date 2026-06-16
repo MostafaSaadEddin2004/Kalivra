@@ -316,7 +316,6 @@
   "dateOfBirthHint": "YYYY-MM-DD (optional)",
   "genderMale": "Male",
   "genderFemale": "Female",
-  "genderOther": "Other",
   "changePhoto": "Change photo",
   "saveChanges": "Save changes",
   "personalInfo": "Personal Information",
@@ -511,6 +510,6 @@
   "linkRequestsScreen": "Joining requests",
   "whatsappNumber": "Whatsapp number",
   "contactInfo": "Contact info",
-  "userLocationInfo": "Location info",
+  "userLocationInfo": "Address info",
   "linkRequestSentSuccessfully": "Association link request has been sent successfully"
 }

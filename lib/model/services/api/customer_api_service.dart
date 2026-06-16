@@ -177,25 +177,11 @@ class CustomerApiService {
   }
 
   Future<bool> updateProfile({
-    required String name,
-    required String email,
-    required String phone,
-    required String address,
-    required String city,
-    required String country,
-    String? postalCode,
-    String? firstName,
-    String? lastName,
-    String? fatherName,
-    String? motherName,
-    String? nationalId,
-    String? whatsappNumber,
+    required String firstName,
+    required String lastName,
     String? gender,
     String? dateOfBirth,
-    int? permanentCapitalId,
-    int? permanentCityId,
-    int? permanentTownId,
-    int? permanentVillageId,
+    String? phone,
     String? officialGovernorate,
     String? officialCity,
     String? officialTown,
@@ -203,10 +189,10 @@ class CustomerApiService {
     String? officialStreet,
     String? officialBuilding,
     String? permanentAddress,
-    File? avatarFile,
+    File? imageFile,
   }) async {
-    if (avatarFile != null) {
-      final length = await avatarFile.length();
+    if (imageFile != null) {
+      final length = await imageFile.length();
       if (length > maxProfileImageBytes) {
         throw Exception(
           'Profile image must be ${maxProfileImageBytes ~/ (1024 * 1024)} MB or smaller.',
@@ -215,62 +201,32 @@ class CustomerApiService {
     }
 
     final Map<String, dynamic> fields = {
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'address': address,
-      'city': city,
-      'country': country,
-      if (postalCode != null && postalCode.trim().isNotEmpty)
-        'postal_code': postalCode.trim(),
-      if (firstName != null && firstName.trim().isNotEmpty)
-        'first_name': firstName.trim(),
-      if (lastName != null && lastName.trim().isNotEmpty)
-        'last_name': lastName.trim(),
-      if (fatherName != null && fatherName.trim().isNotEmpty)
-        'father_name': fatherName.trim(),
-      if (motherName != null && motherName.trim().isNotEmpty)
-        'mother_name': motherName.trim(),
-      if (nationalId != null && nationalId.trim().isNotEmpty)
-        'national_id': nationalId.trim(),
-      if (whatsappNumber != null && whatsappNumber.trim().isNotEmpty)
-        'whatsapp_number': whatsappNumber.trim(),
-      if (gender != null && gender.trim().isNotEmpty) 'gender': gender.trim(),
-      if (dateOfBirth != null && dateOfBirth.trim().isNotEmpty)
-        'date_of_birth': dateOfBirth.trim(),
-      'permanent_capital_id': ?permanentCapitalId,
-      'permanent_city_id': ?permanentCityId,
-      'permanent_town_id': ?permanentTownId,
-      'permanent_village_id': ?permanentVillageId,
-      if (officialGovernorate != null && officialGovernorate.trim().isNotEmpty)
-        'official_governorate': officialGovernorate.trim(),
-      if (officialCity != null && officialCity.trim().isNotEmpty)
-        'official_city': officialCity.trim(),
-      if (officialTown != null && officialTown.trim().isNotEmpty)
-        'official_town': officialTown.trim(),
-      if (officialMunicipalityVillage != null &&
-          officialMunicipalityVillage.trim().isNotEmpty)
-        'official_municipality_village': officialMunicipalityVillage.trim(),
-      if (officialStreet != null && officialStreet.trim().isNotEmpty)
-        'official_street': officialStreet.trim(),
-      if (officialBuilding != null && officialBuilding.trim().isNotEmpty)
-        'official_building': officialBuilding.trim(),
-      if (permanentAddress != null && permanentAddress.trim().isNotEmpty)
-        'permanent_address': permanentAddress.trim(),
+      "first_name": firstName,
+      "last_name": lastName,
+      "gender": gender,
+      "date_of_birth": dateOfBirth,
+      "phone": phone,
+      "official_governorate": officialGovernorate,
+      "official_city": officialCity,
+      "official_town": officialTown,
+      "official_municipality_village": officialMunicipalityVillage,
+      "official_street": officialStreet,
+      "official_building": officialBuilding,
+      "permanent_address": permanentAddress,
     };
 
     try {
-      if (avatarFile != null) {
+      if (imageFile != null) {
         final formData = FormData.fromMap({
           ...fields,
-          'avatar': await MultipartFile.fromFile(
-            avatarFile.path,
-            filename: basename(avatarFile.path),
+          'image': await MultipartFile.fromFile(
+            imageFile.path,
+            filename: basename(imageFile.path),
           ),
         });
-        await _client.post('customer', data: formData);
+        await _client.put('customer/profile', data: formData);
       } else {
-        await _client.post('customer', data: fields);
+        await _client.put('customer/profile', data: fields);
       }
       return true;
     } on DioException catch (e) {

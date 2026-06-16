@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/ads_cubit/ads_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
@@ -45,6 +47,19 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _reaload();
+  }
+
+  Future<void> _reaload() async {
+    AdsCubit().fetchAds();
+    ProductsCubit().loadProducts();
+    ProductsCubit().loadSaleProducts();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScopeExitApp(
       scaffoldKey: _scaffoldKey,
@@ -62,16 +77,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       onCartTap: () => context.pushNamed('cart'),
                     ),
               drawer: const AppDrawer(),
-              body: Padding(
-                padding: EdgeInsets.only(bottom: 54.h),
-                child: IndexedStack(
-                  index: index,
-                  children: const [
-                    HomePage(),
-                    CategoriesPage(),
-                    NotificationsPage(),
-                    SearchPage(),
-                  ],
+              body: RefreshIndicator(
+                onRefresh: _reaload,
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 54.h),
+                  child: IndexedStack(
+                    index: index,
+                    children: const [
+                      HomePage(),
+                      CategoriesPage(),
+                      NotificationsPage(),
+                      SearchPage(),
+                    ],
+                  ),
                 ),
               ),
               bottomNavigationBar: SafeArea(

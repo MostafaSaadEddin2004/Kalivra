@@ -861,9 +861,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get genderFemale => 'أنثى';
 
   @override
-  String get genderOther => 'آخر';
-
-  @override
   String get changePhoto => 'تغيير الصورة';
 
   @override
@@ -1438,7 +1435,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get contactInfo => 'معلومات الاتصال';
 
   @override
-  String get userLocationInfo => 'معلومات الموقع';
+  String get userLocationInfo => 'معلومات العنوان';
 
   @override
   String get linkRequestSentSuccessfully => 'تم إرسال طلب الربط بالجمعية بنجاح';

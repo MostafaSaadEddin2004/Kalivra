@@ -1,20 +1,18 @@
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
-import 'package:kalivra/controller/prefs/local_store.dart';
-import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/location/syrian_location_catalog.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
-import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
+import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
 
@@ -28,325 +26,498 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
+ final _formKey = GlobalKey<FormState>();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _postalController = TextEditingController();
+  final _countryController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _streetController = TextEditingController();
+  final _buildingController = TextEditingController();
+  final _permanentAddressController = TextEditingController();
+
+  String? _gender;
+  String? _selectedGovernorate;
+  String? _selectedCity;
+  String? _selectedTown;
+  String? _selectedVillage;
   File? _pickedAvatarFile;
-  String? _pickedAvatarExtension;
-
-  static const Set<String> _allowedImageExtensions = {
-    'png',
-    'jpeg',
-    'jpg',
-    'svg',
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.args != null) {
-      _nameController.text = widget.args!.name ?? '';
-      _phoneController.text = widget.args!.phone;
-      _emailController.text = widget.args!.email ?? '';
-    }
-  }
+  String? _networkAvatarUrl;
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
-    _postalController.dispose();
+    _countryController.dispose();
+    _dobController.dispose();
+    _streetController.dispose();
+    _buildingController.dispose();
+    _permanentAddressController.dispose();
     super.dispose();
   }
 
-  static String _extensionOf(String path) {
-    final fileName = CustomerApiService.basename(path);
-    final dotIndex = fileName.lastIndexOf('.');
-    if (dotIndex < 0 || dotIndex == fileName.length - 1) return '';
-    return fileName.substring(dotIndex + 1).toLowerCase();
-  }
 
-  Future<void> _openAuthOtp() async {
-    final token = widget.args?.token ?? await LocalStore.getToken();
-    if (!mounted) return;
-    context.go(
-      AppRoutes.authOtp,
-      extra: AuthOtpArgs(
-        email: _emailController.text.trim().isNotEmpty
-            ? _emailController.text.trim()
-            : widget.args?.email,
-        phone: _phoneController.text.trim().isNotEmpty
-            ? _phoneController.text.trim()
-            : widget.args?.phone,
-        token: token,
-      ),
-    );
-  }
-
-  Future<void> _pickProfileImage() async {
-    final l10n = AppLocalizations.of(context)!;
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: false,
-      type: FileType.any,
-    );
-    final path = result?.files.single.path;
-    if (path == null || !mounted) return;
-
-    final extension = _extensionOf(path);
-    if (!_allowedImageExtensions.contains(extension)) {
-      CustomSnackBar.show(context, l10n.profileUnsupportedImageType);
-      return;
-    }
-
-    final file = File(path);
-    if (await file.length() > CustomerApiService.maxProfileImageBytes) {
-      if (!mounted) return;
-      CustomSnackBar.show(context, l10n.profileImageTooLarge);
-      return;
-    }
-
+  void _onGovernorateChanged(String? value) {
     setState(() {
-      _pickedAvatarFile = file;
-      _pickedAvatarExtension = extension;
+      _selectedGovernorate = value;
+      _selectedCity = null;
+      _selectedTown = null;
+      _selectedVillage = null;
     });
   }
 
-  Future<void> _saveProfile() async {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+  void _onCityChanged(String? value) {
+    setState(() {
+      _selectedCity = value;
+      _selectedTown = null;
+      _selectedVillage = null;
+    });
+  }
+
+  void _onTownChanged(String? value) {
+    setState(() {
+      _selectedTown = value;
+      _selectedVillage = null;
+    });
+  }
+
+  void _onVillageChanged(String? value) {
+    setState(() {
+      _selectedVillage = value;
+    });
+  }
+
+  Future<void> _pickAvatar() async {
     final l10n = AppLocalizations.of(context)!;
-    final avatarFile = _pickedAvatarFile;
-    if (avatarFile != null &&
-        await avatarFile.length() > CustomerApiService.maxProfileImageBytes) {
+    final picker = ImagePicker();
+    final x = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 2048,
+      maxHeight: 2048,
+      imageQuality: 88,
+    );
+    if (x == null || !mounted) return;
+    final len = await File(x.path).length();
+    if (len > CustomerApiService.maxProfileImageBytes) {
       if (!mounted) return;
       CustomSnackBar.show(context, l10n.profileImageTooLarge);
       return;
     }
+    setState(() {
+      _pickedAvatarFile = File(x.path);
+      _networkAvatarUrl = null;
+    });
+  }
 
-    final trimmedName = _nameController.text.trim();
-    final parts = trimmedName.split(RegExp(r'\s+'));
-    final firstName = parts.isNotEmpty ? parts.first : '';
-    final lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
-    final address = _addressController.text.trim();
+  Future<void> _save() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    final l10n = AppLocalizations.of(context)!;
+    final f = _pickedAvatarFile;
+    if (f != null) {
+      final len = await f.length();
+      if (len > CustomerApiService.maxProfileImageBytes) {
+        if (!mounted) return;
+        CustomSnackBar.show(context, l10n.profileImageTooLarge);
+        return;
+      }
+    }
 
     try {
       await context.read<AuthCubit>().updateProfile(
-        name: trimmedName,
-        email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
-        address: address,
-        city: address,
-        country: '',
-        postalCode: _postalController.text.trim(),
-        firstName: firstName.isNotEmpty ? firstName : null,
-        lastName: lastName.isNotEmpty ? lastName : null,
-        avatarFile: avatarFile,
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        gender: _gender,
+        dateOfBirth: _dobController.text.trim().isEmpty
+            ? null
+            : _dobController.text.trim(),
+        officialGovernorate: _selectedGovernorate,
+        officialCity: _selectedCity,
+        officialTown: _selectedTown,
+        officialMunicipalityVillage: _selectedVillage,
+        officialStreet: _streetController.text.trim().isEmpty
+            ? null
+            : _streetController.text.trim(),
+        officialBuilding: _buildingController.text.trim().isEmpty
+            ? null
+            : _buildingController.text.trim(),
+        permanentAddress: _permanentAddressController.text.trim().isEmpty
+            ? null
+            : _permanentAddressController.text.trim(),
+        imageFile: f,
       );
-      await _openAuthOtp();
+      if (!mounted) return;
+      CustomSnackBar.show(context, l10n.profileSaved);
+      context.pop();
     } catch (_) {
       if (!mounted) return;
-      final state = context.read<AuthCubit>().state;
-      if (state is AuthFailed) {
-        CustomSnackBar.show(context, state.message);
+      final msg = context.read<AuthCubit>().state;
+      if (msg is AuthFailed) {
+        CustomSnackBar.show(context, msg.message);
       }
     }
   }
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
     final l10n = AppLocalizations.of(context)!;
-
-    return PopScopeExitApp(
-      child: Scaffold(
-        appBar: DrawerScreenAppBar(
-          title: AppLocalizations.of(context)!.completeProfileTitle,
-        ),
-        body: Form(
-          key: _formKey,
-          child: ListView(
-            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
-            children: [
-              Center(
-                child: InkWell(
-                  onTap: _pickProfileImage,
-                  borderRadius: BorderRadius.circular(999),
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 52.r,
-                        backgroundColor: isDark
-                            ? AppColors.burgundy.withValues(alpha: 0.3)
-                            : AppColors.burgundy.withValues(alpha: 0.15),
-                        backgroundImage:
-                            _pickedAvatarFile != null &&
-                                _pickedAvatarExtension != 'svg'
-                            ? FileImage(_pickedAvatarFile!)
-                            : null,
-                        child:
-                            _pickedAvatarFile == null ||
-                                _pickedAvatarExtension == 'svg'
-                            ? Icon(
-                                _pickedAvatarExtension == 'svg'
-                                    ? Icons.image_rounded
-                                    : Icons.person_rounded,
-                                size: 56.r,
-                                color: isDark
-                                    ? AppColors.goldLight
-                                    : AppColors.burgundy,
-                              )
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: Container(
-                          padding: EdgeInsets.all(8.r),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.burgundy
-                                : AppColors.burgundy.withValues(alpha: 0.9),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.2),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.camera_alt_rounded,
-                            size: 20.r,
-                            color: AppColors.offWhite,
+    final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        switch (state) {
+          case AuthLoading():
+            isLoading=true;
+          default:
+          isLoading=false;
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: DrawerScreenAppBar(title: l10n.editProfileTitle),
+          body: Form(
+            key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+              children: [
+                Center(
+                  child: InkWell(
+                    onTap: _pickAvatar,
+                    borderRadius: BorderRadius.circular(999),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CircleAvatar(
+                          radius: 52.r,
+                          backgroundColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.3)
+                              : AppColors.burgundy.withValues(alpha: 0.15),
+                          backgroundImage: _pickedAvatarFile != null
+                              ? FileImage(_pickedAvatarFile!)
+                              : (_networkAvatarUrl != null
+                                    ? NetworkImage(_networkAvatarUrl!)
+                                    : null),
+                          child:
+                              _pickedAvatarFile == null &&
+                                  _networkAvatarUrl == null
+                              ? Icon(
+                                  Icons.person_rounded,
+                                  size: 56.r,
+                                  color: isDark
+                                      ? AppColors.goldLight
+                                      : AppColors.burgundy,
+                                )
+                              : null,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          child: Container(
+                            padding: EdgeInsets.all(8.r),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? AppColors.burgundy
+                                  : AppColors.burgundy.withValues(alpha: 0.9),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              Icons.camera_alt_rounded,
+                              size: 20.r,
+                              color: AppColors.offWhite,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 8.h),
-              Center(
-                child: Text(
-                  AppLocalizations.of(context)!.profilePhoto,
+                SizedBox(height: 8.h),
+                Text(
+                  l10n.changePhoto,
+                  textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(color: labelColor),
                 ),
-              ),
-              SizedBox(height: 28.h),
-              AppTextField(
-                controller: _nameController,
-                label: l10n.fullName,
-                hint: l10n.enterFullNameHint,
-                prefixIcon: Icon(
-                  Icons.badge_outlined,
-                  size: 22.r,
-                  color: labelColor,
+                SizedBox(height: 28.h),
+                _SectionCard(
+                  title: l10n.personalInfo,
+                  icon: Icons.person_outline_rounded,
+                  children: [
+                    AppTextField(
+                      controller: _firstNameController,
+                      label: l10n.firstName,
+                      hint: l10n.firstName,
+                      prefixIcon: Icon(
+                        Icons.badge_outlined,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? l10n.enterFirstName
+                          : null,
+                    ),
+                    SizedBox(height: 16.h),
+                    AppTextField(
+                      controller: _lastNameController,
+                      label: l10n.lastName,
+                      hint: l10n.lastName,
+                      prefixIcon: Icon(
+                        Icons.badge_outlined,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? l10n.enterLastName
+                          : null,
+                    ),
+                    SizedBox(height: 16.h),
+                    DropdownButtonFormField<String?>(
+                      key: ValueKey(_gender),
+                      initialValue: _gender,
+                      decoration: InputDecoration(
+                        labelText: l10n.genderLabel,
+                        prefixIcon: Icon(
+                          Icons.wc_rounded,
+                          size: 22.r,
+                          color: labelColor,
+                        ),
+                      ),
+                      items: [
+                        DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text(l10n.dash),
+                        ),
+                        DropdownMenuItem(
+                          value: 'male',
+                          child: Text(l10n.genderMale),
+                        ),
+                        DropdownMenuItem(
+                          value: 'female',
+                          child: Text(l10n.genderFemale),
+                        ),
+                      ],
+                      onChanged: (v) => setState(() => _gender = v),
+                    ),
+                    SizedBox(height: 16.h),
+                    AppTextField(
+                      controller: _dobController,
+                      label: l10n.dateOfBirthLabel,
+                      hint: l10n.dateOfBirthHint,
+                      prefixIcon: Icon(
+                        Icons.calendar_today_outlined,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                      keyboardType: TextInputType.datetime,
+                    ),
+                  ],
                 ),
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? l10n.enterName : null,
-              ),
-              SizedBox(height: 16.h),
-              AppTextField(
-                controller: _emailController,
-                label: l10n.emailRequired,
-                hint: 'example@email.com',
-                prefixIcon: Icon(
-                  Icons.email_outlined,
-                  size: 22.r,
-                  color: labelColor,
+                SizedBox(height: 20.h),
+                _SectionCard(
+                  title: l10n.contactInfo,
+                  icon: Icons.contact_phone_outlined,
+                  children: [
+                    AppTextField(
+                      controller: _phoneController,
+                      label: l10n.mobileNumber,
+                      hint: '+963 9XX XXX XXX',
+                      prefixIcon: Icon(
+                        Icons.phone_android_rounded,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                      keyboardType: TextInputType.phone,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? l10n.enterPhone
+                          : null,
+                    ),
+                  ],
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
-                    return l10n.enterEmailShort;
-                  }
-                  if (!v.contains('@')) return l10n.invalidEmail;
-                  return null;
-                },
-              ),
-              SizedBox(height: 16.h),
-              AppTextField(
-                controller: _phoneController,
-                label: l10n.mobileNumber,
-                hint: '+963 9XX XXX XXX',
-                prefixIcon: Icon(
-                  Icons.phone_android_rounded,
-                  size: 22.r,
-                  color: labelColor,
+                SizedBox(height: 20.h),
+                _SectionCard(
+                  title: l10n.userLocationInfo,
+                  icon: Icons.location_on_outlined,
+                  children: [
+                    AssociationDropdownField(
+                      label: l10n.associationLinkGovernorate,
+                      value: _selectedGovernorate,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.governorates(),
+                        _selectedGovernorate,
+                      ),
+                      enabled: !isLoading,
+                      onChanged: _onGovernorateChanged,
+                    ),
+                    SizedBox(height: 16.h),
+
+                    AssociationDropdownField(
+                      label: l10n.associationLinkCity,
+                      value: _selectedCity,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.cities(_selectedGovernorate),
+                        _selectedCity,
+                      ),
+                      enabled: !isLoading && _selectedGovernorate != null,
+                      onChanged: _onCityChanged,
+                    ),SizedBox(height: 16.h),
+                    AssociationDropdownField(
+                      label: l10n.associationLinkTown,
+                      value: _selectedTown,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.towns(
+                          _selectedGovernorate,
+                          _selectedCity,
+                        ),
+                        _selectedTown,
+                      ),
+                      enabled: !isLoading && _selectedCity != null,
+                      onChanged: _onTownChanged,
+                    ),
+                    SizedBox(height: 16.h),
+                    AssociationDropdownField(
+                      label: l10n.associationLinkVillage,
+                      value: _selectedVillage,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.villages(
+                          _selectedGovernorate,
+                          _selectedCity,
+                          _selectedTown,
+                        ),
+                        _selectedVillage,
+                      ),
+                      enabled: !isLoading && _selectedTown != null,
+                      onChanged: _onVillageChanged,
+                    ),
+                    SizedBox(height: 16.h),
+                    AppTextField(
+                      controller: _streetController,
+                      label: l10n.associationLinkStreet,
+                      prefixIcon: Icon(
+                        Icons.signpost_outlined,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    AppTextField(
+                      controller: _buildingController,
+                      label: l10n.associationLinkBuilding,
+                      prefixIcon: Icon(
+                        Icons.apartment_rounded,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    AppTextField(
+                      controller: _permanentAddressController,
+                      label: l10n.associationLinkPermanentAddress,
+                      hint: l10n.cityAreaStreet,
+                      prefixIcon: Icon(
+                        Icons.place_outlined,
+                        size: 22.r,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                      maxLines: 2,
+                    ),
+                  ],
                 ),
-                keyboardType: TextInputType.phone,
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? l10n.enterPhone : null,
-              ),
-              SizedBox(height: 16.h),
-              AppTextField(
-                controller: _addressController,
-                label: l10n.addressOrLocation,
-                hint: l10n.cityAreaStreet,
-                prefixIcon: Icon(
-                  Icons.location_on_outlined,
-                  size: 22.r,
-                  color: labelColor,
-                ),
-                maxLines: 2,
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? l10n.enterAddressShort
-                    : null,
-              ),
-              SizedBox(height: 16.h),
-              AppTextField(
-                controller: _postalController,
-                label: l10n.postalCode,
-                hint: '12345',
-                prefixIcon: Icon(
-                  Icons.markunread_mailbox_rounded,
-                  size: 22.r,
-                  color: labelColor,
-                ),
-                keyboardType: TextInputType.number,
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? l10n.enterPostalCodeShort
-                    : null,
-              ),
-              SizedBox(height: 32.h),
-              FilledButton.icon(
-                onPressed: _saveProfile,
-                icon: Icon(Icons.check_rounded, size: 22.r),
-                label: Text(
-                  AppLocalizations.of(context)!.saveAndContinue,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.offWhite,
-                    fontWeight: FontWeight.w700,
+                SizedBox(height: 32.h),
+                BlocListener<AuthCubit, AuthState>(
+                  listener: (context, state) {
+                    switch (state) {
+                      case AuthLoading():
+                        isLoading = true;
+                      default:
+                        isLoading = false;
+                    }
+                  },
+                  child: FilledButton(
+                    onPressed: _save,
+                    style: FilledButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isLoading
+                        ? SpinKitFadingCircle(
+                            color: AppColors.offWhite,
+                            size: 20.r,
+                          )
+                        : Text(
+                            l10n.saveChanges,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ),
-                style: FilledButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-              SizedBox(height: 12.h),
-              TextButton(
-                onPressed: _openAuthOtp,
-                child: Text(
-                  l10n.skipForNow,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: AppColors.goldLight,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.title,
+    required this.icon,
+    required this.children,
+  });
+
+  final String title;
+  final IconData icon;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      child: Padding(
+        padding: EdgeInsets.all(20.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  size: 24.r,
+                  color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                ),
+                SizedBox(width: 10.w),
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
+            ...children,
+          ],
         ),
       ),
     );

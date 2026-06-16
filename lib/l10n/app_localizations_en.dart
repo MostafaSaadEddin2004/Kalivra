@@ -864,9 +864,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genderFemale => 'Female';
 
   @override
-  String get genderOther => 'Other';
-
-  @override
   String get changePhoto => 'Change photo';
 
   @override
@@ -1446,7 +1443,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get contactInfo => 'Contact info';
 
   @override
-  String get userLocationInfo => 'Location info';
+  String get userLocationInfo => 'Address info';
 
   @override
   String get linkRequestSentSuccessfully =>

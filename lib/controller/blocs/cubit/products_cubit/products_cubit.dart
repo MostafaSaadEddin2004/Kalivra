@@ -19,16 +19,16 @@ class ProductsCubit extends Cubit<ProductsState> {
       emit(ProductsFailed(message: e.toString()));
     }
   }
-
-  Future<void> loadAll() async {
+  Future<void> loadSaleProducts() async {
     emit(ProductsLoading());
     try {
-      final products = await _productService.getProducts();
+      final products = await _productService.getSaleProducts();
       emit(ProductsLoaded(products: products));
     } catch (e) {
       emit(ProductsFailed(message: e.toString()));
     }
   }
+
 
   Future<void> loadProductById(int productId) async {
     emit(ProductsLoading());

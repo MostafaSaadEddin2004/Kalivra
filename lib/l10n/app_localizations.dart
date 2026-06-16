@@ -1730,12 +1730,6 @@ abstract class AppLocalizations {
   /// **'Female'**
   String get genderFemale;
 
-  /// No description provided for @genderOther.
-  ///
-  /// In en, this message translates to:
-  /// **'Other'**
-  String get genderOther;
-
   /// No description provided for @changePhoto.
   ///
   /// In en, this message translates to:
@@ -2843,7 +2837,7 @@ abstract class AppLocalizations {
   /// No description provided for @userLocationInfo.
   ///
   /// In en, this message translates to:
-  /// **'Location info'**
+  /// **'Address info'**
   String get userLocationInfo;
 
   /// No description provided for @linkRequestSentSuccessfully.

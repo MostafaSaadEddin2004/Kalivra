@@ -17,44 +17,45 @@ class SalesSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(l10n.offers, style: textTheme.titleMedium),
-              ShowAllButton(
-                onShowAllTap: () => context.push(AppRoutes.allSaleProducts),
-                l10n: l10n,
-                textTheme: textTheme,
-                colorScheme: colorScheme,
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 12.h),
-        SizedBox(
-          height: 230.h,
-          child: BlocBuilder<ProductsCubit, ProductsState>(
-            bloc: ProductsCubit()..loadProducts(),
-            builder: (context, state) {
-              switch (state) {
-                case ProductsLoading():
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    clipBehavior: Clip.none,
-                    itemCount: 2,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(left: 12.w),
-                        child: SizedBox(
-                          width: 160.w,
-                          height: 220.h,
-                          child: Skeletonizer(
+    return BlocBuilder<ProductsCubit, ProductsState>(
+      bloc: ProductsCubit()..loadSaleProducts(),
+      builder: (context, state) {
+        switch (state) {
+          case ProductsLoading():
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(l10n.offers, style: textTheme.titleMedium),
+                      ShowAllButton(
+                        onShowAllTap: () =>
+                            context.push(AppRoutes.allSaleProducts),
+                        l10n: l10n,
+                        textTheme: textTheme,
+                        colorScheme: colorScheme,
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 12.h),
+                Skeletonizer(
+                  child: SizedBox(
+                    height: 230.h,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      clipBehavior: Clip.none,
+                      itemCount: 2,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: EdgeInsets.only(left: 12.w),
+                          child: SizedBox(
+                            width: 160.w,
+                            height: 220.h,
                             child: ProductCard(
                               product: ProductModel(
                                 id: 0,
@@ -75,37 +76,64 @@ class SalesSection extends StatelessWidget {
                               ),
                             ),
                           ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            );
+          case ProductsLoaded():
+            final products = state.products;
+            return state.products.isNotEmpty
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(l10n.offers, style: textTheme.titleMedium),
+                            ShowAllButton(
+                              onShowAllTap: () =>
+                                  context.push(AppRoutes.allSaleProducts),
+                              l10n: l10n,
+                              textTheme: textTheme,
+                              colorScheme: colorScheme,
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  );
-                case ProductsLoaded():
-                  final products = state.products;
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    clipBehavior: Clip.none,
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(left: 12.w),
-                        child: SizedBox(
-                          width: 160.w,
-                          height: 220.h,
-                          child: ProductCard(product: products[index]),
+                      ),
+                      SizedBox(height: 12.h),
+                      SizedBox(
+                        height: 230.h,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          clipBehavior: Clip.none,
+                          itemCount: products.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: EdgeInsets.only(left: 12.w),
+                              child: SizedBox(
+                                width: 160.w,
+                                height: 220.h,
+                                child: ProductCard(product: products[index]),
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  );
-                case ProductsFailed():
-                  return Center(child: Text(state.message));
-                default:
-                  return const SizedBox.shrink();
-              }
-            },
-          ),
-        ),
-      ],
+                      ),
+                    ],
+                  )
+                : const SizedBox.shrink();
+          case ProductsFailed():
+            return Center(child: Text(state.message));
+          default:
+            return const SizedBox.shrink();
+        }
+      },
     );
   }
 }

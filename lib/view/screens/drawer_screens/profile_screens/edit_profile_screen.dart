@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,15 +28,10 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _fatherNameController = TextEditingController();
-  final _motherNameController = TextEditingController();
-  final _nationalIdController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _whatsAppController = TextEditingController();
   final _countryController = TextEditingController();
-  final _postalController = TextEditingController();
   final _dobController = TextEditingController();
   final _streetController = TextEditingController();
   final _buildingController = TextEditingController();
@@ -62,19 +56,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   int? _initialVillageId;
   File? _pickedAvatarFile;
   String? _networkAvatarUrl;
-  bool _didApplyCustomer = false;
+  bool didApplyCustomer = false;
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _fatherNameController.dispose();
-    _motherNameController.dispose();
-    _nationalIdController.dispose();
-    _emailController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _phoneController.dispose();
-    _whatsAppController.dispose();
     _countryController.dispose();
-    _postalController.dispose();
     _dobController.dispose();
     _streetController.dispose();
     _buildingController.dispose();
@@ -103,18 +92,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   void _applyCustomer(CustomerApiModel c) {
-    final fn = c.firstName ?? '';
-    final ln = c.lastName ?? '';
+    final nameParts = (c.name ?? '').trim().split(RegExp(r'\s+'));
+    final fn = c.firstName ?? (nameParts.isNotEmpty ? nameParts.first : '');
+    final ln =
+        c.lastName ??
+        (nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '');
     final addressInfo = c.addressInformation;
-    _nameController.text = (c.name ?? '$fn $ln').trim();
-    _fatherNameController.text = c.fatherName ?? '';
-    _motherNameController.text = c.motherName ?? '';
-    _nationalIdController.text = c.nationalId ?? '';
-    _emailController.text = c.email ?? '';
+    _firstNameController.text = fn;
+    _lastNameController.text = ln;
     _phoneController.text = c.phone ?? '';
-    _whatsAppController.text = c.whatsappNumber ?? '';
     _countryController.text = c.country ?? '';
-    _postalController.text = c.postalCode ?? '';
     _dobController.text = c.dateOfBirth ?? '';
     _selectedGovernorate = addressInfo?.officialGovernorate;
     _selectedCity = addressInfo?.officialCity;
@@ -136,9 +123,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _buildingController.text = addressInfo?.officialBuilding ?? '';
     _permanentAddressController.text = addressInfo?.permanentAddress ?? '';
     final g = c.gender?.toLowerCase().trim();
-    _gender = (g == 'male' || g == 'female' || g == 'other') ? g : null;
+    _gender = (g == 'male' || g == 'female') ? g : null;
     _networkAvatarUrl = _resolveAvatarUrl(c.avatar);
-    _didApplyCustomer = true;
   }
 
   void _onGovernorateChanged(String? value) {
@@ -218,42 +204,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     }
 
-    final trimmedName = _nameController.text.trim();
-    final parts = trimmedName.split(RegExp(r'\s+'));
-    final first = parts.isNotEmpty ? parts.first : '';
-    final last = parts.length > 1 ? parts.sublist(1).join(' ') : '';
-
     try {
       await context.read<AuthCubit>().updateProfile(
-        name: trimmedName,
-        email: _emailController.text.trim(),
         phone: _phoneController.text.trim(),
-        address: _permanentAddressController.text.trim(),
-        city: _selectedCity ?? '',
-        country: _countryController.text.trim(),
-        postalCode: _postalController.text.trim(),
-        firstName: first.isNotEmpty ? first : null,
-        lastName: last.isNotEmpty ? last : null,
-        fatherName: _fatherNameController.text.trim().isEmpty
-            ? null
-            : _fatherNameController.text.trim(),
-        motherName: _motherNameController.text.trim().isEmpty
-            ? null
-            : _motherNameController.text.trim(),
-        nationalId: _nationalIdController.text.trim().isEmpty
-            ? null
-            : _nationalIdController.text.trim(),
-        whatsappNumber: _whatsAppController.text.trim().isEmpty
-            ? null
-            : _whatsAppController.text.trim(),
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
         gender: _gender,
         dateOfBirth: _dobController.text.trim().isEmpty
             ? null
             : _dobController.text.trim(),
-        permanentCapitalId: _selectedGovernorateId,
-        permanentCityId: _selectedCityId,
-        permanentTownId: _selectedTownId,
-        permanentVillageId: _selectedVillageId,
         officialGovernorate: _selectedGovernorate,
         officialCity: _selectedCity,
         officialTown: _selectedTown,
@@ -267,7 +226,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         permanentAddress: _permanentAddressController.text.trim().isEmpty
             ? null
             : _permanentAddressController.text.trim(),
-        avatarFile: f,
+        imageFile: f,
       );
       if (!mounted) return;
       CustomSnackBar.show(context, l10n.profileSaved);
@@ -289,12 +248,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
-    final nationalIdLabel = l10n.localeName == 'ar'
-        ? 'رقم الهوية'
-        : 'National ID';
-
     return BlocConsumer<AuthCubit, AuthState>(
-      listenWhen: (prev, curr) => curr is AuthFetchedData && !_didApplyCustomer,
+      listenWhen: (prev, curr) => curr is AuthFetchedData && !didApplyCustomer,
       listener: (context, state) {
         if (state is AuthFetchedData) {
           setState(() => _applyCustomer(state.customer));
@@ -378,48 +333,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   icon: Icons.person_outline_rounded,
                   children: [
                     AppTextField(
-                      controller: _nameController,
-                      label: l10n.fullName,
-                      hint: l10n.enterFullNameHint,
+                      controller: _firstNameController,
+                      label: l10n.firstName,
+                      hint: l10n.firstName,
                       prefixIcon: Icon(
                         Icons.badge_outlined,
                         size: 22.r,
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? l10n.enterName
+                          ? l10n.enterFirstName
                           : null,
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(
-                      controller: _fatherNameController,
-                      label: l10n.associationLinkFatherName,
+                      controller: _lastNameController,
+                      label: l10n.lastName,
+                      hint: l10n.lastName,
                       prefixIcon: Icon(
-                        Icons.family_restroom_rounded,
+                        Icons.badge_outlined,
                         size: 22.r,
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _motherNameController,
-                      label: l10n.associationLinkMotherName,
-                      prefixIcon: Icon(
-                        Icons.family_restroom_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _nationalIdController,
-                      label: nationalIdLabel,
-                      prefixIcon: Icon(
-                        Icons.badge_rounded,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.number,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? l10n.enterLastName
+                          : null,
                     ),
                     SizedBox(height: 16.h),
                     DropdownButtonFormField<String?>(
@@ -446,10 +384,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           value: 'female',
                           child: Text(l10n.genderFemale),
                         ),
-                        DropdownMenuItem(
-                          value: 'other',
-                          child: Text(l10n.genderOther),
-                        ),
                       ],
                       onChanged: (v) => setState(() => _gender = v),
                     ),
@@ -473,25 +407,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   icon: Icons.contact_phone_outlined,
                   children: [
                     AppTextField(
-                      controller: _emailController,
-                      label: l10n.email,
-                      hint: l10n.emailHint,
-                      prefixIcon: Icon(
-                        Icons.email_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) {
-                          return l10n.enterEmailShort;
-                        }
-                        if (!v.contains('@')) return l10n.invalidEmail;
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
                       controller: _phoneController,
                       label: l10n.mobileNumber,
                       hint: '+963 9XX XXX XXX',
@@ -505,18 +420,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ? l10n.enterPhone
                           : null,
                     ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _whatsAppController,
-                      label: l10n.whatsappNumber,
-                      hint: '+963 9XX XXX XXX',
-                      prefixIcon: Icon(
-                        Icons.call,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.phone,
-                    ),
                   ],
                 ),
                 SizedBox(height: 20.h),
@@ -524,57 +427,55 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   title: l10n.userLocationInfo,
                   icon: Icons.location_on_outlined,
                   children: [
-                    _TwoColumnRow(
-                      start: AssociationDropdownField(
-                        label: l10n.associationLinkGovernorate,
-                        value: _selectedGovernorate,
-                        items: SyrianLocationCatalog.withSavedValue(
-                          SyrianLocationCatalog.governorates(),
-                          _selectedGovernorate,
-                        ),
-                        enabled: !isLoading,
-                        onChanged: _onGovernorateChanged,
+                    AssociationDropdownField(
+                      label: l10n.associationLinkGovernorate,
+                      value: _selectedGovernorate,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.governorates(),
+                        _selectedGovernorate,
                       ),
-                      end: AssociationDropdownField(
-                        label: l10n.associationLinkCity,
-                        value: _selectedCity,
-                        items: SyrianLocationCatalog.withSavedValue(
-                          SyrianLocationCatalog.cities(_selectedGovernorate),
-                          _selectedCity,
-                        ),
-                        enabled: !isLoading && _selectedGovernorate != null,
-                        onChanged: _onCityChanged,
-                      ),
+                      enabled: !isLoading,
+                      onChanged: _onGovernorateChanged,
                     ),
                     SizedBox(height: 16.h),
-                    _TwoColumnRow(
-                      start: AssociationDropdownField(
-                        label: l10n.associationLinkTown,
-                        value: _selectedTown,
-                        items: SyrianLocationCatalog.withSavedValue(
-                          SyrianLocationCatalog.towns(
-                            _selectedGovernorate,
-                            _selectedCity,
-                          ),
+
+                    AssociationDropdownField(
+                      label: l10n.associationLinkCity,
+                      value: _selectedCity,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.cities(_selectedGovernorate),
+                        _selectedCity,
+                      ),
+                      enabled: !isLoading && _selectedGovernorate != null,
+                      onChanged: _onCityChanged,
+                    ),SizedBox(height: 16.h),
+                    AssociationDropdownField(
+                      label: l10n.associationLinkTown,
+                      value: _selectedTown,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.towns(
+                          _selectedGovernorate,
+                          _selectedCity,
+                        ),
+                        _selectedTown,
+                      ),
+                      enabled: !isLoading && _selectedCity != null,
+                      onChanged: _onTownChanged,
+                    ),
+                    SizedBox(height: 16.h),
+                    AssociationDropdownField(
+                      label: l10n.associationLinkVillage,
+                      value: _selectedVillage,
+                      items: SyrianLocationCatalog.withSavedValue(
+                        SyrianLocationCatalog.villages(
+                          _selectedGovernorate,
+                          _selectedCity,
                           _selectedTown,
                         ),
-                        enabled: !isLoading && _selectedCity != null,
-                        onChanged: _onTownChanged,
+                        _selectedVillage,
                       ),
-                      end: AssociationDropdownField(
-                        label: l10n.associationLinkVillage,
-                        value: _selectedVillage,
-                        items: SyrianLocationCatalog.withSavedValue(
-                          SyrianLocationCatalog.villages(
-                            _selectedGovernorate,
-                            _selectedCity,
-                            _selectedTown,
-                          ),
-                          _selectedVillage,
-                        ),
-                        enabled: !isLoading && _selectedTown != null,
-                        onChanged: _onVillageChanged,
-                      ),
+                      enabled: !isLoading && _selectedTown != null,
+                      onChanged: _onVillageChanged,
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(
@@ -640,7 +541,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               color: AppColors.offWhite,
                               fontWeight: FontWeight.w700,
                             ),
-                          )
+                          ),
                   ),
                 ),
               ],
@@ -698,25 +599,6 @@ class _SectionCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _TwoColumnRow extends StatelessWidget {
-  const _TwoColumnRow({required this.start, required this.end});
-
-  final Widget start;
-  final Widget end;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: start),
-        SizedBox(width: 12.w),
-        Expanded(child: end),
-      ],
     );
   }
 }

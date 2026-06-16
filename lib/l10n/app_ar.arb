@@ -310,7 +310,6 @@
   "dateOfBirthHint": "YYYY-MM-DD (اختياري)",
   "genderMale": "ذكر",
   "genderFemale": "أنثى",
-  "genderOther": "آخر",
   "changePhoto": "تغيير الصورة",
   "saveChanges": "حفظ التعديلات",
   "personalInfo": "معلومات شخصية",
@@ -506,6 +505,6 @@
   "linkRequestsScreen": "طلبات الإنضمام",
   "whatsappNumber": "رقم الواتساب",
   "contactInfo": "معلومات الاتصال",
-  "userLocationInfo": "معلومات الموقع",
+  "userLocationInfo": "معلومات العنوان",
   "linkRequestSentSuccessfully": "تم إرسال طلب الربط بالجمعية بنجاح"
 }
