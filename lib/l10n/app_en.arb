@@ -446,8 +446,8 @@
   "allCategories": "All",
   "noProductsInCategory": "No products in this category",
 
-  "associationPersonalProfileButton": "Association Personal Profile",
-  "associationMemberProfileTitle": "Association Member Profile",
+  "associationPersonalProfileButton": "Association Profile",
+  "associationMemberProfileTitle": "Association Profile",
   "associationMemberProfileEmpty": "No linked association profile is available yet. Submit a linking request to connect your account with the association.",
   "associationMemberProfileLinkRequest": "Submit Linking Request",
   "associationMemberCurrentAddress": "Current Address",
@@ -511,5 +511,12 @@
   "whatsappNumber": "Whatsapp number",
   "contactInfo": "Contact info",
   "userLocationInfo": "Address info",
-  "linkRequestSentSuccessfully": "Association link request has been sent successfully"
+  "linkRequestSentSuccessfully": "Association link request has been sent successfully",
+  "frequentlyAskedQuestion": "Frequently asked questions",
+  "associationContactUs": "Contact the association",
+  "associationChatMessageHint": "ُWrite a message",
+  "associationRequestsAndServices": "Requests and services",
+  "associationRequestTypeHint": "select request type",
+  "associationRequestTypeOrMessageRequired": "This field is required",
+  "associationRequestMessageHint": "Enter message"
 }

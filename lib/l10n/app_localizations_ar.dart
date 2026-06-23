@@ -1147,7 +1147,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationLinkDeleteAttachment => 'حذف';
 
   @override
-  String get associationLinkSaveDraft => 'حفظ مؤقت';
+  String get associationLinkSaveDraft => 'حفظ كمسودة';
 
   @override
   String get associationLinkDraftSaved => 'تم حفظ المسودة';
@@ -1439,4 +1439,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get linkRequestSentSuccessfully => 'تم إرسال طلب الربط بالجمعية بنجاح';
+
+  @override
+  String get frequentlyAskedQuestion => 'الأسئلة الأكثر شيوعاً';
+
+  @override
+  String get associationContactUs => 'تواصل مع الجمعية';
+
+  @override
+  String get associationChatMessageHint => 'اكتب رسالة';
+
+  @override
+  String get associationRequestsAndServices => 'طلبات وخدمات';
+
+  @override
+  String get associationRequestTypeHint => 'اختر نوع الطلب';
+
+  @override
+  String get associationRequestTypeOrMessageRequired => 'الحقل مطلوب';
+
+  @override
+  String get associationRequestMessageHint => 'أدخل رسالتك';
 }

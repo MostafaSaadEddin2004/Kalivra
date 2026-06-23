@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
 import 'package:kalivra/view/screens/drawer_screens/association_screens/association_drafts_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_contact_us_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_faq_screen.dart';
+import 'package:kalivra/view/screens/drawer_screens/association_screens/association_requests_and_services_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/association_screens/association_submitted_requests_screen.dart';
 import 'package:kalivra/view/splash_screen.dart';
 import 'package:kalivra/view/screens/home/home_screen.dart';
@@ -82,6 +85,9 @@ abstract class AppRoutes {
   static const String associationDrafts = '/association-drafts';
   static const String associationSubmittedRequests =
       '/association-submitted-requests';
+  static const String associationFaq = '/association-faq';
+  static const String associationContactUs = '/association-contact-us';
+  static const String associationRequestsAndServices = '/association-requests-and-services';
 }
 
 abstract class AppRoutesName {
@@ -123,6 +129,9 @@ abstract class AppRoutesName {
   static const String associationDrafts = 'association-drafts';
   static const String associationSubmittedRequests =
       'association-submitted-requests';
+  static const String associationFaq = 'association-faq';
+  static const String associationContactUs = 'association-contact-us';
+  static const String associationRequestsAndServices = 'association-requests-and-services';
 }
 
 abstract class AppRouter {
@@ -395,6 +404,22 @@ abstract class AppRouter {
             path: AppRoutes.associationSubmittedRequests,
             builder: (context, state) =>
                 const AssociationSubmittedRequestsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationFaq,
+            name: AppRoutesName.associationFaq,
+            builder: (context, state) => const AssociationFaqScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationContactUs,
+            name: AppRoutesName.associationContactUs,
+            builder: (context, state) => const AssociationContactUsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationRequestsAndServices,
+            name: AppRoutesName.associationRequestsAndServices,
+            builder: (context, state) =>
+                const AssociationRequestsAndServicesScreen(),
           ),
         ],
       ),

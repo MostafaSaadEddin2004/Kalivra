@@ -38,7 +38,7 @@ class DrawerScreenAppBar extends StatelessWidget
       ),
       title: Text(
         title,
-        style: theme.textTheme.titleLarge?.copyWith(
+        style: theme.textTheme.titleMedium?.copyWith(
           color: fgColor,
           fontWeight: FontWeight.w700,
         ),

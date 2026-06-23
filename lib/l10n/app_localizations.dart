@@ -2453,13 +2453,13 @@ abstract class AppLocalizations {
   /// No description provided for @associationPersonalProfileButton.
   ///
   /// In en, this message translates to:
-  /// **'Association Personal Profile'**
+  /// **'Association Profile'**
   String get associationPersonalProfileButton;
 
   /// No description provided for @associationMemberProfileTitle.
   ///
   /// In en, this message translates to:
-  /// **'Association Member Profile'**
+  /// **'Association Profile'**
   String get associationMemberProfileTitle;
 
   /// No description provided for @associationMemberProfileEmpty.
@@ -2845,6 +2845,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Association link request has been sent successfully'**
   String get linkRequestSentSuccessfully;
+
+  /// No description provided for @frequentlyAskedQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequently asked questions'**
+  String get frequentlyAskedQuestion;
+
+  /// No description provided for @associationContactUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact the association'**
+  String get associationContactUs;
+
+  /// No description provided for @associationChatMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'ُWrite a message'**
+  String get associationChatMessageHint;
+
+  /// No description provided for @associationRequestsAndServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests and services'**
+  String get associationRequestsAndServices;
+
+  /// No description provided for @associationRequestTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'select request type'**
+  String get associationRequestTypeHint;
+
+  /// No description provided for @associationRequestTypeOrMessageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get associationRequestTypeOrMessageRequired;
+
+  /// No description provided for @associationRequestMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter message'**
+  String get associationRequestMessageHint;
 }
 
 class _AppLocalizationsDelegate

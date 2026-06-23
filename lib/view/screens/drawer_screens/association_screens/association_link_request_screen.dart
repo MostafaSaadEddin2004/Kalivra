@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -80,6 +80,7 @@ class _AssociationLinkRequestScreenState
   final _projectNameController = TextEditingController();
   final _housingUnitController = TextEditingController();
   final _totalPaymentsController = TextEditingController();
+  final _villageController = TextEditingController();
 
   final List<AssociationLinkAttachment> _attachments = [];
   final Map<String, TextEditingController> _attachmentDescriptionControllers =
@@ -90,7 +91,6 @@ class _AssociationLinkRequestScreenState
   String? _currentDraftId;
 
   bool _isLoading = true;
-  bool _isSubmitting = false;
   bool _isLocked = false;
 
   @override
@@ -116,6 +116,7 @@ class _AssociationLinkRequestScreenState
     _projectNameController.dispose();
     _housingUnitController.dispose();
     _totalPaymentsController.dispose();
+    _villageController.dispose();
     for (final c in _attachmentDescriptionControllers.values) {
       c.dispose();
     }
@@ -257,50 +258,50 @@ class _AssociationLinkRequestScreenState
     return null;
   }
 
-  bool _hasIncompleteOptionalData() {
-    final values = [
-      _kunyaController.text,
-      _fatherNameController.text,
-      _motherNameController.text,
-      _selectedGovernorate ?? '',
-      _selectedCity ?? '',
-      _selectedTown ?? '',
-      _selectedVillage ?? '',
-      _streetController.text,
-      _buildingController.text,
-      _permanentAddressController.text,
-      _whatsAppController.text,
-      _emailController.text,
-      _membershipNumberController.text,
-      _priorityNumberController.text,
-      _projectNameController.text,
-      _housingUnitController.text,
-      _totalPaymentsController.text,
-    ];
-    return values.any((v) => v.trim().isEmpty);
-  }
+  // bool _hasIncompleteOptionalData() {
+  //   final values = [
+  //     _kunyaController.text,
+  //     _fatherNameController.text,
+  //     _motherNameController.text,
+  //     _selectedGovernorate ?? '',
+  //     _selectedCity ?? '',
+  //     _selectedTown ?? '',
+  //     _selectedVillage ?? '',
+  //     _streetController.text,
+  //     _buildingController.text,
+  //     _permanentAddressController.text,
+  //     _whatsAppController.text,
+  //     _emailController.text,
+  //     _membershipNumberController.text,
+  //     _priorityNumberController.text,
+  //     _projectNameController.text,
+  //     _housingUnitController.text,
+  //     _totalPaymentsController.text,
+  //   ];
+  //   return values.any((v) => v.trim().isEmpty);
+  // }
 
-  Future<bool> _confirmIncompleteSubmission(AppLocalizations l10n) async {
-    if (!_hasIncompleteOptionalData() && _attachments.isNotEmpty) return true;
-    final shouldContinue = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.associationLinkSubmit),
-        content: Text(l10n.associationLinkIncompleteWarning),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.back),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.associationLinkSubmit),
-          ),
-        ],
-      ),
-    );
-    return shouldContinue ?? false;
-  }
+  // Future<bool> _confirmIncompleteSubmission(AppLocalizations l10n) async {
+  //   if (!_hasIncompleteOptionalData() && _attachments.isNotEmpty) return true;
+  //   final shouldContinue = await showDialog<bool>(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: Text(l10n.associationLinkSubmit),
+  //       content: Text(l10n.associationLinkIncompleteWarning),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.of(context).pop(false),
+  //           child: Text(l10n.back),
+  //         ),
+  //         FilledButton(
+  //           onPressed: () => Navigator.of(context).pop(true),
+  //           child: Text(l10n.associationLinkSubmit),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  //   return shouldContinue ?? false;
+  // }
 
   void _onGovernorateChanged(String? value) {
     setState(() {
@@ -324,10 +325,6 @@ class _AssociationLinkRequestScreenState
       _selectedTown = value;
       _selectedVillage = null;
     });
-  }
-
-  void _onVillageChanged(String? value) {
-    setState(() => _selectedVillage = value);
   }
 
   Future<void> _pickAttachment() async {
@@ -388,53 +385,30 @@ class _AssociationLinkRequestScreenState
   }
 
   Future<void> _submit() async {
-    if (_isLocked || _isSubmitting) return;
-    final l10n = AppLocalizations.of(context)!;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    final shouldContinue = await _confirmIncompleteSubmission(l10n);
-    if (!shouldContinue || !mounted) return;
-
-    setState(() => _isSubmitting = true);
     try {
-      await _apiService.submitRequest(
+      context.read<AssociationLinkCubit>().submitRequest(
+        context: context,
         draft: _currentDraft(),
         fatherName: _fatherNameController.text,
         motherName: _motherNameController.text,
         officialGovernorate: _selectedGovernorate ?? '',
         officialCity: _selectedCity ?? '',
         officialTown: _selectedTown ?? '',
-        officialMunicipalityVillage: _selectedVillage ?? '',
+        officialMunicipalityVillage: _villageController.text,
         officialStreet: _streetController.text,
         officialBuilding: _buildingController.text,
         permanentAddress: _permanentAddressController.text,
         phone: _mobileController.text,
         attachments: _attachmentsWithDescriptions(),
       );
-
-      // Remove the draft from local store once successfully submitted.
-      if (_currentDraftId != null) {
-        await _draftStore.deleteDraft(_currentDraftId!);
-      }
-      await _draftStore.markSubmitted();
-
-      if (!mounted) return;
-      CustomSnackBar.show(context, l10n.associationLinkRequestSubmitted);
-      context.pop();
-    } on DioException catch (e) {
-      if (!mounted) return;
-      CustomSnackBar.show(
-        context,
-        e.message ?? e.response?.statusMessage ?? l10n.invalidPhone,
-      );
     } catch (e) {
-      if (!mounted) return;
       CustomSnackBar.show(context, e.toString());
-    } finally {
-      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   Widget _fieldSpacer() => SizedBox(height: 14.h);
+  bool isSubmitting = false;
+  bool isLoading = false;
 
   Widget _buildTwoColumnRow({required Widget start, required Widget end}) {
     return Row(
@@ -446,6 +420,7 @@ class _AssociationLinkRequestScreenState
       ],
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -459,18 +434,6 @@ class _AssociationLinkRequestScreenState
         title: widget.resubmit
             ? l10n.associationLinkResubmit
             : l10n.associationLinkRequestTitle,
-        actions: [
-          if (!_isLocked)
-            TextButton(
-              onPressed: _isSubmitting ? null : _saveDraft,
-              child: Text(
-                l10n.associationLinkSaveDraft,
-                style: TextStyle(color: theme.appBarTheme.foregroundColor),
-              ),
-            )
-          else
-            SizedBox(width: 48.w),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -507,7 +470,6 @@ class _AssociationLinkRequestScreenState
                             ),
                           ),
                         SizedBox(height: 16.h),
-                        // ── Personal section ─────────────────────────────
                         AssociationFormSection(
                           title: l10n.associationLinkPersonalSection,
                           icon: Icons.person_outline_rounded,
@@ -542,64 +504,54 @@ class _AssociationLinkRequestScreenState
                             ),
                           ],
                         ),
-                        // ── Contact section ──────────────────────────────
                         AssociationFormSection(
                           title: l10n.associationLinkContactSection,
                           icon: Icons.location_on_outlined,
                           children: [
-                            _buildTwoColumnRow(
-                              start: AssociationDropdownField(
-                                label: l10n.associationLinkGovernorate,
-                                value: _selectedGovernorate,
-                                items: SyrianLocationCatalog.withSavedValue(
-                                  SyrianLocationCatalog.governorates(),
+                            AssociationDropdownField(
+                              label: l10n.associationLinkGovernorate,
+                              value: _selectedGovernorate,
+                              items: SyrianLocationCatalog.withSavedValue(
+                                SyrianLocationCatalog.governorates(),
+                                _selectedGovernorate,
+                              ),
+                              enabled: !isLoading,
+                              onChanged: _onGovernorateChanged,
+                            ),
+                            SizedBox(height: 16.h),
+
+                            AssociationDropdownField(
+                              label: l10n.associationLinkCity,
+                              value: _selectedCity,
+                              items: SyrianLocationCatalog.withSavedValue(
+                                SyrianLocationCatalog.cities(
                                   _selectedGovernorate,
                                 ),
-                                enabled: !_isLocked,
-                                onChanged: _onGovernorateChanged,
+                                _selectedCity,
                               ),
-                              end: AssociationDropdownField(
-                                label: l10n.associationLinkCity,
-                                value: _selectedCity,
-                                items: SyrianLocationCatalog.withSavedValue(
-                                  SyrianLocationCatalog.cities(
-                                    _selectedGovernorate,
-                                  ),
+                              enabled:
+                                  !isLoading && _selectedGovernorate != null,
+                              onChanged: _onCityChanged,
+                            ),
+                            SizedBox(height: 16.h),
+                            AssociationDropdownField(
+                              label: l10n.associationLinkTown,
+                              value: _selectedTown,
+                              items: SyrianLocationCatalog.withSavedValue(
+                                SyrianLocationCatalog.towns(
+                                  _selectedGovernorate,
                                   _selectedCity,
                                 ),
-                                enabled: !_isLocked,
-                                onChanged: _onCityChanged,
+                                _selectedTown,
                               ),
+                              enabled: !isLoading && _selectedCity != null,
+                              onChanged: _onTownChanged,
                             ),
                             _fieldSpacer(),
-                            _buildTwoColumnRow(
-                              start: AssociationDropdownField(
-                                label: l10n.associationLinkTown,
-                                value: _selectedTown,
-                                items: SyrianLocationCatalog.withSavedValue(
-                                  SyrianLocationCatalog.towns(
-                                    _selectedGovernorate,
-                                    _selectedCity,
-                                  ),
-                                  _selectedTown,
-                                ),
-                                enabled: !_isLocked,
-                                onChanged: _onTownChanged,
-                              ),
-                              end: AssociationDropdownField(
-                                label: l10n.associationLinkVillage,
-                                value: _selectedVillage,
-                                items: SyrianLocationCatalog.withSavedValue(
-                                  SyrianLocationCatalog.villages(
-                                    _selectedGovernorate,
-                                    _selectedCity,
-                                    _selectedTown,
-                                  ),
-                                  _selectedVillage,
-                                ),
-                                enabled: !_isLocked,
-                                onChanged: _onVillageChanged,
-                              ),
+                            AppTextField(
+                              controller: _villageController,
+                              label: l10n.associationLinkVillage,
+                              enabled: !_isLocked,
                             ),
                             _fieldSpacer(),
                             AppTextField(
@@ -740,17 +692,56 @@ class _AssociationLinkRequestScreenState
                           ),
                         ],
                       ),
-                      child: FilledButton(
-                        onPressed: _isSubmitting ? null : _submit,
-                        child: _isSubmitting
-                            ? SizedBox(
-                                height: 22.h,
-                                width: 22.w,
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2,
+                      child: Row(
+                        spacing: 16.w,
+                        children: [
+                          BlocListener<
+                            AssociationLinkCubit,
+                            AssociationLinkState
+                          >(
+                            listener: (context, state) {
+                              switch (state) {
+                                case AssociationLinkLoading():
+                                  isSubmitting = true;
+                                default:
+                                  isSubmitting = false;
+                              }
+                            },
+                            child: Expanded(
+                              child: FilledButton(
+                                onPressed: _submit,
+                                child: isSubmitting
+                                    ? SpinKitFadingCircle(
+                                        color: AppColors.offWhite,
+                                        size: 20.r,
+                                      )
+                                    : Text(l10n.associationLinkSubmit),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16.w,
+                                vertical: 7.h,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: theme.colorScheme.onTertiaryFixed,
                                 ),
-                              )
-                            : Text(l10n.associationLinkSubmit),
+                                borderRadius: BorderRadius.circular(24.r),
+                              ),
+                              child: InkWell(
+                                onTap: _saveDraft,
+                                child: Text(
+                                  l10n.associationLinkSaveDraft,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -759,10 +750,6 @@ class _AssociationLinkRequestScreenState
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Attachment tile (unchanged from original)
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _AttachmentTile extends StatelessWidget {
   const _AttachmentTile({

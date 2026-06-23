@@ -44,7 +44,136 @@ class _AssociationMemberProfileScreenState
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.associationMemberProfileTitle),
+      appBar: DrawerScreenAppBar(
+        title: l10n.associationMemberProfileTitle,
+        actions: [
+          PopupMenuButton<_AccosiciationMemberProfileMenuActions>(
+            constraints: BoxConstraints(maxWidth: 240.w),
+            position: PopupMenuPosition.under,
+            icon: const Icon(Icons.menu_rounded),
+            onSelected: (value) {
+              switch (value) {
+                case _AccosiciationMemberProfileMenuActions
+                    .associationLinkRequest:
+                  context.push(AppRoutes.associationLinkRequest);
+                  break;
+                case _AccosiciationMemberProfileMenuActions.linkRequests:
+                  context.push(AppRoutes.associationSubmittedRequests);
+                  break;
+                case _AccosiciationMemberProfileMenuActions.drafts:
+                  context.push(AppRoutes.associationDrafts);
+                  break;
+                case _AccosiciationMemberProfileMenuActions.requestsAndServices:
+                  context.push(AppRoutes.associationRequestsAndServices);
+                  break;
+                case _AccosiciationMemberProfileMenuActions
+                    .associationContactUs:
+                  context.push(AppRoutes.associationContactUs);
+                  break;
+                case _AccosiciationMemberProfileMenuActions
+                    .frequentlyAskedQuestion:
+                  context.push(AppRoutes.associationFaq);
+                  break;
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: _AccosiciationMemberProfileMenuActions
+                    .associationLinkRequest,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.link_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.associationLinkRequest,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _AccosiciationMemberProfileMenuActions.linkRequests,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.upload_file_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.linkRequestsScreen,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _AccosiciationMemberProfileMenuActions.drafts,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.drafts_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.draftsScreen, style: theme.textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _AccosiciationMemberProfileMenuActions.requestsAndServices,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.file_copy,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.associationRequestsAndServices, style: theme.textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value:
+                    _AccosiciationMemberProfileMenuActions.associationContactUs,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.question_answer_outlined,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.associationContactUs, style: theme.textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: _AccosiciationMemberProfileMenuActions
+                    .frequentlyAskedQuestion,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.help_rounded,
+                      size: 20.r,
+                      color: theme.colorScheme.onTertiaryFixed,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(l10n.frequentlyAskedQuestion, style: theme.textTheme.bodyMedium),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
       body: FutureBuilder<AssociationMemberProfile?>(
         future: _profileFuture,
         builder: (context, snapshot) {
@@ -481,6 +610,15 @@ class _ProfileHeaderCard extends StatelessWidget {
       ),
     );
   }
+}
+
+enum _AccosiciationMemberProfileMenuActions {
+  drafts,
+  linkRequests,
+  associationLinkRequest,
+  frequentlyAskedQuestion,
+  associationContactUs,
+  requestsAndServices,
 }
 
 class _ProgressCard extends StatelessWidget {

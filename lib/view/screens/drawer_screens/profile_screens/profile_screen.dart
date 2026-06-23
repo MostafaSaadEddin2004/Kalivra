@@ -37,7 +37,6 @@ class _ProfileState extends State<Profile> {
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
-    final valueColor = isDark ? AppColors.offWhite : AppColors.black;
 
     return Scaffold(
       appBar: DrawerScreenAppBar(
@@ -58,15 +57,8 @@ class _ProfileState extends State<Profile> {
                     );
                   }
                   break;
-                case _ProfileMenuAction.associationLinkRequest:
-                  context.push(AppRoutes.associationLinkRequest);
-                  break;
-                case _ProfileMenuAction.linkRequests:
-                  context.push(AppRoutes.associationSubmittedRequests);
-                  break;
-
-                case _ProfileMenuAction.drafts:
-                  context.push(AppRoutes.associationDrafts);
+                case _ProfileMenuAction.associationMemberProfile:
+                  context.push(AppRoutes.associationMemberProfile);
                   break;
               }
             },
@@ -86,47 +78,19 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               PopupMenuItem(
-                value: _ProfileMenuAction.associationLinkRequest,
+                value: _ProfileMenuAction.associationMemberProfile,
                 child: Row(
                   children: [
                     Icon(
-                      Icons.link_rounded,
+                      Icons.groups_rounded,
                       size: 20.r,
                       color: theme.colorScheme.onTertiaryFixed,
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      l10n.associationLinkRequest,
+                      l10n.associationPersonalProfileButton,
                       style: textTheme.bodyMedium,
                     ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _ProfileMenuAction.linkRequests,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.upload_file_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.linkRequestsScreen, style: textTheme.bodyMedium),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _ProfileMenuAction.drafts,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.drafts_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.draftsScreen, style: textTheme.bodyMedium),
                   ],
                 ),
               ),
@@ -170,23 +134,11 @@ class _ProfileState extends State<Profile> {
                         children: [
                           CircleAvatar(radius: 48.r),
                           SizedBox(height: 12.h),
-                          Text('displayName', style: textTheme.headlineSmall),
+                          Text('asascasdsad', style: textTheme.headlineSmall),
                           SizedBox(height: 8.h),
-                          FilledButton.icon(
-                            onPressed: () {},
-                            icon: Icon(Icons.edit_rounded, size: 18.r),
-                            label: Text(l10n.editProfile),
-                            style: FilledButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20.w,
-                                vertical: 10.h,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 28.h),
                     _SectionCard(
                       title: l10n.accountInfo,
                       children: [
@@ -194,6 +146,32 @@ class _ProfileState extends State<Profile> {
                           label: l10n.name,
                           value: '---',
                           icon: Icons.person_outline_rounded,
+                        ),
+                        _InfoRow(
+                          label: l10n.email,
+                          value: '---',
+                          icon: Icons.email_outlined,
+                        ),
+                        _InfoRow(
+                          label: l10n.email,
+                          value: '---',
+                          icon: Icons.email_outlined,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 16.h),
+                    _SectionCard(
+                      title: l10n.accountInfo,
+                      children: [
+                        _InfoRow(
+                          label: l10n.name,
+                          value: '---',
+                          icon: Icons.person_outline_rounded,
+                        ),
+                        _InfoRow(
+                          label: l10n.email,
+                          value: '---',
+                          icon: Icons.email_outlined,
                         ),
                         _InfoRow(
                           label: l10n.email,
@@ -210,13 +188,7 @@ class _ProfileState extends State<Profile> {
               final firstName = customer.firstName ?? '';
               final lastName = customer.lastName ?? '';
               final fullName = '$firstName $lastName'.trim();
-              final displayName = fullName.isNotEmpty
-                  ? fullName
-                  : (customer.name?.trim().isNotEmpty == true
-                        ? customer.name!.trim()
-                        : '---');
               final addressInfo = customer.addressInformation;
-
               return ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
@@ -237,28 +209,6 @@ class _ProfileState extends State<Profile> {
                           ),
                         ),
                         SizedBox(height: 12.h),
-                        Text(
-                          displayName,
-                          style: textTheme.headlineSmall?.copyWith(
-                            color: valueColor,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(height: 12.h),
-                        if (addressInfo?.officialTown != null)
-                          OutlinedButton.icon(
-                            onPressed: () => context.push(
-                              AppRoutes.associationMemberProfile,
-                            ),
-                            icon: Icon(Icons.groups_rounded, size: 20.r),
-                            label: Text(l10n.associationPersonalProfileButton),
-                            style: OutlinedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20.w,
-                                vertical: 12.h,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                   ),
@@ -516,12 +466,7 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-enum _ProfileMenuAction {
-  editProfile,
-  drafts,
-  linkRequests,
-  associationLinkRequest,
-}
+enum _ProfileMenuAction { editProfile, associationMemberProfile }
 
 class ReferralCard extends StatefulWidget {
   const ReferralCard({super.key, required this.referralCode});

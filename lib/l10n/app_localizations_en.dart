@@ -1246,10 +1246,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get allCategories => 'All';
 
   @override
-  String get associationPersonalProfileButton => 'Association Personal Profile';
+  String get associationPersonalProfileButton => 'Association Profile';
 
   @override
-  String get associationMemberProfileTitle => 'Association Member Profile';
+  String get associationMemberProfileTitle => 'Association Profile';
 
   @override
   String get associationMemberProfileEmpty =>
@@ -1448,4 +1448,26 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get linkRequestSentSuccessfully =>
       'Association link request has been sent successfully';
+
+  @override
+  String get frequentlyAskedQuestion => 'Frequently asked questions';
+
+  @override
+  String get associationContactUs => 'Contact the association';
+
+  @override
+  String get associationChatMessageHint => 'ُWrite a message';
+
+  @override
+  String get associationRequestsAndServices => 'Requests and services';
+
+  @override
+  String get associationRequestTypeHint => 'select request type';
+
+  @override
+  String get associationRequestTypeOrMessageRequired =>
+      'This field is required';
+
+  @override
+  String get associationRequestMessageHint => 'Enter message';
 }

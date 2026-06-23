@@ -36,24 +36,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _streetController = TextEditingController();
   final _buildingController = TextEditingController();
   final _permanentAddressController = TextEditingController();
+  final _villageController = TextEditingController();
 
   String? _gender;
   String? _selectedGovernorate;
   String? _selectedCity;
   String? _selectedTown;
-  String? _selectedVillage;
-  String? _initialGovernorate;
-  String? _initialCity;
-  String? _initialTown;
-  String? _initialVillage;
-  int? _selectedGovernorateId;
-  int? _selectedCityId;
-  int? _selectedTownId;
-  int? _selectedVillageId;
-  int? _initialGovernorateId;
-  int? _initialCityId;
-  int? _initialTownId;
-  int? _initialVillageId;
   File? _pickedAvatarFile;
   String? _networkAvatarUrl;
   bool didApplyCustomer = false;
@@ -68,6 +56,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _streetController.dispose();
     _buildingController.dispose();
     _permanentAddressController.dispose();
+    _villageController.dispose();
     super.dispose();
   }
 
@@ -106,19 +95,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _selectedGovernorate = addressInfo?.officialGovernorate;
     _selectedCity = addressInfo?.officialCity;
     _selectedTown = addressInfo?.officialTown;
-    _selectedVillage = addressInfo?.officialMunicipalityVillage;
-    _initialGovernorate = _selectedGovernorate;
-    _initialCity = _selectedCity;
-    _initialTown = _selectedTown;
-    _initialVillage = _selectedVillage;
-    _selectedGovernorateId = addressInfo?.permanentCapitalId;
-    _selectedCityId = addressInfo?.permanentCityId;
-    _selectedTownId = addressInfo?.permanentTownId;
-    _selectedVillageId = addressInfo?.permanentVillageId;
-    _initialGovernorateId = _selectedGovernorateId;
-    _initialCityId = _selectedCityId;
-    _initialTownId = _selectedTownId;
-    _initialVillageId = _selectedVillageId;
+    _villageController.text = addressInfo?.officialMunicipalityVillage ?? '';
     _streetController.text = addressInfo?.officialStreet ?? '';
     _buildingController.text = addressInfo?.officialBuilding ?? '';
     _permanentAddressController.text = addressInfo?.permanentAddress ?? '';
@@ -132,13 +109,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _selectedGovernorate = value;
       _selectedCity = null;
       _selectedTown = null;
-      _selectedVillage = null;
-      _selectedGovernorateId = value == _initialGovernorate
-          ? _initialGovernorateId
-          : null;
-      _selectedCityId = null;
-      _selectedTownId = null;
-      _selectedVillageId = null;
     });
   }
 
@@ -146,26 +116,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _selectedCity = value;
       _selectedTown = null;
-      _selectedVillage = null;
-      _selectedCityId = value == _initialCity ? _initialCityId : null;
-      _selectedTownId = null;
-      _selectedVillageId = null;
     });
   }
 
   void _onTownChanged(String? value) {
     setState(() {
       _selectedTown = value;
-      _selectedVillage = null;
-      _selectedTownId = value == _initialTown ? _initialTownId : null;
-      _selectedVillageId = null;
-    });
-  }
-
-  void _onVillageChanged(String? value) {
-    setState(() {
-      _selectedVillage = value;
-      _selectedVillageId = value == _initialVillage ? _initialVillageId : null;
     });
   }
 
@@ -216,7 +172,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         officialGovernorate: _selectedGovernorate,
         officialCity: _selectedCity,
         officialTown: _selectedTown,
-        officialMunicipalityVillage: _selectedVillage,
         officialStreet: _streetController.text.trim().isEmpty
             ? null
             : _streetController.text.trim(),
@@ -448,7 +403,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       enabled: !isLoading && _selectedGovernorate != null,
                       onChanged: _onCityChanged,
-                    ),SizedBox(height: 16.h),
+                    ),
+                    SizedBox(height: 16.h),
                     AssociationDropdownField(
                       label: l10n.associationLinkTown,
                       value: _selectedTown,
@@ -463,19 +419,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onChanged: _onTownChanged,
                     ),
                     SizedBox(height: 16.h),
-                    AssociationDropdownField(
+                    AppTextField(
+                      controller: _villageController,
                       label: l10n.associationLinkVillage,
-                      value: _selectedVillage,
-                      items: SyrianLocationCatalog.withSavedValue(
-                        SyrianLocationCatalog.villages(
-                          _selectedGovernorate,
-                          _selectedCity,
-                          _selectedTown,
-                        ),
-                        _selectedVillage,
-                      ),
-                      enabled: !isLoading && _selectedTown != null,
-                      onChanged: _onVillageChanged,
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(

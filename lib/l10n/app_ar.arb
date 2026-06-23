@@ -412,7 +412,7 @@
   "associationLinkFileTooLarge": "حجم الملف كبير جداً",
   "associationLinkAddAttachment": "إضافة ملف",
   "associationLinkDeleteAttachment": "حذف",
-  "associationLinkSaveDraft": "حفظ مؤقت",
+  "associationLinkSaveDraft": "حفظ كمسودة",
   "associationLinkDraftSaved": "تم حفظ المسودة",
   "associationLinkResubmit": "إعادة تقديم",
   "associationLinkSubmit": "إرسال الطلب",
@@ -506,5 +506,12 @@
   "whatsappNumber": "رقم الواتساب",
   "contactInfo": "معلومات الاتصال",
   "userLocationInfo": "معلومات العنوان",
-  "linkRequestSentSuccessfully": "تم إرسال طلب الربط بالجمعية بنجاح"
+  "linkRequestSentSuccessfully": "تم إرسال طلب الربط بالجمعية بنجاح",
+  "frequentlyAskedQuestion": "الأسئلة الأكثر شيوعاً",
+  "associationContactUs": "تواصل مع الجمعية",
+  "associationChatMessageHint": "اكتب رسالة",
+  "associationRequestsAndServices": "طلبات وخدمات",
+  "associationRequestTypeHint": "اختر نوع الطلب",
+  "associationRequestTypeOrMessageRequired": "الحقل مطلوب",
+  "associationRequestMessageHint": "أدخل رسالتك"
 }

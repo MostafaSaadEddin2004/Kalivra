@@ -35,12 +35,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _streetController = TextEditingController();
   final _buildingController = TextEditingController();
   final _permanentAddressController = TextEditingController();
+  final _villageController = TextEditingController();
 
   String? _gender;
   String? _selectedGovernorate;
   String? _selectedCity;
   String? _selectedTown;
-  String? _selectedVillage;
   File? _pickedAvatarFile;
   String? _networkAvatarUrl;
 
@@ -54,6 +54,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     _streetController.dispose();
     _buildingController.dispose();
     _permanentAddressController.dispose();
+    _villageController.dispose();
     super.dispose();
   }
 
@@ -63,7 +64,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       _selectedGovernorate = value;
       _selectedCity = null;
       _selectedTown = null;
-      _selectedVillage = null;
     });
   }
 
@@ -71,20 +71,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     setState(() {
       _selectedCity = value;
       _selectedTown = null;
-      _selectedVillage = null;
     });
   }
 
   void _onTownChanged(String? value) {
     setState(() {
       _selectedTown = value;
-      _selectedVillage = null;
-    });
-  }
-
-  void _onVillageChanged(String? value) {
-    setState(() {
-      _selectedVillage = value;
     });
   }
 
@@ -135,7 +127,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         officialGovernorate: _selectedGovernorate,
         officialCity: _selectedCity,
         officialTown: _selectedTown,
-        officialMunicipalityVillage: _selectedVillage,
+        officialMunicipalityVillage: _villageController.text,
         officialStreet: _streetController.text.trim().isEmpty
             ? null
             : _streetController.text.trim(),
@@ -384,19 +376,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       onChanged: _onTownChanged,
                     ),
                     SizedBox(height: 16.h),
-                    AssociationDropdownField(
+                    AppTextField(
+                      controller: _villageController,
                       label: l10n.associationLinkVillage,
-                      value: _selectedVillage,
-                      items: SyrianLocationCatalog.withSavedValue(
-                        SyrianLocationCatalog.villages(
-                          _selectedGovernorate,
-                          _selectedCity,
-                          _selectedTown,
-                        ),
-                        _selectedVillage,
-                      ),
-                      enabled: !isLoading && _selectedTown != null,
-                      onChanged: _onVillageChanged,
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(
