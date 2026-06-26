@@ -15,7 +15,9 @@ class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   Future<ShareResult> _shareApp(BuildContext context) async {
-    return Share.share(kalivraShareUrl, subject: 'Kalivra');
+    return SharePlus.instance.share(
+      ShareParams(text: kalivraShareUrl, subject: 'Kalivra'),
+    );
   }
 
   @override
@@ -48,14 +50,18 @@ class AppDrawer extends StatelessWidget {
                   DrawerItem(
                     icon: Icons.favorite_border_rounded,
                     label: AppLocalizations.of(context)!.drawerFavorites,
-                    onTap: () =>
-                        AppRouter.openScreenWithPop(context, AppRoutes.favorites),
+                    onTap: () => AppRouter.openScreenWithPop(
+                      context,
+                      AppRoutes.favorites,
+                    ),
                   ),
                   DrawerItem(
                     icon: Icons.settings_outlined,
                     label: AppLocalizations.of(context)!.drawerSettings,
-                    onTap: () =>
-                        AppRouter.openScreenWithPop(context, AppRoutes.settings),
+                    onTap: () => AppRouter.openScreenWithPop(
+                      context,
+                      AppRoutes.settings,
+                    ),
                   ),
                   DrawerItem(
                     icon: Icons.phone_outlined,

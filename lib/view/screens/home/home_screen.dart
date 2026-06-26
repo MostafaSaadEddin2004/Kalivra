@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import 'package:kalivra/view/screens/home/categories_page.dart';
 import 'package:kalivra/view/screens/home/home_page.dart';
 import 'package:kalivra/view/screens/home/notifications_page.dart';
 import 'package:kalivra/view/screens/home/search_page.dart';
+import 'package:kalivra/view/widgets/confirm_dialog.dart';
 import 'package:kalivra/view/widgets/nav/custom_nav_bar.dart';
 import 'package:kalivra/view/widgets/drawer/app_drawer.dart';
 import 'package:kalivra/view/widgets/custom_app_bar.dart';
@@ -26,33 +28,43 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<NavItemModel> _buildNavItems(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return [
-      NavItemModel(icon: Icons.home_rounded, index: 0, title: l10n.navHome),
-      NavItemModel(
-        icon: Icons.category_rounded,
-        index: 1,
-        title: l10n.navCategories,
-      ),
-      NavItemModel(
-        icon: Icons.notifications_rounded,
-        index: 2,
-        title: l10n.navNotifications,
-      ),
-      NavItemModel(icon: Icons.search_rounded, index: 3, title: l10n.navSearch),
-    ];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return PopScopeExitApp(
-      scaffoldKey: _scaffoldKey,
+ final l10n = AppLocalizations.of(context)!;
+  
+  List<NavItemModel>  navItems = [
+    NavItemModel(icon: Icons.home_rounded, index: 0, title: l10n.navHome),
+    NavItemModel(
+      icon: Icons.category_rounded,
+      index: 1,
+      title: l10n.navCategories,
+    ),
+    NavItemModel(
+      icon: Icons.notifications_rounded,
+      index: 2,
+      title: l10n.navNotifications,
+    ),
+    NavItemModel(icon: Icons.search_rounded, index: 3, title: l10n.navSearch),
+  ];
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) async {
+        if (_scaffoldKey.currentState!.isDrawerOpen) {
+          _scaffoldKey.currentState!.closeDrawer();
+        } else if (!didPop) {
+          await showDialog<bool>(
+            context: context,
+            builder: (_) => ConfirmDialog(
+              title: l10n.exitAppTitle,
+              message: l10n.exitAppConfirmation,
+              onConfirm: () {
+                Navigator.pop(context);
+                SystemNavigator.pop();
+              },
+            ),
+          );
+        }
+      },
       child: BlocProvider(
         create: (_) => NavCubit(),
         child: BlocBuilder<NavCubit, int>(
@@ -82,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
               bottomNavigationBar: SafeArea(
                 top: false,
                 child: CustomNavBar(
-                  items: _buildNavItems(context),
+                  items: navItems,
                   currentIndex: index,
                   onTap: (i) {
                     context.read<NavCubit>().goTo(i);

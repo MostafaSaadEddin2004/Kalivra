@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "473993028979",
+    "project_id": "kalivra-cd571",
+    "storage_bucket": "kalivra-cd571.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:473993028979:android:b9d909e07460e1a3ebd106",
+        "android_client_info": {
+          "package_name": "com.example.kalivra"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA4cz9XFxyaub__5fY1_gS9BUzUF50tyPs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

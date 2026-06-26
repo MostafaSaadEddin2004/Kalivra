@@ -330,11 +330,9 @@ class _AssociationLinkRequestScreenState
   Future<void> _pickAttachment() async {
     if (_isLocked) return;
     final l10n = AppLocalizations.of(context)!;
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: _allowedExtensions,
-      withData: false,
     );
     if (result == null || !mounted) return;
 
@@ -420,7 +418,6 @@ class _AssociationLinkRequestScreenState
       ],
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

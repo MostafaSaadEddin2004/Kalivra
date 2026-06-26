@@ -37,11 +37,9 @@ class _AssociationRequestsAndServicesScreenState
 
   Future<void> _pickAttachment() async {
     final l10n = AppLocalizations.of(context)!;
-    final result = await FilePicker.platform.pickFiles(
-      allowMultiple: true,
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: _allowedExtensions,
-      withData: false,
     );
     if (result == null || !mounted) return;
 
@@ -117,7 +115,7 @@ class _AssociationRequestsAndServicesScreenState
                         items: requestTypes
                             .map(
                               (item) => DropdownMenuItem(
-                                alignment: AlignmentGeometry.bottomCenter,
+                                alignment: Alignment.center,
                                 value: item.value,
                                 child: Text(item.label),
                               ),
