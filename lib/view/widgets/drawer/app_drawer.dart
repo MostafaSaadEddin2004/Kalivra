@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_footer.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_header.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_item.dart';
 import 'package:share_plus/share_plus.dart';
 
 const String kalivraShareUrl = 'https://kalivra.com';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
+  const AppDrawer({super.key, this.onClose});
+
+  final VoidCallback? onClose;
 
   Future<ShareResult> _shareApp(BuildContext context) async {
     return SharePlus.instance.share(
@@ -30,7 +30,6 @@ class AppDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CustomDrawerHeader(onClose: () => context.pop(context)),
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,

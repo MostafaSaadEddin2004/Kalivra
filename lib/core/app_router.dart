@@ -35,6 +35,8 @@ import 'package:kalivra/view/screens/home/all_products_screen.dart';
 import 'package:kalivra/view/screens/home/all_sale_products_screen.dart';
 import 'package:kalivra/view/screens/home/ad_details_screen.dart';
 import 'package:kalivra/view/screens/home/cart_screen.dart';
+import 'package:kalivra/view/screens/home/notifications_screen.dart';
+import 'package:kalivra/view/screens/home/search_screen.dart';
 import 'package:kalivra/view/screens/checkout/checkout_screen.dart';
 import 'package:kalivra/view/screens/auth/intro_screen.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -79,6 +81,8 @@ abstract class AppRoutes {
   static const String completeProfile = '/complete-profile';
   static const String authOtp = '/auth-otp';
   static const String cart = '/cart';
+  static const String search = '/search';
+  static const String notifications = '/notifications';
   static const String checkout = '/checkout';
   static const String associationLinkRequest = '/association-link-request';
   static const String associationMemberProfile = '/association-member-profile';
@@ -87,7 +91,8 @@ abstract class AppRoutes {
       '/association-submitted-requests';
   static const String associationFaq = '/association-faq';
   static const String associationContactUs = '/association-contact-us';
-  static const String associationRequestsAndServices = '/association-requests-and-services';
+  static const String associationRequestsAndServices =
+      '/association-requests-and-services';
 }
 
 abstract class AppRoutesName {
@@ -123,6 +128,8 @@ abstract class AppRoutesName {
   static const String completeProfile = 'complete-profile';
   static const String authOtp = 'auth-otp';
   static const String cart = 'cart';
+  static const String search = 'search';
+  static const String notifications = 'notifications';
   static const String checkout = 'checkout';
   static const String associationLinkRequest = 'association-link-request';
   static const String associationMemberProfile = 'association-member-profile';
@@ -131,7 +138,8 @@ abstract class AppRoutesName {
       'association-submitted-requests';
   static const String associationFaq = 'association-faq';
   static const String associationContactUs = 'association-contact-us';
-  static const String associationRequestsAndServices = 'association-requests-and-services';
+  static const String associationRequestsAndServices =
+      'association-requests-and-services';
 }
 
 abstract class AppRouter {
@@ -375,6 +383,16 @@ abstract class AppRouter {
             path: AppRoutes.cart,
             name: AppRoutesName.cart,
             builder: (_, _) => const CartScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.search,
+            name: AppRoutesName.search,
+            builder: (_, _) => const SearchScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.notifications,
+            name: AppRoutesName.notifications,
+            builder: (_, _) => const NotificationsScreen(),
           ),
           GoRoute(
             path: AppRoutes.checkout,
