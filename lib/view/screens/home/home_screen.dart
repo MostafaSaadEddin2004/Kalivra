@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/model/nav/nav_item_model.dart';
 import 'package:kalivra/view/screens/home/cart_page.dart';
 import 'package:kalivra/view/screens/home/categories_page.dart';
 import 'package:kalivra/view/screens/home/home_page.dart';
-import 'package:kalivra/view/widgets/confirm_dialog.dart';
 import 'package:kalivra/view/widgets/nav/custom_nav_bar.dart';
-import 'package:kalivra/view/widgets/drawer/app_drawer.dart';
+import 'package:kalivra/view/screens/home/profile_page.dart';
 import 'package:kalivra/view/widgets/custom_app_bar.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
@@ -23,7 +21,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -47,53 +44,28 @@ class _HomeScreenState extends State<HomeScreen> {
         title: l10n.drawerMyAccount,
       ),
     ];
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) async {
-        if (_scaffoldKey.currentState!.isDrawerOpen) {
-          _scaffoldKey.currentState!.closeDrawer();
-        } else if (!didPop) {
-          await showDialog<bool>(
-            context: context,
-            builder: (_) => ConfirmDialog(
-              title: l10n.exitAppTitle,
-              message: l10n.exitAppConfirmation,
-              onConfirm: () {
-                Navigator.pop(context);
-                SystemNavigator.pop();
-              },
-            ),
-          );
-        }
-      },
+    return PopScopeExitApp(
       child: BlocProvider(
         create: (_) => NavCubit(),
         child: BlocBuilder<NavCubit, int>(
           builder: (context, index) {
             return Scaffold(
-              key: _scaffoldKey,
-              extendBody: true,
               appBar: CustomAppBar(
                 onSearchTap: () => context.push(AppRoutes.search),
                 onNotificationsTap: () => context.push(AppRoutes.notifications),
               ),
-              drawer: const AppDrawer(),
-              body: Padding(
-                padding: EdgeInsets.only(bottom: 54.h),
-                child: IndexedStack(
-                  index: index,
-                  children: [
-                    const HomePage(),
-                    const CategoriesPage(),
-                    const CartPage(),
-                    AppDrawer(
-                      onClose: () =>
-                          context.read<NavCubit>().goTo(NavCubit.home),
-                    ),
-                  ],
-                ),
+              body: IndexedStack(
+                index: index,
+                children: [
+                  const HomePage(),
+                  const CategoriesPage(),
+                  const CartPage(),
+                  const ProfilePage(),
+                ],
               ),
               bottomNavigationBar: SafeArea(
                 top: false,
+                maintainBottomViewPadding: true,
                 child: CustomNavBar(
                   items: navItems,
                   currentIndex: index,

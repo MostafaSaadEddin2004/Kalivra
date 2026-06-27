@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   const OrderDetailsScreen({super.key, required this.order});
@@ -24,7 +24,7 @@ class OrderDetailsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.orderDetails),
+      appBar: ScreenAppBar(title: l10n.orderDetails),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
         children: [

@@ -9,7 +9,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
-import '../../widgets/drawer/drawer_screen_app_bar.dart';
+import '../../widgets/profile_page/screen_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -18,7 +18,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.settingsTitle),
+      appBar: ScreenAppBar(title: l10n.settingsTitle),
       body: ListView(
         padding: EdgeInsets.all(20.w),
         children: [

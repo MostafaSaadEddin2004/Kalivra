@@ -6,7 +6,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -85,7 +85,7 @@ class _OtpScreenState extends State<OtpScreen> {
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: _title),
+      appBar: ScreenAppBar(title: _title),
       body: Form(
         key: _formKey,
         child: ListView(

@@ -7,7 +7,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -30,7 +30,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.myOrders),
+      appBar: ScreenAppBar(title: AppLocalizations.of(context)!.myOrders),
       body: BlocBuilder<OrdersCubit, OrdersState>(
         bloc: OrdersCubit()..loadOrders(),
         builder: (context, state) {

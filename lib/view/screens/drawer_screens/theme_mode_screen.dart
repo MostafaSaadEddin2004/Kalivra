@@ -5,7 +5,7 @@ import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/theme/theme_mode_model.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/selectable_card.dart';
 
 class ThemeModeScreen extends StatelessWidget {
@@ -66,7 +66,7 @@ class ThemeModeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.appearanceTitle),
+      appBar: ScreenAppBar(title: AppLocalizations.of(context)!.appearanceTitle),
       body: BlocBuilder<ThemeBloc, ThemeBlocState>(
         builder: (context, state) {
           final currentMode = state is ThemeFetched ? state.mode : ThemeMode.system;

@@ -5,9 +5,9 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 
-class DrawerScreenAppBar extends StatelessWidget
+class ScreenAppBar extends StatelessWidget
     implements PreferredSizeWidget {
-  const DrawerScreenAppBar({
+  const ScreenAppBar({
     super.key,
     required this.title,
     this.actions,

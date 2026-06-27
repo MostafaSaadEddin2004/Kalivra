@@ -6,15 +6,17 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/location/syrian_location_catalog.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
+import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key, this.args});
@@ -151,6 +153,29 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
+  void _skipToOtp() {
+    final args = widget.args;
+    final phone = args?.whatsappNumber.trim();
+    final token = args?.token?.trim();
+
+    if (args == null ||
+        phone == null ||
+        phone.isEmpty ||
+        token == null ||
+        token.isEmpty) {
+      CustomSnackBar.show(
+        context,
+        AppLocalizations.of(context)!.errorMissingData,
+      );
+      return;
+    }
+
+    context.goNamed(
+      AppRoutesName.authOtp,
+      extra: AuthOtpArgs(email: args.email, phone: phone, token: token),
+    );
+  }
+
   bool isLoading = false;
 
   @override
@@ -170,7 +195,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: DrawerScreenAppBar(title: l10n.editProfileTitle),
+          appBar: ScreenAppBar(title: l10n.editProfileTitle),
           body: Form(
             key: _formKey,
             child: ListView(
@@ -416,36 +441,37 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   ],
                 ),
                 SizedBox(height: 32.h),
-                BlocListener<AuthCubit, AuthState>(
-                  listener: (context, state) {
-                    switch (state) {
-                      case AuthLoading():
-                        isLoading = true;
-                      default:
-                        isLoading = false;
-                    }
-                  },
-                  child: FilledButton(
-                    onPressed: _save,
-                    style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14.r),
-                      ),
-                      elevation: 0,
+                FilledButton(
+                  onPressed: _save,
+                  style: FilledButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
                     ),
-                    child: isLoading
-                        ? SpinKitFadingCircle(
+                    elevation: 0,
+                  ),
+                  child: isLoading
+                      ? SpinKitFadingCircle(
+                          color: AppColors.offWhite,
+                          size: 20.r,
+                        )
+                      : Text(
+                          l10n.saveChanges,
+                          style: theme.textTheme.titleMedium?.copyWith(
                             color: AppColors.offWhite,
-                            size: 20.r,
-                          )
-                        : Text(
-                            l10n.saveChanges,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: AppColors.offWhite,
-                              fontWeight: FontWeight.w700,
-                            ),
+                            fontWeight: FontWeight.w700,
                           ),
+                        ),
+                ),
+                SizedBox(height: 12.h),
+                TextButton(
+                  onPressed: isLoading ? null : _skipToOtp,
+                  child: Text(
+                    l10n.skipForNow,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: labelColor,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ],

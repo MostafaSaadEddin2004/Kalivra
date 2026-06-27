@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AllBrandsScreen extends StatelessWidget {
   const AllBrandsScreen({super.key});
@@ -10,7 +10,7 @@ class AllBrandsScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.brandsSection),
+      appBar: ScreenAppBar(title: l10n.brandsSection),
     );
   }
 }

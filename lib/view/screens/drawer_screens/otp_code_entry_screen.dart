@@ -7,7 +7,7 @@ import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class OtpCodeEntryScreen extends StatefulWidget {
@@ -55,7 +55,7 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
       } else if (widget.args.mode == OtpScreenMode.signUp) {
         context.push(AppRoutes.completeProfile, extra: widget.args);
       } else {
-        context.push(AppRoutes.confirmNewPhone, extra: widget.args.phone);
+        context.push(AppRoutes.confirmNewPhone, extra: widget.args.whatsappNumber);
       }
     });
   }
@@ -69,7 +69,7 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     return PopScopeExitApp(
       child: Scaffold(
-      appBar: DrawerScreenAppBar(title: _title(context)),
+      appBar: ScreenAppBar(title: _title(context)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -88,7 +88,7 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.otpSentToPhone(widget.args.phone),
+                      l10n.otpSentToPhone(widget.args.whatsappNumber),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),

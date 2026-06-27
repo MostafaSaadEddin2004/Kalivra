@@ -1,30 +1,27 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:kalivra/main.dart';
+import 'package:kalivra/model/notifications/app_notification.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const Main());
+  test('AppNotification parses Firebase payload data', () {
+    final notification = AppNotification.fromRemoteData({
+      'message_id': 'message-1',
+      'notification_type': 'financial_operation',
+      'title': 'Payment due',
+      'body': 'A financial obligation requires review.',
+      'priority': 'critical',
+      'related_entity': 'obligation',
+      'related_entity_id': 'obligation-1',
+      'is_mandatory': 'true',
+      'channels': 'in_app,sms,email',
+      'created_at': '2026-06-27T10:00:00.000Z',
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(notification.id, 'message-1');
+    expect(notification.type, AppNotificationType.financialOperation);
+    expect(notification.priority, AppNotificationPriority.critical);
+    expect(notification.relatedEntity, AppNotificationRelatedEntity.obligation);
+    expect(notification.relatedEntityId, 'obligation-1');
+    expect(notification.isMandatory, isTrue);
+    expect(notification.channels, contains(AppNotificationDeliveryChannel.sms));
   });
 }

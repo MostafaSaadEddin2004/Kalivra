@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import '../../widgets/drawer/drawer_screen_app_bar.dart';
+import '../../widgets/profile_page/screen_app_bar.dart';
 
 class RateScreen extends StatelessWidget {
   const RateScreen({super.key});
@@ -15,7 +15,7 @@ class RateScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.rateTitle),
+      appBar: ScreenAppBar(title: AppLocalizations.of(context)!.rateTitle),
       body: Padding(
         padding: EdgeInsets.all(24.w),
         child: Column(

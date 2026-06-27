@@ -17,7 +17,7 @@ import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationLinkRequestScreen extends StatefulWidget {
   const AssociationLinkRequestScreen({
@@ -427,7 +427,7 @@ class _AssociationLinkRequestScreenState
     final hintColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(
+      appBar: ScreenAppBar(
         title: widget.resubmit
             ? l10n.associationLinkResubmit
             : l10n.associationLinkRequestTitle,

@@ -7,7 +7,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/association_link_draft_store.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationDraftsScreen extends StatefulWidget {
   const AssociationDraftsScreen({super.key});
@@ -88,7 +88,7 @@ class _AssociationDraftsScreenState extends State<AssociationDraftsScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.associationLinkDraftsTitle),
+      appBar: ScreenAppBar(title: l10n.associationLinkDraftsTitle),
       body: FutureBuilder<List<AssociationLinkDraftEntry>>(
         future: _draftsFuture,
         builder: (context, snapshot) {

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
-class DrawerFooter extends StatelessWidget {
-  const DrawerFooter({super.key});
+class ProfilePageFooter extends StatelessWidget {
+  const ProfilePageFooter({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart'
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/language/language_model.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/selectable_card.dart';
 
 class LanguageScreen extends StatelessWidget {
@@ -51,7 +51,7 @@ class LanguageScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.languageTitle),
+      appBar: ScreenAppBar(title: AppLocalizations.of(context)!.languageTitle),
       body: BlocBuilder<LocaleBloc, LocaleBlocState>(
         builder: (context, state) {
           final useSystem = state is LocaleFetched && state.useSystemLocale;

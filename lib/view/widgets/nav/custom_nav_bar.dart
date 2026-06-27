@@ -19,17 +19,17 @@ class CustomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
+      margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
       padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 0),
       decoration: BoxDecoration(
         color: colorScheme.primary,
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: colorScheme.onSurface.withValues(alpha: 0.15),
-        //     blurRadius: 16.r,
-        //     offset: Offset(0, 4.h),
-        //   ),
-        // ],
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.onSurface.withValues(alpha: 0.15),
+            blurRadius: 16.r,
+            offset: Offset(0, 4.h),
+          ),
+        ],
         borderRadius: BorderRadius.circular(32.r),
       ),
       child: Row(

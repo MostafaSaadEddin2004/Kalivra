@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
-import '../../widgets/drawer/drawer_screen_app_bar.dart';
+import '../../widgets/profile_page/screen_app_bar.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -30,7 +30,7 @@ class _ContactScreenState extends State<ContactScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.contactTitle),
+      appBar: ScreenAppBar(title: l10n.contactTitle),
       body: ListView(
         padding: EdgeInsets.all(20.w),
         children: [

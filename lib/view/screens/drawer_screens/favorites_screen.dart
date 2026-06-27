@@ -6,7 +6,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -33,7 +33,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.favorites),
+      appBar: ScreenAppBar(title: l10n.favorites),
       body: BlocBuilder<WishlistCubit, WishlistState>(
         bloc: WishlistCubit()..loadWishlist(),
         builder: (context, state) {

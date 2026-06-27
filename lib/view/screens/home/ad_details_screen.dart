@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/ad/advertisement_model.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AdDetailsScreen extends StatelessWidget {
   const AdDetailsScreen({super.key, required this.ad});
@@ -16,7 +16,7 @@ class AdDetailsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(
+      appBar: ScreenAppBar(
         title: ad.companyName ?? ad.title,
       ),
       body: SingleChildScrollView(

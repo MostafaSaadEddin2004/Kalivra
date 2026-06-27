@@ -8,7 +8,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class SetNewPasswordScreen extends StatefulWidget {
   const SetNewPasswordScreen({super.key});
@@ -40,7 +40,6 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
     context.go(AppRoutes.home);
   }
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -49,9 +48,8 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
 
     final l10n = AppLocalizations.of(context)!;
     return PopScopeExitApp(
-      scaffoldKey: _scaffoldKey,
       child: Scaffold(
-        appBar: DrawerScreenAppBar(title: l10n.setNewPasswordTitle),
+        appBar: ScreenAppBar(title: l10n.setNewPasswordTitle),
         body: Form(
           key: _formKey,
           child: ListView(

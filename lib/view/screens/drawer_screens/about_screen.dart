@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import '../../widgets/drawer/drawer_screen_app_bar.dart';
+import '../../widgets/profile_page/screen_app_bar.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -14,7 +14,7 @@ class AboutScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.drawerAboutApp),
+      appBar: ScreenAppBar(title: l10n.drawerAboutApp),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(24.w),
         child: Column(

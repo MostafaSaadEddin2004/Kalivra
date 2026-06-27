@@ -20,7 +20,6 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
   final _whatsappNumberController = TextEditingController();
   final _countryCodeController = TextEditingController();
   final _firstNameController = TextEditingController();
@@ -40,7 +39,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
-    _phoneController.dispose();
     _whatsappNumberController.dispose();
     _firstNameController.dispose();
     _emailController.dispose();
@@ -118,51 +116,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   label: AppLocalizations.of(context)!.email,
                   hint: AppLocalizations.of(context)!.enterEmail,
                   keyboardType: TextInputType.emailAddress,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return AppLocalizations.of(context)!.enterEmail;
-                    }
-                    return null;
-                  },
                 ),
-                SizedBox(height: 20.h),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: AppTextField(
-                        textDirection: TextDirection.ltr,
-                        controller: _phoneController,
-                        label: AppLocalizations.of(context)!.phoneLabel,
-                        hint: '9xx xxx xxx',
-                        keyboardType: TextInputType.phone,
-                        maxLength: 9,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return AppLocalizations.of(context)!.enterPhone;
-                          }
-                          if (v.trim().length < 8) {
-                            return AppLocalizations.of(
-                              context,
-                            )!.invalidPhoneShort;
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    SizedBox(
-                      width: 75.w,
-                      child: AppTextField(
-                        textDirection: TextDirection.ltr,
-                        enabled: false,
-                        controller: _countryCodeController,
-                        keyboardType: TextInputType.phone,
-                      ),
-                    ),
-                  ],
-                ),
-
                 SizedBox(height: 20.h),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +128,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         label: AppLocalizations.of(
                           context,
                         )!.signUpWhatsAppLabel,
-                        hint: AppLocalizations.of(context)!.signUpWhatsAppHint,
+                        hint: AppLocalizations.of(
+                          context,
+                        )!.signUpWhatsAppHint,
                         keyboardType: TextInputType.phone,
                         maxLength: 9,
                         validator: (v) {
@@ -204,7 +160,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ],
                 ),
-
+                
                 SizedBox(height: 20.h),
                 AppTextField(
                   controller: _passwordController,
@@ -217,15 +173,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         : Icons.visibility_rounded,
                     iconSize: 22.r,
                     color: labelColor,
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () => setState(
+                      () => _obscurePassword = !_obscurePassword,
+                    ),
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) {
                       return AppLocalizations.of(context)!.enterPassword;
                     }
                     if (v.length < 6) {
-                      return AppLocalizations.of(context)!.passwordMinLength;
+                      return AppLocalizations.of(
+                        context,
+                      )!.passwordMinLength;
                     }
                     return null;
                   },
@@ -252,7 +211,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       )!.confirmPasswordRequired;
                     }
                     if (v != _passwordController.text) {
-                      return AppLocalizations.of(context)!.passwordsDoNotMatch;
+                      return AppLocalizations.of(
+                        context,
+                      )!.passwordsDoNotMatch;
                     }
                     return null;
                   },
@@ -283,15 +244,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           firstName: _firstNameController.text.trim(),
                           lastName: _lastNameController.text.trim(),
                           email: _emailController.text.trim(),
-                          phone:
-                              _countryCodeController.text +
-                              _phoneController.text,
                           whatsappNumber:
                               _countryCodeController.text +
                               _whatsappNumberController.text,
-
                           password: _passwordController.text,
-                          passwordConfirmation: _confirmPasswordController.text,
+                          passwordConfirmation:
+                              _confirmPasswordController.text,
                           referralCode: _referralCodeController.text.trim(),
                         );
                       },
@@ -326,7 +284,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Text(
                       AppLocalizations.of(context)!.haveAccount,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                        color: isDark
+                            ? AppColors.taupe
+                            : AppColors.burgundy,
                       ),
                     ),
                     TextButton(

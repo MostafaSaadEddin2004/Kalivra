@@ -10,7 +10,7 @@ import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
 import 'package:kalivra/view/widgets/product/wishlist_icon.dart';
 
@@ -78,7 +78,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final viewData = ProductViewData.fromProduct(product, l10n);
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.productDetails),
+      appBar: ScreenAppBar(title: l10n.productDetails),
       body: BlocBuilder<ProductsCubit, ProductsState>(
         builder: (context, state) {
           final variantState =

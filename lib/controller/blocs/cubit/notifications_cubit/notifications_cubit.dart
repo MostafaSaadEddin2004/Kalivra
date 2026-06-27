@@ -13,10 +13,16 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   Future<void> _updateLoginRequired() async {
     final token = await LocalStore.getToken();
     final loginRequired = token == null || token.isEmpty;
+    final notifications = loginRequired
+        ? const <AppNotification>[]
+        : state.notifications.isEmpty
+        ? _seedNotifications()
+        : state.notifications;
+
     emit(
       state.copyWith(
         loginRequired: loginRequired,
-        notifications: loginRequired ? const [] : _seedNotifications(),
+        notifications: notifications,
       ),
     );
   }
@@ -33,6 +39,38 @@ class NotificationsCubit extends Cubit<NotificationsState> {
           return notification.copyWith(readAt: readAt);
         })
         .toList(growable: false);
+
+    emit(state.copyWith(notifications: notifications));
+  }
+
+  AppNotification receiveRemoteNotification(
+    Map<String, dynamic> data, {
+    String? fallbackId,
+    String? fallbackTitle,
+    String? fallbackMessage,
+  }) {
+    final notification = AppNotification.fromRemoteData(
+      data,
+      fallbackId: fallbackId,
+      fallbackTitle: fallbackTitle,
+      fallbackMessage: fallbackMessage,
+    );
+    addOrUpdateNotification(notification);
+    return notification;
+  }
+
+  void addOrUpdateNotification(AppNotification notification) {
+    final currentNotifications = state.notifications;
+    final existingIndex = currentNotifications.indexWhere(
+      (item) => item.id == notification.id,
+    );
+
+    final notifications = List<AppNotification>.of(currentNotifications);
+    if (existingIndex == -1) {
+      notifications.insert(0, notification);
+    } else {
+      notifications[existingIndex] = notification;
+    }
 
     emit(state.copyWith(notifications: notifications));
   }

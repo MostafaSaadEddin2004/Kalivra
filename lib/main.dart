@@ -16,8 +16,10 @@ import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dar
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/firebase_helper.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/screen_util_config.dart';
+import 'package:kalivra/model/notifications/app_notification.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -26,6 +28,7 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  await FirebaseHelper.initialize();
   runApp(
     MultiBlocProvider(
       providers: [
@@ -45,8 +48,66 @@ void main() async {
   );
 }
 
-class Main extends StatelessWidget {
+class Main extends StatefulWidget {
   const Main({super.key});
+
+  @override
+  State<Main> createState() => _MainState();
+}
+
+class _MainState extends State<Main> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+
+      FirebaseHelper.initialize(
+        onNotificationReceived: _handleNotificationReceived,
+        onNotificationTap: _handleNotificationTap,
+      );
+    });
+  }
+
+  void _handleNotificationReceived(Map<String, dynamic> data) {
+    if (!mounted) {
+      return;
+    }
+
+    context.read<NotificationsCubit>().receiveRemoteNotification(data);
+  }
+
+  void _handleNotificationTap(Map<String, dynamic> data) {
+    if (!mounted) {
+      return;
+    }
+
+    final notification = context
+        .read<NotificationsCubit>()
+        .receiveRemoteNotification(data);
+    context.read<NotificationsCubit>().markAsRead(notification.id);
+    AppRouter.router.push(_routeForNotification(notification));
+  }
+
+  String _routeForNotification(AppNotification notification) {
+    switch (notification.type) {
+      case AppNotificationType.memberOperation:
+        return AppRoutes.associationMemberProfile;
+      case AppNotificationType.financialOperation:
+        return AppRoutes.orders;
+      case AppNotificationType.decisionSession:
+      case AppNotificationType.officialAnnouncement:
+      case AppNotificationType.legalDeadline:
+        return AppRoutes.associationRequestsAndServices;
+      case AppNotificationType.manualSystemNotice:
+        return AppRoutes.settings;
+      case AppNotificationType.deliveryFailure:
+        return AppRoutes.contact;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(

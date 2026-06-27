@@ -42,8 +42,6 @@ class CategoriesPage extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(child: SizedBox(height: 8.h)),
-
-            // ── Category Tab Bar ──────────────────────────────────
             SliverToBoxAdapter(
               child: BlocBuilder<CategoriesCubit, CategoriesState>(
                 bloc: CategoriesCubit()..loadCategories(),

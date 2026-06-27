@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class ConfirmNewPhoneScreen extends StatelessWidget {
   const ConfirmNewPhoneScreen({super.key, required this.phone});
@@ -29,7 +29,7 @@ class ConfirmNewPhoneScreen extends StatelessWidget {
         : AppColors.offWhite;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.changePhoneTitle),
+      appBar: ScreenAppBar(title: l10n.changePhoneTitle),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
         children: [

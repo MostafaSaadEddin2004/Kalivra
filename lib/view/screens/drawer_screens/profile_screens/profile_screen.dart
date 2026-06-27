@@ -6,7 +6,7 @@ import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -37,7 +37,7 @@ class _ProfileState extends State<Profile> {
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(
+      appBar: ScreenAppBar(
         title: l10n.myAccount,
         actions: [
           BlocBuilder<AuthCubit, AuthState>(

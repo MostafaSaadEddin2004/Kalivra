@@ -7,7 +7,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_member_profile.dart';
 import 'package:kalivra/model/services/api/association_link_api_service.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationMemberProfileScreen extends StatefulWidget {
   const AssociationMemberProfileScreen({super.key});
@@ -44,7 +44,7 @@ class _AssociationMemberProfileScreenState
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(
+      appBar: ScreenAppBar(
         title: l10n.associationMemberProfileTitle,
         actions: [
           PopupMenuButton<_AccosiciationMemberProfileMenuActions>(

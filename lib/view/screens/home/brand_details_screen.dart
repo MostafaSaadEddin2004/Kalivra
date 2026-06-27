@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class BrandDetailsScreen extends StatelessWidget {
   const BrandDetailsScreen({super.key, required this.brand});
@@ -19,7 +19,7 @@ class BrandDetailsScreen extends StatelessWidget {
         : AppColors.burgundy.withValues(alpha: 0.06);
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: brand.name),
+      appBar: ScreenAppBar(title: brand.name),
       body: ListView(
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
         children: [

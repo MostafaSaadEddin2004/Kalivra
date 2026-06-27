@@ -7,7 +7,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -54,7 +54,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.changePasswordTitle),
+      appBar: ScreenAppBar(title: l10n.changePasswordTitle),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -206,7 +206,7 @@ enum OtpScreenMode { forgotPassword, changePhone, signUp }
 class OtpOnboardingArgs {
   const OtpOnboardingArgs({
     required this.mode,
-    required this.phone,
+    required this.whatsappNumber,
     this.email,
     this.token,
     this.name,
@@ -214,7 +214,7 @@ class OtpOnboardingArgs {
     this.referralCode,
   });
   final OtpScreenMode mode;
-  final String phone;
+  final String whatsappNumber;
   final String? email;
   final String? token;
   final String? name;

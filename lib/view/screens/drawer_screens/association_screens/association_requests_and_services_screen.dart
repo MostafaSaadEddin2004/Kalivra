@@ -9,7 +9,7 @@ import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationRequestsAndServicesScreen extends StatefulWidget {
   const AssociationRequestsAndServicesScreen({super.key});
@@ -87,7 +87,7 @@ class _AssociationRequestsAndServicesScreenState
     ];
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.associationRequestsAndServices),
+      appBar: ScreenAppBar(title: l10n.associationRequestsAndServices),
       body: Form(
         key: _formKey,
         child: Column(

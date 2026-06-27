@@ -5,7 +5,7 @@ import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dar
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class AllProductsScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.products),
+      appBar: ScreenAppBar(title: l10n.products),
       body: BlocBuilder<ProductsCubit, ProductsState>(
         bloc: ProductsCubit()..loadProducts(),
         builder: (context, state) {

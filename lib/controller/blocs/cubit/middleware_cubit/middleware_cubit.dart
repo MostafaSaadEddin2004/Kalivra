@@ -7,7 +7,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/view/screens/auth/intro_screen.dart';
 import 'package:kalivra/view/splash_screen.dart';
 import 'package:kalivra/view/widgets/confirm_dialog.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_item.dart';
+import 'package:kalivra/view/widgets/profile_page/profile_page_item.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/login_dialog.dart';
 
@@ -46,7 +46,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
     if (token != null && token.isNotEmpty) {
       emit(
         LogOutButton(
-          button: DrawerItem(
+          button: ProfilePageItem(
             icon: Icons.logout_rounded,
             label: AppLocalizations.of(context)!.signOut,
             onTap: () => showDialog(
@@ -88,7 +88,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
     } else {
       emit(
         LoginButton(
-          button: DrawerItem(
+          button: ProfilePageItem(
             icon: Icons.login_rounded,
             label: AppLocalizations.of(context)!.signIn,
             onTap: () => context.go(AppRoutes.login),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class DrawerItem extends StatelessWidget {
-  const DrawerItem({
+class ProfilePageItem extends StatelessWidget {
+  const ProfilePageItem({
     super.key,
     required this.icon,
     required this.label,

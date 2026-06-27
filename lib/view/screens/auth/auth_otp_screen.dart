@@ -10,7 +10,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AuthOtpArgs {
@@ -190,7 +190,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
       child: Form(
         key: _formState,
         child: Scaffold(
-          appBar: DrawerScreenAppBar(title: l10n.authOtpTitle),
+          appBar: ScreenAppBar(title: l10n.authOtpTitle),
           body: ListView(
             padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
             children: [

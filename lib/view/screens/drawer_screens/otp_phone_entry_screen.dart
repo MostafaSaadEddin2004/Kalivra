@@ -7,7 +7,7 @@ import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class OtpPhoneEntryScreen extends StatefulWidget {
@@ -31,7 +31,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
   void initState() {
     super.initState();
     _phoneController = TextEditingController(
-      text: widget.signUpArgs?.phone ?? '',
+      text: widget.signUpArgs?.whatsappNumber ?? '',
     );
   }
 
@@ -66,13 +66,13 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
         extra: widget.signUpArgs != null
             ? OtpOnboardingArgs(
                 mode: OtpScreenMode.signUp,
-                phone: _phoneController.text.trim(),
+                whatsappNumber: _phoneController.text.trim(),
                 name: widget.signUpArgs!.name,
                 password: widget.signUpArgs!.password,
               )
             : OtpOnboardingArgs(
                 mode: widget._effectiveMode,
-                phone: _phoneController.text.trim(),
+                whatsappNumber: _phoneController.text.trim(),
               ),
       );
     });
@@ -86,7 +86,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
 
     return PopScopeExitApp(
       child: Scaffold(
-      appBar: DrawerScreenAppBar(title: _title(context)),
+      appBar: ScreenAppBar(title: _title(context)),
       body: Form(
         key: _formKey,
         child: ListView(

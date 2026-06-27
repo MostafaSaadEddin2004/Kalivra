@@ -14,7 +14,7 @@ import 'package:kalivra/model/services/api/customer_api_service.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 const String _kMediaOrigin = 'https://test1.zedan-world.com';
 
@@ -213,7 +213,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: DrawerScreenAppBar(title: l10n.editProfileTitle),
+          appBar: ScreenAppBar(title: l10n.editProfileTitle),
           body: Form(
             key: _formKey,
             child: ListView(

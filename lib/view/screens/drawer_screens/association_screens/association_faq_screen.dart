@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationFaqScreen extends StatefulWidget {
   const AssociationFaqScreen({super.key});
@@ -43,7 +43,7 @@ class _AssociationFaqScreenState extends State<AssociationFaqScreen> {
     ];
 
     return Scaffold(
-      appBar: DrawerScreenAppBar(title: l10n.frequentlyAskedQuestion),
+      appBar: ScreenAppBar(title: l10n.frequentlyAskedQuestion),
       body: ListView.separated(
         padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 32.h),
         itemCount: faqs.length,
