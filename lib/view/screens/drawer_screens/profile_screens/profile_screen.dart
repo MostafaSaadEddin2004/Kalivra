@@ -25,9 +25,7 @@ class _ProfileState extends State<Profile> {
       if (!mounted) return;
       final authCubit = context.read<AuthCubit>();
       authCubit
-        ..loadProfile()
-        ..checkAuthStatus(context);
-    });
+      .loadProfile(context  );});
   }
 
   @override

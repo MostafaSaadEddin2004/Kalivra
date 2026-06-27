@@ -10,7 +10,10 @@ import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/brand_cubit/brand_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
@@ -33,6 +36,9 @@ void main() async {
         BlocProvider(create: (context) => CartCubit()),
         BlocProvider(create: (context) => ProductsCubit()),
         BlocProvider(create: (context) => BrandCubit()),
+        BlocProvider(create: (context) => NotificationsCubit()),
+        BlocProvider(create: (context) => WishlistCubit()),
+        BlocProvider(create: (context) => OrdersCubit()),
       ],
       child: const Main(),
     ),

@@ -45,16 +45,17 @@ class BrandsSection extends StatelessWidget {
                 case BrandFailure():
                   return Center(child: Text(state.message));
                 case BrandsFetched():
-                  return ListView.separated(
+                final brands = state.brands;
+                  return brands.isNotEmpty? ListView.separated(
                     separatorBuilder: (context, index) => SizedBox(width: 12.w),
                     scrollDirection: Axis.horizontal,
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     clipBehavior: Clip.none,
-                    itemCount: state.brands.length,
+                    itemCount: brands.length,
                     itemBuilder: (context, index) {
-                      return BrandCard(brand: state.brands[index]);
+                      return BrandCard(brand: brands[index]);
                     },
-                  );
+                  ): Center(child: Text('mdmdm'),);
                 default:
                   return Skeletonizer(
                     child: ListView.separated(

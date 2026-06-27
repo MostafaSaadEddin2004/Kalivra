@@ -18,17 +18,6 @@ class AuthCubit extends Cubit<AuthState> {
 
   final CustomerApiService _customerApiService = CustomerApiService();
 
-  Future<void> checkAuthStatus(BuildContext context) async {
-    final token = await LocalStore.getToken();
-    if (token == null || token.isEmpty) {
-      emit(
-        UnAuthinticated(
-          message: AppLocalizations.of(context)!.loginToViewProfile,
-        ),
-      );
-    }
-  }
-
   Future<void> login({
     required BuildContext context,
     required String phone,
@@ -163,13 +152,22 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> loadProfile() async {
-    emit(AuthLoading());
-    try {
-      final customerInfo = await _customerApiService.getProfile();
-      emit(AuthFetchedData(customer: customerInfo));
-    } catch (e) {
-      emit(AuthFailed(message: e.toString()));
+  Future<void> loadProfile(BuildContext context) async {
+    final token = await LocalStore.getToken();
+    if (token == null || token.isEmpty) {
+      emit(
+        UnAuthinticated(
+          message: AppLocalizations.of(context)!.loginToViewProfile,
+        ),
+      );
+    } else {
+      emit(AuthLoading());
+      try {
+        final customerInfo = await _customerApiService.getProfile();
+        emit(AuthFetchedData(customer: customerInfo));
+      } catch (e) {
+        emit(AuthFailed(message: e.toString()));
+      }
     }
   }
 
@@ -186,8 +184,9 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> updateProfile({
-     required String firstName,
+    required String firstName,
     required String lastName,
+    required BuildContext context,
     String? gender,
     String? dateOfBirth,
     String? phone,
@@ -218,7 +217,7 @@ class AuthCubit extends Cubit<AuthState> {
         imageFile: imageFile,
       );
       emit(AuthSuccessed(message: 'تم تحديث البيانات بنجاح'));
-      await loadProfile();
+      await loadProfile(context);
     } catch (e) {
       emit(AuthFailed(message: e.toString()));
       throw Exception(e);

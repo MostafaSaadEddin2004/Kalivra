@@ -26,7 +26,7 @@ class CompleteProfileScreen extends StatefulWidget {
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
- final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -57,7 +57,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     _villageController.dispose();
     super.dispose();
   }
-
 
   void _onGovernorateChanged(String? value) {
     setState(() {
@@ -117,6 +116,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
     try {
       await context.read<AuthCubit>().updateProfile(
+        context: context,
         phone: _phoneController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
@@ -163,9 +163,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       listener: (context, state) {
         switch (state) {
           case AuthLoading():
-            isLoading=true;
+            isLoading = true;
           default:
-          isLoading=false;
+            isLoading = false;
         }
       },
       builder: (context, state) {
@@ -361,7 +361,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                       ),
                       enabled: !isLoading && _selectedGovernorate != null,
                       onChanged: _onCityChanged,
-                    ),SizedBox(height: 16.h),
+                    ),
+                    SizedBox(height: 16.h),
                     AssociationDropdownField(
                       label: l10n.associationLinkTown,
                       value: _selectedTown,

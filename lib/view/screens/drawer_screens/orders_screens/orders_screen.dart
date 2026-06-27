@@ -8,6 +8,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/view/widgets/drawer/drawer_screen_app_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -31,6 +32,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Scaffold(
       appBar: DrawerScreenAppBar(title: AppLocalizations.of(context)!.myOrders),
       body: BlocBuilder<OrdersCubit, OrdersState>(
+        bloc: OrdersCubit()..loadOrders(),
         builder: (context, state) {
           switch (state) {
             case OrdersLoaded():
@@ -78,23 +80,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
             case OrdersFailed():
               return Center(child: Text(state.message));
             default:
-              return ListView.separated(
-                padding: EdgeInsets.all(20.w),
-                itemCount: 4,
-                separatorBuilder: (_, _) => SizedBox(height: 12.h),
-                itemBuilder: (context, index) {
-                  return _OrderCard(
-                    order: OrderModel(
-                      id: '0',
-                      date: 'date',
-                      status: 'status',
-                      subtotal: 00,
-                      deliveryCost: 00,
-                      total: 0,
-                      items: [],
-                    ),
-                  );
-                },
+              return Skeletonizer(
+                child: ListView.separated(
+                  padding: EdgeInsets.all(20.w),
+                  itemCount: 4,
+                  separatorBuilder: (_, _) => SizedBox(height: 12.h),
+                  itemBuilder: (context, index) {
+                    return _OrderCard(
+                      order: OrderModel(
+                        id: '0',
+                        date: 'date',
+                        status: 'status',
+                        subtotal: 00,
+                        deliveryCost: 00,
+                        total: 0,
+                        items: [],
+                      ),
+                    );
+                  },
+                ),
               );
           }
         },

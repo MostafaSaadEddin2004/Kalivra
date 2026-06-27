@@ -303,13 +303,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         elevation: 0,
                       ),
                       child: isLoading
-                          ? SizedBox(
-                                  width: 20.r,
-                                  height: 20.r,
-                                  child: const SpinKitThreeBounce(
-                                    color: AppColors.offWhite,
-                                  ),
-                                )
+                          ? SpinKitFadingCircle(
+                              color: AppColors.offWhite,
+                              size: 20.r,
+                            )
                           : Text(
                               AppLocalizations.of(
                                 context,

@@ -259,7 +259,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                             ? SizedBox(
                                 width: 16.r,
                                 height: 16.r,
-                                child: const SpinKitThreeBounce(
+                                child: const SpinKitFadingCircle(
                                   color: AppColors.offWhite,
                                 ),
                               )

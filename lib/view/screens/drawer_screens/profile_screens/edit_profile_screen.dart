@@ -162,6 +162,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       await context.read<AuthCubit>().updateProfile(
+        context: context,
         phone: _phoneController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
