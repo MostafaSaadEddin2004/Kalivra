@@ -24,8 +24,8 @@ class _ProfileState extends State<Profile> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       final authCubit = context.read<AuthCubit>();
-      authCubit
-      .loadProfile(context  );});
+      authCubit.loadProfile(context);
+    });
   }
 
   @override
@@ -40,59 +40,68 @@ class _ProfileState extends State<Profile> {
       appBar: DrawerScreenAppBar(
         title: l10n.myAccount,
         actions: [
-          PopupMenuButton<_ProfileMenuAction>(
-            constraints: BoxConstraints(maxWidth: 200.w),
-            position: PopupMenuPosition.under,
-            icon: const Icon(Icons.menu_rounded),
-            onSelected: (value) {
-              switch (value) {
-                case _ProfileMenuAction.editProfile:
-                  final authState = context.read<AuthCubit>().state;
-                  if (authState is AuthFetchedData) {
-                    context.push(
-                      AppRoutes.editProfile,
-                      extra: authState.customer,
-                    );
-                  }
-                  break;
-                case _ProfileMenuAction.associationMemberProfile:
-                  context.push(AppRoutes.associationMemberProfile);
-                  break;
+          BlocBuilder<AuthCubit, AuthState>(
+            builder: (context, state) {
+              switch (state) {
+                case AuthFetchedData():
+                  return PopupMenuButton<_ProfileMenuAction>(
+                    constraints: BoxConstraints(maxWidth: 200.w),
+                    position: PopupMenuPosition.under,
+                    icon: const Icon(Icons.menu_rounded),
+                    onSelected: (value) {
+                      switch (value) {
+                        case _ProfileMenuAction.editProfile:
+                          final authState = context.read<AuthCubit>().state;
+                          if (authState is AuthFetchedData) {
+                            context.push(
+                              AppRoutes.editProfile,
+                              extra: authState.customer,
+                            );
+                          }
+                          break;
+                        case _ProfileMenuAction.associationMemberProfile:
+                          context.push(AppRoutes.associationMemberProfile);
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: _ProfileMenuAction.editProfile,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.edit_rounded,
+                              size: 20.r,
+                              color: theme.colorScheme.onTertiaryFixed,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(l10n.editProfile, style: textTheme.bodyMedium),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: _ProfileMenuAction.associationMemberProfile,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.groups_rounded,
+                              size: 20.r,
+                              color: theme.colorScheme.onTertiaryFixed,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              l10n.associationPersonalProfileButton,
+                              style: textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                default:
+                  return SizedBox.shrink();
               }
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _ProfileMenuAction.editProfile,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.edit_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.editProfile, style: textTheme.bodyMedium),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _ProfileMenuAction.associationMemberProfile,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.groups_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.associationPersonalProfileButton,
-                      style: textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ),
         ],
       ),
