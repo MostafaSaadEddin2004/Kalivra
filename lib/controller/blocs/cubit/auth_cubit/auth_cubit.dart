@@ -8,7 +8,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
 import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 
 export 'auth_state.dart';

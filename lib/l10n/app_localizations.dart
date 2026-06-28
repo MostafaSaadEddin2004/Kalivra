@@ -176,6 +176,12 @@ abstract class AppLocalizations {
   /// **'Privacy Policy'**
   String get drawerPrivacyPolicy;
 
+  /// No description provided for @drawerTermsConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms and Conditions'**
+  String get drawerTermsConditions;
+
   /// No description provided for @drawerShare.
   ///
   /// In en, this message translates to:

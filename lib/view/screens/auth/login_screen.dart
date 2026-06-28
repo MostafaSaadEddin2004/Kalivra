@@ -7,7 +7,7 @@ import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 

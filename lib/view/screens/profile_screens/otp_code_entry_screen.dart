@@ -5,76 +5,58 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
+import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
-class OtpPhoneEntryScreen extends StatefulWidget {
-  const OtpPhoneEntryScreen({super.key, this.mode, this.signUpArgs});
+class OtpCodeEntryScreen extends StatefulWidget {
+  const OtpCodeEntryScreen({super.key, required this.args});
 
-  final OtpScreenMode? mode;
-  final OtpOnboardingArgs? signUpArgs;
-
-  OtpScreenMode get _effectiveMode => signUpArgs?.mode ?? mode ?? OtpScreenMode.changePhone;
+  final OtpOnboardingArgs args;
 
   @override
-  State<OtpPhoneEntryScreen> createState() => _OtpPhoneEntryScreenState();
+  State<OtpCodeEntryScreen> createState() => _OtpCodeEntryScreenState();
 }
 
-class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
-  late final TextEditingController _phoneController;
+class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
+  final _otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-    _phoneController = TextEditingController(
-      text: widget.signUpArgs?.whatsappNumber ?? '',
-    );
-  }
-
-  @override
   void dispose() {
-    _phoneController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
   String _title(BuildContext context) {
-    if (widget.signUpArgs != null) return AppLocalizations.of(context)!.verifyPhoneTitle;
-    final m = widget._effectiveMode;
-    return m == OtpScreenMode.forgotPassword
-        ? AppLocalizations.of(context)!.recoverPasswordTitle
-        : AppLocalizations.of(context)!.changePhoneOtpTitle;
+    final l10n = AppLocalizations.of(context)!;
+    if (widget.args.mode == OtpScreenMode.signUp) return l10n.verifyCodeTitle;
+    return widget.args.mode == OtpScreenMode.forgotPassword
+        ? l10n.recoverPasswordTitle
+        : l10n.changePhoneOtpTitle;
   }
 
-  int get _stepTotal => widget.signUpArgs != null ? 2 : 3;
+  int get _stepTotal => widget.args.mode == OtpScreenMode.signUp ? 2 : 3;
 
-  void _sendCode() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+  void _verify() {
+    final l10n = AppLocalizations.of(context)!;
+    if (_otpController.text.trim().length < 4) {
+      CustomSnackBar.show(context, l10n.enterCodeHintSnack);
+      return;
+    }
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 600), () {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      CustomSnackBar.show(
-        context,
-        AppLocalizations.of(context)!.codeSentViaWhatsApp(_phoneController.text),
-      );
-      context.push(
-        AppRoutes.otpVerify,
-        extra: widget.signUpArgs != null
-            ? OtpOnboardingArgs(
-                mode: OtpScreenMode.signUp,
-                whatsappNumber: _phoneController.text.trim(),
-                name: widget.signUpArgs!.name,
-                password: widget.signUpArgs!.password,
-              )
-            : OtpOnboardingArgs(
-                mode: widget._effectiveMode,
-                whatsappNumber: _phoneController.text.trim(),
-              ),
-      );
+      if (widget.args.mode == OtpScreenMode.forgotPassword) {
+        context.push(AppRoutes.setNewPassword);
+      } else if (widget.args.mode == OtpScreenMode.signUp) {
+        context.push(AppRoutes.completeProfile, extra: widget.args);
+      } else {
+        context.push(AppRoutes.confirmNewPhone, extra: widget.args.whatsappNumber);
+      }
     });
   }
 
@@ -84,6 +66,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
+    final l10n = AppLocalizations.of(context)!;
     return PopScopeExitApp(
       child: Scaffold(
       appBar: ScreenAppBar(title: _title(context)),
@@ -92,7 +75,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
         child: ListView(
           padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
           children: [
-            _StepIndicator(step: 1, total: _stepTotal),
+            _StepIndicator(step: 2, total: _stepTotal),
             SizedBox(height: 24.h),
             Card(
               elevation: 2,
@@ -105,11 +88,16 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.signUpArgs != null
-                          ? AppLocalizations.of(context)!.otpPhoneHintSignUp
-                          : widget._effectiveMode == OtpScreenMode.forgotPassword
-                              ? AppLocalizations.of(context)!.otpPhoneHintForgot
-                              : AppLocalizations.of(context)!.otpPhoneHintChange,
+                      l10n.otpSentToPhone(widget.args.whatsappNumber),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                    ),
+                    SizedBox(height: 20.h),
+                    Text(
+                      widget.args.mode == OtpScreenMode.signUp
+                          ? l10n.otpCodeHintSignUp
+                          : l10n.otpCodeHintOther,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                         height: 1.4,
@@ -117,19 +105,18 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                     ),
                     SizedBox(height: 20.h),
                     AppTextField(
-                      controller: _phoneController,
-                      label: AppLocalizations.of(context)!.phoneLabel,
-                      hint: '+966 5XX XXX XXXX',
-                      keyboardType: TextInputType.phone,
-                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPhone : null,
+                      controller: _otpController,
+                      label: l10n.otpCodeLabel,
+                      hint: '••••',
+                      keyboardType: TextInputType.number,
+                      maxLength: 6,
+                      prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
                     ),
                     SizedBox(height: 20.h),
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton.icon(
-                        onPressed: _isLoading ? null : _sendCode,
+                        onPressed: _isLoading ? null : _verify,
                         icon: _isLoading
                             ? SizedBox(
                                 width: 20.r,
@@ -139,8 +126,14 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                                   color: AppColors.offWhite,
                                 ),
                               )
-                            : Icon(Icons.chat_rounded, size: 20.r),
-                        label: Text(AppLocalizations.of(context)!.sendCodeViaWhatsApp),
+                            : Icon(Icons.verified_user_rounded, size: 20.r),
+                        label: Text(
+                          l10n.verify,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppColors.offWhite,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                         style: FilledButton.styleFrom(
                           padding: EdgeInsets.symmetric(vertical: 14.h),
                           shape: RoundedRectangleBorder(

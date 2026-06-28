@@ -8,7 +8,7 @@ import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {

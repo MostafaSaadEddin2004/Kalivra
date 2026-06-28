@@ -38,7 +38,7 @@ class ProductsSection extends StatelessWidget {
         ),
         SizedBox(height: 12.h),
         SizedBox(
-          height: 220.h,
+          height: 224.h,
           child: BlocBuilder<ProductsCubit, ProductsState>(
             bloc: ProductsCubit()..loadProducts(),
             builder: (context, state) {

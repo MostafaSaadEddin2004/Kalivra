@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_drafts_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_contact_us_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_faq_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_requests_and_services_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_submitted_requests_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_drafts_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_contact_us_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_faq_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_requests_and_services_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_submitted_requests_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/terms_conditions_screen.dart';
 import 'package:kalivra/view/splash_screen.dart';
 import 'package:kalivra/view/screens/home/home_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/about_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/profile_screens/profile_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/contact_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_link_request_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/association_screens/association_member_profile_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/profile_screens/edit_profile_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/favorites_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/about_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/profile_screens/profile_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/contact_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_link_request_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_member_profile_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/profile_screens/edit_profile_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/favorites_screen.dart';
 import 'package:kalivra/model/order/order_model.dart';
-import 'package:kalivra/view/screens/drawer_screens/orders_screens/order_details_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/orders_screens/orders_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/privacy_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/rate_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/change_password_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/confirm_new_phone_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/language_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/otp_code_entry_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/otp_phone_entry_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/settings_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/set_new_password_screen.dart';
-import 'package:kalivra/view/screens/drawer_screens/theme_mode_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/orders_screens/order_details_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/orders_screens/orders_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/privacy_policy_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/rate_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/confirm_new_phone_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/language_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/otp_code_entry_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/otp_phone_entry_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/settings_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/set_new_password_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/theme_mode_screen.dart';
 import 'package:kalivra/view/screens/home/product_details_screen.dart';
 import 'package:kalivra/view/screens/home/brand_details_screen.dart';
 import 'package:kalivra/view/screens/home/all_brands_screen.dart';
@@ -57,7 +58,8 @@ abstract class AppRoutes {
   static const String settings = '/settings';
   static const String contact = '/contact';
   static const String about = '/about';
-  static const String privacy = '/privacy';
+  static const String privacyPolicy = '/privacyPolicy';
+  static const String termsConditions = '/termsConditions';
   static const String rate = '/rate';
   static const String editProfile = '/edit-profile';
   static const String orderDetails = '/order-details';
@@ -104,7 +106,8 @@ abstract class AppRoutesName {
   static const String settings = 'settings';
   static const String contact = 'contact';
   static const String about = 'about';
-  static const String privacy = 'privacy';
+  static const String privacyPolicy = 'privacyPolicy';
+  static const String termsConditions = 'termsConditions';
   static const String rate = 'rate';
   static const String editProfile = 'edit-profile';
   static const String orderDetails = 'order-details';
@@ -311,9 +314,14 @@ abstract class AppRouter {
             builder: (_, _) => const AboutScreen(),
           ),
           GoRoute(
-            path: AppRoutes.privacy,
-            name: AppRoutesName.privacy,
-            builder: (_, _) => const PrivacyScreen(),
+            path: AppRoutes.privacyPolicy,
+            name: AppRoutesName.privacyPolicy,
+            builder: (_, _) => const PrivacyPolicyScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.termsConditions,
+            name: AppRoutesName.termsConditions,
+            builder: (_, _) => const TermsConditionsScreen(),
           ),
           GoRoute(
             path: AppRoutes.rate,

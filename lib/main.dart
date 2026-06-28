@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
+import 'package:kalivra/controller/blocs/cubit/app_info_cubit/app_info_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/brand_cubit/brand_cubit.dart';
@@ -42,6 +43,7 @@ void main() async {
         BlocProvider(create: (context) => NotificationsCubit()),
         BlocProvider(create: (context) => WishlistCubit()),
         BlocProvider(create: (context) => OrdersCubit()),
+        BlocProvider(create: (context) => AppInfoCubit()),
       ],
       child: const Main(),
     ),

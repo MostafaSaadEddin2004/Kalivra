@@ -67,7 +67,13 @@ class ProfilePage extends StatelessWidget {
           icon: Icons.privacy_tip_outlined,
           label: AppLocalizations.of(context)!.drawerPrivacyPolicy,
           onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.privacy),
+              AppRouter.openScreenWithPop(context, AppRoutes.privacyPolicy),
+        ),
+        ProfilePageItem(
+          icon: Icons.quiz_outlined,
+          label: AppLocalizations.of(context)!.drawerTermsConditions,
+          onTap: () =>
+              AppRouter.openScreenWithPop(context, AppRoutes.termsConditions),
         ),
         ProfilePageItem(
           icon: Icons.share_rounded,

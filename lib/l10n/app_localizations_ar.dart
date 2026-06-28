@@ -48,6 +48,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerPrivacyPolicy => 'سياسة الخصوصية';
 
   @override
+  String get drawerTermsConditions => 'الشروط والأحكام';
+
+  @override
   String get drawerShare => 'مشاركة';
 
   @override

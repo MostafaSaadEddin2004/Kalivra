@@ -48,6 +48,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerPrivacyPolicy => 'Privacy Policy';
 
   @override
+  String get drawerTermsConditions => 'Terms and Conditions';
+
+  @override
   String get drawerShare => 'Share';
 
   @override
