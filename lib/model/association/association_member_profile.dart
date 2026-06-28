@@ -1,4 +1,3 @@
-import 'package:kalivra/model/association/association_link_request_draft.dart';
 
 class AssociationMemberProfile {
   const AssociationMemberProfile({
@@ -62,58 +61,12 @@ class AssociationMemberProfile {
     );
   }
 
-  factory AssociationMemberProfile.fromLinkRequest(
-    AssociationLinkRequestDraft draft,
-  ) {
-    final currentAddress = [
-      draft.governorate,
-      draft.city,
-      draft.town,
-      draft.municipality,
-      draft.street,
-      draft.building,
-    ].where((part) => part.trim().isNotEmpty).join(' - ');
-
-    return AssociationMemberProfile(
-      personal: AssociationMemberPersonal(
-        fullName: [
-          draft.firstName,
-          draft.kunya,
-          draft.fatherName,
-        ].where((part) => part.trim().isNotEmpty).join(' '),
-        membershipNumber: draft.membershipNumber,
-        priorityNumber: draft.priorityNumber,
-        mobile: draft.mobile,
-        whatsApp: draft.whatsApp,
-        email: draft.email,
-        currentAddress: currentAddress,
-        permanentAddress: draft.permanentAddress,
-        governorate: draft.governorate,
-        city: draft.city,
-        town: draft.town,
-        village: draft.municipality,
-        street: draft.street,
-        building: draft.building,
-        projectName: draft.projectName,
-        housingUnit: draft.housingUnit,
-      ),
-      financialSummary: AssociationFinancialSummary(
-        totalAmount: _parseAmount(draft.totalPayments),
-      ),
-    );
-  }
-
   static double _toPercent(dynamic raw) {
     if (raw == null) return 0;
     if (raw is num) return (raw / (raw > 1 ? 100 : 1)).clamp(0.0, 1.0);
     final parsed = double.tryParse(raw.toString());
     if (parsed == null) return 0;
     return (parsed > 1 ? parsed / 100 : parsed).clamp(0.0, 1.0);
-  }
-
-  static double _parseAmount(String raw) {
-    final normalized = raw.replaceAll(RegExp(r'[^\d.]'), '');
-    return double.tryParse(normalized) ?? 0;
   }
 
   static List<int> _parseYears(dynamic raw) {

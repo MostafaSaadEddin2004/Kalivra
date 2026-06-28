@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
-import 'package:kalivra/model/association/association_link_request_draft.dart';
 import 'package:kalivra/model/association/association_member_profile.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
@@ -10,26 +9,6 @@ class AssociationLinkApiService {
   AssociationLinkApiService();
 
   final DioClient _client = DioClient();
-
-  Future<AssociationLinkRequestDraft?> fetchDraftsRequests() async {
-    try {
-      final res = await _client.get('customer/association/requests/latest');
-      final body = res.data;
-      if (body is! Map) return null;
-      final data = body['data'];
-      if (data is Map<String, dynamic>) {
-        return AssociationLinkRequestDraft.fromJson(data);
-      }
-      if (data is Map) {
-        return AssociationLinkRequestDraft.fromJson(
-          Map<String, dynamic>.from(data),
-        );
-      }
-      return null;
-    } catch (_) {
-      return null;
-    }
-  }
 
   Future<List<AssociationRequestSummary>> fetchRequests() async {
     try {
@@ -52,7 +31,6 @@ class AssociationLinkApiService {
   }
 
   Future<void> submitRequest({
-    required AssociationLinkRequestDraft draft,
     required String fatherName,
     required String motherName,
     required String officialGovernorate,
@@ -66,7 +44,6 @@ class AssociationLinkApiService {
     required List<AssociationLinkAttachment> attachments,
   }) async {
     final fields = <String, dynamic>{
-      ...draft.toJson(),
       'father_name': fatherName.trim(),
       'mother_name': motherName.trim(),
       'official_governorate': officialGovernorate.trim(),
@@ -94,27 +71,14 @@ class AssociationLinkApiService {
     );
   }
 
-  Future<AssociationMemberProfile?> fetchProfile() async {
+  Future<AssociationMemberProfile> fetchProfile() async {
     try {
       final res = await _client.get('customer/association/member');
       final body = res.data;
-      if (body is! Map) return null;
       final data = body['data'];
-      if (data is Map<String, dynamic>) {
-        return AssociationMemberProfile.fromJson(data);
-      }
-      if (data is Map) {
-        return AssociationMemberProfile.fromJson(
-          Map<String, dynamic>.from(data),
-        );
-      }
-    } catch (_) {
-      // Fall back to the latest link request when there is no member profile yet
-      // or when the API client returns a transformed error message.
+      return AssociationMemberProfile.fromJson(data);
+    } catch (e) {
+      throw e.toString();
     }
-
-    final link = await AssociationLinkApiService().fetchDraftsRequests();
-    if (link == null) return null;
-    return AssociationMemberProfile.fromLinkRequest(link);
   }
 }

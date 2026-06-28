@@ -2300,18 +2300,6 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get associationLinkDeleteAttachment;
 
-  /// No description provided for @associationLinkSaveDraft.
-  ///
-  /// In en, this message translates to:
-  /// **'Save Draft'**
-  String get associationLinkSaveDraft;
-
-  /// No description provided for @associationLinkDraftSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Draft saved'**
-  String get associationLinkDraftSaved;
-
   /// No description provided for @associationLinkResubmit.
   ///
   /// In en, this message translates to:
@@ -2714,42 +2702,6 @@ abstract class AppLocalizations {
   /// **'Exit app'**
   String get exitAppTitle;
 
-  /// No description provided for @associationLinkDraftsTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'My Drafts'**
-  String get associationLinkDraftsTitle;
-
-  /// No description provided for @associationLinkNoDrafts.
-  ///
-  /// In en, this message translates to:
-  /// **'You have no saved drafts yet.'**
-  String get associationLinkNoDrafts;
-
-  /// No description provided for @associationLinkNewDraft.
-  ///
-  /// In en, this message translates to:
-  /// **'New Request'**
-  String get associationLinkNewDraft;
-
-  /// No description provided for @associationLinkDraftDeleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Draft deleted.'**
-  String get associationLinkDraftDeleted;
-
-  /// No description provided for @associationLinkDeleteDraftTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Draft'**
-  String get associationLinkDeleteDraftTitle;
-
-  /// No description provided for @associationLinkDeleteDraftConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete this draft? This action cannot be undone.'**
-  String get associationLinkDeleteDraftConfirm;
-
   /// No description provided for @associationLinkNoData.
   ///
   /// In en, this message translates to:
@@ -2815,12 +2767,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
-
-  /// No description provided for @draftsScreen.
-  ///
-  /// In en, this message translates to:
-  /// **'Drafts Screen'**
-  String get draftsScreen;
 
   /// No description provided for @linkRequestsScreen.
   ///

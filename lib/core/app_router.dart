@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
-import 'package:kalivra/view/screens/profile_screens/association_screens/association_drafts_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_contact_us_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_faq_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_requests_and_services_screen.dart';
@@ -88,7 +87,6 @@ abstract class AppRoutes {
   static const String checkout = '/checkout';
   static const String associationLinkRequest = '/association-link-request';
   static const String associationMemberProfile = '/association-member-profile';
-  static const String associationDrafts = '/association-drafts';
   static const String associationSubmittedRequests =
       '/association-submitted-requests';
   static const String associationFaq = '/association-faq';
@@ -136,7 +134,6 @@ abstract class AppRoutesName {
   static const String checkout = 'checkout';
   static const String associationLinkRequest = 'association-link-request';
   static const String associationMemberProfile = 'association-member-profile';
-  static const String associationDrafts = 'association-drafts';
   static const String associationSubmittedRequests =
       'association-submitted-requests';
   static const String associationFaq = 'association-faq';
@@ -415,16 +412,9 @@ abstract class AppRouter {
           GoRoute(
             path: AppRoutes.associationLinkRequest,
             builder: (context, state) {
-              final extra = state.extra as Map<String, dynamic>?;
               return AssociationLinkRequestScreen(
-                draftId: extra?['draftId'] as String?,
-                resubmit: extra?['resubmit'] as bool? ?? false,
               );
             },
-          ),
-          GoRoute(
-            path: AppRoutes.associationDrafts,
-            builder: (context, state) => const AssociationDraftsScreen(),
           ),
           GoRoute(
             path: AppRoutes.associationSubmittedRequests,

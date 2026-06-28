@@ -60,9 +60,6 @@ class _AssociationMemberProfileScreenState
                 case _AccosiciationMemberProfileMenuActions.linkRequests:
                   context.push(AppRoutes.associationSubmittedRequests);
                   break;
-                case _AccosiciationMemberProfileMenuActions.drafts:
-                  context.push(AppRoutes.associationDrafts);
-                  break;
                 case _AccosiciationMemberProfileMenuActions.requestsAndServices:
                   context.push(AppRoutes.associationRequestsAndServices);
                   break;
@@ -109,20 +106,6 @@ class _AssociationMemberProfileScreenState
                       l10n.linkRequestsScreen,
                       style: theme.textTheme.bodyMedium,
                     ),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _AccosiciationMemberProfileMenuActions.drafts,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.drafts_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.draftsScreen, style: theme.textTheme.bodyMedium),
                   ],
                 ),
               ),
@@ -613,7 +596,6 @@ class _ProfileHeaderCard extends StatelessWidget {
 }
 
 enum _AccosiciationMemberProfileMenuActions {
-  drafts,
   linkRequests,
   associationLinkRequest,
   frequentlyAskedQuestion,

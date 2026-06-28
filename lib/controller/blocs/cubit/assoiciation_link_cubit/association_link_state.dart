@@ -17,12 +17,6 @@ final class AssociationLinkRequestsFetched extends AssociationLinkState {
   AssociationLinkRequestsFetched({required this.linkRequests});
 }
 
-final class AssociationLinkDraftsFetched extends AssociationLinkState {
-  final AssociationLinkRequestDraft drafts;
-
-  AssociationLinkDraftsFetched({required this.drafts});
-}
-
 final class AssociationLinkSubmittedSuccessfully extends AssociationLinkState {
   final String successMessage;
 

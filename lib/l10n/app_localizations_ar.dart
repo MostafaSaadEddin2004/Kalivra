@@ -1150,12 +1150,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationLinkDeleteAttachment => 'حذف';
 
   @override
-  String get associationLinkSaveDraft => 'حفظ كمسودة';
-
-  @override
-  String get associationLinkDraftSaved => 'تم حفظ المسودة';
-
-  @override
   String get associationLinkResubmit => 'إعادة تقديم';
 
   @override
@@ -1374,25 +1368,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get exitAppTitle => 'الخروج من التطبيق';
 
   @override
-  String get associationLinkDraftsTitle => 'مسوداتي';
-
-  @override
-  String get associationLinkNoDrafts => 'لا توجد مسودات محفوظة بعد.';
-
-  @override
-  String get associationLinkNewDraft => 'طلب جديد';
-
-  @override
-  String get associationLinkDraftDeleted => 'تم حذف المسودة.';
-
-  @override
-  String get associationLinkDeleteDraftTitle => 'حذف المسودة';
-
-  @override
-  String get associationLinkDeleteDraftConfirm =>
-      'هل أنت متأكد من حذف هذه المسودة؟ لا يمكن التراجع عن هذا الإجراء.';
-
-  @override
   String get associationLinkNoData => 'لا توجد بيانات';
 
   @override
@@ -1424,9 +1399,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get delete => 'حذف';
-
-  @override
-  String get draftsScreen => 'المسودات';
 
   @override
   String get linkRequestsScreen => 'طلبات الإنضمام';

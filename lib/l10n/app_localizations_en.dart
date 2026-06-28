@@ -1156,12 +1156,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationLinkDeleteAttachment => 'Delete';
 
   @override
-  String get associationLinkSaveDraft => 'Save Draft';
-
-  @override
-  String get associationLinkDraftSaved => 'Draft saved';
-
-  @override
   String get associationLinkResubmit => 'Resubmit';
 
   @override
@@ -1381,25 +1375,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exitAppTitle => 'Exit app';
 
   @override
-  String get associationLinkDraftsTitle => 'My Drafts';
-
-  @override
-  String get associationLinkNoDrafts => 'You have no saved drafts yet.';
-
-  @override
-  String get associationLinkNewDraft => 'New Request';
-
-  @override
-  String get associationLinkDraftDeleted => 'Draft deleted.';
-
-  @override
-  String get associationLinkDeleteDraftTitle => 'Delete Draft';
-
-  @override
-  String get associationLinkDeleteDraftConfirm =>
-      'Are you sure you want to delete this draft? This action cannot be undone.';
-
-  @override
   String get associationLinkNoData => 'No data';
 
   @override
@@ -1432,9 +1407,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get delete => 'Delete';
-
-  @override
-  String get draftsScreen => 'Drafts Screen';
 
   @override
   String get linkRequestsScreen => 'Joining requests';
