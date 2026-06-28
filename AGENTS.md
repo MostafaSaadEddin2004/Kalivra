@@ -13,6 +13,7 @@ This is a Flutter project.
 - Do not change UI design unless requested.
 - Do not remove existing features.
 - Do not add packages unless necessary.
+- Do just what I exactly ask and nothing else.
 
 ## Commands to check work
 Run these after meaningful changes:
