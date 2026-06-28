@@ -24,7 +24,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navSearch => 'Search';
 
   @override
-  String get drawerMyAccount => 'My Account';
+  String get drawerMyAccount => 'Profile';
 
   @override
   String get drawerMyOrders => 'My Orders';

@@ -90,49 +90,48 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 40.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: AppTextField(
-                            textDirection: TextDirection.ltr,
-                            controller: _whatsappController,
-                            label: AppLocalizations.of(
-                              context,
-                            )!.signUpWhatsAppLabel,
-                            hint: AppLocalizations.of(
-                              context,
-                            )!.signUpWhatsAppHint,
-                            keyboardType: TextInputType.phone,
-                            maxLength: 9,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return AppLocalizations.of(
-                                  context,
-                                )!.enterWhatsAppNumber;
-                              }
-                              if (v.trim().length < 8) {
-                                return AppLocalizations.of(
-                                  context,
-                                )!.invalidWhatsAppShort;
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        SizedBox(
-                          width: 75.w,
-                          child: AppTextField(
-                            textDirection: TextDirection.ltr,
-                            enabled: false,
-                            controller: _countryCodeController,
-                            keyboardType: TextInputType.phone,
-                          ),
-                        ),
-                      ],
+                   Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: TextDirection.ltr,
+                  children: [
+                    SizedBox(
+                      width: 75.w,
+                      child: AppTextField(
+                        textDirection: TextDirection.ltr,
+                        enabled: false,
+                        controller: _countryCodeController,
+                        keyboardType: TextInputType.phone,
+                      ),
                     ),
-                    SizedBox(height: 20.h),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: AppTextField(
+                        textDirection: TextDirection.ltr,
+                        controller: _whatsappController,
+                        label: AppLocalizations.of(
+                          context,
+                        )!.signUpWhatsAppLabel,
+                        hint: AppLocalizations.of(context)!.signUpWhatsAppHint,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 9,
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) {
+                            return AppLocalizations.of(
+                              context,
+                            )!.enterWhatsAppNumber;
+                          }
+                          if (v.trim().length < 8) {
+                            return AppLocalizations.of(
+                              context,
+                            )!.invalidWhatsAppShort;
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                   SizedBox(height: 20.h),
                     AppTextField(
                       controller: _passwordController,
                       label: AppLocalizations.of(context)!.passwordLabel,

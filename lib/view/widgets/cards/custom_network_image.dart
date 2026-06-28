@@ -20,60 +20,20 @@ class CustomNetworkImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imageUrl == null || imageUrl!.isEmpty) {
-      return _FallbackIcon(
-        width: width,
+      return Center(
+        child: Icon(defaultIcon ?? Icons.image_outlined, size: 35.sp),
+      );
+    } else {
+      return CachedNetworkImage(
+        imageUrl: imageUrl!,
         height: height,
-        icon: defaultIcon ?? Icons.image_not_supported_outlined,
+        width: width,
+        fit: BoxFit.cover,
+        placeholder: (context, url) => Skeletonizer(child: Container()),
+        errorWidget: (context, url, error) {
+          return Center(child: Icon(Icons.broken_image, size: 35.sp));
+        },
       );
     }
-
-    return CachedNetworkImage(
-      imageUrl: imageUrl!,
-      height: height,
-      width: width,
-      fit: BoxFit.cover,
-      errorListener: (_) {},
-      placeholder: (context, url) => SizedBox(
-        width: width,
-        height: height,
-        child: Skeletonizer(child: Container(color: Colors.white)),
-      ),
-      errorWidget: (context, url, error) {
-        return _FallbackIcon(
-          width: width,
-          height: height,
-          icon: defaultIcon ?? Icons.broken_image_outlined,
-        );
-      },
-    );
-  }
-}
-
-class _FallbackIcon extends StatelessWidget {
-  const _FallbackIcon({
-    required this.width,
-    required this.height,
-    required this.icon,
-  });
-
-  final double? width;
-  final double? height;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Center(
-        child: Icon(
-          icon,
-          size: 35.sp,
-          color: colorScheme.primary.withValues(alpha: 0.55),
-        ),
-      ),
-    );
   }
 }

@@ -24,7 +24,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navSearch => 'البحث';
 
   @override
-  String get drawerMyAccount => 'حسابي';
+  String get drawerMyAccount => 'الحساب';
 
   @override
   String get drawerMyOrders => 'طلباتي';

@@ -21,7 +21,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -50,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
         child: BlocBuilder<NavCubit, int>(
           builder: (context, index) {
             return Scaffold(
+              extendBody: true,
               appBar: CustomAppBar(
                 onSearchTap: () => context.push(AppRoutes.search),
                 onNotificationsTap: () => context.push(AppRoutes.notifications),

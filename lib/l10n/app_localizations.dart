@@ -131,7 +131,7 @@ abstract class AppLocalizations {
   /// No description provided for @drawerMyAccount.
   ///
   /// In en, this message translates to:
-  /// **'My Account'**
+  /// **'Profile'**
   String get drawerMyAccount;
 
   /// No description provided for @drawerMyOrders.
