@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
-import 'package:kalivra/model/association/association_member_profile.dart';
+import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
 import 'package:kalivra/model/services/api/association_link_api_service.dart';

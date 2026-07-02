@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/model/association/association_member_profile.dart';
-import 'package:kalivra/model/services/api/association_link_api_service.dart';
+import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
@@ -19,22 +20,19 @@ class AssociationMemberProfileScreen extends StatefulWidget {
 
 class _AssociationMemberProfileScreenState
     extends State<AssociationMemberProfileScreen> {
-  final _api = AssociationLinkApiService();
-  late Future<AssociationMemberProfile?> _profileFuture;
   int? _selectedYear;
 
   @override
   void initState() {
     super.initState();
-    _profileFuture = _api.fetchProfile();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AssociationLinkCubit>().fetchProfile();
+    });
   }
 
   Future<void> _reload() async {
-    final future = _api.fetchProfile();
-    setState(() {
-      _profileFuture = future;
-    });
-    await future;
+    await context.read<AssociationLinkCubit>().fetchProfile();
   }
 
   @override
@@ -47,102 +45,129 @@ class _AssociationMemberProfileScreenState
       appBar: ScreenAppBar(
         title: l10n.associationMemberProfileTitle,
         actions: [
-          PopupMenuButton<_AccosiciationMemberProfileMenuActions>(
-            constraints: BoxConstraints(maxWidth: 240.w),
-            position: PopupMenuPosition.under,
-            icon: const Icon(Icons.menu_rounded),
-            onSelected: (value) {
-              switch (value) {
-                case _AccosiciationMemberProfileMenuActions.linkRequests:
-                  context.push(AppRoutes.associationSubmittedRequests);
-                  break;
-                case _AccosiciationMemberProfileMenuActions.requestsAndServices:
-                  context.push(AppRoutes.associationRequestsAndServices);
-                  break;
-                case _AccosiciationMemberProfileMenuActions
-                    .associationContactUs:
-                  context.push(AppRoutes.associationContactUs);
-                  break;
-                case _AccosiciationMemberProfileMenuActions
-                    .frequentlyAskedQuestion:
-                  context.push(AppRoutes.associationFaq);
-                  break;
+          BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
+            builder: (context, state) {
+              switch (state) {
+                case AssociationProfileFetched():
+                  final data = state.memberInfo;
+                  return data.isAssociationMember
+                      ? PopupMenuButton<_AccosiciationMemberProfileMenuActions>(
+                          position: PopupMenuPosition.under,
+                          icon: const Icon(Icons.menu_rounded),
+                          onSelected: (value) {
+                            switch (value) {
+                              case _AccosiciationMemberProfileMenuActions
+                                  .linkRequests:
+                                context.push(
+                                  AppRoutes.associationSubmittedRequests,
+                                );
+                                break;
+                              case _AccosiciationMemberProfileMenuActions
+                                  .requestsAndServices:
+                                context.push(
+                                  AppRoutes.associationRequestsAndServices,
+                                );
+                                break;
+                              case _AccosiciationMemberProfileMenuActions
+                                  .associationContactUs:
+                                context.push(AppRoutes.associationContactUs);
+                                break;
+                              case _AccosiciationMemberProfileMenuActions
+                                  .frequentlyAskedQuestion:
+                                context.push(AppRoutes.associationFaq);
+                                break;
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: _AccosiciationMemberProfileMenuActions
+                                  .requestsAndServices,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.link_rounded,
+                                    size: 20.r,
+                                    color: theme.colorScheme.onTertiaryFixed,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    l10n.associationRequestsAndServices,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: _AccosiciationMemberProfileMenuActions
+                                  .linkRequests,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.upload_file_rounded,
+                                    size: 20.r,
+                                    color: theme.colorScheme.onTertiaryFixed,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    l10n.linkRequestsScreen,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            PopupMenuItem(
+                              value: _AccosiciationMemberProfileMenuActions
+                                  .associationContactUs,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.question_answer_outlined,
+                                    size: 20.r,
+                                    color: theme.colorScheme.onTertiaryFixed,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    l10n.associationContactUs,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: _AccosiciationMemberProfileMenuActions
+                                  .frequentlyAskedQuestion,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.help_rounded,
+                                    size: 20.r,
+                                    color: theme.colorScheme.onTertiaryFixed,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    l10n.frequentlyAskedQuestion,
+                                    style: theme.textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      : SizedBox.shrink();
+                default:
+                  return SizedBox.shrink();
               }
             },
-            itemBuilder: (context) => [
-               PopupMenuItem(
-                value: _AccosiciationMemberProfileMenuActions.requestsAndServices,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.link_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.associationRequestsAndServices, style: theme.textTheme.bodyMedium),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _AccosiciationMemberProfileMenuActions.linkRequests,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.upload_file_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.linkRequestsScreen,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-             
-              PopupMenuItem(
-                value:
-                    _AccosiciationMemberProfileMenuActions.associationContactUs,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.question_answer_outlined,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.associationContactUs, style: theme.textTheme.bodyMedium),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: _AccosiciationMemberProfileMenuActions
-                    .frequentlyAskedQuestion,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.help_rounded,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.frequentlyAskedQuestion, style: theme.textTheme.bodyMedium),
-                  ],
-                ),
-              ),
-            ],
           ),
         ],
       ),
-      body: FutureBuilder<AssociationMemberProfile?>(
-        future: _profileFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
+        builder: (context, state) {
+          if (state is AssociationLinkLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (snapshot.hasError) {
+          if (state is AssociationLinkFailure) {
             return _MessageState(
               icon: Icons.error_outline_rounded,
               message: l10n.associationMemberLoadFailed,
@@ -150,13 +175,23 @@ class _AssociationMemberProfileScreenState
               onAction: _reload,
             );
           }
-          final profile = snapshot.data;
-          if (profile == null) {
+          if (state is! AssociationProfileFetched) {
             return _MessageState(
               icon: Icons.link_off_rounded,
               message: l10n.associationMemberProfileEmpty,
               actionLabel: l10n.associationMemberProfileLinkRequest,
               onAction: () => context.push(AppRoutes.associationLinkRequest),
+            );
+          }
+
+          final profile = state.memberInfo;
+          if (!profile.isAssociationMember) {
+            return _MessageState(
+              icon: Icons.link_off_rounded,
+              message: l10n.associationMemberProfileEmpty,
+              actionLabel: l10n.associationRequestsAndServices,
+              onAction: () =>
+                  context.push(AppRoutes.associationRequestsAndServices),
             );
           }
 
@@ -458,7 +493,7 @@ class _AssociationMemberProfileScreenState
     );
   }
 
-  List<int> _resolveYears(AssociationMemberProfile profile) {
+  List<int> _resolveYears(AssociationMemberProfileModel profile) {
     if (profile.paymentYears.isNotEmpty) {
       return [...profile.paymentYears]..sort();
     }
@@ -498,10 +533,114 @@ class _AssociationMemberProfileScreenState
   }
 }
 
+extension _AssociationMemberProfileModelView on AssociationMemberProfileModel {
+  _AssociationMemberPersonalView get personal =>
+      _AssociationMemberPersonalView(person, associationMember, memberships);
+
+  double get membershipStatusPercent => hasActiveMemberships ? 1 : 0;
+
+  double get paymentCommitmentPercent => isAssociationMember ? 1 : 0;
+
+  List<int> get paymentYears => const [];
+
+  List<dynamic> get installments => const [];
+
+  List<dynamic> get otherPayments => const [];
+
+  List<dynamic> get notifications => const [];
+
+  List<dynamic> get events => const [];
+
+  List<dynamic> get measurements => const [];
+
+  List<dynamic> get attachments => const [];
+
+  _AssociationMemberFinancialSummaryView get financialSummary =>
+      const _AssociationMemberFinancialSummaryView();
+}
+
+class _AssociationMemberPersonalView {
+  const _AssociationMemberPersonalView(
+    this.person,
+    this.associationMember,
+    this.memberships,
+  );
+
+  final dynamic person;
+  final dynamic associationMember;
+  final List<dynamic> memberships;
+
+  String get fullName =>
+      _readString(person, const ['full_name', 'name', 'first_name']);
+
+  String get membershipNumber {
+    final direct = _readString(associationMember, const ['membership_number']);
+    if (direct.isNotEmpty) return direct;
+    if (memberships.isEmpty) return '';
+    return _readString(memberships.first, const ['membership_number']);
+  }
+
+  String get mobile => _readString(person, const ['mobile', 'phone']);
+
+  String get whatsApp =>
+      _readString(person, const ['whatsapp', 'whats_app', 'phone']);
+
+  String get email => _readString(person, const ['email']);
+
+  String get currentAddress =>
+      _readString(person, const ['current_address', 'address']);
+
+  String get permanentAddress =>
+      _readString(person, const ['permanent_address']);
+
+  String get priorityNumber =>
+      _readString(associationMember, const ['priority_number']);
+
+  String get projectName =>
+      _readString(associationMember, const ['project_name']);
+
+  String get housingUnit =>
+      _readString(associationMember, const ['housing_unit', 'unit_number']);
+
+  String get governorate => _readString(person, const ['governorate']);
+
+  String get city => _readString(person, const ['city']);
+
+  String get town => _readString(person, const ['town']);
+
+  String get village => _readString(person, const ['village']);
+
+  String get street => _readString(person, const ['street']);
+
+  String get building => _readString(person, const ['building']);
+}
+
+class _AssociationMemberFinancialSummaryView {
+  const _AssociationMemberFinancialSummaryView();
+
+  double get totalAmount => 0;
+
+  double get paidAmount => 0;
+
+  int get remainingInstallments => 0;
+}
+
+String _readString(Object? source, List<String> keys) {
+  if (source is! Map) return '';
+
+  for (final key in keys) {
+    final value = source[key];
+    final text = value?.toString().trim() ?? '';
+    if (text.isNotEmpty) return text;
+  }
+
+  return '';
+}
+
 class _ProfileHeaderCard extends StatelessWidget {
   const _ProfileHeaderCard({required this.profile, required this.isDark});
 
-  final AssociationMemberProfile profile;
+  final AssociationMemberProfileModel profile;
   final bool isDark;
 
   @override
@@ -724,7 +863,7 @@ class _SummaryTile extends StatelessWidget {
           Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           Text(
             value,
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith( 
               color: isDark ? AppColors.goldLight : AppColors.burgundy,
               fontWeight: FontWeight.w800,
             ),
@@ -747,7 +886,7 @@ class _DataSection extends StatelessWidget {
   final String title;
   final IconData icon;
   final List<String> headers;
-  final List<List<String>> rows;
+  final List<List<dynamic>> rows;
   final String emptyMessage;
 
   @override
@@ -772,7 +911,9 @@ class _DataSection extends StatelessWidget {
               ),
               child: Column(
                 children: List.generate(headers.length, (index) {
-                  final cell = index < row.length ? row[index] : '';
+                  final cell = index < row.length
+                      ? row[index]?.toString() ?? ''
+                      : '';
                   if (cell.trim().isEmpty) return const SizedBox.shrink();
                   return Padding(
                     padding: EdgeInsets.only(bottom: 8.h),

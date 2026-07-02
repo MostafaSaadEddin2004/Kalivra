@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
-import 'package:kalivra/model/services/api/association_link_api_service.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationSubmittedRequestsScreen extends StatefulWidget {
@@ -19,8 +20,7 @@ class AssociationSubmittedRequestsScreen extends StatefulWidget {
 
 class _AssociationSubmittedRequestsScreenState
     extends State<AssociationSubmittedRequestsScreen> {
-  final _api = AssociationLinkApiService();
-  late Future<List<AssociationRequestSummary>> _requestsFuture;
+  final _associationCubit = AssociationLinkCubit();
 
   @override
   void initState() {
@@ -28,12 +28,14 @@ class _AssociationSubmittedRequestsScreenState
     _reload();
   }
 
+  @override
+  void dispose() {
+    _associationCubit.close();
+    super.dispose();
+  }
+
   Future<void> _reload() async {
-    final future = _api.fetchRequests();
-    setState(() {
-      _requestsFuture = future;
-    });
-    await future;
+    await _associationCubit.fetchRequests();
   }
 
   @override
@@ -42,18 +44,20 @@ class _AssociationSubmittedRequestsScreenState
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.associationSubmittedRequestsTitle),
-      body: FutureBuilder<List<AssociationRequestSummary>>(
-        future: _requestsFuture,
+      body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
+        bloc: _associationCubit,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot is AssociationLinkLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot.hasError) {
+          if (snapshot is AssociationLinkFailure) {
             return _ErrorState(onRetry: _reload);
           }
 
-          final requests = snapshot.data ?? [];
+          final requests = snapshot is AssociationLinkRequestsFetched
+              ? snapshot.linkRequests
+              : <AssociationRequestSummary>[];
 
           if (requests.isEmpty) {
             return _EmptyState(

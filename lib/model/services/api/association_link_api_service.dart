@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
-import 'package:kalivra/model/association/association_member_profile.dart';
+import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
@@ -15,7 +15,7 @@ class AssociationLinkApiService {
 
   Future<List<AssociationRequestSummary>> fetchRequests() async {
     try {
-      final res = await _client.get('customer/association/requests');
+      final res = await _client.get('customer/requests');
       final body = res.data;
       if (body is! Map) return [];
       final data = body['data'];
@@ -142,12 +142,12 @@ Future<List<AssociationRequestType>> fetchRequestTypes() async {
     await _client.post('customer/requests', data: FormData.fromMap(fields));
   }
 
-  Future<AssociationMemberProfile> fetchProfile() async {
+  Future<AssociationMemberProfileModel> fetchProfile() async {
     try {
       final res = await _client.get('customer/association/member');
       final body = res.data;
       final data = body['data'];
-      return AssociationMemberProfile.fromJson(data);
+      return AssociationMemberProfileModel.fromJson(data);
     } catch (e) {
       throw e.toString();
     }

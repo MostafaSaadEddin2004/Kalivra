@@ -6,7 +6,7 @@ sealed class AssociationLinkState {}
 final class AssociationLinkLoading extends AssociationLinkState {}
 
 final class AssociationProfileFetched extends AssociationLinkState {
-  final AssociationMemberProfile memberInfo;
+  final AssociationMemberProfileModel memberInfo;
 
   AssociationProfileFetched({required this.memberInfo});
 }
