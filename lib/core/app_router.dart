@@ -11,7 +11,6 @@ import 'package:kalivra/view/screens/home/home_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/about_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/profile_screens/profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/contact_screen.dart';
-import 'package:kalivra/view/screens/profile_screens/association_screens/association_link_request_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_member_profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/profile_screens/edit_profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/favorites_screen.dart';

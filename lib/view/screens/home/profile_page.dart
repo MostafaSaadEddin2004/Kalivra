@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -10,8 +11,7 @@ import 'package:share_plus/share_plus.dart';
 const String kalivraShareUrl = 'https://kalivra.com';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key,});
-
+  const ProfilePage({super.key});
 
   Future<ShareResult> _shareApp(BuildContext context) async {
     return SharePlus.instance.share(
@@ -22,46 +22,37 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-    children: [
+      children: [
         ProfilePageItem(
           icon: Icons.person_outline_rounded,
           label: AppLocalizations.of(context)!.drawerMyAccount,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.account),
+          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.account),
         ),
         ProfilePageItem(
           icon: Icons.receipt_long_outlined,
           label: AppLocalizations.of(context)!.drawerMyOrders,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.orders),
+          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.orders),
         ),
         ProfilePageItem(
           icon: Icons.favorite_border_rounded,
           label: AppLocalizations.of(context)!.drawerFavorites,
-          onTap: () => AppRouter.openScreenWithPop(
-            context,
-            AppRoutes.favorites,
-          ),
+          onTap: () =>
+              AppRouter.openScreenWithPop(context, AppRoutes.favorites),
         ),
         ProfilePageItem(
           icon: Icons.settings_outlined,
           label: AppLocalizations.of(context)!.drawerSettings,
-          onTap: () => AppRouter.openScreenWithPop(
-            context,
-            AppRoutes.settings,
-          ),
+          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.settings),
         ),
         ProfilePageItem(
           icon: Icons.phone_outlined,
           label: AppLocalizations.of(context)!.drawerContactUs,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.contact),
+          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.contact),
         ),
         ProfilePageItem(
           icon: Icons.info_outline_rounded,
           label: AppLocalizations.of(context)!.drawerAboutApp,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.about),
+          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.about),
         ),
         ProfilePageItem(
           icon: Icons.privacy_tip_outlined,
@@ -83,8 +74,7 @@ class ProfilePage extends StatelessWidget {
         ProfilePageItem(
           icon: Icons.star_rounded,
           label: AppLocalizations.of(context)!.rateTitle,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.rate),
+          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.rate),
         ),
         BlocBuilder<MiddlewareCubit, MiddlewareState>(
           bloc: MiddlewareCubit()..getLoinOrLogoutButton(context),
@@ -100,6 +90,7 @@ class ProfilePage extends StatelessWidget {
           },
         ),
         const ProfilePageFooter(),
+        SizedBox(height: 72.h),
       ],
     );
   }

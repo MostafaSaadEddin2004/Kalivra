@@ -15,10 +15,9 @@ import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product, this.width});
+  const ProductCard({super.key, required this.product, });
 
   final ProductModel product;
-  final double? width;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +32,7 @@ class ProductCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      child: SizedBox(width: width?? double.infinity,
+      child: SizedBox(width: 160.w,
         child: InkWell(
           onTap: () => context.push(AppRoutes.productDetails, extra: product),
           borderRadius: BorderRadius.circular(16.r),
@@ -126,7 +125,7 @@ class ProductCard extends StatelessWidget {
                                 color: AppColors.red,
                               ),
                             ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 4.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,

@@ -53,10 +53,6 @@ class _AssociationMemberProfileScreenState
             icon: const Icon(Icons.menu_rounded),
             onSelected: (value) {
               switch (value) {
-                case _AccosiciationMemberProfileMenuActions
-                    .associationLinkRequest:
-                  context.push(AppRoutes.associationLinkRequest);
-                  break;
                 case _AccosiciationMemberProfileMenuActions.linkRequests:
                   context.push(AppRoutes.associationSubmittedRequests);
                   break;
@@ -74,9 +70,8 @@ class _AssociationMemberProfileScreenState
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: _AccosiciationMemberProfileMenuActions
-                    .associationLinkRequest,
+               PopupMenuItem(
+                value: _AccosiciationMemberProfileMenuActions.requestsAndServices,
                 child: Row(
                   children: [
                     Icon(
@@ -85,10 +80,7 @@ class _AssociationMemberProfileScreenState
                       color: theme.colorScheme.onTertiaryFixed,
                     ),
                     const SizedBox(width: 12),
-                    Text(
-                      l10n.associationLinkRequest,
-                      style: theme.textTheme.bodyMedium,
-                    ),
+                    Text(l10n.associationRequestsAndServices, style: theme.textTheme.bodyMedium),
                   ],
                 ),
               ),
@@ -109,20 +101,7 @@ class _AssociationMemberProfileScreenState
                   ],
                 ),
               ),
-              PopupMenuItem(
-                value: _AccosiciationMemberProfileMenuActions.requestsAndServices,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.file_copy,
-                      size: 20.r,
-                      color: theme.colorScheme.onTertiaryFixed,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(l10n.associationRequestsAndServices, style: theme.textTheme.bodyMedium),
-                  ],
-                ),
-              ),
+             
               PopupMenuItem(
                 value:
                     _AccosiciationMemberProfileMenuActions.associationContactUs,
@@ -597,7 +576,6 @@ class _ProfileHeaderCard extends StatelessWidget {
 
 enum _AccosiciationMemberProfileMenuActions {
   linkRequests,
-  associationLinkRequest,
   frequentlyAskedQuestion,
   associationContactUs,
   requestsAndServices,

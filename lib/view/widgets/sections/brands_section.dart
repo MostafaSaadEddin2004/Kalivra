@@ -35,7 +35,6 @@ class BrandsSection extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 12.h),
         SizedBox(
           height: 120.h,
           child: BlocBuilder<BrandCubit, BrandState>(

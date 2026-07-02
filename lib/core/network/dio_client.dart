@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/app_interceptor.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 const String baseUrl = "https://test2.kalivra-world.com/api/";
 
@@ -27,6 +28,15 @@ class DioClient {
         logResponseBody: logResponseBody,
       ),
       ErrorInterceptor(),
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseBody: true,
+        responseHeader: false,
+        error: true,
+        compact: true,
+        maxWidth: 90,
+      ),
     ]);
   }
 

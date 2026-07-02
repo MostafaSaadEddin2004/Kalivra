@@ -193,21 +193,27 @@ class CategoriesPage extends StatelessWidget {
                         ),
                       );
                     }
-                    return SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      sliver: SliverGrid(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12.h,
-                          crossAxisSpacing: 12.w,
-                          childAspectRatio: 0.72,
+                    return CustomScrollView(
+                      slivers: [
+                        SliverPadding(
+                          padding: EdgeInsets.symmetric(horizontal: 20.w),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 12.h,
+                                  crossAxisSpacing: 12.w,
+                                  childAspectRatio: 0.72,
+                                ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) =>
+                                  ProductCard(product: state.products[index]),
+                              childCount: state.products.length,
+                            ),
+                          ),
                         ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) =>
-                              ProductCard(product: state.products[index]),
-                          childCount: state.products.length,
-                        ),
-                      ),
+                        SliverToBoxAdapter(child: SizedBox(height: 72.h)),
+                      ],
                     );
 
                   case ProductsFailed():
@@ -236,7 +242,9 @@ class CategoriesPage extends StatelessWidget {
                                 urlKey: '',
                                 images: [],
                                 isNew: true,
-                                prices: ProductPrices(regular: PriceDetail(price: '')),
+                                prices: ProductPrices(
+                                  regular: PriceDetail(price: ''),
+                                ),
                                 isFeatured: true,
                                 onSale: true,
                                 isSaleable: true,

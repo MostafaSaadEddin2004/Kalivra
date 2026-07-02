@@ -41,7 +41,6 @@ class SalesSection extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 12.h),
                 Skeletonizer(
                   child: SizedBox(
                     height: 230.h,
@@ -105,9 +104,8 @@ class SalesSection extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(height: 12.h),
                       SizedBox(
-                        height: 230.h,
+                        height: 224.h,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: EdgeInsets.symmetric(horizontal: 16.w),

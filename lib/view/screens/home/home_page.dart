@@ -27,7 +27,7 @@ class _HomePageState extends State<HomePage> {
         SliverToBoxAdapter(child: AdSlider()),
         SliverToBoxAdapter(child: SizedBox(height: 24.h)),
         SliverToBoxAdapter(child: SalesSection()),
-        SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+        SliverToBoxAdapter(child: SizedBox(height: 72.h)),
       ],
     );
   }

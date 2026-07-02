@@ -36,7 +36,6 @@ class ProductsSection extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 12.h),
         SizedBox(
           height: 224.h,
           child: BlocBuilder<ProductsCubit, ProductsState>(
@@ -54,11 +53,7 @@ class ProductsSection extends StatelessWidget {
                     separatorBuilder: (context, index) => SizedBox(width: 8.w),
                     itemCount: products.length,
                     itemBuilder: (context, index) {
-                      return SizedBox(
-                        width: 160.w,
-                        height: 220.h,
-                        child: ProductCard(product: products[index]),
-                      );
+                      return ProductCard(product: products[index]);
                     },
                   );
                 default:
