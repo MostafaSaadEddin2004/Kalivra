@@ -242,9 +242,7 @@ class CustomerApiService {
     }
 
     final message = res.data is Map ? res.data['message']?.toString() : null;
-    throw message?.isNotEmpty == true
-        ? message!
-        : 'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹';
+    throw message?.isNotEmpty == true ? message! : 'حدث خطأ غير متوقع';
   }
 
   Future<bool> updateProfile({

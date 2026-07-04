@@ -316,32 +316,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           : null,
                     ),
                     SizedBox(height: 16.h),
-                    DropdownButtonFormField<String?>(
-                      key: ValueKey(_gender),
-                      initialValue: _gender,
-                      decoration: InputDecoration(
-                        labelText: l10n.genderLabel,
-                        prefixIcon: Icon(
-                          Icons.wc_rounded,
-                          size: 22.r,
-                          color: labelColor,
-                        ),
-                      ),
-                      items: [
-                        DropdownMenuItem<String?>(
-                          value: null,
-                          child: Text(l10n.dash),
-                        ),
-                        DropdownMenuItem(
-                          value: 'male',
-                          child: Text(l10n.genderMale),
-                        ),
-                        DropdownMenuItem(
-                          value: 'female',
-                          child: Text(l10n.genderFemale),
-                        ),
-                      ],
-                      onChanged: (v) => setState(() => _gender = v),
+                    AssociationDropdownField(
+                      label: l10n.genderLabel,
+                      hintText: l10n.dash,
+                      value: _gender,
+                      items: const ['male', 'female'],
+                      itemLabelBuilder: (value) =>
+                          value == 'male' ? l10n.genderMale : l10n.genderFemale,
+                      enabled: !isLoading,
+                      onChanged: (value) => setState(() => _gender = value),
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(

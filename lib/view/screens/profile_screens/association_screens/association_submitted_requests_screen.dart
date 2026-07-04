@@ -45,18 +45,25 @@ class _AssociationSubmittedRequestsScreenState
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.associationSubmittedRequestsTitle),
       body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
-        bloc: _associationCubit,
-        builder: (context, snapshot) {
-          if (snapshot is AssociationLinkLoading) {
+        bloc: _associationCubit..fetchRequests(),
+        builder: (context, state) {
+          switch (state) {
+            case AssociationLinkLoading():
+            case AssociationLinkRequestsFetched():
+            case AssociationLinkFailure():
+              
+            default:
+          }
+          if (state is AssociationLinkLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (snapshot is AssociationLinkFailure) {
+          if (state is AssociationLinkFailure) {
             return _ErrorState(onRetry: _reload);
           }
 
-          final requests = snapshot is AssociationLinkRequestsFetched
-              ? snapshot.linkRequests
+          final requests = state is AssociationLinkRequestsFetched
+              ? state.linkRequests
               : <AssociationRequestSummary>[];
 
           if (requests.isEmpty) {
@@ -361,10 +368,6 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Error state
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _ErrorState extends StatelessWidget {
   const _ErrorState({required this.onRetry});

@@ -50,8 +50,8 @@ class _AssociationMemberProfileScreenState
               switch (state) {
                 case AssociationProfileFetched():
                   final data = state.memberInfo;
-                  return data.isAssociationMember
-                      ? PopupMenuButton<_AccosiciationMemberProfileMenuActions>(
+                  return
+                   PopupMenuButton<_AccosiciationMemberProfileMenuActions>(
                           position: PopupMenuPosition.under,
                           icon: const Icon(Icons.menu_rounded),
                           onSelected: (value) {
@@ -153,8 +153,7 @@ class _AssociationMemberProfileScreenState
                               ),
                             ),
                           ],
-                        )
-                      : SizedBox.shrink();
+                        );
                 default:
                   return SizedBox.shrink();
               }

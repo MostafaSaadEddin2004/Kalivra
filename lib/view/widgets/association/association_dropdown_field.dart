@@ -10,6 +10,9 @@ class AssociationDropdownField extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.enabled = true,
+    this.hintText,
+    this.trailing,
+    this.itemLabelBuilder,
     this.validator,
   });
 
@@ -18,6 +21,9 @@ class AssociationDropdownField extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final bool enabled;
+  final String? hintText;
+  final Widget? trailing;
+  final String Function(String item)? itemLabelBuilder;
   final String? Function(String?)? validator;
 
   @override
@@ -33,10 +39,14 @@ class AssociationDropdownField extends StatelessWidget {
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
     final radius = 14.r;
     final canSelect = enabled && items.isNotEmpty;
+    final selectedValue =
+        value != null && value!.isNotEmpty && items.contains(value)
+        ? value
+        : null;
 
     return DropdownButtonFormField<String?>(
       key: ValueKey('$label-$value-${items.join('|')}'),
-      initialValue: value != null && value!.isNotEmpty ? value : null,
+      initialValue: selectedValue,
       isExpanded: true,
       decoration: InputDecoration(
         labelText: label,
@@ -61,10 +71,18 @@ class AssociationDropdownField extends StatelessWidget {
           borderSide: BorderSide(color: border.withValues(alpha: 0.35)),
         ),
         labelStyle: TextStyle(color: labelColor),
+        hintText: hintText,
+        suffixIcon: trailing,
+        suffixIconConstraints: trailing == null
+            ? null
+            : BoxConstraints(minWidth: 48.w, minHeight: 48.h),
       ),
       items: items
           .map(
-            (item) => DropdownMenuItem<String?>(value: item, child: Text(item)),
+            (item) => DropdownMenuItem<String?>(
+              value: item,
+              child: Text(itemLabelBuilder?.call(item) ?? item),
+            ),
           )
           .toList(),
       onChanged: canSelect ? onChanged : null,

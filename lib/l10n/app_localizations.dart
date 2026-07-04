@@ -2174,6 +2174,12 @@ abstract class AppLocalizations {
   /// **'Mother\'s Name'**
   String get associationLinkMotherName;
 
+  /// No description provided for @associationLinkNationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'National ID'**
+  String get associationLinkNationalId;
+
   /// No description provided for @associationLinkGovernorate.
   ///
   /// In en, this message translates to:
@@ -2341,6 +2347,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No attachments added yet. Supporting documents are recommended.'**
   String get associationLinkNoAttachments;
+
+  /// No description provided for @associationRequestedMembershipType.
+  ///
+  /// In en, this message translates to:
+  /// **'Requested membership type'**
+  String get associationRequestedMembershipType;
+
+  /// No description provided for @associationMembershipTypeTourism.
+  ///
+  /// In en, this message translates to:
+  /// **'Tourism'**
+  String get associationMembershipTypeTourism;
+
+  /// No description provided for @associationMembershipTypeResidential.
+  ///
+  /// In en, this message translates to:
+  /// **'Residential'**
+  String get associationMembershipTypeResidential;
+
+  /// No description provided for @associationAdditionalAddresses.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional addresses'**
+  String get associationAdditionalAddresses;
+
+  /// No description provided for @associationAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get associationAddress;
+
+  /// No description provided for @associationAdditionalAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional address'**
+  String get associationAdditionalAddress;
+
+  /// No description provided for @associationAddAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add address'**
+  String get associationAddAddress;
+
+  /// No description provided for @associationAddressRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Add address'**
+  String get associationAddressRequired;
+
+  /// No description provided for @associationDeleteAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete address'**
+  String get associationDeleteAddress;
+
+  /// No description provided for @associationAddressLoadingRequestTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get associationAddressLoadingRequestTypes;
+
+  /// No description provided for @associationAddressSelectCapital.
+  ///
+  /// In en, this message translates to:
+  /// **'Select capital'**
+  String get associationAddressSelectCapital;
+
+  /// No description provided for @associationAddressLoadingCapitals.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the capitals'**
+  String get associationAddressLoadingCapitals;
+
+  /// No description provided for @associationAddressSelectCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Select city'**
+  String get associationAddressSelectCity;
+
+  /// No description provided for @associationAddressLoadingCities.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the cities'**
+  String get associationAddressLoadingCities;
+
+  /// No description provided for @associationAddressSelectTown.
+  ///
+  /// In en, this message translates to:
+  /// **'Select town'**
+  String get associationAddressSelectTown;
+
+  /// No description provided for @associationAddressLoadingTowns.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading the towns'**
+  String get associationAddressLoadingTowns;
+
+  /// No description provided for @associationAddressLoadAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Load again'**
+  String get associationAddressLoadAgain;
 
   /// No description provided for @verifyPhoneTitle.
   ///

@@ -1092,6 +1092,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationLinkMotherName => 'Mother\'s Name';
 
   @override
+  String get associationLinkNationalId => 'National ID';
+
+  @override
   String get associationLinkGovernorate => 'Governorate';
 
   @override
@@ -1180,6 +1183,57 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get associationLinkNoAttachments =>
       'No attachments added yet. Supporting documents are recommended.';
+
+  @override
+  String get associationRequestedMembershipType => 'Requested membership type';
+
+  @override
+  String get associationMembershipTypeTourism => 'Tourism';
+
+  @override
+  String get associationMembershipTypeResidential => 'Residential';
+
+  @override
+  String get associationAdditionalAddresses => 'Additional addresses';
+
+  @override
+  String get associationAddress => 'Address';
+
+  @override
+  String get associationAdditionalAddress => 'Additional address';
+
+  @override
+  String get associationAddAddress => 'Add address';
+
+  @override
+  String get associationAddressRequired => 'Add address';
+
+  @override
+  String get associationDeleteAddress => 'Delete address';
+
+  @override
+  String get associationAddressLoadingRequestTypes => 'Loading';
+
+  @override
+  String get associationAddressSelectCapital => 'Select capital';
+
+  @override
+  String get associationAddressLoadingCapitals => 'Loading the capitals';
+
+  @override
+  String get associationAddressSelectCity => 'Select city';
+
+  @override
+  String get associationAddressLoadingCities => 'Loading the cities';
+
+  @override
+  String get associationAddressSelectTown => 'Select town';
+
+  @override
+  String get associationAddressLoadingTowns => 'Loading the towns';
+
+  @override
+  String get associationAddressLoadAgain => 'Load again';
 
   @override
   String get verifyPhoneTitle => 'Verify phone number';

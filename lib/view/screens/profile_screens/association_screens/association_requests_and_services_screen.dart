@@ -3,17 +3,20 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
-import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
-import 'package:kalivra/model/location/syrian_location_catalog.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+
+const String _membershipTypeTourism = 'سياحية';
+const String _membershipTypeResidential = 'سكنية';
 
 class AssociationRequestsAndServicesScreen extends StatefulWidget {
   const AssociationRequestsAndServicesScreen({super.key});
@@ -32,15 +35,8 @@ class _AssociationRequestsAndServicesScreenState
     'jpg',
     'jpeg',
     'png',
-    'gif',
     'webp',
     'pdf',
-    'doc',
-    'docx',
-    'mp4',
-    'mov',
-    'avi',
-    'mkv',
   ];
 
   late final AssociationLinkCubit _associationLinkCubit;
@@ -49,23 +45,20 @@ class _AssociationRequestsAndServicesScreenState
 
   final _messageController = TextEditingController();
 
-  final _firstNameController = TextEditingController();
-  final _kunyaController = TextEditingController();
   final _fatherNameController = TextEditingController();
   final _motherNameController = TextEditingController();
+  final _nationalIdController = TextEditingController();
 
   final _streetController = TextEditingController();
   final _buildingController = TextEditingController();
-  final _permanentAddressController = TextEditingController();
-  final _mobileController = TextEditingController();
-  final _whatsAppController = TextEditingController();
-  final _emailController = TextEditingController();
+  final List<TextEditingController> _additionalAddressControllers = [
+    TextEditingController(),
+  ];
 
   final _membershipNumberController = TextEditingController();
   final _priorityNumberController = TextEditingController();
   final _projectNameController = TextEditingController();
   final _housingUnitController = TextEditingController();
-  final _totalPaymentsController = TextEditingController();
   final _villageController = TextEditingController();
 
   final List<AssociationLinkAttachment> _attachments = [];
@@ -76,6 +69,7 @@ class _AssociationRequestsAndServicesScreenState
   final List<dynamic> _requestTypes = [];
 
   String? _requestType;
+  String? _requestedMembershipType;
   String? _selectedGovernorate;
   String? _selectedCity;
   String? _selectedTown;
@@ -97,7 +91,7 @@ class _AssociationRequestsAndServicesScreenState
     _associationLinkCubit = AssociationLinkCubit()..fetchRequestTypes();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _bootstrap();
+      context.read<AddressInfoCubit>().fetchCapitals();
     });
   }
 
@@ -107,23 +101,21 @@ class _AssociationRequestsAndServicesScreenState
 
     _messageController.dispose();
 
-    _firstNameController.dispose();
-    _kunyaController.dispose();
     _fatherNameController.dispose();
     _motherNameController.dispose();
+    _nationalIdController.dispose();
 
     _streetController.dispose();
     _buildingController.dispose();
-    _permanentAddressController.dispose();
-    _mobileController.dispose();
-    _whatsAppController.dispose();
-    _emailController.dispose();
+
+    for (final controller in _additionalAddressControllers) {
+      controller.dispose();
+    }
 
     _membershipNumberController.dispose();
     _priorityNumberController.dispose();
     _projectNameController.dispose();
     _housingUnitController.dispose();
-    _totalPaymentsController.dispose();
     _villageController.dispose();
 
     for (final controller in _attachmentDescriptionControllers.values) {
@@ -131,18 +123,6 @@ class _AssociationRequestsAndServicesScreenState
     }
 
     super.dispose();
-  }
-
-  Future<void> _bootstrap() async {
-    final authState = context.read<AuthCubit>().state;
-
-    if (authState is AuthFetchedData) {
-      _accountPhone = authState.customer.phone;
-
-      if (_mobileController.text.trim().isEmpty) {
-        _mobileController.text = authState.customer.phone ?? '';
-      }
-    }
   }
 
   String _normalizePhone(String value) {
@@ -227,12 +207,22 @@ class _AssociationRequestsAndServicesScreenState
     });
   }
 
+  void _onRequestedMembershipTypeChanged(String? value) {
+    setState(() {
+      _requestedMembershipType = value;
+    });
+  }
+
   void _onGovernorateChanged(String? value) {
     setState(() {
       _selectedGovernorate = value;
       _selectedCity = null;
       _selectedTown = null;
     });
+
+    if (value != null) {
+      context.read<AddressInfoCubit>().fetchCities(capitalId: value);
+    }
   }
 
   void _onCityChanged(String? value) {
@@ -240,6 +230,10 @@ class _AssociationRequestsAndServicesScreenState
       _selectedCity = value;
       _selectedTown = null;
     });
+
+    if (value != null) {
+      context.read<AddressInfoCubit>().fetchTowns(cityId: value);
+    }
   }
 
   void _onTownChanged(String? value) {
@@ -302,6 +296,30 @@ class _AssociationRequestsAndServicesScreenState
     });
   }
 
+  void _addAdditionalAddress() {
+    if (_isLocked) return;
+
+    if (_additionalAddressControllers.first.text.trim().isEmpty) {
+      CustomSnackBar.show(
+        context,
+        AppLocalizations.of(context)!.associationAddressRequired,
+      );
+      return;
+    }
+
+    setState(() {
+      _additionalAddressControllers.add(TextEditingController());
+    });
+  }
+
+  void _removeAdditionalAddress(int index) {
+    if (_isLocked || _additionalAddressControllers.length == 1) return;
+
+    setState(() {
+      _additionalAddressControllers.removeAt(index).dispose();
+    });
+  }
+
   List<AssociationLinkAttachment> _attachmentsWithDescriptions() {
     return _attachments.map((attachment) {
       return attachment.copyWith(
@@ -309,6 +327,13 @@ class _AssociationRequestsAndServicesScreenState
             _attachmentDescriptionControllers[attachment.id]?.text.trim() ?? '',
       );
     }).toList();
+  }
+
+  List<String> _additionalAddresses() {
+    return _additionalAddressControllers
+        .map((controller) => controller.text.trim())
+        .where((address) => address.isNotEmpty)
+        .toList();
   }
 
   Future<void> _submit() async {
@@ -324,6 +349,11 @@ class _AssociationRequestsAndServicesScreenState
 
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    if (_isMembershipRequest && _additionalAddresses().isEmpty) {
+      CustomSnackBar.show(context, l10n.associationAddressRequired);
+      return;
+    }
+
     if (_isMembershipRequest && _attachments.isEmpty) {
       CustomSnackBar.show(
         context,
@@ -334,20 +364,21 @@ class _AssociationRequestsAndServicesScreenState
 
     try {
       if (_isMembershipRequest) {
-        await _associationLinkCubit.submitRequest(
+        await _associationLinkCubit.submitLinkRequest(
           context: context,
           customerNote: _messageController.text.trim(),
           type: _membershipRequestType,
           fatherName: _fatherNameController.text.trim(),
           motherName: _motherNameController.text.trim(),
+          nationalId: _nationalIdController.text.trim(),
+          requestedMembershipType: _requestedMembershipType!,
           permanentCapitalId: _selectedGovernorate,
           permanentCityId: _selectedCity,
           permanentTownId: _selectedTown,
-          permanentVillageId: _villageController.text.trim(),
+          permanentVillage: _villageController.text.trim(),
           officialStreet: _streetController.text.trim(),
           officialBuilding: _buildingController.text.trim(),
-          permanentAddress: _permanentAddressController.text.trim(),
-          phone: _mobileController.text.trim(),
+          additionalAddresses: _additionalAddresses(),
           claimedMembershipNumber: _membershipNumberController.text.trim(),
           claimedPriorityNumber: _priorityNumberController.text.trim(),
           claimedBuildingNumber: _buildingController.text.trim(),
@@ -355,14 +386,10 @@ class _AssociationRequestsAndServicesScreenState
           attachments: _attachmentsWithDescriptions(),
         );
       } else {
-        await _associationLinkCubit.submitRequest(
+        await _associationLinkCubit.submitNormalRequest(
           context: context,
           type: _requestType!,
           customerNote: _messageController.text.trim(),
-          fatherName: '',
-          motherName: '',
-          officialStreet: '',
-          officialBuilding: '',
           attachments: _attachmentsWithDescriptions(),
         );
       }
@@ -382,17 +409,6 @@ class _AssociationRequestsAndServicesScreenState
 
   Widget _fieldSpacer() {
     return SizedBox(height: 14.h);
-  }
-
-  Widget _buildTwoColumnRow({required Widget start, required Widget end}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: start),
-        SizedBox(width: 12.w),
-        Expanded(child: end),
-      ],
-    );
   }
 
   Widget _buildRequestTypeDropdown({
@@ -418,30 +434,34 @@ class _AssociationRequestsAndServicesScreenState
         ? _requestType
         : null;
 
-    return DropdownButtonFormField<String>(
-      initialValue: selectedValue,
-      decoration: InputDecoration(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(24.r)),
-        hintText: isLoadingTypes
-            ? 'جاري التحميل'
-            : l10n.associationRequestTypeHint,
+    return Card(
+      margin: EdgeInsets.zero,
+      child: Padding(
+        padding: EdgeInsets.all(12.w),
+        child: AssociationDropdownField(
+          label: l10n.associationRequestTypeHint,
+          hintText: isLoadingTypes
+              ? l10n.associationAddressLoadingRequestTypes
+              : l10n.associationRequestTypeHint,
+          value: selectedValue,
+          items: isLoadingTypes
+              ? const []
+              : _requestTypes
+                    .map<String>((item) => item.value as String)
+                    .toList(),
+          itemLabelBuilder: (value) {
+            final item = _requestTypes.firstWhere(
+              (requestType) => requestType.value == value,
+            );
+            return item.label;
+          },
+          enabled: !isBusy,
+          onChanged: _onRequestTypeChanged,
+          validator: (value) => value == null
+              ? l10n.associationRequestTypeOrMessageRequired
+              : null,
+        ),
       ),
-      items: isLoadingTypes
-          ? const []
-          : _requestTypes.map<DropdownMenuItem<String>>((item) {
-              return DropdownMenuItem<String>(
-                value: item.value,
-                child: Text(item.label),
-              );
-            }).toList(),
-      onChanged: isBusy ? null : _onRequestTypeChanged,
-      validator: (value) {
-        if (value == null) {
-          return l10n.associationRequestTypeOrMessageRequired;
-        }
-
-        return null;
-      },
     );
   }
 
@@ -454,24 +474,30 @@ class _AssociationRequestsAndServicesScreenState
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SizedBox(height: 16.h),
-        AppTextField(
-          controller: _messageController,
-          label: l10n.messageLabel,
-          hint: l10n.associationRequestMessageHint,
-          maxLines: 6,
-          textInputAction: TextInputAction.newline,
-          prefixIcon: Icon(
-            Icons.notes_rounded,
-            color: isDark ? AppColors.taupe : AppColors.burgundy,
-          ),
-          validator: (value) {
-            if (_hasSelectedGeneralRequest &&
-                (value == null || value.trim().isEmpty)) {
-              return l10n.associationRequestTypeOrMessageRequired;
-            }
+        Card(
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: EdgeInsets.all(12.w),
+            child: AppTextField(
+              controller: _messageController,
+              label: l10n.messageLabel,
+              hint: l10n.associationRequestMessageHint,
+              maxLines: 6,
+              textInputAction: TextInputAction.newline,
+              prefixIcon: Icon(
+                Icons.message_rounded,
+                color: isDark ? AppColors.taupe : AppColors.burgundy,
+              ),
+              validator: (value) {
+                if (_hasSelectedGeneralRequest &&
+                    (value == null || value.trim().isEmpty)) {
+                  return l10n.associationRequestTypeOrMessageRequired;
+                }
 
-            return null;
-          },
+                return null;
+              },
+            ),
+          ),
         ),
         SizedBox(height: 16.h),
         _RequestAttachmentsSection(
@@ -493,19 +519,11 @@ class _AssociationRequestsAndServicesScreenState
       top: false,
       child: SizedBox(
         width: double.infinity,
-        child: FilledButton.icon(
+        child: FilledButton(
           onPressed: !_hasSelectedAnyRequest || isSubmitting ? null : _submit,
-          icon: isSubmitting
-              ? SizedBox(
-                  width: 20.r,
-                  height: 20.r,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.offWhite,
-                  ),
-                )
-              : const Icon(Icons.send_rounded),
-          label: Text(AppLocalizations.of(context)!.associationLinkSubmit),
+          child: isSubmitting
+              ? SpinKitFadingCircle(color: AppColors.offWhite, size: 20.r)
+              : Text(AppLocalizations.of(context)!.associationLinkSubmit),
         ),
       ),
     );
@@ -544,28 +562,24 @@ class _AssociationRequestsAndServicesScreenState
                   _buildRequestTypeDropdown(l10n: l10n, state: state),
                   if (_isMembershipRequest) ...[
                     SizedBox(height: 16.h),
-                    AssociationLinkRequestScreen(
-                      hasSelectedGeneralRequest: _hasSelectedGeneralRequest,
-                      messageController: _messageController,
+                    AssociationLinkRequestSection(
                       isLocked: _isLocked,
-                      firstNameController: _firstNameController,
-                      kunyaController: _kunyaController,
+                      hasSelectedGeneralRequest: _hasSelectedGeneralRequest,
                       fatherNameController: _fatherNameController,
                       motherNameController: _motherNameController,
+                      nationalIdController: _nationalIdController,
                       selectedGovernorate: _selectedGovernorate,
                       selectedCity: _selectedCity,
                       selectedTown: _selectedTown,
                       streetController: _streetController,
                       buildingController: _buildingController,
-                      permanentAddressController: _permanentAddressController,
-                      mobileController: _mobileController,
-                      whatsAppController: _whatsAppController,
-                      emailController: _emailController,
+                      additionalAddressControllers:
+                          _additionalAddressControllers,
+                      requestedMembershipType: _requestedMembershipType,
                       membershipNumberController: _membershipNumberController,
                       priorityNumberController: _priorityNumberController,
                       projectNameController: _projectNameController,
                       housingUnitController: _housingUnitController,
-                      totalPaymentsController: _totalPaymentsController,
                       villageController: _villageController,
                       attachments: _attachments,
                       attachmentDescriptionControllers:
@@ -573,6 +587,10 @@ class _AssociationRequestsAndServicesScreenState
                       onGovernorateChanged: _onGovernorateChanged,
                       onCityChanged: _onCityChanged,
                       onTownChanged: _onTownChanged,
+                      onRequestedMembershipTypeChanged:
+                          _onRequestedMembershipTypeChanged,
+                      onAddAdditionalAddress: _addAdditionalAddress,
+                      onRemoveAdditionalAddress: _removeAdditionalAddress,
                       onPickAttachment: _pickAttachment,
                       onRemoveAttachment: _removeAttachment,
                       validateRequiredName: (value) =>
@@ -584,7 +602,6 @@ class _AssociationRequestsAndServicesScreenState
                       validateOptionalEmail: (value) =>
                           _validateOptionalEmail(value, l10n),
                       fieldSpacer: _fieldSpacer,
-                      buildTwoColumnRow: _buildTwoColumnRow,
                     ),
                   ],
                   if (_hasSelectedGeneralRequest)
@@ -607,34 +624,32 @@ class _AssociationRequestsAndServicesScreenState
   }
 }
 
-class AssociationLinkRequestScreen extends StatelessWidget {
-  const AssociationLinkRequestScreen({
+class AssociationLinkRequestSection extends StatefulWidget {
+  const AssociationLinkRequestSection({
     super.key,
-    required this.isLocked,
-    required this.firstNameController,
-    required this.kunyaController,
     required this.fatherNameController,
     required this.motherNameController,
+    required this.nationalIdController,
     required this.selectedGovernorate,
     required this.selectedCity,
     required this.selectedTown,
     required this.streetController,
     required this.buildingController,
-    required this.permanentAddressController,
-    required this.mobileController,
-    required this.whatsAppController,
-    required this.emailController,
+    required this.additionalAddressControllers,
+    required this.requestedMembershipType,
     required this.membershipNumberController,
     required this.priorityNumberController,
     required this.projectNameController,
     required this.housingUnitController,
-    required this.totalPaymentsController,
     required this.villageController,
     required this.attachments,
     required this.attachmentDescriptionControllers,
     required this.onGovernorateChanged,
     required this.onCityChanged,
     required this.onTownChanged,
+    required this.onRequestedMembershipTypeChanged,
+    required this.onAddAdditionalAddress,
+    required this.onRemoveAdditionalAddress,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
     required this.validateRequiredName,
@@ -642,17 +657,13 @@ class AssociationLinkRequestScreen extends StatelessWidget {
     required this.validateOptionalPhone,
     required this.validateOptionalEmail,
     required this.fieldSpacer,
-    required this.buildTwoColumnRow,
     required this.hasSelectedGeneralRequest,
-    required this.messageController,
+    required this.isLocked,
   });
 
-  final bool isLocked;
-
-  final TextEditingController firstNameController;
-  final TextEditingController kunyaController;
   final TextEditingController fatherNameController;
   final TextEditingController motherNameController;
+  final TextEditingController nationalIdController;
 
   final String? selectedGovernorate;
   final String? selectedCity;
@@ -660,17 +671,13 @@ class AssociationLinkRequestScreen extends StatelessWidget {
 
   final TextEditingController streetController;
   final TextEditingController buildingController;
-  final TextEditingController permanentAddressController;
-  final TextEditingController mobileController;
-  final TextEditingController whatsAppController;
-  final TextEditingController emailController;
+  final List<TextEditingController> additionalAddressControllers;
+  final String? requestedMembershipType;
 
   final TextEditingController membershipNumberController;
   final TextEditingController priorityNumberController;
   final TextEditingController projectNameController;
   final TextEditingController housingUnitController;
-  final TextEditingController totalPaymentsController;
-  final TextEditingController messageController;
   final TextEditingController villageController;
 
   final List<AssociationLinkAttachment> attachments;
@@ -679,6 +686,9 @@ class AssociationLinkRequestScreen extends StatelessWidget {
   final ValueChanged<String?> onGovernorateChanged;
   final ValueChanged<String?> onCityChanged;
   final ValueChanged<String?> onTownChanged;
+  final ValueChanged<String?> onRequestedMembershipTypeChanged;
+  final VoidCallback onAddAdditionalAddress;
+  final ValueChanged<int> onRemoveAdditionalAddress;
 
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
@@ -690,68 +700,52 @@ class AssociationLinkRequestScreen extends StatelessWidget {
   final bool hasSelectedGeneralRequest;
 
   final Widget Function() fieldSpacer;
+  final bool isLocked;
 
-  final Widget Function({required Widget start, required Widget end})
-  buildTwoColumnRow;
+  @override
+  State<AssociationLinkRequestSection> createState() =>
+      _AssociationLinkRequestSectionState();
+}
+
+class _AssociationLinkRequestSectionState
+    extends State<AssociationLinkRequestSection> {
+  bool get isLocked => widget.isLocked;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final hintColor = isDark ? AppColors.taupe : AppColors.burgundy;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (isLocked)
-          Container(
-            padding: EdgeInsets.all(14.w),
-            margin: EdgeInsets.only(bottom: 16.h),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.burgundy.withValues(alpha: 0.2)
-                  : AppColors.burgundy.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Text(
-              l10n.associationLinkSubmittedLocked,
-              style: theme.textTheme.bodyMedium?.copyWith(color: hintColor),
-            ),
-          ),
         AssociationFormSection(
           title: l10n.associationLinkPersonalSection,
           icon: Icons.person_outline_rounded,
           children: [
             AppTextField(
-              controller: firstNameController,
-              label: l10n.associationLinkFirstName,
-              enabled: !isLocked,
-              textCapitalization: TextCapitalization.words,
-              validator: validateRequiredName,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: kunyaController,
-              label: l10n.associationLinkKunya,
-              enabled: !isLocked,
-              textCapitalization: TextCapitalization.words,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: fatherNameController,
+              controller: widget.fatherNameController,
               label: l10n.associationLinkFatherName,
-              enabled: !isLocked,
               textCapitalization: TextCapitalization.words,
-              validator: validateRequiredName,
+              validator: widget.validateRequiredName,
             ),
-            fieldSpacer(),
+            widget.fieldSpacer(),
             AppTextField(
-              controller: motherNameController,
+              controller: widget.motherNameController,
               label: l10n.associationLinkMotherName,
-              enabled: !isLocked,
               textCapitalization: TextCapitalization.words,
-              validator: validateRequiredName,
+              validator: widget.validateRequiredName,
+            ),
+            widget.fieldSpacer(),
+            AppTextField(
+              controller: widget.nationalIdController,
+              label: l10n.associationLinkNationalId,
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.required;
+                }
+
+                return null;
+              },
             ),
           ],
         ),
@@ -759,52 +753,127 @@ class AssociationLinkRequestScreen extends StatelessWidget {
           title: l10n.associationLinkContactSection,
           icon: Icons.location_on_outlined,
           children: [
-            AssociationDropdownField(
-              label: l10n.associationLinkGovernorate,
-              value: selectedGovernorate,
-              items: SyrianLocationCatalog.withSavedValue(
-                SyrianLocationCatalog.governorates(),
-                selectedGovernorate,
-              ),
-              enabled: !isLocked,
-              onChanged: onGovernorateChanged,
-              validator: (value) => value == null ? l10n.required : null,
+            BlocBuilder<AddressInfoCubit, AddressInfoState>(
+              builder: (context, addressState) {
+                final capitalLabels = {
+                  for (final capital in addressState.capitals)
+                    capital.id: capital.name,
+                };
+                final cityLabels = {
+                  for (final city in addressState.cities) city.id: city.name,
+                };
+                final townLabels = {
+                  for (final town in addressState.towns) town.id: town.name,
+                };
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AssociationDropdownField(
+                      label: l10n.associationLinkGovernorate,
+                      hintText: addressState.isLoadingCapitals
+                          ? l10n.associationAddressLoadingCapitals
+                          : l10n.associationAddressSelectCapital,
+                      value: widget.selectedGovernorate,
+                      items: addressState.capitals
+                          .map((capital) => capital.id)
+                          .toList(),
+                      itemLabelBuilder: (id) => capitalLabels[id] ?? id,
+                      enabled:
+                          !isLocked &&
+                          !addressState.isLoadingCapitals &&
+                          !addressState.capitalsFailed,
+                      trailing: addressState.capitalsFailed
+                          ? _AddressReloadButton(
+                              onPressed: isLocked
+                                  ? null
+                                  : () => context
+                                        .read<AddressInfoCubit>()
+                                        .fetchCapitals(),
+                            )
+                          : null,
+                      onChanged: widget.onGovernorateChanged,
+                      validator: (value) =>
+                          value == null ? l10n.required : null,
+                    ),
+                    SizedBox(height: 16.h),
+                    AssociationDropdownField(
+                      label: l10n.associationLinkCity,
+                      hintText: addressState.isLoadingCities
+                          ? l10n.associationAddressLoadingCities
+                          : l10n.associationAddressSelectCity,
+                      value: widget.selectedCity,
+                      items: addressState.cities
+                          .map((city) => city.id)
+                          .toList(),
+                      itemLabelBuilder: (id) => cityLabels[id] ?? id,
+                      enabled:
+                          !isLocked &&
+                          widget.selectedGovernorate != null &&
+                          !addressState.isLoadingCities &&
+                          !addressState.citiesFailed,
+                      trailing:
+                          addressState.citiesFailed &&
+                              widget.selectedGovernorate != null
+                          ? _AddressReloadButton(
+                              onPressed: isLocked
+                                  ? null
+                                  : () => context
+                                        .read<AddressInfoCubit>()
+                                        .fetchCities(
+                                          capitalId:
+                                              widget.selectedGovernorate!,
+                                        ),
+                            )
+                          : null,
+                      onChanged: widget.onCityChanged,
+                      validator: (value) =>
+                          value == null ? l10n.required : null,
+                    ),
+                    SizedBox(height: 16.h),
+                    AssociationDropdownField(
+                      label: l10n.associationLinkTown,
+                      hintText: addressState.isLoadingTowns
+                          ? l10n.associationAddressLoadingTowns
+                          : l10n.associationAddressSelectTown,
+                      value: widget.selectedTown,
+                      items: addressState.towns.map((town) => town.id).toList(),
+                      itemLabelBuilder: (id) => townLabels[id] ?? id,
+                      enabled:
+                          !isLocked &&
+                          widget.selectedCity != null &&
+                          !addressState.isLoadingTowns &&
+                          !addressState.townsFailed,
+                      trailing:
+                          addressState.townsFailed &&
+                              widget.selectedCity != null
+                          ? _AddressReloadButton(
+                              onPressed: isLocked
+                                  ? null
+                                  : () => context
+                                        .read<AddressInfoCubit>()
+                                        .fetchTowns(
+                                          cityId: widget.selectedCity!,
+                                        ),
+                            )
+                          : null,
+                      onChanged: widget.onTownChanged,
+                      validator: (value) =>
+                          value == null ? l10n.required : null,
+                    ),
+                  ],
+                );
+              },
             ),
-            SizedBox(height: 16.h),
-            AssociationDropdownField(
-              label: l10n.associationLinkCity,
-              value: selectedCity,
-              items: SyrianLocationCatalog.withSavedValue(
-                SyrianLocationCatalog.cities(selectedGovernorate),
-                selectedCity,
-              ),
-              enabled: !isLocked && selectedGovernorate != null,
-              onChanged: onCityChanged,
-              validator: (value) => value == null ? l10n.required : null,
-            ),
-            SizedBox(height: 16.h),
-            AssociationDropdownField(
-              label: l10n.associationLinkTown,
-              value: selectedTown,
-              items: SyrianLocationCatalog.withSavedValue(
-                SyrianLocationCatalog.towns(selectedGovernorate, selectedCity),
-                selectedTown,
-              ),
-              enabled: !isLocked && selectedCity != null,
-              onChanged: onTownChanged,
-              validator: (value) => value == null ? l10n.required : null,
-            ),
-            fieldSpacer(),
+            widget.fieldSpacer(),
             AppTextField(
-              controller: villageController,
+              controller: widget.villageController,
               label: l10n.associationLinkVillage,
-              enabled: !isLocked,
             ),
-            fieldSpacer(),
+            widget.fieldSpacer(),
             AppTextField(
-              controller: streetController,
+              controller: widget.streetController,
               label: l10n.associationLinkStreet,
-              enabled: !isLocked,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return l10n.required;
@@ -813,11 +882,10 @@ class AssociationLinkRequestScreen extends StatelessWidget {
                 return null;
               },
             ),
-            fieldSpacer(),
+            widget.fieldSpacer(),
             AppTextField(
-              controller: buildingController,
+              controller: widget.buildingController,
               label: l10n.associationLinkBuilding,
-              enabled: !isLocked,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return l10n.required;
@@ -826,36 +894,12 @@ class AssociationLinkRequestScreen extends StatelessWidget {
                 return null;
               },
             ),
-            fieldSpacer(),
-            AppTextField(
-              controller: permanentAddressController,
-              label: l10n.associationLinkPermanentAddress,
-              enabled: !isLocked,
-              maxLines: 2,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: mobileController,
-              label: l10n.associationLinkMobile,
-              enabled: !isLocked,
-              keyboardType: TextInputType.phone,
-              validator: validateRequiredPhone,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: whatsAppController,
-              label: l10n.associationLinkWhatsApp,
-              enabled: !isLocked,
-              keyboardType: TextInputType.phone,
-              validator: validateOptionalPhone,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: emailController,
-              label: l10n.associationLinkEmail,
-              enabled: !isLocked,
-              keyboardType: TextInputType.emailAddress,
-              validator: validateOptionalEmail,
+            widget.fieldSpacer(),
+            _AdditionalAddressesSection(
+              controllers: widget.additionalAddressControllers,
+              enabled: !widget.isLocked,
+              onAddAddress: widget.onAddAdditionalAddress,
+              onRemoveAddress: widget.onRemoveAdditionalAddress,
             ),
           ],
         ),
@@ -863,68 +907,145 @@ class AssociationLinkRequestScreen extends StatelessWidget {
           title: l10n.associationLinkMembershipSection,
           icon: Icons.apartment_outlined,
           children: [
-            buildTwoColumnRow(
-              start: AppTextField(
-                controller: membershipNumberController,
-                label: l10n.associationLinkMembershipNumber,
-                enabled: !isLocked,
-                keyboardType: TextInputType.number,
-              ),
-              end: AppTextField(
-                controller: priorityNumberController,
-                label: l10n.associationLinkPriorityNumber,
-                enabled: !isLocked,
-                keyboardType: TextInputType.number,
-              ),
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: projectNameController,
-              label: l10n.associationLinkProjectName,
-              enabled: !isLocked,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: housingUnitController,
-              label: l10n.associationLinkHousingUnit,
-              enabled: !isLocked,
-            ),
-            fieldSpacer(),
-            AppTextField(
-              controller: totalPaymentsController,
-              label: l10n.associationLinkTotalPayments,
-              enabled: !isLocked,
-              keyboardType: TextInputType.number,
-            ),
-            fieldSpacer(),
-          ],
-        ), 
-            AppTextField(
-              controller: messageController,
-              label: l10n.messageLabel,
-              hint: l10n.associationRequestMessageHint,
-              maxLines: 6,
-              textInputAction: TextInputAction.newline,
-              prefixIcon: Icon(
-                Icons.notes_rounded,
-                color: isDark ? AppColors.taupe : AppColors.burgundy,
-              ),
-              validator: (value) {
-                if (hasSelectedGeneralRequest &&
-                    (value == null || value.trim().isEmpty)) {
-                  return l10n.associationRequestTypeOrMessageRequired;
-                }
-
-                return null;
+            AssociationDropdownField(
+              label: l10n.associationRequestedMembershipType,
+              hintText: l10n.associationRequestedMembershipType,
+              value: widget.requestedMembershipType,
+              items: const [_membershipTypeTourism, _membershipTypeResidential],
+              itemLabelBuilder: (value) {
+                return switch (value) {
+                  _membershipTypeTourism =>
+                    l10n.associationMembershipTypeTourism,
+                  _membershipTypeResidential =>
+                    l10n.associationMembershipTypeResidential,
+                  _ => value,
+                };
               },
-            ),fieldSpacer(),
-        _RequestAttachmentsSection(
-          attachments: attachments,
-          attachmentDescriptionControllers: attachmentDescriptionControllers,
-          enabled: !isLocked,
-          onPickAttachment: onPickAttachment,
-          onRemoveAttachment: onRemoveAttachment,
+              enabled: !widget.isLocked,
+              onChanged: widget.onRequestedMembershipTypeChanged,
+              validator: (value) => value == null ? l10n.required : null,
+            ),
+            widget.fieldSpacer(),
+            Row(
+              children: [
+                Expanded(
+                  child: AppTextField(
+                    controller: widget.membershipNumberController,
+                    label: l10n.associationLinkMembershipNumber,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: 16.w),
+                Expanded(
+                  child: AppTextField(
+                    controller: widget.priorityNumberController,
+                    label: l10n.associationLinkPriorityNumber,
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+              ],
+            ),
+            widget.fieldSpacer(),
+            AppTextField(
+              controller: widget.projectNameController,
+              label: l10n.associationLinkProjectName,
+            ),
+            widget.fieldSpacer(),
+            AppTextField(
+              controller: widget.housingUnitController,
+              label: l10n.associationLinkHousingUnit,
+            ),
+            widget.fieldSpacer(),
+          ],
         ),
+        _RequestAttachmentsSection(
+          attachments: widget.attachments,
+          attachmentDescriptionControllers:
+              widget.attachmentDescriptionControllers,
+          enabled: !widget.isLocked,
+          onPickAttachment: widget.onPickAttachment,
+          onRemoveAttachment: widget.onRemoveAttachment,
+        ),
+      ],
+    );
+  }
+}
+
+class _AddressReloadButton extends StatelessWidget {
+  const _AddressReloadButton({required this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsetsDirectional.only(end: 4.w),
+      child: TextButton.icon(
+        onPressed: onPressed,
+        icon: Icon(Icons.refresh_rounded, size: 18.r),
+        label: Text(AppLocalizations.of(context)!.associationAddressLoadAgain),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          minimumSize: Size(0, 36.h),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
+    );
+  }
+}
+
+class _AdditionalAddressesSection extends StatelessWidget {
+  const _AdditionalAddressesSection({
+    required this.controllers,
+    required this.enabled,
+    required this.onAddAddress,
+    required this.onRemoveAddress,
+  });
+
+  final List<TextEditingController> controllers;
+  final bool enabled;
+  final VoidCallback onAddAddress;
+  final ValueChanged<int> onRemoveAddress;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (var index = 0; index < controllers.length; index++) ...[
+          if (index > 0) SizedBox(height: 14.h),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppTextField(
+                controller: controllers[index],
+                label: index == 0
+                    ? l10n.associationAddress
+                    : l10n.associationAdditionalAddress,
+                maxLines: 2,
+                enabled: enabled,
+                validator: index == 0
+                    ? (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return l10n.associationAddressRequired;
+                        }
+
+                        return null;
+                      }
+                    : null,
+              ),
+            ],
+          ),
+        ],
+        if (enabled) ...[
+          SizedBox(height: 14.h),
+          OutlinedButton.icon(
+            onPressed: onAddAddress,
+            icon: const Icon(Icons.add_rounded),
+            label: Text(l10n.associationAddAddress),
+          ),
+        ],
       ],
     );
   }

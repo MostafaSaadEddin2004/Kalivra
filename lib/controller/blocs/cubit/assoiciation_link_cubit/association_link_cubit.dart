@@ -5,13 +5,13 @@ import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
-import 'package:kalivra/model/services/api/association_link_api_service.dart';
+import 'package:kalivra/model/services/api/association_api_service.dart';
 
 part 'association_link_state.dart';
 
 class AssociationLinkCubit extends Cubit<AssociationLinkState> {
   AssociationLinkCubit() : super(AssociationLinkLoading());
-  final _api = AssociationLinkApiService();
+  final _api = AssociationApiService();
 
   Future<void> fetchProfile() async {
     try {
@@ -43,38 +43,33 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     }
   }
 
-  Future<void> submitRequest({
+  Future<void> submitLinkRequest({
     required BuildContext context,
     String customerNote = '',
     required String type,
-    String? membershipId,
-    String? requestedMembershipType,
+    required String requestedMembershipType,
     required String fatherName,
     required String motherName,
-    String? nationalId,
+    required String nationalId,
     String? permanentCapitalId,
     String? permanentCityId,
     String? permanentTownId,
-    String? permanentVillageId,
+    String? permanentVillage,
     required String officialStreet,
     required String officialBuilding,
-    String permanentAddress = '',
-    String phone = '',
-    Object? additionalAddresses,
+    required List<String> additionalAddresses,
     String? claimedMembershipNumber,
     String? claimedPriorityNumber,
     String? claimedBuildingNumber,
     String? claimedUnitNumber,
     List<AssociationLinkAttachment> attachments = const [],
-    List<AssociationLinkAttachment>? documents,
   }) async {
     final l10n = AppLocalizations.of(context)!;
     try {
       emit(AssociationLinkLoading());
-      await _api.submitRequest(
+      await _api.submitLinkRequest(
         customerNote: customerNote,
         type: type,
-        membershipId: membershipId,
         requestedMembershipType: requestedMembershipType,
         fatherName: fatherName,
         motherName: motherName,
@@ -82,18 +77,39 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
         permanentCapitalId: permanentCapitalId,
         permanentCityId: permanentCityId,
         permanentTownId: permanentTownId,
-        permanentVillageId: permanentVillageId,
+        permanentVillage: permanentVillage ?? '',
         officialStreet: officialStreet,
         officialBuilding: officialBuilding,
-        permanentAddress: permanentAddress,
-        phone: phone,
         additionalAddresses: additionalAddresses,
         claimedMembershipNumber: claimedMembershipNumber,
         claimedPriorityNumber: claimedPriorityNumber,
         claimedBuildingNumber: claimedBuildingNumber,
         claimedUnitNumber: claimedUnitNumber,
         attachments: attachments,
-        documents: documents,
+      );
+      emit(
+        AssociationLinkSubmittedSuccessfully(
+          successMessage: l10n.linkRequestSentSuccessfully,
+        ),
+      );
+    } catch (e) {
+      emit(AssociationLinkFailure(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> submitNormalRequest({
+    required BuildContext context,
+    required String type,
+    String customerNote = '',
+    List<AssociationLinkAttachment> attachments = const [],
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    try {
+      emit(AssociationLinkLoading());
+      await _api.submitNormalRequest(
+        type: type,
+        customerNot: customerNote,
+        attachments: attachments,
       );
       emit(
         AssociationLinkSubmittedSuccessfully(

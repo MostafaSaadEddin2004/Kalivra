@@ -1087,6 +1087,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationLinkMotherName => 'اسم الأم';
 
   @override
+  String get associationLinkNationalId => 'الرقم الوطني';
+
+  @override
   String get associationLinkGovernorate => 'المحافظة';
 
   @override
@@ -1173,6 +1176,57 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get associationLinkNoAttachments =>
       'لم تتم إضافة مرفقات بعد. يُنصح بإرفاق وثائق داعمة.';
+
+  @override
+  String get associationRequestedMembershipType => 'نوع العضوية المطلوبة';
+
+  @override
+  String get associationMembershipTypeTourism => 'سياحية';
+
+  @override
+  String get associationMembershipTypeResidential => 'سكنية';
+
+  @override
+  String get associationAdditionalAddresses => 'العناوين الإضافية';
+
+  @override
+  String get associationAddress => 'العنوان';
+
+  @override
+  String get associationAdditionalAddress => 'عنوان إضافي';
+
+  @override
+  String get associationAddAddress => 'إضافة عنوان';
+
+  @override
+  String get associationAddressRequired => 'أضف عنواناً';
+
+  @override
+  String get associationDeleteAddress => 'حذف العنوان';
+
+  @override
+  String get associationAddressLoadingRequestTypes => 'جاري التحميل';
+
+  @override
+  String get associationAddressSelectCapital => 'اختر المحافظة';
+
+  @override
+  String get associationAddressLoadingCapitals => 'جاري تحميل المحافظات';
+
+  @override
+  String get associationAddressSelectCity => 'اختر المدينة';
+
+  @override
+  String get associationAddressLoadingCities => 'جاري تحميل المدن';
+
+  @override
+  String get associationAddressSelectTown => 'اختر البلدة';
+
+  @override
+  String get associationAddressLoadingTowns => 'جاري تحميل البلدات';
+
+  @override
+  String get associationAddressLoadAgain => 'تحميل مرة أخرى';
 
   @override
   String get verifyPhoneTitle => 'التحقق من رقم الجوال';
