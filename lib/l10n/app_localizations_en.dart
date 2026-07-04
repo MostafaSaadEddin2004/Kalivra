@@ -69,7 +69,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsChangePassword => 'Change Password';
 
   @override
-  String get settingsChangePhone => 'Change Phone Number';
+  String get settingsChangePhone => 'Reset WhatsApp Number';
 
   @override
   String get appearanceTitle => 'Appearance';

@@ -37,7 +37,12 @@ class AuthCubit extends Cubit<AuthState> {
         final token = await LocalStore.getToken();
         context.goNamed(
           AppRoutesName.authOtp,
-          extra: AuthOtpArgs(email: phone, phone: phone, token: token),
+          extra: AuthOtpArgs(
+            email: phone,
+            phone: phone,
+            token: token,
+            purpose: 'login',
+          ),
         );
         emit(AuthFailed(message: 'Email is not verfied.'));
       } else if (e == 'INCORRECT_PASSWORD') {
@@ -147,6 +152,124 @@ class AuthCubit extends Cubit<AuthState> {
         emit(AuthFailed(message: e.toString()));
         CustomSnackBar.show(context, e.toString());
       }
+    }
+  }
+
+  Future<void> sendWhatsappOtp({
+    required BuildContext context,
+    required String whatsappNumber,
+  }) async {
+    emit(AuthLoading());
+    try {
+      await _customerApiService.sendWhatsappOtp(whatsappNumber: whatsappNumber);
+      if (!context.mounted) return;
+      emit(AuthSuccessed(message: 'OTP sent successfully'));
+    } catch (e) {
+      if (!context.mounted) return;
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> verifyWhatsappOtp({
+    required BuildContext context,
+    required String whatsappNumber,
+    required String otp,
+  }) async {
+    emit(AuthLoading());
+    try {
+      await _customerApiService.verifyWhatsappOtp(
+        whatsappNumber: whatsappNumber,
+        otp: otp,
+      );
+      if (!context.mounted) return;
+      emit(VerifySuccessed(message: 'OTP verified successfully'));
+    } catch (e) {
+      if (!context.mounted) return;
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> changeWhatsappNumber({
+    required BuildContext context,
+    required String whatsappNumber,
+  }) async {
+    emit(AuthLoading());
+    try {
+      await _customerApiService.changeWhatsappNumber(
+        whatsappNumber: whatsappNumber,
+      );
+      if (!context.mounted) return;
+      emit(AuthSuccessed(message: 'WhatsApp number changed successfully'));
+    } catch (e) {
+      if (!context.mounted) return;
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> sendPasswordOtp({
+    required BuildContext context,
+    required String whatsappNumber,
+  }) async {
+    emit(AuthLoading());
+    try {
+      await _customerApiService.sendPasswordOtp(whatsappNumber: whatsappNumber);
+      if (!context.mounted) return;
+      emit(AuthSuccessed(message: 'OTP sent successfully'));
+    } catch (e) {
+      if (!context.mounted) return;
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> verifyPasswordOtp({
+    required BuildContext context,
+    required String whatsappNumber,
+    required String otp,
+  }) async {
+    emit(AuthLoading());
+    try {
+      await _customerApiService.verifyPasswordOtp(
+        whatsappNumber: whatsappNumber,
+        otp: otp,
+      );
+      if (!context.mounted) return;
+      emit(VerifySuccessed(message: 'OTP verified successfully'));
+    } catch (e) {
+      if (!context.mounted) return;
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> changePasswordByWhatsapp({
+    required BuildContext context,
+    required String whatsappNumber,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    emit(AuthLoading());
+    try {
+      await _customerApiService.changePasswordByWhatsapp(
+        whatsappNumber: whatsappNumber,
+        password: password,
+        passwordConfirmation: passwordConfirmation,
+      );
+      if (!context.mounted) return;
+      emit(AuthSuccessed(message: 'Password updated successfully'));
+    } catch (e) {
+      if (!context.mounted) return;
+      emit(AuthFailed(message: e.toString()));
+      CustomSnackBar.show(context, e.toString());
+      rethrow;
     }
   }
 

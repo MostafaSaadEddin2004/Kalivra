@@ -84,7 +84,6 @@ abstract class AppRoutes {
   static const String search = '/search';
   static const String notifications = '/notifications';
   static const String checkout = '/checkout';
-  static const String associationLinkRequest = '/association-link-request';
   static const String associationMemberProfile = '/association-member-profile';
   static const String associationSubmittedRequests =
       '/association-submitted-requests';
@@ -131,7 +130,6 @@ abstract class AppRoutesName {
   static const String search = 'search';
   static const String notifications = 'notifications';
   static const String checkout = 'checkout';
-  static const String associationLinkRequest = 'association-link-request';
   static const String associationMemberProfile = 'association-member-profile';
   static const String associationSubmittedRequests =
       'association-submitted-requests';
@@ -289,7 +287,10 @@ abstract class AppRouter {
           GoRoute(
             path: AppRoutes.setNewPassword,
             name: AppRoutesName.setNewPassword,
-            builder: (_, _) => const SetNewPasswordScreen(),
+            builder: (context, state) {
+              final whatsappNumber = state.extra as String? ?? '';
+              return SetNewPasswordScreen(whatsappNumber: whatsappNumber);
+            },
           ),
           GoRoute(
             path: AppRoutes.confirmNewPhone,
@@ -407,13 +408,6 @@ abstract class AppRouter {
             path: AppRoutes.associationMemberProfile,
             name: AppRoutesName.associationMemberProfile,
             builder: (_, _) => const AssociationMemberProfileScreen(),
-          ),
-          GoRoute(
-            path: AppRoutes.associationLinkRequest,
-            builder: (context, state) {
-              return AssociationLinkRequestScreen(
-              );
-            },
           ),
           GoRoute(
             path: AppRoutes.associationSubmittedRequests,

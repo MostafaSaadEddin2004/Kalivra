@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
@@ -116,9 +117,14 @@ class _OtpScreenState extends State<OtpScreen> {
                       label: AppLocalizations.of(context)!.phoneLabel,
                       hint: '+966 5XX XXX XXXX',
                       keyboardType: TextInputType.phone,
-                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPhone : null,
+                      prefixIcon: Icon(
+                        Icons.phone_android_rounded,
+                        size: 22.r,
+                        color: labelColor,
+                      ),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? AppLocalizations.of(context)!.enterPhone
+                          : null,
                     ),
                     SizedBox(height: 16.h),
                     SizedBox(
@@ -145,9 +151,13 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                     ),
-                      if (_codeSent) ...[
+                    if (_codeSent) ...[
                       SizedBox(height: 24.h),
-                      Divider(color: isDark ? AppColors.taupe.withValues(alpha: 0.3) : AppColors.burgundy.withValues(alpha: 0.3)),
+                      Divider(
+                        color: isDark
+                            ? AppColors.taupe.withValues(alpha: 0.3)
+                            : AppColors.burgundy.withValues(alpha: 0.3),
+                      ),
                       SizedBox(height: 20.h),
                       Text(
                         'أدخل الرمز المرسل إليك',
@@ -157,13 +167,43 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      AppTextField(
+                      PinCodeTextField(
+                        appContext: context,
                         controller: _otpController,
-                        label: 'رمز التحقق',
-                        hint: '••••',
+                        autoDisposeControllers: false,
+                        length: 6,
                         keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
+                        animationType: AnimationType.fade,
+                        textStyle: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? AppColors.offWhite : AppColors.black,
+                        ),
+                        cursorColor: labelColor,
+                        enableActiveFill: true,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(12.r),
+                          fieldHeight: 52.r,
+                          fieldWidth: 44.w,
+                          activeColor: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          selectedColor: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          inactiveColor: isDark
+                              ? AppColors.taupe.withValues(alpha: 0.5)
+                              : AppColors.burgundy.withValues(alpha: 0.35),
+                          activeFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.12)
+                              : AppColors.offWhite,
+                          selectedFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.18)
+                              : AppColors.offWhite,
+                          inactiveFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.08)
+                              : AppColors.offWhite,
+                        ),
                       ),
                       SizedBox(height: 16.h),
                       SizedBox(

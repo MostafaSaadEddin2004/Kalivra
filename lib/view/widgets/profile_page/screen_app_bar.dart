@@ -5,13 +5,8 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 
-class ScreenAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
-  const ScreenAppBar({
-    super.key,
-    required this.title,
-    this.actions,
-  });
+class ScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const ScreenAppBar({super.key, required this.title, this.actions});
 
   final String title;
   final List<Widget>? actions;
@@ -23,8 +18,7 @@ class ScreenAppBar extends StatelessWidget
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final fgColor =
-        theme.appBarTheme.foregroundColor ?? AppColors.offWhite;
+    final fgColor = theme.appBarTheme.foregroundColor ?? AppColors.offWhite;
 
     return AppBar(
       elevation: 0,
@@ -43,7 +37,7 @@ class ScreenAppBar extends StatelessWidget
           fontWeight: FontWeight.w700,
         ),
       ),
-      actions: actions ?? [SizedBox(width: 48.w)],
+      actions: actions,
     );
   }
 }

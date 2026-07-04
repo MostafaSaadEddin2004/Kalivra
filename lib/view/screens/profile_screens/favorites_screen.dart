@@ -7,6 +7,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -111,22 +112,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: EdgeInsets.only(bottom: 12.h),
-                    child: ProductCard(
-                      product: ProductModel(
-                              id: 0,
-                              sku: '',
-                              name: '',
-                              urlKey: '',
-                              images: [],
-                              isNew: true,
-                              prices: ProductPrices(regular: PriceDetail(price: '')),
-                              isFeatured: true,
-                              onSale: true,
-                              isSaleable: true,
-                              isWishlist: true,
-                              ratings: ProductRatings(average: '', total: 0),
-                              reviews: ProductReviews(total: 0),
-                            ),
+                    child: Skeletonizer(
+                      child: ProductCard(
+                        product: ProductModel(
+                                id: 0,
+                                sku: '',
+                                name: '',
+                                urlKey: '',
+                                images: [],
+                                isNew: true,
+                                prices: ProductPrices(regular: PriceDetail(price: '')),
+                                isFeatured: true,
+                                onSale: true,
+                                isSaleable: true,
+                                isWishlist: true,
+                                ratings: ProductRatings(average: '', total: 0),
+                                reviews: ProductReviews(total: 0),
+                              ),
+                      ),
                     ),
                   );
                 },

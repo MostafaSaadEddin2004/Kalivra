@@ -174,6 +174,79 @@ class CustomerApiService {
     }
   }
 
+  Future<void> sendWhatsappOtp({required String whatsappNumber}) async {
+    await _postCustomerAction(
+      'customer/whatsapp/send-otp',
+      data: {'whatsapp_number': whatsappNumber},
+    );
+  }
+
+  Future<void> verifyWhatsappOtp({
+    required String whatsappNumber,
+    required String otp,
+  }) async {
+    await _postCustomerAction(
+      'customer/whatsapp/verify-otp',
+      data: {'whatsapp_number': whatsappNumber, 'otp': otp},
+    );
+  }
+
+  Future<void> changeWhatsappNumber({required String whatsappNumber}) async {
+    await _postCustomerAction(
+      'customer/whatsapp/change-whatsapp-number',
+      data: {'whatsapp_number': whatsappNumber},
+    );
+  }
+
+  Future<void> sendPasswordOtp({required String whatsappNumber}) async {
+    await _postCustomerAction(
+      'customer/password/send-otp',
+      data: {'whatsapp_number': whatsappNumber},
+    );
+  }
+
+  Future<void> verifyPasswordOtp({
+    required String whatsappNumber,
+    required String otp,
+  }) async {
+    await _postCustomerAction(
+      'customer/password/verify-otp',
+      data: {'whatsapp_number': whatsappNumber, 'otp': otp},
+    );
+  }
+
+  Future<void> changePasswordByWhatsapp({
+    required String whatsappNumber,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    await _postCustomerAction(
+      'customer/password/change-password',
+      data: {
+        'whatsapp_number': whatsappNumber,
+        'password': password,
+        'password_confirmation': passwordConfirmation,
+      },
+    );
+  }
+
+  Future<void> _postCustomerAction(
+    String path, {
+    required Map<String, dynamic> data,
+  }) async {
+    final res = await _client.post(path, data: data);
+    if (res.statusCode != null &&
+        res.statusCode! >= 200 &&
+        res.statusCode! < 300) {
+      return;
+    }
+
+    final message = res.data is Map ? res.data['message']?.toString() : null;
+    throw message?.isNotEmpty == true
+        ? message!
+        : 'Ø­Ø¯Ø« Ø®Ø·Ø£ ØºÙŠØ± Ù…ØªÙˆÙ‚Ø¹';
+  }
+
   Future<bool> updateProfile({
     required String firstName,
     required String lastName,

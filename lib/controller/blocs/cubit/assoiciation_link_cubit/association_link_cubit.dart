@@ -46,7 +46,7 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
   Future<void> submitRequest({
     required BuildContext context,
     String customerNote = '',
-    String type = 'association_membership',
+    required String type,
     String? membershipId,
     String? requestedMembershipType,
     required String fatherName,

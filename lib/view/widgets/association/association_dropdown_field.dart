@@ -10,6 +10,7 @@ class AssociationDropdownField extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.enabled = true,
+    this.validator,
   });
 
   final String label;
@@ -17,6 +18,7 @@ class AssociationDropdownField extends StatelessWidget {
   final List<String> items;
   final ValueChanged<String?> onChanged;
   final bool enabled;
+  final String? Function(String?)? validator;
 
   @override
   Widget build(BuildContext context) {
@@ -62,13 +64,11 @@ class AssociationDropdownField extends StatelessWidget {
       ),
       items: items
           .map(
-            (item) => DropdownMenuItem<String?>(
-              value: item,
-              child: Text(item),
-            ),
+            (item) => DropdownMenuItem<String?>(value: item, child: Text(item)),
           )
           .toList(),
       onChanged: canSelect ? onChanged : null,
+      validator: validator,
     );
   }
 }

@@ -221,7 +221,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsChangePhone.
   ///
   /// In en, this message translates to:
-  /// **'Change Phone Number'**
+  /// **'Reset WhatsApp Number'**
   String get settingsChangePhone;
 
   /// No description provided for @appearanceTitle.

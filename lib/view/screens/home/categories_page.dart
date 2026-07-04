@@ -17,230 +17,260 @@ class CategoriesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CurrentCategoryCubit>(
+          create: (_) => CurrentCategoryCubit(),
+        ),
+        BlocProvider<CategoriesCubit>(
+          create: (_) => CategoriesCubit()..loadCategories(),
+        ),
+        BlocProvider<ProductsCubit>(
+          create: (_) => ProductsCubit()..loadProducts(),
+        ),
+      ],
+      child: const _CategoriesPageBody(),
+    );
+  }
+}
+
+class _CategoriesPageBody extends StatelessWidget {
+  const _CategoriesPageBody();
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
     final isDark = theme.brightness == Brightness.dark;
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => CurrentCategoryCubit()),
-        BlocProvider(create: (_) => CategoriesCubit()),
-        BlocProvider(create: (_) => ProductsCubit()..loadProducts()),
-      ],
-      child: BlocListener<CurrentCategoryCubit, CurrentCategoryState>(
-        listener: (context, state) {
-          if (state is CurrentCategoryFetched) {
-            final productsCubit = context.read<ProductsCubit>();
-            if (state.isAll) {
-              productsCubit.loadProducts();
-            } else {
-              productsCubit.loadProductByCategoryId(state.categoryId);
-            }
+
+    return BlocListener<CurrentCategoryCubit, CurrentCategoryState>(
+      listener: (context, state) {
+        if (state is CurrentCategoryFetched) {
+          final productsCubit = context.read<ProductsCubit>();
+
+          if (state.isAll) {
+            productsCubit.loadProducts();
+          } else {
+            productsCubit.loadProductByCategoryId(state.categoryId);
           }
-        },
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: SizedBox(height: 8.h)),
-            SliverToBoxAdapter(
-              child: BlocBuilder<CategoriesCubit, CategoriesState>(
-                bloc: CategoriesCubit()..loadCategories(),
-                builder: (context, state) {
-                  switch (state) {
-                    case CategoriesLoaded():
-                      // أضف "الكل" كأول عنصر محلياً
-                      final allCategory = CategoryApiModel(
-                        id: -1,
-                        name: l10n.allCategories,
-                      );
-                      final categories = [allCategory, ...state.categories];
+        }
+      },
+      child: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8.h)),
 
-                      return SizedBox(
-                        height: 48.h,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          itemCount: categories.length,
-                          separatorBuilder: (_, _) => SizedBox(width: 10.w),
-                          itemBuilder: (context, index) {
-                            return BlocBuilder<
-                              CurrentCategoryCubit,
-                              CurrentCategoryState
-                            >(
-                              builder: (context, indexState) {
-                                if (indexState is CurrentCategoryFetched) {
-                                  return CategoryButton(
-                                    category: categories[index],
-                                    currentIndex: indexState.currentIndex,
-                                    index: index,
-                                    onTap: () {
-                                      if (index == 0) {
-                                        context
-                                            .read<CurrentCategoryCubit>()
-                                            .selectAll();
-                                      } else {
-                                        context
-                                            .read<CurrentCategoryCubit>()
-                                            .changeCurrentCategory(
-                                              index,
-                                              categories[index].id,
-                                            );
-                                      }
-                                    },
-                                  );
-                                }
-                                return const SizedBox();
-                              },
-                            );
-                          },
-                        ),
-                      );
+          SliverToBoxAdapter(
+            child: BlocBuilder<CategoriesCubit, CategoriesState>(
+              builder: (context, state) {
+                switch (state) {
+                  case CategoriesLoaded():
+                    final allCategory = CategoryApiModel(
+                      id: -1,
+                      name: l10n.allCategories,
+                    );
 
-                    case CategoriesFailed():
-                      return Center(child: Text(state.message));
+                    final categories = <CategoryApiModel>[
+                      allCategory,
+                      ...state.categories,
+                    ];
 
-                    default:
-                      return SizedBox(
-                        height: 48.h,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          itemCount: 4,
-                          separatorBuilder: (_, _) => SizedBox(width: 10.w),
-                          itemBuilder: (context, index) {
-                            return Skeletonizer(
-                              child: CategoryButton(
-                                category: CategoryApiModel(id: 1, name: 'name'),
-                                currentIndex: 0,
-                                index: 0,
-                                onTap: () {},
+                    return SizedBox(
+                      height: 48.h,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        itemCount: categories.length,
+                        separatorBuilder: (_, _) => SizedBox(width: 10.w),
+                        itemBuilder: (context, index) {
+                          return BlocBuilder<CurrentCategoryCubit,
+                              CurrentCategoryState>(
+                            builder: (context, currentCategoryState) {
+                              int currentIndex = 0;
+
+                              if (currentCategoryState
+                                  is CurrentCategoryFetched) {
+                                currentIndex =
+                                    currentCategoryState.currentIndex;
+                              }
+
+                              return CategoryButton(
+                                category: categories[index],
+                                currentIndex: currentIndex,
+                                index: index,
+                                onTap: () {
+                                  if (index == 0) {
+                                    context
+                                        .read<CurrentCategoryCubit>()
+                                        .selectAll();
+                                  } else {
+                                    context
+                                        .read<CurrentCategoryCubit>()
+                                        .changeCurrentCategory(
+                                          index,
+                                          categories[index].id,
+                                        );
+                                  }
+                                },
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    );
+
+                  case CategoriesFailed():
+                    return Center(child: Text(state.message));
+
+                  default:
+                    return SizedBox(
+                      height: 48.h,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        itemCount: 4,
+                        separatorBuilder: (_, _) => SizedBox(width: 10.w),
+                        itemBuilder: (context, index) {
+                          return Skeletonizer(
+                            child: CategoryButton(
+                              category: CategoryApiModel(
+                                id: index,
+                                name: 'Category',
                               ),
-                            );
-                          },
+                              currentIndex: 0,
+                              index: index,
+                              onTap: () {},
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                }
+              },
+            ),
+          ),
+
+          SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: BlocBuilder<ProductsCubit, ProductsState>(
+                builder: (context, state) {
+                  final count = state is ProductsLoaded
+                      ? state.products.length
+                      : 0;
+
+                  return Row(
+                    children: [
+                      SizedBox(width: 8.w),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8.w,
+                          vertical: 4.h,
                         ),
-                      );
-                  }
+                        decoration: BoxDecoration(
+                          color: colorScheme.onSecondaryFixed,
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          count.toString(),
+                          style: textTheme.labelMedium?.copyWith(
+                            color: colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Text(
+                        l10n.product,
+                        style: textTheme.titleMedium,
+                      ),
+                    ],
+                  );
                 },
               ),
             ),
+          ),
 
-            SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+          SliverToBoxAdapter(child: SizedBox(height: 12.h)),
 
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: BlocBuilder<ProductsCubit, ProductsState>(
-                  builder: (context, state) {
-                    final count = state is ProductsLoaded
-                        ? state.products.length
-                        : 0;
-                    return Row(
-                      children: [
-                        SizedBox(width: 8.w),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 8.w,
-                            vertical: 4.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.onSecondaryFixed,
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Text(
-                            count.toString(),
-                            style: textTheme.labelMedium?.copyWith(
-                              color: colorScheme.primary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        Text(l10n.product, style: textTheme.titleMedium),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
-
-            SliverToBoxAdapter(child: SizedBox(height: 12.h)),
-
-            BlocBuilder<ProductsCubit, ProductsState>(
-              builder: (context, state) {
-                switch (state) {
-                  case ProductsLoaded():
-                    if (state.products.isEmpty) {
-                      return SliverFillRemaining(
-                        hasScrollBody: false,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.category_outlined,
-                                size: 64.r,
-                                color: isDark
-                                    ? AppColors.taupe
-                                    : AppColors.burgundy.withValues(alpha: 0.6),
-                              ),
-                              SizedBox(height: 16.h),
-                              Text(
-                                l10n.noProductsInCategory,
-                                style: theme.textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                    return CustomScrollView(
-                      slivers: [
-                        SliverPadding(
-                          padding: EdgeInsets.symmetric(horizontal: 20.w),
-                          sliver: SliverGrid(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 12.h,
-                                  crossAxisSpacing: 12.w,
-                                  childAspectRatio: 0.72,
-                                ),
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) =>
-                                  ProductCard(product: state.products[index]),
-                              childCount: state.products.length,
-                            ),
-                          ),
-                        ),
-                        SliverToBoxAdapter(child: SizedBox(height: 72.h)),
-                      ],
-                    );
-
-                  case ProductsFailed():
+          BlocBuilder<ProductsCubit, ProductsState>(
+            builder: (context, state) {
+              switch (state) {
+                case ProductsLoaded():
+                  if (state.products.isEmpty) {
                     return SliverFillRemaining(
                       hasScrollBody: false,
-                      child: Center(child: Text(state.message)),
-                    );
-
-                  default:
-                    return SliverPadding(
-                      padding: EdgeInsets.symmetric(horizontal: 20.w),
-                      sliver: SliverGrid(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12.h,
-                          crossAxisSpacing: 12.w,
-                          childAspectRatio: 0.72,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.category_outlined,
+                              size: 64.r,
+                              color: isDark
+                                  ? AppColors.taupe
+                                  : AppColors.burgundy.withValues(alpha: 0.6),
+                            ),
+                            SizedBox(height: 16.h),
+                            Text(
+                              l10n.noProductsInCategory,
+                              style: theme.textTheme.titleMedium,
+                            ),
+                          ],
                         ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) => Skeletonizer(
+                      ),
+                    );
+                  }
+                  return SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12.h,
+                        crossAxisSpacing: 12.w,
+                        childAspectRatio: 0.72,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return ProductCard(
+                            product: state.products[index],
+                          );
+                        },
+                        childCount: state.products.length,
+                      ),
+                    ),
+                  );
+
+                case ProductsFailed():
+                  return SliverToBoxAdapter(
+                    child: Center(
+                      child: Text(state.message),
+                    ),
+                  );
+
+                default:
+                  return SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    sliver: SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12.h,
+                        crossAxisSpacing: 12.w,
+                        childAspectRatio: 0.72,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return Skeletonizer(
                             child: ProductCard(
                               product: ProductModel(
                                 id: 0,
                                 sku: '',
                                 name: '',
                                 urlKey: '',
-                                images: [],
+                                images: const [],
                                 isNew: true,
                                 prices: ProductPrices(
                                   regular: PriceDetail(price: ''),
@@ -249,20 +279,25 @@ class CategoriesPage extends StatelessWidget {
                                 onSale: true,
                                 isSaleable: true,
                                 isWishlist: true,
-                                ratings: ProductRatings(average: '', total: 0),
+                                ratings: ProductRatings(
+                                  average: '',
+                                  total: 0,
+                                ),
                                 reviews: ProductReviews(total: 0),
                               ),
                             ),
-                          ),
-                          childCount: 4,
-                        ),
+                          );
+                        },
+                        childCount: 4,
                       ),
-                    );
-                }
-              },
-            ),
-          ],
-        ),
+                    ),
+                  );
+              }
+            },
+          ),
+
+          SliverToBoxAdapter(child: SizedBox(height: 72.h)),
+        ],
       ),
     );
   }

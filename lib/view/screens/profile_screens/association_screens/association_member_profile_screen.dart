@@ -180,7 +180,7 @@ class _AssociationMemberProfileScreenState
               icon: Icons.link_off_rounded,
               message: l10n.associationMemberProfileEmpty,
               actionLabel: l10n.associationMemberProfileLinkRequest,
-              onAction: () => context.push(AppRoutes.associationLinkRequest),
+              onAction: () => context.push(AppRoutes.associationRequestsAndServices),
             );
           }
 

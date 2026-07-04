@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
@@ -16,7 +18,8 @@ class OtpPhoneEntryScreen extends StatefulWidget {
   final OtpScreenMode? mode;
   final OtpOnboardingArgs? signUpArgs;
 
-  OtpScreenMode get _effectiveMode => signUpArgs?.mode ?? mode ?? OtpScreenMode.changePhone;
+  OtpScreenMode get _effectiveMode =>
+      signUpArgs?.mode ?? mode ?? OtpScreenMode.changePhone;
 
   @override
   State<OtpPhoneEntryScreen> createState() => _OtpPhoneEntryScreenState();
@@ -42,7 +45,9 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
   }
 
   String _title(BuildContext context) {
-    if (widget.signUpArgs != null) return AppLocalizations.of(context)!.verifyPhoneTitle;
+    if (widget.signUpArgs != null) {
+      return AppLocalizations.of(context)!.verifyPhoneTitle;
+    }
     final m = widget._effectiveMode;
     return m == OtpScreenMode.forgotPassword
         ? AppLocalizations.of(context)!.recoverPasswordTitle
@@ -51,31 +56,60 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
 
   int get _stepTotal => widget.signUpArgs != null ? 2 : 3;
 
-  void _sendCode() {
+  Future<void> _sendCode() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final whatsappNumber = _phoneController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 800), () {
+    try {
+      if (widget.signUpArgs != null) {
+        await context.read<AuthCubit>().resendOtp(
+          context: context,
+          whatsappNumber: whatsappNumber,
+          email: widget.signUpArgs?.email,
+          token: widget.signUpArgs?.token,
+          purpose: 'register',
+        );
+      } else if (widget._effectiveMode == OtpScreenMode.forgotPassword) {
+        await context.read<AuthCubit>().sendPasswordOtp(
+          context: context,
+          whatsappNumber: whatsappNumber,
+        );
+      } else {
+        await context.read<AuthCubit>().sendWhatsappOtp(
+          context: context,
+          whatsappNumber: whatsappNumber,
+        );
+      }
+
       if (!mounted) return;
       setState(() => _isLoading = false);
-      CustomSnackBar.show(
-        context,
-        AppLocalizations.of(context)!.codeSentViaWhatsApp(_phoneController.text),
-      );
+      CustomSnackBar.show(context, l10n.codeSentViaWhatsApp(whatsappNumber));
       context.push(
         AppRoutes.otpVerify,
         extra: widget.signUpArgs != null
             ? OtpOnboardingArgs(
                 mode: OtpScreenMode.signUp,
-                whatsappNumber: _phoneController.text.trim(),
+                whatsappNumber: whatsappNumber,
+                email: widget.signUpArgs!.email,
+                token: widget.signUpArgs!.token,
                 name: widget.signUpArgs!.name,
                 password: widget.signUpArgs!.password,
+                referralCode: widget.signUpArgs!.referralCode,
               )
             : OtpOnboardingArgs(
                 mode: widget._effectiveMode,
-                whatsappNumber: _phoneController.text.trim(),
+                whatsappNumber: whatsappNumber,
               ),
       );
-    });
+    } catch (_) {
+      // Error snackbar is shown by AuthCubit.
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -86,78 +120,86 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
 
     return PopScopeExitApp(
       child: Scaffold(
-      appBar: ScreenAppBar(title: _title(context)),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
-          children: [
-            _StepIndicator(step: 1, total: _stepTotal),
-            SizedBox(height: 24.h),
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.signUpArgs != null
-                          ? AppLocalizations.of(context)!.otpPhoneHintSignUp
-                          : widget._effectiveMode == OtpScreenMode.forgotPassword
-                              ? AppLocalizations.of(context)!.otpPhoneHintForgot
-                              : AppLocalizations.of(context)!.otpPhoneHintChange,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                        height: 1.4,
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    AppTextField(
-                      controller: _phoneController,
-                      label: AppLocalizations.of(context)!.phoneLabel,
-                      hint: '+966 5XX XXX XXXX',
-                      keyboardType: TextInputType.phone,
-                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty) ? AppLocalizations.of(context)!.enterPhone : null,
-                    ),
-                    SizedBox(height: 20.h),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _isLoading ? null : _sendCode,
-                        icon: _isLoading
-                            ? SizedBox(
-                                width: 20.r,
-                                height: 20.r,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.offWhite,
-                                ),
-                              )
-                            : Icon(Icons.chat_rounded, size: 20.r),
-                        label: Text(AppLocalizations.of(context)!.sendCodeViaWhatsApp),
-                        style: FilledButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 14.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          elevation: 0,
+        appBar: ScreenAppBar(title: _title(context)),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
+            children: [
+              _StepIndicator(step: 1, total: _stepTotal),
+              SizedBox(height: 24.h),
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(20.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.signUpArgs != null
+                            ? AppLocalizations.of(context)!.otpPhoneHintSignUp
+                            : widget._effectiveMode ==
+                                  OtpScreenMode.forgotPassword
+                            ? AppLocalizations.of(context)!.otpPhoneHintForgot
+                            : AppLocalizations.of(context)!.otpPhoneHintChange,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDark ? AppColors.taupe : AppColors.burgundy,
+                          height: 1.4,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 20.h),
+                      AppTextField(
+                        controller: _phoneController,
+                        label: AppLocalizations.of(context)!.phoneLabel,
+                        hint: '+966 5XX XXX XXXX',
+                        keyboardType: TextInputType.phone,
+                        prefixIcon: Icon(
+                          Icons.phone_android_rounded,
+                          size: 22.r,
+                          color: labelColor,
+                        ),
+                        validator: (v) => (v == null || v.trim().isEmpty)
+                            ? AppLocalizations.of(context)!.enterPhone
+                            : null,
+                      ),
+                      SizedBox(height: 20.h),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _isLoading ? null : _sendCode,
+                          icon: _isLoading
+                              ? SizedBox(
+                                  width: 20.r,
+                                  height: 20.r,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.offWhite,
+                                  ),
+                                )
+                              : Icon(Icons.chat_rounded, size: 20.r),
+                          label: Text(
+                            AppLocalizations.of(context)!.sendCodeViaWhatsApp,
+                          ),
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
@@ -181,7 +223,9 @@ class _StepIndicator extends StatelessWidget {
             child: Container(
               height: 2,
               margin: EdgeInsets.symmetric(horizontal: 4.w),
-              color: i ~/ 2 < step ? activeColor : activeColor.withValues(alpha: 0.3),
+              color: i ~/ 2 < step
+                  ? activeColor
+                  : activeColor.withValues(alpha: 0.3),
             ),
           );
         }
@@ -196,7 +240,11 @@ class _StepIndicator extends StatelessWidget {
           ),
           child: Center(
             child: isActive
-                ? Icon(Icons.check_rounded, size: 16.r, color: AppColors.offWhite)
+                ? Icon(
+                    Icons.check_rounded,
+                    size: 16.r,
+                    color: AppColors.offWhite,
+                  )
                 : Text(
                     '$s',
                     style: theme.textTheme.labelMedium?.copyWith(

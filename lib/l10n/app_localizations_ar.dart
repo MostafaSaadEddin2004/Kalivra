@@ -69,7 +69,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsChangePassword => 'تغيير كلمة المرور';
 
   @override
-  String get settingsChangePhone => 'تغيير رقم الجوال';
+  String get settingsChangePhone => 'إعادة تعيين رقم واتساب';
 
   @override
   String get appearanceTitle => 'المظهر';

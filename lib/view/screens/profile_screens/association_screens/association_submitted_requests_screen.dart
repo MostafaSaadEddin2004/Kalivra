@@ -62,7 +62,7 @@ class _AssociationSubmittedRequestsScreenState
           if (requests.isEmpty) {
             return _EmptyState(
               onNewRequest: () async {
-                await context.push(AppRoutes.associationLinkRequest);
+                await context.push(AppRoutes.associationRequestsAndServices);
                 await _reload();
               },
             );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
@@ -11,7 +13,16 @@ class ConfirmNewPhoneScreen extends StatelessWidget {
 
   final String phone;
 
-  void _confirm(BuildContext context) {
+  Future<void> _confirm(BuildContext context) async {
+    try {
+      await context.read<AuthCubit>().changeWhatsappNumber(
+        context: context,
+        whatsappNumber: phone,
+      );
+    } catch (_) {
+      return;
+    }
+    if (!context.mounted) return;
     CustomSnackBar.show(context, AppLocalizations.of(context)!.newPhoneSuccess);
     context.pop();
   }
@@ -55,7 +66,10 @@ class ConfirmNewPhoneScreen extends StatelessWidget {
                   SizedBox(height: 16.h),
                   Container(
                     width: double.infinity,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 14.h,
+                    ),
                     decoration: BoxDecoration(
                       color: fillColor,
                       borderRadius: BorderRadius.circular(12.r),
@@ -66,14 +80,18 @@ class ConfirmNewPhoneScreen extends StatelessWidget {
                         Icon(
                           Icons.phone_android_rounded,
                           size: 24.r,
-                          color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                          color: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
                         ),
                         SizedBox(width: 12.w),
                         Expanded(
                           child: Text(
                             phone,
                             style: theme.textTheme.titleMedium?.copyWith(
-                              color: isDark ? AppColors.offWhite : AppColors.black,
+                              color: isDark
+                                  ? AppColors.offWhite
+                                  : AppColors.black,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -136,7 +154,9 @@ class _StepIndicator extends StatelessWidget {
             child: Container(
               height: 2,
               margin: EdgeInsets.symmetric(horizontal: 4.w),
-              color: i ~/ 2 < step ? activeColor : activeColor.withValues(alpha: 0.3),
+              color: i ~/ 2 < step
+                  ? activeColor
+                  : activeColor.withValues(alpha: 0.3),
             ),
           );
         }
@@ -151,7 +171,11 @@ class _StepIndicator extends StatelessWidget {
           ),
           child: Center(
             child: isActive
-                ? Icon(Icons.check_rounded, size: 16.r, color: AppColors.offWhite)
+                ? Icon(
+                    Icons.check_rounded,
+                    size: 16.r,
+                    color: AppColors.offWhite,
+                  )
                 : Text(
                     '$s',
                     style: theme.textTheme.labelMedium?.copyWith(

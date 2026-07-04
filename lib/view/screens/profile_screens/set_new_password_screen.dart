@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
@@ -11,7 +13,9 @@ import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class SetNewPasswordScreen extends StatefulWidget {
-  const SetNewPasswordScreen({super.key});
+  const SetNewPasswordScreen({super.key, required this.whatsappNumber});
+
+  final String whatsappNumber;
 
   @override
   State<SetNewPasswordScreen> createState() => _SetNewPasswordScreenState();
@@ -23,6 +27,7 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
   final _confirmController = TextEditingController();
   bool _obscureNew = true;
   bool _obscureConfirm = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -31,13 +36,28 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    CustomSnackBar.show(
-      context,
-      AppLocalizations.of(context)!.passwordUpdatedSuccess,
-    );
-    context.go(AppRoutes.home);
+    final l10n = AppLocalizations.of(context)!;
+
+    setState(() => _isLoading = true);
+    try {
+      await context.read<AuthCubit>().changePasswordByWhatsapp(
+        context: context,
+        whatsappNumber: widget.whatsappNumber,
+        password: _newController.text,
+        passwordConfirmation: _confirmController.text,
+      );
+      if (!mounted) return;
+      CustomSnackBar.show(context, l10n.passwordUpdatedSuccess);
+      context.go(AppRoutes.login);
+    } catch (_) {
+      // Error snackbar is shown by AuthCubit.
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -137,8 +157,17 @@ class _SetNewPasswordScreenState extends State<SetNewPasswordScreen> {
               ),
               SizedBox(height: 24.h),
               FilledButton.icon(
-                onPressed: _submit,
-                icon: Icon(Icons.check_rounded, size: 22.r),
+                onPressed: _isLoading ? null : _submit,
+                icon: _isLoading
+                    ? SizedBox(
+                        width: 20.r,
+                        height: 20.r,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.offWhite,
+                        ),
+                      )
+                    : Icon(Icons.check_rounded, size: 22.r),
                 label: Text(
                   l10n.updatePasswordButton,
                   style: theme.textTheme.titleMedium?.copyWith(

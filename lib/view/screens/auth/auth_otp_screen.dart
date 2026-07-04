@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
@@ -208,16 +208,42 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 40.h),
-                    AppTextField(
+                    PinCodeTextField(
+                      appContext: context,
                       controller: _otpController,
-                      label: l10n.otpCodeLabel,
-                      hint: '••••••',
+                      autoDisposeControllers: false,
+                      length: 6,
                       keyboardType: TextInputType.number,
-                      maxLength: 6,
-                      prefixIcon: Icon(
-                        Icons.pin_rounded,
-                        size: 22.r,
-                        color: labelColor,
+                      animationType: AnimationType.fade,
+                      textStyle: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: isDark ? AppColors.offWhite : AppColors.black,
+                      ),
+                      cursorColor: labelColor,
+                      enableActiveFill: true,
+                      pinTheme: PinTheme(
+                        shape: PinCodeFieldShape.box,
+                        borderRadius: BorderRadius.circular(12.r),
+                        fieldHeight: 52.r,
+                        fieldWidth: 44.w,
+                        activeColor: isDark
+                            ? AppColors.goldLight
+                            : AppColors.burgundy,
+                        selectedColor: isDark
+                            ? AppColors.goldLight
+                            : AppColors.burgundy,
+                        inactiveColor: isDark
+                            ? AppColors.taupe.withValues(alpha: 0.5)
+                            : AppColors.burgundy.withValues(alpha: 0.35),
+                        activeFillColor: isDark
+                            ? AppColors.burgundy.withValues(alpha: 0.12)
+                            : AppColors.offWhite,
+                        selectedFillColor: isDark
+                            ? AppColors.burgundy.withValues(alpha: 0.18)
+                            : AppColors.offWhite,
+                        inactiveFillColor: isDark
+                            ? AppColors.burgundy.withValues(alpha: 0.08)
+                            : AppColors.offWhite,
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -251,7 +277,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                               otp: _otpController.text.trim(),
                               whatsappNumber: widget.args.phone?.trim() ?? '',
                               email: widget.args.email?.trim(),
-                              token: widget.args.token!,
+                              token: widget.args.token ?? '',
                             );
                           }
                         },

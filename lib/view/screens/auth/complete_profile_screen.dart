@@ -172,7 +172,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
     context.goNamed(
       AppRoutesName.authOtp,
-      extra: AuthOtpArgs(email: args.email, phone: phone, token: token),
+      extra: AuthOtpArgs(
+        email: args.email,
+        phone: phone,
+        token: token,
+        purpose: 'register',
+      ),
     );
   }
 

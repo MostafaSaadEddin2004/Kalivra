@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
@@ -8,7 +11,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
-import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class OtpCodeEntryScreen extends StatefulWidget {
   const OtpCodeEntryScreen({super.key, required this.args});
@@ -40,24 +42,46 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
 
   int get _stepTotal => widget.args.mode == OtpScreenMode.signUp ? 2 : 3;
 
-  void _verify() {
+  Future<void> _verify() async {
     final l10n = AppLocalizations.of(context)!;
     if (_otpController.text.trim().length < 4) {
       CustomSnackBar.show(context, l10n.enterCodeHintSnack);
       return;
     }
     setState(() => _isLoading = true);
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+    try {
       if (widget.args.mode == OtpScreenMode.forgotPassword) {
-        context.push(AppRoutes.setNewPassword);
+        await context.read<AuthCubit>().verifyPasswordOtp(
+          context: context,
+          whatsappNumber: widget.args.whatsappNumber,
+          otp: _otpController.text.trim(),
+        );
+        if (!mounted) return;
+        context.push(
+          AppRoutes.setNewPassword,
+          extra: widget.args.whatsappNumber,
+        );
       } else if (widget.args.mode == OtpScreenMode.signUp) {
         context.push(AppRoutes.completeProfile, extra: widget.args);
       } else {
-        context.push(AppRoutes.confirmNewPhone, extra: widget.args.whatsappNumber);
+        await context.read<AuthCubit>().verifyWhatsappOtp(
+          context: context,
+          whatsappNumber: widget.args.whatsappNumber,
+          otp: _otpController.text.trim(),
+        );
+        if (!mounted) return;
+        context.push(
+          AppRoutes.confirmNewPhone,
+          extra: widget.args.whatsappNumber,
+        );
       }
-    });
+    } catch (_) {
+      // Error snackbar is shown by AuthCubit.
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -69,88 +93,118 @@ class _OtpCodeEntryScreenState extends State<OtpCodeEntryScreen> {
     final l10n = AppLocalizations.of(context)!;
     return PopScopeExitApp(
       child: Scaffold(
-      appBar: ScreenAppBar(title: _title(context)),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
-          children: [
-            _StepIndicator(step: 2, total: _stepTotal),
-            SizedBox(height: 24.h),
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.otpSentToPhone(widget.args.whatsappNumber),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    Text(
-                      widget.args.mode == OtpScreenMode.signUp
-                          ? l10n.otpCodeHintSignUp
-                          : l10n.otpCodeHintOther,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                        height: 1.4,
-                      ),
-                    ),
-                    SizedBox(height: 20.h),
-                    AppTextField(
-                      controller: _otpController,
-                      label: l10n.otpCodeLabel,
-                      hint: '••••',
-                      keyboardType: TextInputType.number,
-                      maxLength: 6,
-                      prefixIcon: Icon(Icons.pin_rounded, size: 22.r, color: labelColor),
-                    ),
-                    SizedBox(height: 20.h),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton.icon(
-                        onPressed: _isLoading ? null : _verify,
-                        icon: _isLoading
-                            ? SizedBox(
-                                width: 20.r,
-                                height: 20.r,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.offWhite,
-                                ),
-                              )
-                            : Icon(Icons.verified_user_rounded, size: 20.r),
-                        label: Text(
-                          l10n.verify,
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppColors.offWhite,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        style: FilledButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 14.h),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          elevation: 0,
+        appBar: ScreenAppBar(title: _title(context)),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
+            children: [
+              _StepIndicator(step: 2, total: _stepTotal),
+              SizedBox(height: 24.h),
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(20.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.otpSentToPhone(widget.args.whatsappNumber),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: isDark ? AppColors.taupe : AppColors.burgundy,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 20.h),
+                      Text(
+                        widget.args.mode == OtpScreenMode.signUp
+                            ? l10n.otpCodeHintSignUp
+                            : l10n.otpCodeHintOther,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: isDark ? AppColors.taupe : AppColors.burgundy,
+                          height: 1.4,
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      PinCodeTextField(
+                        appContext: context,
+                        controller: _otpController,
+                        autoDisposeControllers: false,
+                        length: 6,
+                        keyboardType: TextInputType.number,
+                        animationType: AnimationType.fade,
+                        textStyle: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? AppColors.offWhite : AppColors.black,
+                        ),
+                        cursorColor: labelColor,
+                        enableActiveFill: true,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(12.r),
+                          fieldHeight: 52.r,
+                          fieldWidth: 44.w,
+                          activeColor: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          selectedColor: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          inactiveColor: isDark
+                              ? AppColors.taupe.withValues(alpha: 0.5)
+                              : AppColors.burgundy.withValues(alpha: 0.35),
+                          activeFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.12)
+                              : AppColors.offWhite,
+                          selectedFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.18)
+                              : AppColors.offWhite,
+                          inactiveFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.08)
+                              : AppColors.offWhite,
+                        ),
+                      ),
+                      SizedBox(height: 20.h),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: _isLoading ? null : _verify,
+                          icon: _isLoading
+                              ? SizedBox(
+                                  width: 20.r,
+                                  height: 20.r,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppColors.offWhite,
+                                  ),
+                                )
+                              : Icon(Icons.verified_user_rounded, size: 20.r),
+                          label: Text(
+                            l10n.verify,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }
@@ -174,7 +228,9 @@ class _StepIndicator extends StatelessWidget {
             child: Container(
               height: 2,
               margin: EdgeInsets.symmetric(horizontal: 4.w),
-              color: i ~/ 2 < step ? activeColor : activeColor.withValues(alpha: 0.3),
+              color: i ~/ 2 < step
+                  ? activeColor
+                  : activeColor.withValues(alpha: 0.3),
             ),
           );
         }
@@ -189,7 +245,11 @@ class _StepIndicator extends StatelessWidget {
           ),
           child: Center(
             child: isActive
-                ? Icon(Icons.check_rounded, size: 16.r, color: AppColors.offWhite)
+                ? Icon(
+                    Icons.check_rounded,
+                    size: 16.r,
+                    color: AppColors.offWhite,
+                  )
                 : Text(
                     '$s',
                     style: theme.textTheme.labelMedium?.copyWith(
