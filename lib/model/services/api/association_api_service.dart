@@ -70,7 +70,8 @@ class AssociationApiService {
     String? claimedUnitNumber,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
-    final data = {
+    final data = 
+    {
       'type': type,
       'customer_note': customerNote,
       'father_name': fatherName,

@@ -72,7 +72,7 @@ class CustomerApiService {
       'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,
-      'referral_code_input': referralCode ?? '',
+      // 'referral_code_input': referralCode ?? '',
     };
 
     final res = await _client.post('customer/register', data: body);

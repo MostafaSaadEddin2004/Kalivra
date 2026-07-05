@@ -50,110 +50,110 @@ class _AssociationMemberProfileScreenState
               switch (state) {
                 case AssociationProfileFetched():
                   final data = state.memberInfo;
-                  return
-                   PopupMenuButton<_AccosiciationMemberProfileMenuActions>(
-                          position: PopupMenuPosition.under,
-                          icon: const Icon(Icons.menu_rounded),
-                          onSelected: (value) {
-                            switch (value) {
-                              case _AccosiciationMemberProfileMenuActions
-                                  .linkRequests:
-                                context.push(
-                                  AppRoutes.associationSubmittedRequests,
-                                );
-                                break;
-                              case _AccosiciationMemberProfileMenuActions
-                                  .requestsAndServices:
-                                context.push(
-                                  AppRoutes.associationRequestsAndServices,
-                                );
-                                break;
-                              case _AccosiciationMemberProfileMenuActions
-                                  .associationContactUs:
-                                context.push(AppRoutes.associationContactUs);
-                                break;
-                              case _AccosiciationMemberProfileMenuActions
-                                  .frequentlyAskedQuestion:
-                                context.push(AppRoutes.associationFaq);
-                                break;
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: _AccosiciationMemberProfileMenuActions
-                                  .requestsAndServices,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.link_rounded,
-                                    size: 20.r,
-                                    color: theme.colorScheme.onTertiaryFixed,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    l10n.associationRequestsAndServices,
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                ],
+                  return PopupMenuButton<
+                    _AccosiciationMemberProfileMenuActions
+                  >(
+                    position: PopupMenuPosition.under,
+                    icon: const Icon(Icons.menu_rounded),
+                    onSelected: (value) {
+                      switch (value) {
+                        case _AccosiciationMemberProfileMenuActions
+                            .linkRequests:
+                          context.push(AppRoutes.associationSubmittedRequests);
+                          break;
+                        case _AccosiciationMemberProfileMenuActions
+                            .requestsAndServices:
+                          context.push(
+                            AppRoutes.associationRequestsAndServices,
+                          );
+                          break;
+                        case _AccosiciationMemberProfileMenuActions
+                            .associationContactUs:
+                          context.push(AppRoutes.associationContactUs);
+                          break;
+                        case _AccosiciationMemberProfileMenuActions
+                            .frequentlyAskedQuestion:
+                          context.push(AppRoutes.associationFaq);
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      if (data.isAssociationMember)
+                        PopupMenuItem(
+                          value: _AccosiciationMemberProfileMenuActions
+                              .requestsAndServices,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.link_rounded,
+                                size: 20.r,
+                                color: theme.colorScheme.onTertiaryFixed,
                               ),
+                              const SizedBox(width: 12),
+                              Text(
+                                l10n.associationRequestsAndServices,
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      PopupMenuItem(
+                        value:
+                            _AccosiciationMemberProfileMenuActions.linkRequests,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.upload_file_rounded,
+                              size: 20.r,
+                              color: theme.colorScheme.onTertiaryFixed,
                             ),
-                            PopupMenuItem(
-                              value: _AccosiciationMemberProfileMenuActions
-                                  .linkRequests,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.upload_file_rounded,
-                                    size: 20.r,
-                                    color: theme.colorScheme.onTertiaryFixed,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    l10n.linkRequestsScreen,
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            PopupMenuItem(
-                              value: _AccosiciationMemberProfileMenuActions
-                                  .associationContactUs,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.question_answer_outlined,
-                                    size: 20.r,
-                                    color: theme.colorScheme.onTertiaryFixed,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    l10n.associationContactUs,
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: _AccosiciationMemberProfileMenuActions
-                                  .frequentlyAskedQuestion,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.help_rounded,
-                                    size: 20.r,
-                                    color: theme.colorScheme.onTertiaryFixed,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    l10n.frequentlyAskedQuestion,
-                                    style: theme.textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
+                            const SizedBox(width: 12),
+                            Text(
+                              l10n.linkRequestsScreen,
+                              style: theme.textTheme.bodyMedium,
                             ),
                           ],
-                        );
+                        ),
+                      ),
+
+                      PopupMenuItem(
+                        value: _AccosiciationMemberProfileMenuActions
+                            .associationContactUs,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.question_answer_outlined,
+                              size: 20.r,
+                              color: theme.colorScheme.onTertiaryFixed,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              l10n.associationContactUs,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: _AccosiciationMemberProfileMenuActions
+                            .frequentlyAskedQuestion,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.help_rounded,
+                              size: 20.r,
+                              color: theme.colorScheme.onTertiaryFixed,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              l10n.frequentlyAskedQuestion,
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
                 default:
                   return SizedBox.shrink();
               }
@@ -179,7 +179,8 @@ class _AssociationMemberProfileScreenState
               icon: Icons.link_off_rounded,
               message: l10n.associationMemberProfileEmpty,
               actionLabel: l10n.associationMemberProfileLinkRequest,
-              onAction: () => context.push(AppRoutes.associationRequestsAndServices),
+              onAction: () =>
+                  context.push(AppRoutes.associationRequestsAndServices),
             );
           }
 
@@ -862,7 +863,7 @@ class _SummaryTile extends StatelessWidget {
           Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
           Text(
             value,
-            style: theme.textTheme.titleMedium?.copyWith( 
+            style: theme.textTheme.titleMedium?.copyWith(
               color: isDark ? AppColors.goldLight : AppColors.burgundy,
               fontWeight: FontWeight.w800,
             ),
