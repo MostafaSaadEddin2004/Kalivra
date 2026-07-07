@@ -31,11 +31,11 @@ class BrandCubit extends Cubit<BrandState> {
 
   Future<void> fetchProductsByBrandId(int brandId) async {
     try {
-      emit(BrandLoading());
+      emit(BrandProductsLoading());
       final products = await BrandApiService().getProductsByBrandId(brandId);
       emit(BrandProductFetched(products));
     } catch (e) {
-      emit(BrandFailure(e.toString()));
+      emit(BrandProductsFailure(e.toString()));
     }
   }
 }

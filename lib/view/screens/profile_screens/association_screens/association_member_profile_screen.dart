@@ -68,6 +68,10 @@ class _AssociationMemberProfileScreenState
                           );
                           break;
                         case _AccosiciationMemberProfileMenuActions
+                            .announcements:
+                          context.push(AppRoutes.associationAnnouncements);
+                          break;
+                        case _AccosiciationMemberProfileMenuActions
                             .associationContactUs:
                           context.push(AppRoutes.associationContactUs);
                           break;
@@ -92,6 +96,25 @@ class _AssociationMemberProfileScreenState
                               const SizedBox(width: 12),
                               Text(
                                 l10n.associationRequestsAndServices,
+                                style: theme.textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (data.isAssociationMember)
+                        PopupMenuItem(
+                          value: _AccosiciationMemberProfileMenuActions
+                              .announcements,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.campaign_rounded,
+                                size: 20.r,
+                                color: theme.colorScheme.onTertiaryFixed,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                l10n.associationAnnouncementsTitle,
                                 style: theme.textTheme.bodyMedium,
                               ),
                             ],
@@ -718,6 +741,7 @@ enum _AccosiciationMemberProfileMenuActions {
   frequentlyAskedQuestion,
   associationContactUs,
   requestsAndServices,
+  announcements,
 }
 
 class _ProgressCard extends StatelessWidget {

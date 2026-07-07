@@ -54,7 +54,7 @@ class BrandsSection extends StatelessWidget {
                     itemBuilder: (context, index) {
                       return BrandCard(brand: brands[index]);
                     },
-                  ): Center(child: Text('mdmdm'),);
+                  ): SizedBox.shrink();
                 default:
                   return Skeletonizer(
                     child: ListView.separated(

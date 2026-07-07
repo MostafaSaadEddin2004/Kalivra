@@ -348,6 +348,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchNoResults => 'لا توجد نتائج.';
 
   @override
+  String get searchStartHint => 'ابحث واكتشف ما تحتاجه';
+
+  @override
   String get noProductsInCategory => 'لا توجد منتجات في هذا التصنيف';
 
   @override
@@ -1504,6 +1507,143 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get associationRequestsAndServices => 'طلبات وخدمات';
+
+  @override
+  String get associationAnnouncementsTitle => 'البلاغات الرسمية';
+
+  @override
+  String get associationAnnouncementsSubtitle =>
+      'تابع البلاغات الرسمية وحالة التبليغ والمهل والمرفقات.';
+
+  @override
+  String get associationAnnouncementsHint =>
+      'اضغط على كارد البلاغ لعرض التفاصيل الرسمية كاملة.';
+
+  @override
+  String get associationAnnouncementTotal => 'الإجمالي';
+
+  @override
+  String get associationAnnouncementDelivered => 'تم التبليغ';
+
+  @override
+  String get associationAnnouncementPending => 'بانتظار التبليغ';
+
+  @override
+  String get associationAnnouncementCategory => 'الصنف';
+
+  @override
+  String get associationAnnouncementType => 'النوع';
+
+  @override
+  String get associationAnnouncementRecipients => 'المستلمون';
+
+  @override
+  String get associationAnnouncementDeadline => 'المهلة القانونية';
+
+  @override
+  String get associationAnnouncementRelatedEntity => 'الكيان المرتبط';
+
+  @override
+  String get associationAnnouncementChannels => 'قنوات التبليغ';
+
+  @override
+  String get associationAnnouncementContent => 'محتوى البلاغ';
+
+  @override
+  String get associationAnnouncementAttachments => 'المرفقات';
+
+  @override
+  String get associationAnnouncementNoAttachments => 'لا توجد مرفقات';
+
+  @override
+  String get associationAnnouncementCategoryElectronic => 'بلاغ إلكتروني';
+
+  @override
+  String get associationAnnouncementCategoryOfficial => 'بلاغ رسمي موثق';
+
+  @override
+  String get associationAnnouncementTypePaymentNotice => 'إشعار استحقاق';
+
+  @override
+  String get associationAnnouncementTypeMeetingInvitation => 'دعوة اجتماع';
+
+  @override
+  String get associationAnnouncementTypeDecisionNotice => 'تبليغ قرار';
+
+  @override
+  String get associationAnnouncementChannelInApp => 'داخل التطبيق';
+
+  @override
+  String get associationAnnouncementChannelWhatsapp => 'واتساب';
+
+  @override
+  String get associationAnnouncementChannelSms => 'رسالة نصية';
+
+  @override
+  String get associationAnnouncementChannelEmail => 'البريد الإلكتروني';
+
+  @override
+  String get associationAnnouncementNoDeadline => 'لا توجد مهلة قانونية';
+
+  @override
+  String get associationAnnouncementSampleTitle1 => 'تذكير بمهلة الدفع';
+
+  @override
+  String get associationAnnouncementSampleRecipients1 => 'أعضاء المشروع السكني';
+
+  @override
+  String get associationAnnouncementSampleDeadline1 => 'متبقي 10 أيام';
+
+  @override
+  String get associationAnnouncementSampleRelated1 => 'مدفوعات المشروع';
+
+  @override
+  String get associationAnnouncementSampleContent1 =>
+      'يرجى مراجعة جدول الدفعات المستحقة وإتمام الدفع المطلوب قبل انتهاء المهلة القانونية. هذا البلاغ مرتبط بالملف المالي للعضو.';
+
+  @override
+  String get associationAnnouncementSampleAttachment1 => 'جدول الدفعات.pdf';
+
+  @override
+  String get associationAnnouncementSampleAttachment2 =>
+      'نص البلاغ الرسمي.docx';
+
+  @override
+  String get associationAnnouncementSampleTitle2 =>
+      'دعوة لحضور اجتماع الهيئة العامة';
+
+  @override
+  String get associationAnnouncementSampleRecipients2 =>
+      'جميع أعضاء الجمعية الفعالين';
+
+  @override
+  String get associationAnnouncementSampleDeadline2 =>
+      'تاريخ الاجتماع: 2026-07-20';
+
+  @override
+  String get associationAnnouncementSampleRelated2 => 'جلسة الهيئة العامة';
+
+  @override
+  String get associationAnnouncementSampleContent2 =>
+      'تدعوكم الجمعية لحضور اجتماع الهيئة العامة. تجدون جدول الأعمال وتعليمات الحضور ضمن مرفقات هذا البلاغ.';
+
+  @override
+  String get associationAnnouncementSampleAttachment3 =>
+      'جدول أعمال الاجتماع.pdf';
+
+  @override
+  String get associationAnnouncementSampleTitle3 => 'تبليغ بقرار مجلس الإدارة';
+
+  @override
+  String get associationAnnouncementSampleRecipients3 =>
+      'الأعضاء المرتبطون بالمرحلة الثانية';
+
+  @override
+  String get associationAnnouncementSampleRelated3 => 'قرار مجلس الإدارة';
+
+  @override
+  String get associationAnnouncementSampleContent3 =>
+      'تم نشر قرار مجلس الإدارة للاطلاع عليه. يقدّم هذا البلاغ للتوثيق وإعلام الأعضاء.';
 
   @override
   String get associationRequestTypeHint => 'اختر نوع الطلب';

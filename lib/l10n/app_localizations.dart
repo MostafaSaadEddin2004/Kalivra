@@ -740,6 +740,12 @@ abstract class AppLocalizations {
   /// **'No results found.'**
   String get searchNoResults;
 
+  /// No description provided for @searchStartHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search and discover what you need'**
+  String get searchStartHint;
+
   /// No description provided for @noProductsInCategory.
   ///
   /// In en, this message translates to:
@@ -2977,6 +2983,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Requests and services'**
   String get associationRequestsAndServices;
+
+  /// No description provided for @associationAnnouncementsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Official announcements'**
+  String get associationAnnouncementsTitle;
+
+  /// No description provided for @associationAnnouncementsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track official notices, delivery status, deadlines, and attachments.'**
+  String get associationAnnouncementsSubtitle;
+
+  /// No description provided for @associationAnnouncementsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap an announcement card to view its full official details.'**
+  String get associationAnnouncementsHint;
+
+  /// No description provided for @associationAnnouncementTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get associationAnnouncementTotal;
+
+  /// No description provided for @associationAnnouncementDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get associationAnnouncementDelivered;
+
+  /// No description provided for @associationAnnouncementPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get associationAnnouncementPending;
+
+  /// No description provided for @associationAnnouncementCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get associationAnnouncementCategory;
+
+  /// No description provided for @associationAnnouncementType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get associationAnnouncementType;
+
+  /// No description provided for @associationAnnouncementRecipients.
+  ///
+  /// In en, this message translates to:
+  /// **'Recipients'**
+  String get associationAnnouncementRecipients;
+
+  /// No description provided for @associationAnnouncementDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal deadline'**
+  String get associationAnnouncementDeadline;
+
+  /// No description provided for @associationAnnouncementRelatedEntity.
+  ///
+  /// In en, this message translates to:
+  /// **'Related entity'**
+  String get associationAnnouncementRelatedEntity;
+
+  /// No description provided for @associationAnnouncementChannels.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery channels'**
+  String get associationAnnouncementChannels;
+
+  /// No description provided for @associationAnnouncementContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement content'**
+  String get associationAnnouncementContent;
+
+  /// No description provided for @associationAnnouncementAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachments'**
+  String get associationAnnouncementAttachments;
+
+  /// No description provided for @associationAnnouncementNoAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'No attachments'**
+  String get associationAnnouncementNoAttachments;
+
+  /// No description provided for @associationAnnouncementCategoryElectronic.
+  ///
+  /// In en, this message translates to:
+  /// **'Electronic announcement'**
+  String get associationAnnouncementCategoryElectronic;
+
+  /// No description provided for @associationAnnouncementCategoryOfficial.
+  ///
+  /// In en, this message translates to:
+  /// **'Documented official announcement'**
+  String get associationAnnouncementCategoryOfficial;
+
+  /// No description provided for @associationAnnouncementTypePaymentNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment due notice'**
+  String get associationAnnouncementTypePaymentNotice;
+
+  /// No description provided for @associationAnnouncementTypeMeetingInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting invitation'**
+  String get associationAnnouncementTypeMeetingInvitation;
+
+  /// No description provided for @associationAnnouncementTypeDecisionNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision notice'**
+  String get associationAnnouncementTypeDecisionNotice;
+
+  /// No description provided for @associationAnnouncementChannelInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app'**
+  String get associationAnnouncementChannelInApp;
+
+  /// No description provided for @associationAnnouncementChannelWhatsapp.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get associationAnnouncementChannelWhatsapp;
+
+  /// No description provided for @associationAnnouncementChannelSms.
+  ///
+  /// In en, this message translates to:
+  /// **'SMS'**
+  String get associationAnnouncementChannelSms;
+
+  /// No description provided for @associationAnnouncementChannelEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get associationAnnouncementChannelEmail;
+
+  /// No description provided for @associationAnnouncementNoDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'No legal deadline'**
+  String get associationAnnouncementNoDeadline;
+
+  /// No description provided for @associationAnnouncementSampleTitle1.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment deadline reminder'**
+  String get associationAnnouncementSampleTitle1;
+
+  /// No description provided for @associationAnnouncementSampleRecipients1.
+  ///
+  /// In en, this message translates to:
+  /// **'Members of the residential project'**
+  String get associationAnnouncementSampleRecipients1;
+
+  /// No description provided for @associationAnnouncementSampleDeadline1.
+  ///
+  /// In en, this message translates to:
+  /// **'10 days remaining'**
+  String get associationAnnouncementSampleDeadline1;
+
+  /// No description provided for @associationAnnouncementSampleRelated1.
+  ///
+  /// In en, this message translates to:
+  /// **'Project payments'**
+  String get associationAnnouncementSampleRelated1;
+
+  /// No description provided for @associationAnnouncementSampleContent1.
+  ///
+  /// In en, this message translates to:
+  /// **'Please review the due payment schedule and complete the required payment before the legal deadline. This announcement is linked to the member financial file.'**
+  String get associationAnnouncementSampleContent1;
+
+  /// No description provided for @associationAnnouncementSampleAttachment1.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment schedule.pdf'**
+  String get associationAnnouncementSampleAttachment1;
+
+  /// No description provided for @associationAnnouncementSampleAttachment2.
+  ///
+  /// In en, this message translates to:
+  /// **'Official notice.docx'**
+  String get associationAnnouncementSampleAttachment2;
+
+  /// No description provided for @associationAnnouncementSampleTitle2.
+  ///
+  /// In en, this message translates to:
+  /// **'General assembly meeting invitation'**
+  String get associationAnnouncementSampleTitle2;
+
+  /// No description provided for @associationAnnouncementSampleRecipients2.
+  ///
+  /// In en, this message translates to:
+  /// **'All active association members'**
+  String get associationAnnouncementSampleRecipients2;
+
+  /// No description provided for @associationAnnouncementSampleDeadline2.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting date: 2026-07-20'**
+  String get associationAnnouncementSampleDeadline2;
+
+  /// No description provided for @associationAnnouncementSampleRelated2.
+  ///
+  /// In en, this message translates to:
+  /// **'General assembly session'**
+  String get associationAnnouncementSampleRelated2;
+
+  /// No description provided for @associationAnnouncementSampleContent2.
+  ///
+  /// In en, this message translates to:
+  /// **'You are invited to attend the general assembly meeting. The meeting agenda and attendance instructions are attached to this announcement.'**
+  String get associationAnnouncementSampleContent2;
+
+  /// No description provided for @associationAnnouncementSampleAttachment3.
+  ///
+  /// In en, this message translates to:
+  /// **'Meeting agenda.pdf'**
+  String get associationAnnouncementSampleAttachment3;
+
+  /// No description provided for @associationAnnouncementSampleTitle3.
+  ///
+  /// In en, this message translates to:
+  /// **'Board decision notification'**
+  String get associationAnnouncementSampleTitle3;
+
+  /// No description provided for @associationAnnouncementSampleRecipients3.
+  ///
+  /// In en, this message translates to:
+  /// **'Members linked to phase two'**
+  String get associationAnnouncementSampleRecipients3;
+
+  /// No description provided for @associationAnnouncementSampleRelated3.
+  ///
+  /// In en, this message translates to:
+  /// **'Board decision'**
+  String get associationAnnouncementSampleRelated3;
+
+  /// No description provided for @associationAnnouncementSampleContent3.
+  ///
+  /// In en, this message translates to:
+  /// **'The association board decision has been published for review. This notice is provided for documentation and member awareness.'**
+  String get associationAnnouncementSampleContent3;
 
   /// No description provided for @associationRequestTypeHint.
   ///

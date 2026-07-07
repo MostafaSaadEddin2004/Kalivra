@@ -350,6 +350,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchNoResults => 'No results found.';
 
   @override
+  String get searchStartHint => 'Search and discover what you need';
+
+  @override
   String get noProductsInCategory => 'No products in this category';
 
   @override
@@ -1513,6 +1516,147 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get associationRequestsAndServices => 'Requests and services';
+
+  @override
+  String get associationAnnouncementsTitle => 'Official announcements';
+
+  @override
+  String get associationAnnouncementsSubtitle =>
+      'Track official notices, delivery status, deadlines, and attachments.';
+
+  @override
+  String get associationAnnouncementsHint =>
+      'Tap an announcement card to view its full official details.';
+
+  @override
+  String get associationAnnouncementTotal => 'Total';
+
+  @override
+  String get associationAnnouncementDelivered => 'Delivered';
+
+  @override
+  String get associationAnnouncementPending => 'Pending';
+
+  @override
+  String get associationAnnouncementCategory => 'Category';
+
+  @override
+  String get associationAnnouncementType => 'Type';
+
+  @override
+  String get associationAnnouncementRecipients => 'Recipients';
+
+  @override
+  String get associationAnnouncementDeadline => 'Legal deadline';
+
+  @override
+  String get associationAnnouncementRelatedEntity => 'Related entity';
+
+  @override
+  String get associationAnnouncementChannels => 'Delivery channels';
+
+  @override
+  String get associationAnnouncementContent => 'Announcement content';
+
+  @override
+  String get associationAnnouncementAttachments => 'Attachments';
+
+  @override
+  String get associationAnnouncementNoAttachments => 'No attachments';
+
+  @override
+  String get associationAnnouncementCategoryElectronic =>
+      'Electronic announcement';
+
+  @override
+  String get associationAnnouncementCategoryOfficial =>
+      'Documented official announcement';
+
+  @override
+  String get associationAnnouncementTypePaymentNotice => 'Payment due notice';
+
+  @override
+  String get associationAnnouncementTypeMeetingInvitation =>
+      'Meeting invitation';
+
+  @override
+  String get associationAnnouncementTypeDecisionNotice => 'Decision notice';
+
+  @override
+  String get associationAnnouncementChannelInApp => 'In-app';
+
+  @override
+  String get associationAnnouncementChannelWhatsapp => 'WhatsApp';
+
+  @override
+  String get associationAnnouncementChannelSms => 'SMS';
+
+  @override
+  String get associationAnnouncementChannelEmail => 'Email';
+
+  @override
+  String get associationAnnouncementNoDeadline => 'No legal deadline';
+
+  @override
+  String get associationAnnouncementSampleTitle1 => 'Payment deadline reminder';
+
+  @override
+  String get associationAnnouncementSampleRecipients1 =>
+      'Members of the residential project';
+
+  @override
+  String get associationAnnouncementSampleDeadline1 => '10 days remaining';
+
+  @override
+  String get associationAnnouncementSampleRelated1 => 'Project payments';
+
+  @override
+  String get associationAnnouncementSampleContent1 =>
+      'Please review the due payment schedule and complete the required payment before the legal deadline. This announcement is linked to the member financial file.';
+
+  @override
+  String get associationAnnouncementSampleAttachment1 => 'Payment schedule.pdf';
+
+  @override
+  String get associationAnnouncementSampleAttachment2 => 'Official notice.docx';
+
+  @override
+  String get associationAnnouncementSampleTitle2 =>
+      'General assembly meeting invitation';
+
+  @override
+  String get associationAnnouncementSampleRecipients2 =>
+      'All active association members';
+
+  @override
+  String get associationAnnouncementSampleDeadline2 =>
+      'Meeting date: 2026-07-20';
+
+  @override
+  String get associationAnnouncementSampleRelated2 =>
+      'General assembly session';
+
+  @override
+  String get associationAnnouncementSampleContent2 =>
+      'You are invited to attend the general assembly meeting. The meeting agenda and attendance instructions are attached to this announcement.';
+
+  @override
+  String get associationAnnouncementSampleAttachment3 => 'Meeting agenda.pdf';
+
+  @override
+  String get associationAnnouncementSampleTitle3 =>
+      'Board decision notification';
+
+  @override
+  String get associationAnnouncementSampleRecipients3 =>
+      'Members linked to phase two';
+
+  @override
+  String get associationAnnouncementSampleRelated3 => 'Board decision';
+
+  @override
+  String get associationAnnouncementSampleContent3 =>
+      'The association board decision has been published for review. This notice is provided for documentation and member awareness.';
 
   @override
   String get associationRequestTypeHint => 'select request type';

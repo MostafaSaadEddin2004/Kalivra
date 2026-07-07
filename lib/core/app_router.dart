@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcements_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_contact_us_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_faq_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_requests_and_services_screen.dart';
@@ -92,6 +93,7 @@ abstract class AppRoutes {
   static const String associationContactUs = '/association-contact-us';
   static const String associationRequestsAndServices =
       '/association-requests-and-services';
+  static const String associationAnnouncements = '/association-announcements';
 }
 
 abstract class AppRoutesName {
@@ -138,6 +140,7 @@ abstract class AppRoutesName {
   static const String associationContactUs = 'association-contact-us';
   static const String associationRequestsAndServices =
       'association-requests-and-services';
+  static const String associationAnnouncements = 'association-announcements';
 }
 
 abstract class AppRouter {
@@ -437,6 +440,11 @@ abstract class AppRouter {
             name: AppRoutesName.associationRequestsAndServices,
             builder: (context, state) =>
                 const AssociationRequestsAndServicesScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationAnnouncements,
+            name: AppRoutesName.associationAnnouncements,
+            builder: (context, state) => const AssociationAnnouncementsScreen(),
           ),
         ],
       ),

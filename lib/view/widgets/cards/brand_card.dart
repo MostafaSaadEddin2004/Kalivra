@@ -23,6 +23,7 @@ class BrandCard extends StatelessWidget {
         onTap: () => context.push(AppRoutes.brandDetails, extra: brand),
         child: SizedBox(
           width: expanded ? null : 90.w,
+          height: 100.h,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

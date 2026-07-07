@@ -62,56 +62,40 @@ class _SuggestionsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 12.h),
-            child: Text(
-              'اقتراحات سريعة',
-              style: Theme.of(context).textTheme.titleMedium,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 32.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 76.r,
+              width: 76.r,
+              decoration: BoxDecoration(
+                color: colorScheme.primary.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.manage_search_rounded,
+                size: 40.r,
+                color: colorScheme.primary,
+              ),
             ),
-          ),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          sliver: SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 12.h,
-              crossAxisSpacing: 12.w,
-              childAspectRatio: 1.2,
+            SizedBox(height: 18.h),
+            Text(
+              l10n.searchStartHint,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            delegate: SliverChildListDelegate([
-              const SearchResultCard(label: 'دهانات'),
-              const SearchResultCard(label: 'سيراميك'),
-              const SearchResultCard(label: 'أدوات صحية'),
-              const SearchResultCard(label: 'حديد'),
-              const SearchResultCard(label: 'كهربائيات'),
-              const SearchResultCard(label: 'ديكور'),
-            ]),
-          ),
+          ],
         ),
-        SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Text(
-              'آخر البحث',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 16.h),
-            child: Text(
-              'لم تبحث عن شيء بعد. اكتب في شريط البحث أعلاه.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
