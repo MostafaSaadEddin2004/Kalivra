@@ -46,6 +46,7 @@ import 'package:kalivra/view/screens/auth/complete_profile_screen.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
 import 'package:kalivra/model/ad/advertisement_model.dart';
+import 'package:kalivra/model/category/category_api_model.dart';
 
 abstract class AppRoutes {
   static const String splash = '/';
@@ -197,7 +198,14 @@ abstract class AppRouter {
           GoRoute(
             path: AppRoutes.home,
             name: AppRoutesName.home,
-            builder: (_, _) => const HomeScreen(),
+            builder: (_, state) {
+              final extra = state.extra;
+              final initialCategory = extra is CategoryApiModel ? extra : null;
+              return HomeScreen(
+                key: ValueKey('home-${initialCategory?.id ?? 'all'}'),
+                initialCategory: initialCategory,
+              );
+            },
           ),
           GoRoute(
             path: AppRoutes.account,

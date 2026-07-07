@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
+import 'package:kalivra/model/association/association_request_address.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
@@ -57,33 +58,28 @@ class AssociationApiService {
     required String fatherName,
     required String motherName,
     required String nationalId,
-    String? permanentCapitalId,
-    String? permanentCityId,
-    String? permanentTownId,
-    String permanentVillage = '',
-    required String officialStreet,
-    required String officialBuilding,
-    required List<String> additionalAddresses,
+    required AssociationRequestAddress permanentAddress,
+    required AssociationRequestAddress currentAddress,
+    required List<AssociationRequestAddress> additionalAddresses,
     String? claimedMembershipNumber,
     String? claimedPriorityNumber,
     String? claimedBuildingNumber,
     String? claimedUnitNumber,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
-    final data = 
-    {
+    final data = {
       'type': type,
       'customer_note': customerNote,
       'father_name': fatherName,
       'mother_name': motherName,
       'national_id': nationalId,
-      'permanent_capital_id': permanentCapitalId,
-      'permanent_city_id': permanentCityId,
-      'permanent_town_id': permanentTownId,
-      'village': permanentVillage,
-      'official_street': officialStreet,
-      'official_building': officialBuilding,
-      'additional_addresses': additionalAddresses,
+      'addresses': {
+        'permanent': permanentAddress.toMap(),
+        'current': currentAddress.toMap(),
+        'additional': additionalAddresses
+            .map((address) => address.toMap(includeDetails: true))
+            .toList(),
+      },
       'requested_membership_type': requestedMembershipType,
       'claimed_membership_number': claimedMembershipNumber,
       'claimed_priority_number': claimedPriorityNumber,

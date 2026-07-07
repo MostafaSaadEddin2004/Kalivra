@@ -9,6 +9,7 @@ import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/associati
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
+import 'package:kalivra/model/association/association_request_address.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
@@ -50,10 +51,10 @@ class _AssociationRequestsAndServicesScreenState
   final _nationalIdController = TextEditingController();
 
   final _streetController = TextEditingController();
+  final _streetNumberController = TextEditingController();
   final _buildingController = TextEditingController();
-  final List<TextEditingController> _additionalAddressControllers = [
-    TextEditingController(),
-  ];
+  final _currentAddress = _AssociationAddressInput();
+  final List<_AssociationAddressInput> _additionalAddresses = [];
 
   final _membershipNumberController = TextEditingController();
   final _priorityNumberController = TextEditingController();
@@ -75,6 +76,7 @@ class _AssociationRequestsAndServicesScreenState
   String? _selectedTown;
   String? _accountPhone;
 
+  bool _hasCurrentAddress = false;
   bool _isLocked = false;
 
   bool get _isMembershipRequest => _requestType == _membershipRequestType;
@@ -89,10 +91,6 @@ class _AssociationRequestsAndServicesScreenState
     super.initState();
 
     _associationLinkCubit = AssociationLinkCubit()..fetchRequestTypes();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AddressInfoCubit>().fetchCapitals();
-    });
   }
 
   @override
@@ -106,10 +104,12 @@ class _AssociationRequestsAndServicesScreenState
     _nationalIdController.dispose();
 
     _streetController.dispose();
+    _streetNumberController.dispose();
     _buildingController.dispose();
+    _currentAddress.dispose();
 
-    for (final controller in _additionalAddressControllers) {
-      controller.dispose();
+    for (final address in _additionalAddresses) {
+      address.dispose();
     }
 
     _membershipNumberController.dispose();
@@ -219,10 +219,6 @@ class _AssociationRequestsAndServicesScreenState
       _selectedCity = null;
       _selectedTown = null;
     });
-
-    if (value != null) {
-      context.read<AddressInfoCubit>().fetchCities(capitalId: value);
-    }
   }
 
   void _onCityChanged(String? value) {
@@ -230,10 +226,6 @@ class _AssociationRequestsAndServicesScreenState
       _selectedCity = value;
       _selectedTown = null;
     });
-
-    if (value != null) {
-      context.read<AddressInfoCubit>().fetchTowns(cityId: value);
-    }
   }
 
   void _onTownChanged(String? value) {
@@ -299,24 +291,29 @@ class _AssociationRequestsAndServicesScreenState
   void _addAdditionalAddress() {
     if (_isLocked) return;
 
-    if (_additionalAddressControllers.first.text.trim().isEmpty) {
-      CustomSnackBar.show(
-        context,
-        AppLocalizations.of(context)!.associationAddressRequired,
-      );
-      return;
-    }
-
     setState(() {
-      _additionalAddressControllers.add(TextEditingController());
+      if (_hasCurrentAddress) {
+        _additionalAddresses.add(_AssociationAddressInput());
+      } else {
+        _hasCurrentAddress = true;
+      }
     });
   }
 
   void _removeAdditionalAddress(int index) {
-    if (_isLocked || _additionalAddressControllers.length == 1) return;
+    if (_isLocked) return;
 
     setState(() {
-      _additionalAddressControllers.removeAt(index).dispose();
+      _additionalAddresses.removeAt(index).dispose();
+    });
+  }
+
+  void _removeCurrentAddress() {
+    if (_isLocked) return;
+
+    setState(() {
+      _hasCurrentAddress = false;
+      _currentAddress.clear();
     });
   }
 
@@ -329,10 +326,26 @@ class _AssociationRequestsAndServicesScreenState
     }).toList();
   }
 
-  List<String> _additionalAddresses() {
-    return _additionalAddressControllers
-        .map((controller) => controller.text.trim())
-        .where((address) => address.isNotEmpty)
+  AssociationRequestAddress _permanentAddress() {
+    return AssociationRequestAddress(
+      capitalId: _selectedGovernorate,
+      cityId: _selectedCity,
+      townId: _selectedTown,
+      village: _villageController.text.trim(),
+      streetName: _streetController.text.trim(),
+      streetNumber: _streetNumberController.text.trim(),
+      building: _buildingController.text.trim(),
+    );
+  }
+
+  AssociationRequestAddress _currentRequestAddress() {
+    if (!_hasCurrentAddress) return _permanentAddress();
+    return _currentAddress.toRequestAddress();
+  }
+
+  List<AssociationRequestAddress> _additionalRequestAddresses() {
+    return _additionalAddresses
+        .map((address) => address.toRequestAddress(includeDetails: true))
         .toList();
   }
 
@@ -348,11 +361,6 @@ class _AssociationRequestsAndServicesScreenState
     }
 
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    if (_isMembershipRequest && _additionalAddresses().isEmpty) {
-      CustomSnackBar.show(context, l10n.associationAddressRequired);
-      return;
-    }
 
     if (_isMembershipRequest && _attachments.isEmpty) {
       CustomSnackBar.show(
@@ -372,13 +380,9 @@ class _AssociationRequestsAndServicesScreenState
           motherName: _motherNameController.text.trim(),
           nationalId: _nationalIdController.text.trim(),
           requestedMembershipType: _requestedMembershipType!,
-          permanentCapitalId: _selectedGovernorate,
-          permanentCityId: _selectedCity,
-          permanentTownId: _selectedTown,
-          permanentVillage: _villageController.text.trim(),
-          officialStreet: _streetController.text.trim(),
-          officialBuilding: _buildingController.text.trim(),
-          additionalAddresses: _additionalAddresses(),
+          permanentAddress: _permanentAddress(),
+          currentAddress: _currentRequestAddress(),
+          additionalAddresses: _additionalRequestAddresses(),
           claimedMembershipNumber: _membershipNumberController.text.trim(),
           claimedPriorityNumber: _priorityNumberController.text.trim(),
           claimedBuildingNumber: _buildingController.text.trim(),
@@ -562,7 +566,7 @@ class _AssociationRequestsAndServicesScreenState
                   _buildRequestTypeDropdown(l10n: l10n, state: state),
                   if (_isMembershipRequest) ...[
                     SizedBox(height: 16.h),
-                    AssociationLinkRequestSection(
+                    _AssociationLinkRequestSection(
                       isLocked: _isLocked,
                       hasSelectedGeneralRequest: _hasSelectedGeneralRequest,
                       fatherNameController: _fatherNameController,
@@ -572,9 +576,11 @@ class _AssociationRequestsAndServicesScreenState
                       selectedCity: _selectedCity,
                       selectedTown: _selectedTown,
                       streetController: _streetController,
+                      streetNumberController: _streetNumberController,
                       buildingController: _buildingController,
-                      additionalAddressControllers:
-                          _additionalAddressControllers,
+                      hasCurrentAddress: _hasCurrentAddress,
+                      currentAddress: _currentAddress,
+                      additionalAddresses: _additionalAddresses,
                       requestedMembershipType: _requestedMembershipType,
                       membershipNumberController: _membershipNumberController,
                       priorityNumberController: _priorityNumberController,
@@ -591,6 +597,7 @@ class _AssociationRequestsAndServicesScreenState
                           _onRequestedMembershipTypeChanged,
                       onAddAdditionalAddress: _addAdditionalAddress,
                       onRemoveAdditionalAddress: _removeAdditionalAddress,
+                      onRemoveCurrentAddress: _removeCurrentAddress,
                       onPickAttachment: _pickAttachment,
                       onRemoveAttachment: _removeAttachment,
                       validateRequiredName: (value) =>
@@ -624,9 +631,8 @@ class _AssociationRequestsAndServicesScreenState
   }
 }
 
-class AssociationLinkRequestSection extends StatefulWidget {
-  const AssociationLinkRequestSection({
-    super.key,
+class _AssociationLinkRequestSection extends StatefulWidget {
+  const _AssociationLinkRequestSection({
     required this.fatherNameController,
     required this.motherNameController,
     required this.nationalIdController,
@@ -634,8 +640,11 @@ class AssociationLinkRequestSection extends StatefulWidget {
     required this.selectedCity,
     required this.selectedTown,
     required this.streetController,
+    required this.streetNumberController,
     required this.buildingController,
-    required this.additionalAddressControllers,
+    required this.hasCurrentAddress,
+    required this.currentAddress,
+    required this.additionalAddresses,
     required this.requestedMembershipType,
     required this.membershipNumberController,
     required this.priorityNumberController,
@@ -650,6 +659,7 @@ class AssociationLinkRequestSection extends StatefulWidget {
     required this.onRequestedMembershipTypeChanged,
     required this.onAddAdditionalAddress,
     required this.onRemoveAdditionalAddress,
+    required this.onRemoveCurrentAddress,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
     required this.validateRequiredName,
@@ -670,8 +680,11 @@ class AssociationLinkRequestSection extends StatefulWidget {
   final String? selectedTown;
 
   final TextEditingController streetController;
+  final TextEditingController streetNumberController;
   final TextEditingController buildingController;
-  final List<TextEditingController> additionalAddressControllers;
+  final bool hasCurrentAddress;
+  final _AssociationAddressInput currentAddress;
+  final List<_AssociationAddressInput> additionalAddresses;
   final String? requestedMembershipType;
 
   final TextEditingController membershipNumberController;
@@ -689,6 +702,7 @@ class AssociationLinkRequestSection extends StatefulWidget {
   final ValueChanged<String?> onRequestedMembershipTypeChanged;
   final VoidCallback onAddAdditionalAddress;
   final ValueChanged<int> onRemoveAdditionalAddress;
+  final VoidCallback onRemoveCurrentAddress;
 
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
@@ -703,12 +717,12 @@ class AssociationLinkRequestSection extends StatefulWidget {
   final bool isLocked;
 
   @override
-  State<AssociationLinkRequestSection> createState() =>
+  State<_AssociationLinkRequestSection> createState() =>
       _AssociationLinkRequestSectionState();
 }
 
 class _AssociationLinkRequestSectionState
-    extends State<AssociationLinkRequestSection> {
+    extends State<_AssociationLinkRequestSection> {
   bool get isLocked => widget.isLocked;
 
   @override
@@ -753,153 +767,25 @@ class _AssociationLinkRequestSectionState
           title: l10n.associationLinkContactSection,
           icon: Icons.location_on_outlined,
           children: [
-            BlocBuilder<AddressInfoCubit, AddressInfoState>(
-              builder: (context, addressState) {
-                final capitalLabels = {
-                  for (final capital in addressState.capitals)
-                    capital.id: capital.name,
-                };
-                final cityLabels = {
-                  for (final city in addressState.cities) city.id: city.name,
-                };
-                final townLabels = {
-                  for (final town in addressState.towns) town.id: town.name,
-                };
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AssociationDropdownField(
-                      label: l10n.associationLinkGovernorate,
-                      hintText: addressState.isLoadingCapitals
-                          ? l10n.associationAddressLoadingCapitals
-                          : l10n.associationAddressSelectCapital,
-                      value: widget.selectedGovernorate,
-                      items: addressState.capitals
-                          .map((capital) => capital.id)
-                          .toList(),
-                      itemLabelBuilder: (id) => capitalLabels[id] ?? id,
-                      enabled:
-                          !isLocked &&
-                          !addressState.isLoadingCapitals &&
-                          !addressState.capitalsFailed,
-                      trailing: addressState.capitalsFailed
-                          ? _AddressReloadButton(
-                              onPressed: isLocked
-                                  ? null
-                                  : () => context
-                                        .read<AddressInfoCubit>()
-                                        .fetchCapitals(),
-                            )
-                          : null,
-                      onChanged: widget.onGovernorateChanged,
-                      validator: (value) =>
-                          value == null ? l10n.required : null,
-                    ),
-                    SizedBox(height: 16.h),
-                    AssociationDropdownField(
-                      label: l10n.associationLinkCity,
-                      hintText: addressState.isLoadingCities
-                          ? l10n.associationAddressLoadingCities
-                          : l10n.associationAddressSelectCity,
-                      value: widget.selectedCity,
-                      items: addressState.cities
-                          .map((city) => city.id)
-                          .toList(),
-                      itemLabelBuilder: (id) => cityLabels[id] ?? id,
-                      enabled:
-                          !isLocked &&
-                          widget.selectedGovernorate != null &&
-                          !addressState.isLoadingCities &&
-                          !addressState.citiesFailed,
-                      trailing:
-                          addressState.citiesFailed &&
-                              widget.selectedGovernorate != null
-                          ? _AddressReloadButton(
-                              onPressed: isLocked
-                                  ? null
-                                  : () => context
-                                        .read<AddressInfoCubit>()
-                                        .fetchCities(
-                                          capitalId:
-                                              widget.selectedGovernorate!,
-                                        ),
-                            )
-                          : null,
-                      onChanged: widget.onCityChanged,
-                      validator: (value) =>
-                          value == null ? l10n.required : null,
-                    ),
-                    SizedBox(height: 16.h),
-                    AssociationDropdownField(
-                      label: l10n.associationLinkTown,
-                      hintText: addressState.isLoadingTowns
-                          ? l10n.associationAddressLoadingTowns
-                          : l10n.associationAddressSelectTown,
-                      value: widget.selectedTown,
-                      items: addressState.towns.map((town) => town.id).toList(),
-                      itemLabelBuilder: (id) => townLabels[id] ?? id,
-                      enabled:
-                          !isLocked &&
-                          widget.selectedCity != null &&
-                          !addressState.isLoadingTowns &&
-                          !addressState.townsFailed,
-                      trailing:
-                          addressState.townsFailed &&
-                              widget.selectedCity != null
-                          ? _AddressReloadButton(
-                              onPressed: isLocked
-                                  ? null
-                                  : () => context
-                                        .read<AddressInfoCubit>()
-                                        .fetchTowns(
-                                          cityId: widget.selectedCity!,
-                                        ),
-                            )
-                          : null,
-                      onChanged: widget.onTownChanged,
-                      validator: (value) =>
-                          value == null ? l10n.required : null,
-                    ),
-                  ],
-                );
-              },
-            ),
-            widget.fieldSpacer(),
-            AppTextField(
-              controller: widget.villageController,
-              label: l10n.associationLinkVillage,
-            ),
-            widget.fieldSpacer(),
-            AppTextField(
-              controller: widget.streetController,
-              label: l10n.associationLinkStreet,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.required;
-                }
-
-                return null;
-              },
-            ),
-            widget.fieldSpacer(),
-            AppTextField(
-              controller: widget.buildingController,
-              label: l10n.associationLinkBuilding,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.required;
-                }
-
-                return null;
-              },
-            ),
-            widget.fieldSpacer(),
-            _AdditionalAddressesSection(
-              controllers: widget.additionalAddressControllers,
+            _AssociationAddressesSection(
+              selectedGovernorate: widget.selectedGovernorate,
+              selectedCity: widget.selectedCity,
+              selectedTown: widget.selectedTown,
+              villageController: widget.villageController,
+              streetController: widget.streetController,
+              streetNumberController: widget.streetNumberController,
+              buildingController: widget.buildingController,
+              hasCurrentAddress: widget.hasCurrentAddress,
+              currentAddress: widget.currentAddress,
+              additionalAddresses: widget.additionalAddresses,
               enabled: !widget.isLocked,
+              fieldSpacer: widget.fieldSpacer,
+              onGovernorateChanged: widget.onGovernorateChanged,
+              onCityChanged: widget.onCityChanged,
+              onTownChanged: widget.onTownChanged,
               onAddAddress: widget.onAddAdditionalAddress,
               onRemoveAddress: widget.onRemoveAdditionalAddress,
+              onRemoveCurrentAddress: widget.onRemoveCurrentAddress,
             ),
           ],
         ),
@@ -994,18 +880,94 @@ class _AddressReloadButton extends StatelessWidget {
   }
 }
 
-class _AdditionalAddressesSection extends StatelessWidget {
-  const _AdditionalAddressesSection({
-    required this.controllers,
+class _AssociationAddressInput {
+  final labelController = TextEditingController();
+  final typeController = TextEditingController();
+  final villageController = TextEditingController();
+  final streetController = TextEditingController();
+  final streetNumberController = TextEditingController();
+  final buildingController = TextEditingController();
+
+  String? selectedGovernorate;
+  String? selectedCity;
+  String? selectedTown;
+
+  void clear() {
+    selectedGovernorate = null;
+    selectedCity = null;
+    selectedTown = null;
+    labelController.clear();
+    typeController.clear();
+    villageController.clear();
+    streetController.clear();
+    streetNumberController.clear();
+    buildingController.clear();
+  }
+
+  AssociationRequestAddress toRequestAddress({bool includeDetails = false}) {
+    return AssociationRequestAddress(
+      capitalId: selectedGovernorate,
+      cityId: selectedCity,
+      townId: selectedTown,
+      village: villageController.text.trim(),
+      streetName: streetController.text.trim(),
+      streetNumber: streetNumberController.text.trim(),
+      building: buildingController.text.trim(),
+      label: includeDetails ? labelController.text.trim() : '',
+      type: includeDetails ? typeController.text.trim() : '',
+    );
+  }
+
+  void dispose() {
+    labelController.dispose();
+    typeController.dispose();
+    villageController.dispose();
+    streetController.dispose();
+    streetNumberController.dispose();
+    buildingController.dispose();
+  }
+}
+
+class _AssociationAddressesSection extends StatelessWidget {
+  const _AssociationAddressesSection({
+    required this.selectedGovernorate,
+    required this.selectedCity,
+    required this.selectedTown,
+    required this.villageController,
+    required this.streetController,
+    required this.streetNumberController,
+    required this.buildingController,
+    required this.hasCurrentAddress,
+    required this.currentAddress,
+    required this.additionalAddresses,
     required this.enabled,
+    required this.fieldSpacer,
+    required this.onGovernorateChanged,
+    required this.onCityChanged,
+    required this.onTownChanged,
     required this.onAddAddress,
     required this.onRemoveAddress,
+    required this.onRemoveCurrentAddress,
   });
 
-  final List<TextEditingController> controllers;
+  final String? selectedGovernorate;
+  final String? selectedCity;
+  final String? selectedTown;
+  final TextEditingController villageController;
+  final TextEditingController streetController;
+  final TextEditingController streetNumberController;
+  final TextEditingController buildingController;
+  final bool hasCurrentAddress;
+  final _AssociationAddressInput currentAddress;
+  final List<_AssociationAddressInput> additionalAddresses;
   final bool enabled;
+  final Widget Function() fieldSpacer;
+  final ValueChanged<String?> onGovernorateChanged;
+  final ValueChanged<String?> onCityChanged;
+  final ValueChanged<String?> onTownChanged;
   final VoidCallback onAddAddress;
   final ValueChanged<int> onRemoveAddress;
+  final VoidCallback onRemoveCurrentAddress;
 
   @override
   Widget build(BuildContext context) {
@@ -1013,29 +975,78 @@ class _AdditionalAddressesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var index = 0; index < controllers.length; index++) ...[
-          if (index > 0) SizedBox(height: 14.h),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AppTextField(
-                controller: controllers[index],
-                label: index == 0
-                    ? l10n.associationAddress
-                    : l10n.associationAdditionalAddress,
-                maxLines: 2,
-                enabled: enabled,
-                validator: index == 0
-                    ? (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return l10n.associationAddressRequired;
-                        }
-
-                        return null;
-                      }
-                    : null,
-              ),
-            ],
+        _AddressFormFields(
+          title: l10n.associationLinkPermanentAddress,
+          selectedGovernorate: selectedGovernorate,
+          selectedCity: selectedCity,
+          selectedTown: selectedTown,
+          villageController: villageController,
+          streetController: streetController,
+          streetNumberController: streetNumberController,
+          buildingController: buildingController,
+          enabled: enabled,
+          fieldSpacer: fieldSpacer,
+          onGovernorateChanged: onGovernorateChanged,
+          onCityChanged: onCityChanged,
+          onTownChanged: onTownChanged,
+        ),
+        if (hasCurrentAddress) ...[
+          SizedBox(height: 18.h),
+          _AddressFormFields(
+            title: l10n.associationMemberCurrentAddress,
+            selectedGovernorate: currentAddress.selectedGovernorate,
+            selectedCity: currentAddress.selectedCity,
+            selectedTown: currentAddress.selectedTown,
+            villageController: currentAddress.villageController,
+            streetController: currentAddress.streetController,
+            streetNumberController: currentAddress.streetNumberController,
+            buildingController: currentAddress.buildingController,
+            enabled: enabled,
+            fieldSpacer: fieldSpacer,
+            onRemove: onRemoveCurrentAddress,
+            onGovernorateChanged: (value) {
+              currentAddress.selectedGovernorate = value;
+              currentAddress.selectedCity = null;
+              currentAddress.selectedTown = null;
+            },
+            onCityChanged: (value) {
+              currentAddress.selectedCity = value;
+              currentAddress.selectedTown = null;
+            },
+            onTownChanged: (value) {
+              currentAddress.selectedTown = value;
+            },
+          ),
+        ],
+        for (var index = 0; index < additionalAddresses.length; index++) ...[
+          SizedBox(height: 18.h),
+          _AddressFormFields(
+            title: '${l10n.associationAdditionalAddress} ${index + 1}',
+            selectedGovernorate: additionalAddresses[index].selectedGovernorate,
+            selectedCity: additionalAddresses[index].selectedCity,
+            selectedTown: additionalAddresses[index].selectedTown,
+            villageController: additionalAddresses[index].villageController,
+            streetController: additionalAddresses[index].streetController,
+            streetNumberController:
+                additionalAddresses[index].streetNumberController,
+            buildingController: additionalAddresses[index].buildingController,
+            labelController: additionalAddresses[index].labelController,
+            typeController: additionalAddresses[index].typeController,
+            enabled: enabled,
+            fieldSpacer: fieldSpacer,
+            onRemove: () => onRemoveAddress(index),
+            onGovernorateChanged: (value) {
+              additionalAddresses[index].selectedGovernorate = value;
+              additionalAddresses[index].selectedCity = null;
+              additionalAddresses[index].selectedTown = null;
+            },
+            onCityChanged: (value) {
+              additionalAddresses[index].selectedCity = value;
+              additionalAddresses[index].selectedTown = null;
+            },
+            onTownChanged: (value) {
+              additionalAddresses[index].selectedTown = value;
+            },
           ),
         ],
         if (enabled) ...[
@@ -1043,9 +1054,298 @@ class _AdditionalAddressesSection extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onAddAddress,
             icon: const Icon(Icons.add_rounded),
-            label: Text(l10n.associationAddAddress),
+            label: Text(
+              hasCurrentAddress
+                  ? l10n.associationAdditionalAddress
+                  : l10n.associationAddCurrentAddress,
+            ),
           ),
         ],
+      ],
+    );
+  }
+}
+
+class _AddressFormFields extends StatefulWidget {
+  const _AddressFormFields({
+    required this.title,
+    required this.selectedGovernorate,
+    required this.selectedCity,
+    required this.selectedTown,
+    required this.villageController,
+    required this.streetController,
+    required this.streetNumberController,
+    required this.buildingController,
+    required this.enabled,
+    required this.fieldSpacer,
+    required this.onGovernorateChanged,
+    required this.onCityChanged,
+    required this.onTownChanged,
+    this.labelController,
+    this.typeController,
+    this.onRemove,
+  });
+
+  final String title;
+  final String? selectedGovernorate;
+  final String? selectedCity;
+  final String? selectedTown;
+  final TextEditingController villageController;
+  final TextEditingController streetController;
+  final TextEditingController streetNumberController;
+  final TextEditingController buildingController;
+  final TextEditingController? labelController;
+  final TextEditingController? typeController;
+  final bool enabled;
+  final Widget Function() fieldSpacer;
+  final ValueChanged<String?> onGovernorateChanged;
+  final ValueChanged<String?> onCityChanged;
+  final ValueChanged<String?> onTownChanged;
+  final VoidCallback? onRemove;
+
+  @override
+  State<_AddressFormFields> createState() => _AddressFormFieldsState();
+}
+
+class _AddressFormFieldsState extends State<_AddressFormFields> {
+  late final AddressInfoCubit _addressInfoCubit;
+  late String? _selectedGovernorate;
+  late String? _selectedCity;
+  late String? _selectedTown;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedGovernorate = widget.selectedGovernorate;
+    _selectedCity = widget.selectedCity;
+    _selectedTown = widget.selectedTown;
+    _addressInfoCubit = AddressInfoCubit()..fetchCapitals();
+  }
+
+  @override
+  void didUpdateWidget(covariant _AddressFormFields oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedGovernorate != widget.selectedGovernorate) {
+      _selectedGovernorate = widget.selectedGovernorate;
+    }
+    if (oldWidget.selectedCity != widget.selectedCity) {
+      _selectedCity = widget.selectedCity;
+    }
+    if (oldWidget.selectedTown != widget.selectedTown) {
+      _selectedTown = widget.selectedTown;
+    }
+  }
+
+  @override
+  void dispose() {
+    _addressInfoCubit.close();
+    super.dispose();
+  }
+
+  void _onGovernorateChanged(String? value) {
+    widget.onGovernorateChanged(value);
+    setState(() {
+      _selectedGovernorate = value;
+      _selectedCity = null;
+      _selectedTown = null;
+    });
+    if (value != null) {
+      _addressInfoCubit.fetchCities(capitalId: value);
+    }
+  }
+
+  void _onCityChanged(String? value) {
+    widget.onCityChanged(value);
+    setState(() {
+      _selectedCity = value;
+      _selectedTown = null;
+    });
+    if (value != null) {
+      _addressInfoCubit.fetchTowns(cityId: value);
+    }
+  }
+
+  void _onTownChanged(String? value) {
+    widget.onTownChanged(value);
+    setState(() {
+      _selectedTown = value;
+    });
+  }
+
+  String? _requiredValue(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppLocalizations.of(context)!.required;
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labelController = widget.labelController;
+    final typeController = widget.typeController;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ),
+            if (widget.enabled && widget.onRemove != null)
+              IconButton(
+                onPressed: widget.onRemove,
+                tooltip: l10n.associationDeleteAddress,
+                icon: const Icon(Icons.delete_outline_rounded),
+              ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        if (labelController != null && typeController != null) ...[
+          AppTextField(
+            controller: labelController,
+            label: l10n.associationAddressLabel,
+            enabled: widget.enabled,
+            validator: _requiredValue,
+          ),
+          widget.fieldSpacer(),
+          AppTextField(
+            controller: typeController,
+            label: l10n.associationAddressType,
+            enabled: widget.enabled,
+          ),
+          widget.fieldSpacer(),
+        ],
+        BlocBuilder<AddressInfoCubit, AddressInfoState>(
+          bloc: _addressInfoCubit,
+          builder: (context, addressState) {
+            final capitalLabels = {
+              for (final capital in addressState.capitals)
+                capital.id: capital.name,
+            };
+            final cityLabels = {
+              for (final city in addressState.cities) city.id: city.name,
+            };
+            final townLabels = {
+              for (final town in addressState.towns) town.id: town.name,
+            };
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AssociationDropdownField(
+                  label: l10n.associationLinkGovernorate,
+                  hintText: addressState.isLoadingCapitals
+                      ? l10n.associationAddressLoadingCapitals
+                      : l10n.associationAddressSelectCapital,
+                  value: _selectedGovernorate,
+                  items: addressState.capitals
+                      .map((capital) => capital.id)
+                      .toList(),
+                  itemLabelBuilder: (id) => capitalLabels[id] ?? id,
+                  enabled:
+                      widget.enabled &&
+                      !addressState.isLoadingCapitals &&
+                      !addressState.capitalsFailed,
+                  trailing: addressState.capitalsFailed
+                      ? _AddressReloadButton(
+                          onPressed: widget.enabled
+                              ? _addressInfoCubit.fetchCapitals
+                              : null,
+                        )
+                      : null,
+                  onChanged: _onGovernorateChanged,
+                  validator: (value) => value == null ? l10n.required : null,
+                ),
+                SizedBox(height: 16.h),
+                AssociationDropdownField(
+                  label: l10n.associationLinkCity,
+                  hintText: addressState.isLoadingCities
+                      ? l10n.associationAddressLoadingCities
+                      : l10n.associationAddressSelectCity,
+                  value: _selectedCity,
+                  items: addressState.cities.map((city) => city.id).toList(),
+                  itemLabelBuilder: (id) => cityLabels[id] ?? id,
+                  enabled:
+                      widget.enabled &&
+                      _selectedGovernorate != null &&
+                      !addressState.isLoadingCities &&
+                      !addressState.citiesFailed,
+                  trailing:
+                      addressState.citiesFailed && _selectedGovernorate != null
+                      ? _AddressReloadButton(
+                          onPressed: widget.enabled
+                              ? () => _addressInfoCubit.fetchCities(
+                                  capitalId: _selectedGovernorate!,
+                                )
+                              : null,
+                        )
+                      : null,
+                  onChanged: _onCityChanged,
+                  validator: (value) => value == null ? l10n.required : null,
+                ),
+                SizedBox(height: 16.h),
+                AssociationDropdownField(
+                  label: l10n.associationLinkTown,
+                  hintText: addressState.isLoadingTowns
+                      ? l10n.associationAddressLoadingTowns
+                      : l10n.associationAddressSelectTown,
+                  value: _selectedTown,
+                  items: addressState.towns.map((town) => town.id).toList(),
+                  itemLabelBuilder: (id) => townLabels[id] ?? id,
+                  enabled:
+                      widget.enabled &&
+                      _selectedCity != null &&
+                      !addressState.isLoadingTowns &&
+                      !addressState.townsFailed,
+                  trailing: addressState.townsFailed && _selectedCity != null
+                      ? _AddressReloadButton(
+                          onPressed: widget.enabled
+                              ? () => _addressInfoCubit.fetchTowns(
+                                  cityId: _selectedCity!,
+                                )
+                              : null,
+                        )
+                      : null,
+                  onChanged: _onTownChanged,
+                  validator: (value) => value == null ? l10n.required : null,
+                ),
+              ],
+            );
+          },
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.villageController,
+          label: l10n.associationLinkVillage,
+          enabled: widget.enabled,
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.streetController,
+          label: l10n.associationLinkStreet,
+          enabled: widget.enabled,
+          validator: _requiredValue,
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.streetNumberController,
+          label: l10n.associationStreetNumber,
+          enabled: widget.enabled,
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.buildingController,
+          label: l10n.associationLinkBuilding,
+          enabled: widget.enabled,
+          validator: _requiredValue,
+        ),
       ],
     );
   }

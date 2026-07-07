@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
+import 'package:kalivra/model/category/category_api_model.dart';
 import 'package:kalivra/model/nav/nav_item_model.dart';
 import 'package:kalivra/view/screens/home/cart_page.dart';
 import 'package:kalivra/view/screens/home/categories_page.dart';
@@ -14,7 +15,9 @@ import 'package:kalivra/view/widgets/custom_app_bar.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key, this.initialCategory});
+
+  final CategoryApiModel? initialCategory;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -26,10 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     List<NavItemModel> navItems = [
-      NavItemModel(icon: Icons.home_rounded, index: 0, title: l10n.navHome),
+      NavItemModel(icon: Icons.home_rounded, index: NavCubit.home, title: l10n.navHome),
       NavItemModel(
         icon: Icons.category_rounded,
-        index: 1,
+        index: NavCubit.categories,
         title: l10n.navCategories,
       ),
       NavItemModel(
@@ -45,7 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
     return PopScopeExitApp(
       child: BlocProvider(
-        create: (_) => NavCubit(),
+        create: (_) => NavCubit(
+          initialIndex: widget.initialCategory == null
+              ? NavCubit.home
+              : NavCubit.categories,
+        ),
         child: BlocBuilder<NavCubit, int>(
           builder: (context, index) {
             return Scaffold(
@@ -54,11 +61,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 onSearchTap: () => context.push(AppRoutes.search),
                 onNotificationsTap: () => context.push(AppRoutes.notifications),
               ),
-              body: IndexedStack(sizing: StackFit.passthrough,clipBehavior: Clip.none,
+              body: IndexedStack(
+                sizing: StackFit.passthrough,
+                clipBehavior: Clip.none,
                 index: index,
                 children: [
                   const HomePage(),
-                  const CategoriesPage(),
+                  CategoriesPage(initialCategory: widget.initialCategory),
                   const CartPage(),
                   const ProfilePage(),
                 ],

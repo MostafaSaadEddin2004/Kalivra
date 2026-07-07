@@ -5,28 +5,28 @@ import 'package:meta/meta.dart';
 part 'current_category_state.dart';
 
 class CurrentCategoryCubit extends Cubit<CurrentCategoryState> {
-  CurrentCategoryCubit()
-      : super(CurrentCategoryFetched(
+  CurrentCategoryCubit({int? initialCategoryId})
+    : super(
+        CurrentCategoryFetched(
           currentIndex: 0,
-          categoryId: -1,
-          isAll: true,
-        ));
+          categoryId: initialCategoryId ?? -1,
+          isAll: initialCategoryId == null,
+        ),
+      );
 
   void selectAll() {
-    emit(CurrentCategoryFetched(
-      currentIndex: 0,
-      categoryId: -1,
-      isAll: true,
-    ));
+    emit(CurrentCategoryFetched(currentIndex: 0, categoryId: -1, isAll: true));
     CategoriesCubit.currentSelectedCategory = -1;
   }
 
   void changeCurrentCategory(int index, int categoryId) {
-    emit(CurrentCategoryFetched(
-      currentIndex: index,
-      categoryId: categoryId,
-      isAll: false,
-    ));
+    emit(
+      CurrentCategoryFetched(
+        currentIndex: index,
+        categoryId: categoryId,
+        isAll: false,
+      ),
+    );
     CategoriesCubit.currentSelectedCategory = categoryId;
   }
 }

@@ -27,8 +27,9 @@ class PopScopeExitApp extends StatelessWidget {
               },
             ),
           );
+        } else {
+          context.pop();
         }
-        context.pop();
       },
       child: child,
     );

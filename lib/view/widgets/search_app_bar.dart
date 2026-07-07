@@ -8,11 +8,13 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.hintText,
     this.onChanged,
+    this.onSubmitted,
     this.controller,
   });
 
   final String? hintText;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final TextEditingController? controller;
 
   @override
@@ -28,10 +30,14 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
         cursorColor: AppColors.burgundy,
         controller: controller,
         onChanged: onChanged,
+        onSubmitted: onSubmitted,
+        textInputAction: TextInputAction.search,
         style: TextStyle(color: AppColors.burgundy, fontSize: 16.sp),
         decoration: InputDecoration(
           hintText: hintText ?? AppLocalizations.of(context)!.searchHint,
-          hintStyle: textTheme.displaySmall?.copyWith(color: AppColors.burgundy),
+          hintStyle: textTheme.displaySmall?.copyWith(
+            color: AppColors.burgundy,
+          ),
           prefixIcon: Icon(
             Icons.search_rounded,
             color: AppColors.burgundy,

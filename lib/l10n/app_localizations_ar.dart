@@ -336,6 +336,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get product => 'منتج';
 
   @override
+  String get searchResultProduct => 'منتج';
+
+  @override
+  String get searchResultBrand => 'علامة تجارية';
+
+  @override
+  String get searchResultCategory => 'تصنيف';
+
+  @override
+  String get searchNoResults => 'لا توجد نتائج.';
+
+  @override
   String get noProductsInCategory => 'لا توجد منتجات في هذا التصنيف';
 
   @override
@@ -1197,6 +1209,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get associationAddAddress => 'إضافة عنوان';
+
+  @override
+  String get associationAddCurrentAddress => 'إضافة العنوان الحالي';
+
+  @override
+  String get associationStreetNumber => 'رقم الشارع';
+
+  @override
+  String get associationAddressLabel => 'تسمية العنوان';
+
+  @override
+  String get associationAddressType => 'نوع العنوان';
 
   @override
   String get associationAddressRequired => 'أضف عنواناً';

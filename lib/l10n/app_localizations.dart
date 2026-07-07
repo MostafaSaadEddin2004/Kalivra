@@ -716,6 +716,30 @@ abstract class AppLocalizations {
   /// **'Product'**
   String get product;
 
+  /// No description provided for @searchResultProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get searchResultProduct;
+
+  /// No description provided for @searchResultBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get searchResultBrand;
+
+  /// No description provided for @searchResultCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get searchResultCategory;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found.'**
+  String get searchNoResults;
+
   /// No description provided for @noProductsInCategory.
   ///
   /// In en, this message translates to:
@@ -2389,6 +2413,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add address'**
   String get associationAddAddress;
+
+  /// No description provided for @associationAddCurrentAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add current address'**
+  String get associationAddCurrentAddress;
+
+  /// No description provided for @associationStreetNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Street number'**
+  String get associationStreetNumber;
+
+  /// No description provided for @associationAddressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address label'**
+  String get associationAddressLabel;
+
+  /// No description provided for @associationAddressType.
+  ///
+  /// In en, this message translates to:
+  /// **'Address type'**
+  String get associationAddressType;
 
   /// No description provided for @associationAddressRequired.
   ///

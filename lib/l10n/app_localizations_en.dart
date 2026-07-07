@@ -338,6 +338,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get product => 'Product';
 
   @override
+  String get searchResultProduct => 'Product';
+
+  @override
+  String get searchResultBrand => 'Brand';
+
+  @override
+  String get searchResultCategory => 'Category';
+
+  @override
+  String get searchNoResults => 'No results found.';
+
+  @override
   String get noProductsInCategory => 'No products in this category';
 
   @override
@@ -1204,6 +1216,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get associationAddAddress => 'Add address';
+
+  @override
+  String get associationAddCurrentAddress => 'Add current address';
+
+  @override
+  String get associationStreetNumber => 'Street number';
+
+  @override
+  String get associationAddressLabel => 'Address label';
+
+  @override
+  String get associationAddressType => 'Address type';
 
   @override
   String get associationAddressRequired => 'Add address';

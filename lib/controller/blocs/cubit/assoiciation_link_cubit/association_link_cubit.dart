@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
+import 'package:kalivra/model/association/association_request_address.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
 import 'package:kalivra/model/services/api/association_api_service.dart';
@@ -51,13 +52,9 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     required String fatherName,
     required String motherName,
     required String nationalId,
-    String? permanentCapitalId,
-    String? permanentCityId,
-    String? permanentTownId,
-    String? permanentVillage,
-    required String officialStreet,
-    required String officialBuilding,
-    required List<String> additionalAddresses,
+    required AssociationRequestAddress permanentAddress,
+    required AssociationRequestAddress currentAddress,
+    required List<AssociationRequestAddress> additionalAddresses,
     String? claimedMembershipNumber,
     String? claimedPriorityNumber,
     String? claimedBuildingNumber,
@@ -74,12 +71,8 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
         fatherName: fatherName,
         motherName: motherName,
         nationalId: nationalId,
-        permanentCapitalId: permanentCapitalId,
-        permanentCityId: permanentCityId,
-        permanentTownId: permanentTownId,
-        permanentVillage: permanentVillage ?? '',
-        officialStreet: officialStreet,
-        officialBuilding: officialBuilding,
+        permanentAddress: permanentAddress,
+        currentAddress: currentAddress,
         additionalAddresses: additionalAddresses,
         claimedMembershipNumber: claimedMembershipNumber,
         claimedPriorityNumber: claimedPriorityNumber,

@@ -13,29 +13,43 @@ import 'package:kalivra/view/widgets/category/category_button.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CategoriesPage extends StatelessWidget {
-  const CategoriesPage({super.key});
+  const CategoriesPage({super.key, this.initialCategory});
+
+  final CategoryApiModel? initialCategory;
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<CurrentCategoryCubit>(
-          create: (_) => CurrentCategoryCubit(),
+          create: (_) =>
+              CurrentCategoryCubit(initialCategoryId: initialCategory?.id),
         ),
         BlocProvider<CategoriesCubit>(
           create: (_) => CategoriesCubit()..loadCategories(),
         ),
         BlocProvider<ProductsCubit>(
-          create: (_) => ProductsCubit()..loadProducts(),
+          create: (_) {
+            final cubit = ProductsCubit();
+            final categoryId = initialCategory?.id;
+            if (categoryId == null) {
+              cubit.loadProducts();
+            } else {
+              cubit.loadProductByCategoryId(categoryId);
+            }
+            return cubit;
+          },
         ),
       ],
-      child: const _CategoriesPageBody(),
+      child: _CategoriesPageBody(initialCategory: initialCategory),
     );
   }
 }
 
 class _CategoriesPageBody extends StatelessWidget {
-  const _CategoriesPageBody();
+  const _CategoriesPageBody({this.initialCategory});
+
+  final CategoryApiModel? initialCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +85,14 @@ class _CategoriesPageBody extends StatelessWidget {
                       name: l10n.allCategories,
                     );
 
+                    final loadedCategories = state.categories.where(
+                      (category) => category.id != initialCategory?.id,
+                    );
+
                     final categories = <CategoryApiModel>[
                       allCategory,
-                      ...state.categories,
+                      ?initialCategory,
+                      ...loadedCategories,
                     ];
 
                     return SizedBox(
@@ -84,15 +103,27 @@ class _CategoriesPageBody extends StatelessWidget {
                         itemCount: categories.length,
                         separatorBuilder: (_, _) => SizedBox(width: 10.w),
                         itemBuilder: (context, index) {
-                          return BlocBuilder<CurrentCategoryCubit,
-                              CurrentCategoryState>(
+                          return BlocBuilder<
+                            CurrentCategoryCubit,
+                            CurrentCategoryState
+                          >(
                             builder: (context, currentCategoryState) {
                               int currentIndex = 0;
 
                               if (currentCategoryState
                                   is CurrentCategoryFetched) {
-                                currentIndex =
-                                    currentCategoryState.currentIndex;
+                                currentIndex = currentCategoryState.isAll
+                                    ? 0
+                                    : categories.indexWhere(
+                                        (category) =>
+                                            category.id ==
+                                            currentCategoryState.categoryId,
+                                      );
+
+                                if (currentIndex < 0) {
+                                  currentIndex =
+                                      currentCategoryState.currentIndex;
+                                }
                               }
 
                               return CategoryButton(
@@ -183,10 +214,7 @@ class _CategoriesPageBody extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 8.w),
-                      Text(
-                        l10n.product,
-                        style: textTheme.titleMedium,
-                      ),
+                      Text(l10n.product, style: textTheme.titleMedium),
                     ],
                   );
                 },
@@ -233,22 +261,15 @@ class _CategoriesPageBody extends StatelessWidget {
                         crossAxisSpacing: 12.w,
                         childAspectRatio: 0.72,
                       ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          return ProductCard(
-                            product: state.products[index],
-                          );
-                        },
-                        childCount: state.products.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return ProductCard(product: state.products[index]);
+                      }, childCount: state.products.length),
                     ),
                   );
 
                 case ProductsFailed():
                   return SliverToBoxAdapter(
-                    child: Center(
-                      child: Text(state.message),
-                    ),
+                    child: Center(child: Text(state.message)),
                   );
 
                 default:
@@ -261,35 +282,29 @@ class _CategoriesPageBody extends StatelessWidget {
                         crossAxisSpacing: 12.w,
                         childAspectRatio: 0.72,
                       ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          return Skeletonizer(
-                            child: ProductCard(
-                              product: ProductModel(
-                                id: 0,
-                                sku: '',
-                                name: '',
-                                urlKey: '',
-                                images: const [],
-                                isNew: true,
-                                prices: ProductPrices(
-                                  regular: PriceDetail(price: ''),
-                                ),
-                                isFeatured: true,
-                                onSale: true,
-                                isSaleable: true,
-                                isWishlist: true,
-                                ratings: ProductRatings(
-                                  average: '',
-                                  total: 0,
-                                ),
-                                reviews: ProductReviews(total: 0),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        return Skeletonizer(
+                          child: ProductCard(
+                            product: ProductModel(
+                              id: 0,
+                              sku: '',
+                              name: '',
+                              urlKey: '',
+                              images: const [],
+                              isNew: true,
+                              prices: ProductPrices(
+                                regular: PriceDetail(price: ''),
                               ),
+                              isFeatured: true,
+                              onSale: true,
+                              isSaleable: true,
+                              isWishlist: true,
+                              ratings: ProductRatings(average: '', total: 0),
+                              reviews: ProductReviews(total: 0),
                             ),
-                          );
-                        },
-                        childCount: 4,
-                      ),
+                          ),
+                        );
+                      }, childCount: 4),
                     ),
                   );
               }
