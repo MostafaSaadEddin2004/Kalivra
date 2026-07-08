@@ -5,10 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/notifications/app_notification.dart';
 import 'package:kalivra/view/widgets/cards/notification_card.dart';
+import 'package:kalivra/view/widgets/login_required_placeholder.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -27,10 +28,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: ScreenAppBar(
+        title: AppLocalizations.of(context)!.navNotifications,
+      ),
       body: BlocBuilder<NotificationsCubit, NotificationsState>(
         builder: (context, state) {
           if (state.loginRequired) {
-            return _LoginRequiredPlaceholder(
+            return LoginRequiredPlaceholder(
+              icon: Icons.notifications_off_outlined,
+              title: AppLocalizations.of(
+                context,
+              )!.loginRequiredForNotifications,
+              description: AppLocalizations.of(
+                context,
+              )!.notificationsLoginPrompt,
               onLoginTap: () => context.push(AppRoutes.login),
             );
           }
@@ -135,63 +146,6 @@ class _EmptyNotificationsPlaceholder extends StatelessWidget {
               AppLocalizations.of(context)!.navNotifications,
               style: theme.textTheme.titleMedium,
               textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LoginRequiredPlaceholder extends StatelessWidget {
-  const _LoginRequiredPlaceholder({required this.onLoginTap});
-
-  final VoidCallback onLoginTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.notifications_off_outlined,
-              size: 64.r,
-              color: isDark
-                  ? AppColors.taupe
-                  : AppColors.burgundy.withValues(alpha: 0.6),
-            ),
-            SizedBox(height: 20.h),
-            Text(
-              AppLocalizations.of(context)!.loginRequiredForNotifications,
-              style: theme.textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 12.h),
-            Text(
-              AppLocalizations.of(context)!.loginPromptNotifications,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: isDark
-                    ? AppColors.taupe
-                    : AppColors.burgundy.withValues(alpha: 0.8),
-              ),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 24.h),
-            FilledButton(
-              onPressed: onLoginTap,
-              style: FilledButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 14.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-              ),
-              child: Text(AppLocalizations.of(context)!.signIn),
             ),
           ],
         ),

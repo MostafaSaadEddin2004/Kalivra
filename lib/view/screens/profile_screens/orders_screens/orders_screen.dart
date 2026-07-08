@@ -7,6 +7,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
+import 'package:kalivra/view/widgets/login_required_placeholder.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -32,9 +33,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return Scaffold(
       appBar: ScreenAppBar(title: AppLocalizations.of(context)!.myOrders),
       body: BlocBuilder<OrdersCubit, OrdersState>(
-        bloc: OrdersCubit()..loadOrders(),
         builder: (context, state) {
           switch (state) {
+            case OrdersLoginRequired():
+              return LoginRequiredPlaceholder(
+                icon: Icons.receipt_long_outlined,
+                title: AppLocalizations.of(context)!.loginRequiredForOrders,
+                description: AppLocalizations.of(context)!.ordersLoginPrompt,
+                onLoginTap: () => context.push(AppRoutes.login),
+              );
             case OrdersLoaded():
               final orders = state.orders;
               if (orders.isEmpty) {

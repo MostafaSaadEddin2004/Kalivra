@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,6 +10,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
+import 'package:kalivra/view/widgets/cards/text_slider.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationMemberProfileScreen extends StatefulWidget {
@@ -237,6 +240,8 @@ class _AssociationMemberProfileScreenState
               padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
               children: [
                 _ProfileHeaderCard(profile: profile, isDark: isDark),
+                SizedBox(height: 16.h),
+                const _AssociationNewsFeedSlider(),
                 SizedBox(height: 16.h),
                 _ProgressCard(
                   title: l10n.associationMemberMembershipStatus,
@@ -554,6 +559,186 @@ class _AssociationMemberProfileScreenState
     if (normalized.contains('doc')) return Icons.description_outlined;
     return Icons.insert_drive_file_outlined;
   }
+}
+
+class _AssociationNewsFeedSlider extends StatefulWidget {
+  const _AssociationNewsFeedSlider();
+
+  @override
+  State<_AssociationNewsFeedSlider> createState() =>
+      _AssociationNewsFeedSliderState();
+}
+
+class _AssociationNewsFeedSliderState
+    extends State<_AssociationNewsFeedSlider> {
+  late final PageController _pageController;
+  Timer? _timer;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      final items = _newsItems(context);
+      if (!mounted || !_pageController.hasClients || items.length < 2) return;
+      final nextIndex = (_currentIndex + 1) % items.length;
+      _pageController.animateToPage(
+        nextIndex,
+        duration: const Duration(milliseconds: 420),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = theme.brightness == Brightness.dark;
+    final items = _newsItems(context);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16.r),
+      child: Container(
+        height: 82.h,
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+        decoration: BoxDecoration(
+          color: isDark
+              ? AppColors.black.withValues(alpha: 0.52)
+              : AppColors.goldLight.withValues(alpha: 0.22),
+          border: Border.all(
+            color: isDark
+                ? AppColors.goldLight.withValues(alpha: 0.22)
+                : AppColors.goldDark.withValues(alpha: 0.24),
+          ),
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42.r,
+              height: 42.r,
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.goldLight.withValues(alpha: 0.16)
+                    : AppColors.burgundy.withValues(alpha: 0.08),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.newspaper_rounded,
+                color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                size: 22.r,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.associationNewsFeedTitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  SizedBox(
+                    height: 30.h,
+                    child: PageView.builder(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: items.length,
+                      onPageChanged: (index) =>
+                          setState(() => _currentIndex = index),
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return Row(
+                          children: [
+                            if (item.isImportant) ...[
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 8.w,
+                                  vertical: 4.h,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.burgundy.withValues(
+                                    alpha: isDark ? 0.28 : 0.1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  l10n.associationNewsFeedImportant,
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: isDark
+                                        ? AppColors.goldLight
+                                        : AppColors.burgundy,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                            ],
+                            Expanded(
+                              child: TextSlider(
+                                key: ValueKey(item.text),
+                                text: item.text,
+                                height: 30.h,
+                                sliderSpeed: 28,
+                                textStyle: theme.textTheme.titleSmall?.copyWith(
+                                  color: isDark
+                                      ? AppColors.offWhite
+                                      : AppColors.black,
+                                  fontWeight: item.isImportant
+                                      ? FontWeight.w800
+                                      : FontWeight.w600,
+                                  height: 1.25,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<_AssociationNewsItem> _newsItems(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      _AssociationNewsItem(
+        text: l10n.associationNewsFeedSample1,
+        isImportant: true,
+      ),
+      _AssociationNewsItem(text: l10n.associationNewsFeedSample2),
+      _AssociationNewsItem(text: l10n.associationNewsFeedSample3),
+    ];
+  }
+}
+
+class _AssociationNewsItem {
+  const _AssociationNewsItem({required this.text, this.isImportant = false});
+
+  final String text;
+  final bool isImportant;
 }
 
 extension _AssociationMemberProfileModelView on AssociationMemberProfileModel {

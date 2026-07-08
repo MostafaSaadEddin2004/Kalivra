@@ -28,4 +28,14 @@ class AppInfoServices {
     final res = await _client.get('contact');
     return ContactApiModel.fromJson((res.data['data']));
   }
+
+  Future<void> postAppRating({
+    required int rating,
+    required String comment,
+  }) async {
+    await _client.post(
+      'customer/app-rating',
+      data: {'rating': rating, 'comment': comment},
+    );
+  }
 }

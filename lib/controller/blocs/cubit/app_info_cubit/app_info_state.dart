@@ -29,6 +29,16 @@ final class AppTermsConditionsFetched extends AppInfoState {
   AppTermsConditionsFetched({required this.termaConditionsData});
 }
 
+final class AppRatingAuthChecking extends AppInfoState {}
+
+final class AppRatingReady extends AppInfoState {}
+
+final class AppRatingLoginRequired extends AppInfoState {}
+
+final class AppRatingSubmitting extends AppInfoState {}
+
+final class AppRatingSubmitted extends AppInfoState {}
+
 final class AppInfoFailure extends AppInfoState {
   final String errorMessage;
 

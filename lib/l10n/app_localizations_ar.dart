@@ -318,6 +318,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'سجّل الدخول أو أنشئ حساباً لاستلام إشعارات الطلبات والعروض.';
 
   @override
+  String get loginRequiredForOrders => 'يجب تسجيل الدخول لعرض طلباتك';
+
+  @override
+  String get ordersLoginPrompt => 'سجّل الدخول أو أنشئ حساباً لمتابعة طلباتك.';
+
+  @override
+  String get loginRequiredForFavorites => 'يجب تسجيل الدخول لعرض المفضلة';
+
+  @override
+  String get favoritesLoginPrompt =>
+      'سجّل الدخول أو أنشئ حساباً لحفظ المنتجات المفضلة وعرضها.';
+
+  @override
   String get signIn => 'تسجيل الدخول';
 
   @override
@@ -924,6 +937,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get thanksForRating => 'شكراً لتقييمك';
 
   @override
+  String get ratingComment => 'التعليق';
+
+  @override
+  String get ratingCommentHint => 'أخبرنا المزيد عن تجربتك';
+
+  @override
+  String get selectRating => 'يرجى اختيار تقييم';
+
+  @override
+  String get loginRequiredForRating => 'يجب تسجيل الدخول لتقييم التطبيق';
+
+  @override
+  String get ratingLoginPrompt =>
+      'سجّل الدخول أو أنشئ حساباً لمشاركة تجربتك مع التطبيق.';
+
+  @override
   String get size => 'الحجم';
 
   @override
@@ -1507,6 +1536,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get associationRequestsAndServices => 'طلبات وخدمات';
+
+  @override
+  String get associationNewsFeedTitle => 'شريط الأخبار';
+
+  @override
+  String get associationNewsFeedImportant => 'هام';
+
+  @override
+  String get associationNewsFeedSample1 =>
+      'تحديث جدول الدفعات: يرجى مراجعة أحدث مواعيد الاستحقاق الخاصة بالمشروع السكني.';
+
+  @override
+  String get associationNewsFeedSample2 =>
+      'يستقبل مكتب الجمعية استفسارات الأعضاء من الأحد إلى الخميس، من الساعة 9 صباحاً حتى 2 ظهراً.';
+
+  @override
+  String get associationNewsFeedSample3 =>
+      'تم توفير ملخص جديد عن تقدم أعمال المرحلة الثانية من المشروع للاطلاع من قبل الأعضاء.';
 
   @override
   String get associationAnnouncementsTitle => 'البلاغات الرسمية';

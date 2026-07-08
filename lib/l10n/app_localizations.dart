@@ -680,6 +680,30 @@ abstract class AppLocalizations {
   /// **'Sign in or create an account to receive order and offer notifications.'**
   String get notificationsLoginPrompt;
 
+  /// No description provided for @loginRequiredForOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view your orders'**
+  String get loginRequiredForOrders;
+
+  /// No description provided for @ordersLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to track your orders.'**
+  String get ordersLoginPrompt;
+
+  /// No description provided for @loginRequiredForFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view your favorites'**
+  String get loginRequiredForFavorites;
+
+  /// No description provided for @favoritesLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to save and view favorite products.'**
+  String get favoritesLoginPrompt;
+
   /// No description provided for @signIn.
   ///
   /// In en, this message translates to:
@@ -1856,6 +1880,36 @@ abstract class AppLocalizations {
   /// **'Thanks for your rating'**
   String get thanksForRating;
 
+  /// No description provided for @ratingComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment'**
+  String get ratingComment;
+
+  /// No description provided for @ratingCommentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us more about your experience'**
+  String get ratingCommentHint;
+
+  /// No description provided for @selectRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a rating'**
+  String get selectRating;
+
+  /// No description provided for @loginRequiredForRating.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to rate the app'**
+  String get loginRequiredForRating;
+
+  /// No description provided for @ratingLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to share your app experience.'**
+  String get ratingLoginPrompt;
+
   /// No description provided for @size.
   ///
   /// In en, this message translates to:
@@ -2983,6 +3037,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Requests and services'**
   String get associationRequestsAndServices;
+
+  /// No description provided for @associationNewsFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'News feed'**
+  String get associationNewsFeedTitle;
+
+  /// No description provided for @associationNewsFeedImportant.
+  ///
+  /// In en, this message translates to:
+  /// **'Important'**
+  String get associationNewsFeedImportant;
+
+  /// No description provided for @associationNewsFeedSample1.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment schedule update: please review the latest due dates for the residential project.'**
+  String get associationNewsFeedSample1;
+
+  /// No description provided for @associationNewsFeedSample2.
+  ///
+  /// In en, this message translates to:
+  /// **'The association office will receive member inquiries from Sunday to Thursday, 9 AM to 2 PM.'**
+  String get associationNewsFeedSample2;
+
+  /// No description provided for @associationNewsFeedSample3.
+  ///
+  /// In en, this message translates to:
+  /// **'A new progress summary for the second project phase is available for members to review.'**
+  String get associationNewsFeedSample3;
 
   /// No description provided for @associationAnnouncementsTitle.
   ///

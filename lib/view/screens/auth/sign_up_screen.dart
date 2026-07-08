@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,6 +29,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _referralCodeController = TextEditingController();
+  late final TapGestureRecognizer _privacyPolicyRecognizer;
+  late final TapGestureRecognizer _termsConditionsRecognizer;
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool isLoading = false;
@@ -35,6 +38,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   void initState() {
     super.initState();
     _countryCodeController.text = '+963';
+    _privacyPolicyRecognizer = TapGestureRecognizer()
+      ..onTap = () =>
+          AppRouter.openScreenWithPop(context, AppRoutes.privacyPolicy);
+    _termsConditionsRecognizer = TapGestureRecognizer()
+      ..onTap = () =>
+          AppRouter.openScreenWithPop(context, AppRoutes.termsConditions);
   }
 
   @override
@@ -47,6 +56,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _referralCodeController.dispose();
+    _privacyPolicyRecognizer.dispose();
+    _termsConditionsRecognizer.dispose();
     super.dispose();
   }
 
@@ -215,6 +226,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ReferralCodeField(
                   controller: _referralCodeController,
                   bottomSpacing: 20,
+                ),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: isDark ? AppColors.taupe : AppColors.burgundy,
+                    ),
+                    children: [
+                      const TextSpan(text: 'Read our '),
+                      TextSpan(
+                        text: 'privacy policy',
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: _privacyPolicyRecognizer,
+                      ),
+                      const TextSpan(text: ' and the '),
+                      TextSpan(
+                        text: 'terms and conditions',
+                        style: const TextStyle(
+                          decoration: TextDecoration.underline,
+                        ),
+                        recognizer: _termsConditionsRecognizer,
+                      ),
+                      const TextSpan(text: '.'),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 32.h),
                 BlocConsumer<AuthCubit, AuthState>(

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
+import 'package:kalivra/view/widgets/login_required_placeholder.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -36,9 +39,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.favorites),
       body: BlocBuilder<WishlistCubit, WishlistState>(
-        bloc: WishlistCubit()..loadWishlist(),
         builder: (context, state) {
           switch (state) {
+            case WishlistLoginRequired():
+              return LoginRequiredPlaceholder(
+                icon: Icons.favorite_border_rounded,
+                title: l10n.loginRequiredForFavorites,
+                description: l10n.favoritesLoginPrompt,
+                onLoginTap: () => context.push(AppRoutes.login),
+              );
             case WishlistLoaded():
               final products = state.wishlist;
               if (products.isEmpty) {
@@ -102,9 +111,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 },
               );
             case WishlistFailed():
-              return Center(
-                child: Text(state.message),
-              );
+              return Center(child: Text(state.message));
             default:
               return ListView.builder(
                 padding: EdgeInsets.all(16.w),
@@ -115,20 +122,22 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     child: Skeletonizer(
                       child: ProductCard(
                         product: ProductModel(
-                                id: 0,
-                                sku: '',
-                                name: '',
-                                urlKey: '',
-                                images: [],
-                                isNew: true,
-                                prices: ProductPrices(regular: PriceDetail(price: '')),
-                                isFeatured: true,
-                                onSale: true,
-                                isSaleable: true,
-                                isWishlist: true,
-                                ratings: ProductRatings(average: '', total: 0),
-                                reviews: ProductReviews(total: 0),
-                              ),
+                          id: 0,
+                          sku: '',
+                          name: '',
+                          urlKey: '',
+                          images: [],
+                          isNew: true,
+                          prices: ProductPrices(
+                            regular: PriceDetail(price: ''),
+                          ),
+                          isFeatured: true,
+                          onSale: true,
+                          isSaleable: true,
+                          isWishlist: true,
+                          ratings: ProductRatings(average: '', total: 0),
+                          reviews: ProductReviews(total: 0),
+                        ),
                       ),
                     ),
                   );

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_state.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/model/services/api/wishlist_api_service.dart';
 
@@ -8,10 +9,16 @@ export 'wishlist_state.dart';
 class WishlistCubit extends Cubit<WishlistState> {
   WishlistCubit() : super(WishlistLoading());
 
-  final WishlistApiService _wishlistService =WishlistApiService();
+  final WishlistApiService _wishlistService = WishlistApiService();
 
   Future<void> loadWishlist() async {
     emit(WishlistLoading());
+    final token = await LocalStore.getToken();
+    if (token == null || token.isEmpty) {
+      emit(WishlistLoginRequired());
+      return;
+    }
+
     try {
       final list = await _wishlistService.getWishlist();
       final products = <ProductModel>[];

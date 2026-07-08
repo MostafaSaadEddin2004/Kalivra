@@ -4,11 +4,14 @@ abstract class OrdersState {}
 
 final class OrdersLoading extends OrdersState {}
 
+final class OrdersLoginRequired extends OrdersState {}
+
 final class OrdersLoaded extends OrdersState {
   final List<OrderModel> orders;
 
   OrdersLoaded({required this.orders});
 }
+
 final class OneOrderLoaded extends OrdersState {
   final OrderModel order;
 

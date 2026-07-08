@@ -8,17 +8,19 @@ class TextSlider extends StatelessWidget {
     required this.text,
     this.textStyle,
     this.sliderSpeed,
+    this.height,
   });
 
   final String text;
   final TextStyle? textStyle;
   final double? sliderSpeed;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return SizedBox(
-      height: 20.h,
+      height: height ?? 20.h,
       child: text.trim().isEmpty
           ? const SizedBox.shrink()
           : Marquee(
@@ -34,7 +36,7 @@ class TextSlider extends StatelessWidget {
               blankSpace: 40.w,
               velocity: sliderSpeed ?? 40,
               startAfter: const Duration(seconds: 2),
-              numberOfRounds: 3, 
+              numberOfRounds: 3,
             ),
     );
   }

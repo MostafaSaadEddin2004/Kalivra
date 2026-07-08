@@ -320,6 +320,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Sign in or create an account to receive order and offer notifications.';
 
   @override
+  String get loginRequiredForOrders => 'Sign in to view your orders';
+
+  @override
+  String get ordersLoginPrompt =>
+      'Sign in or create an account to track your orders.';
+
+  @override
+  String get loginRequiredForFavorites => 'Sign in to view your favorites';
+
+  @override
+  String get favoritesLoginPrompt =>
+      'Sign in or create an account to save and view favorite products.';
+
+  @override
   String get signIn => 'Sign In';
 
   @override
@@ -928,6 +942,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thanksForRating => 'Thanks for your rating';
 
   @override
+  String get ratingComment => 'Comment';
+
+  @override
+  String get ratingCommentHint => 'Tell us more about your experience';
+
+  @override
+  String get selectRating => 'Please select a rating';
+
+  @override
+  String get loginRequiredForRating => 'Sign in to rate the app';
+
+  @override
+  String get ratingLoginPrompt =>
+      'Sign in or create an account to share your app experience.';
+
+  @override
   String get size => 'Size';
 
   @override
@@ -1516,6 +1546,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get associationRequestsAndServices => 'Requests and services';
+
+  @override
+  String get associationNewsFeedTitle => 'News feed';
+
+  @override
+  String get associationNewsFeedImportant => 'Important';
+
+  @override
+  String get associationNewsFeedSample1 =>
+      'Payment schedule update: please review the latest due dates for the residential project.';
+
+  @override
+  String get associationNewsFeedSample2 =>
+      'The association office will receive member inquiries from Sunday to Thursday, 9 AM to 2 PM.';
+
+  @override
+  String get associationNewsFeedSample3 =>
+      'A new progress summary for the second project phase is available for members to review.';
 
   @override
   String get associationAnnouncementsTitle => 'Official announcements';
