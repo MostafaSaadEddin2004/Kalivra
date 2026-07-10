@@ -63,7 +63,7 @@ class CartCubit extends Cubit<CartState> {
       final token = await LocalStore.getToken();
       if (token == null || token.isEmpty) {
         _cart = null;
-        emit(CartInitial());
+        emit(CartLoginRequired());
         return;
       }
       final cart = await _cartService.getCart();
@@ -90,12 +90,7 @@ class CartCubit extends Cubit<CartState> {
       );
       await _emitLoaded(cart);
       if (cart != null) {
-        emit(
-          AddToCartSuccessed(
-            message: 'added',
-            cart: cart,
-          ),
-        );
+        emit(AddToCartSuccessed(message: 'added', cart: cart));
       }
     } catch (e) {
       emit(CartFailure(message: e.toString()));
@@ -109,12 +104,7 @@ class CartCubit extends Cubit<CartState> {
       final cart = await _cartService.getCart();
       await _emitLoaded(cart);
       if (cart != null) {
-        emit(
-          RemoveFromCartSuccessed(
-            message: 'removed',
-            cart: cart,
-          ),
-        );
+        emit(RemoveFromCartSuccessed(message: 'removed', cart: cart));
       }
     } catch (e) {
       emit(CartFailure(message: e.toString()));
@@ -158,10 +148,7 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> clear() async {
-    final ids = items
-        .map((e) => e.cartItemId)
-        .whereType<int>()
-        .toList();
+    final ids = items.map((e) => e.cartItemId).whereType<int>().toList();
     await removeSelectedItems(ids);
   }
 

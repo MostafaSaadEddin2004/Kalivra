@@ -8,6 +8,7 @@ import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_c
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_request_address.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
@@ -64,10 +65,10 @@ class _AssociationRequestsAndServicesScreenState
 
   final List<AssociationLinkAttachment> _attachments = [];
 
-  final Map<String, TextEditingController> _attachmentDescriptionControllers =
-      {};
+  final Map<String, String?> _attachmentTypeIds = {};
 
   final List<dynamic> _requestTypes = [];
+  final List<AssociationAttachmentType> _attachmentTypes = [];
 
   String? _requestType;
   String? _requestedMembershipType;
@@ -117,10 +118,6 @@ class _AssociationRequestsAndServicesScreenState
     _projectNameController.dispose();
     _housingUnitController.dispose();
     _villageController.dispose();
-
-    for (final controller in _attachmentDescriptionControllers.values) {
-      controller.dispose();
-    }
 
     super.dispose();
   }
@@ -199,11 +196,7 @@ class _AssociationRequestsAndServicesScreenState
 
       _attachments.clear();
 
-      for (final controller in _attachmentDescriptionControllers.values) {
-        controller.dispose();
-      }
-
-      _attachmentDescriptionControllers.clear();
+      _attachmentTypeIds.clear();
     });
   }
 
@@ -274,7 +267,7 @@ class _AssociationRequestsAndServicesScreenState
 
         _attachments.add(AssociationLinkAttachment(id: id, file: file));
 
-        _attachmentDescriptionControllers[id] = TextEditingController();
+        _attachmentTypeIds[id] = null;
       });
     }
   }
@@ -284,7 +277,13 @@ class _AssociationRequestsAndServicesScreenState
 
     setState(() {
       _attachments.removeWhere((attachment) => attachment.id == id);
-      _attachmentDescriptionControllers.remove(id)?.dispose();
+      _attachmentTypeIds.remove(id);
+    });
+  }
+
+  void _onAttachmentTypeChanged(String id, String? value) {
+    setState(() {
+      _attachmentTypeIds[id] = value;
     });
   }
 
@@ -317,11 +316,10 @@ class _AssociationRequestsAndServicesScreenState
     });
   }
 
-  List<AssociationLinkAttachment> _attachmentsWithDescriptions() {
+  List<AssociationLinkAttachment> _attachmentsWithTypes() {
     return _attachments.map((attachment) {
       return attachment.copyWith(
-        description:
-            _attachmentDescriptionControllers[attachment.id]?.text.trim() ?? '',
+        attachmentTypeId: _attachmentTypeIds[attachment.id],
       );
     }).toList();
   }
@@ -387,14 +385,14 @@ class _AssociationRequestsAndServicesScreenState
           claimedPriorityNumber: _priorityNumberController.text.trim(),
           claimedBuildingNumber: _buildingController.text.trim(),
           claimedUnitNumber: _housingUnitController.text.trim(),
-          attachments: _attachmentsWithDescriptions(),
+          attachments: _attachmentsWithTypes(),
         );
       } else {
         await _associationLinkCubit.submitNormalRequest(
           context: context,
           type: _requestType!,
           customerNote: _messageController.text.trim(),
-          attachments: _attachmentsWithDescriptions(),
+          attachments: _attachmentsWithTypes(),
         );
       }
 
@@ -506,10 +504,12 @@ class _AssociationRequestsAndServicesScreenState
         SizedBox(height: 16.h),
         _RequestAttachmentsSection(
           attachments: _attachments,
-          attachmentDescriptionControllers: _attachmentDescriptionControllers,
+          attachmentTypes: _attachmentTypes,
+          attachmentTypeIds: _attachmentTypeIds,
           enabled: !_isLocked,
           onPickAttachment: _pickAttachment,
           onRemoveAttachment: _removeAttachment,
+          onAttachmentTypeChanged: _onAttachmentTypeChanged,
         ),
       ],
     );
@@ -551,6 +551,15 @@ class _AssociationRequestsAndServicesScreenState
                   ..clear()
                   ..addAll(state.requestTypes);
               });
+              _associationLinkCubit.fetchAttachmentTypes();
+            }
+
+            if (state is AssociationAttachmentTypesFetched) {
+              setState(() {
+                _attachmentTypes
+                  ..clear()
+                  ..addAll(state.attachmentTypes);
+              });
             }
 
             if (state is AssociationLinkFailure && _requestTypes.isNotEmpty) {
@@ -572,6 +581,7 @@ class _AssociationRequestsAndServicesScreenState
                       fatherNameController: _fatherNameController,
                       motherNameController: _motherNameController,
                       nationalIdController: _nationalIdController,
+                      customerNoteController: _messageController,
                       selectedGovernorate: _selectedGovernorate,
                       selectedCity: _selectedCity,
                       selectedTown: _selectedTown,
@@ -588,8 +598,8 @@ class _AssociationRequestsAndServicesScreenState
                       housingUnitController: _housingUnitController,
                       villageController: _villageController,
                       attachments: _attachments,
-                      attachmentDescriptionControllers:
-                          _attachmentDescriptionControllers,
+                      attachmentTypes: _attachmentTypes,
+                      attachmentTypeIds: _attachmentTypeIds,
                       onGovernorateChanged: _onGovernorateChanged,
                       onCityChanged: _onCityChanged,
                       onTownChanged: _onTownChanged,
@@ -600,6 +610,7 @@ class _AssociationRequestsAndServicesScreenState
                       onRemoveCurrentAddress: _removeCurrentAddress,
                       onPickAttachment: _pickAttachment,
                       onRemoveAttachment: _removeAttachment,
+                      onAttachmentTypeChanged: _onAttachmentTypeChanged,
                       validateRequiredName: (value) =>
                           _validateRequiredName(value, l10n),
                       validateRequiredPhone: (value) =>
@@ -636,6 +647,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.fatherNameController,
     required this.motherNameController,
     required this.nationalIdController,
+    required this.customerNoteController,
     required this.selectedGovernorate,
     required this.selectedCity,
     required this.selectedTown,
@@ -652,7 +664,8 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.housingUnitController,
     required this.villageController,
     required this.attachments,
-    required this.attachmentDescriptionControllers,
+    required this.attachmentTypes,
+    required this.attachmentTypeIds,
     required this.onGovernorateChanged,
     required this.onCityChanged,
     required this.onTownChanged,
@@ -662,6 +675,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.onRemoveCurrentAddress,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
+    required this.onAttachmentTypeChanged,
     required this.validateRequiredName,
     required this.validateRequiredPhone,
     required this.validateOptionalPhone,
@@ -674,6 +688,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
   final TextEditingController fatherNameController;
   final TextEditingController motherNameController;
   final TextEditingController nationalIdController;
+  final TextEditingController customerNoteController;
 
   final String? selectedGovernorate;
   final String? selectedCity;
@@ -694,7 +709,8 @@ class _AssociationLinkRequestSection extends StatefulWidget {
   final TextEditingController villageController;
 
   final List<AssociationLinkAttachment> attachments;
-  final Map<String, TextEditingController> attachmentDescriptionControllers;
+  final List<AssociationAttachmentType> attachmentTypes;
+  final Map<String, String?> attachmentTypeIds;
 
   final ValueChanged<String?> onGovernorateChanged;
   final ValueChanged<String?> onCityChanged;
@@ -706,6 +722,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
 
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
+  final void Function(String id, String? value) onAttachmentTypeChanged;
 
   final String? Function(String?) validateRequiredName;
   final String? Function(String?) validateRequiredPhone;
@@ -844,13 +861,28 @@ class _AssociationLinkRequestSectionState
             widget.fieldSpacer(),
           ],
         ),
+        AssociationFormSection(
+          title: l10n.messageLabel,
+          icon: Icons.message_outlined,
+          children: [
+            AppTextField(
+              controller: widget.customerNoteController,
+              label: l10n.messageLabel,
+              hint: l10n.associationRequestMessageHint,
+              enabled: !widget.isLocked,
+              maxLines: 4,
+              textInputAction: TextInputAction.newline,
+            ),
+          ],
+        ),
         _RequestAttachmentsSection(
           attachments: widget.attachments,
-          attachmentDescriptionControllers:
-              widget.attachmentDescriptionControllers,
+          attachmentTypes: widget.attachmentTypes,
+          attachmentTypeIds: widget.attachmentTypeIds,
           enabled: !widget.isLocked,
           onPickAttachment: widget.onPickAttachment,
           onRemoveAttachment: widget.onRemoveAttachment,
+          onAttachmentTypeChanged: widget.onAttachmentTypeChanged,
         ),
       ],
     );
@@ -1354,17 +1386,21 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
 class _RequestAttachmentsSection extends StatelessWidget {
   const _RequestAttachmentsSection({
     required this.attachments,
-    required this.attachmentDescriptionControllers,
+    required this.attachmentTypes,
+    required this.attachmentTypeIds,
     required this.enabled,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
+    required this.onAttachmentTypeChanged,
   });
 
   final List<AssociationLinkAttachment> attachments;
-  final Map<String, TextEditingController> attachmentDescriptionControllers;
+  final List<AssociationAttachmentType> attachmentTypes;
+  final Map<String, String?> attachmentTypeIds;
   final bool enabled;
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
+  final void Function(String id, String? value) onAttachmentTypeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -1386,10 +1422,12 @@ class _RequestAttachmentsSection extends StatelessWidget {
           SizedBox(height: 14.h),
           AttachmentTile(
             attachment: attachment,
-            descriptionController:
-                attachmentDescriptionControllers[attachment.id]!,
+            attachmentTypes: attachmentTypes,
+            selectedAttachmentTypeId: attachmentTypeIds[attachment.id],
             enabled: enabled,
             onDelete: () => onRemoveAttachment(attachment.id),
+            onAttachmentTypeChanged: (value) =>
+                onAttachmentTypeChanged(attachment.id, value),
           ),
         ],
         if (enabled) ...[
@@ -1409,15 +1447,19 @@ class AttachmentTile extends StatelessWidget {
   const AttachmentTile({
     super.key,
     required this.attachment,
-    required this.descriptionController,
+    required this.attachmentTypes,
+    required this.selectedAttachmentTypeId,
     required this.enabled,
     required this.onDelete,
+    required this.onAttachmentTypeChanged,
   });
 
   final AssociationLinkAttachment attachment;
-  final TextEditingController descriptionController;
+  final List<AssociationAttachmentType> attachmentTypes;
+  final String? selectedAttachmentTypeId;
   final bool enabled;
   final VoidCallback onDelete;
+  final ValueChanged<String?> onAttachmentTypeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -1455,19 +1497,17 @@ class AttachmentTile extends StatelessWidget {
             ],
           ),
           SizedBox(height: 8.h),
-          AppTextField(
-            controller: descriptionController,
-            label: l10n.associationLinkAttachmentDescription,
+          AssociationDropdownField(
+            label: l10n.associationLinkAttachmentType,
+            hintText: l10n.associationLinkAttachmentType,
+            value: selectedAttachmentTypeId,
+            items: attachmentTypes.map((type) => type.id).toList(),
+            itemLabelBuilder: (id) {
+              return attachmentTypes.firstWhere((type) => type.id == id).label;
+            },
             enabled: enabled,
-            validator: enabled
-                ? (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l10n.required;
-                    }
-
-                    return null;
-                  }
-                : null,
+            onChanged: onAttachmentTypeChanged,
+            validator: (value) => value == null ? l10n.required : null,
           ),
         ],
       ),

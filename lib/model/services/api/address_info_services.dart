@@ -8,19 +8,19 @@ class AddressInfoServices {
   final DioClient _client = DioClient();
 
   Future<List<CapitalModel>> getCapitals() async {
-    final res = await _client.get('core/countries');
+    final res = await _client.get('address/capitals');
     final data = res.data['data'];
     return _parseList(data, CapitalModel.fromJson);
   }
 
   Future<List<CityModel>> getCities({required String capitalId}) async {
-    final res = await _client.get('core/states',queryParameters: {'country_code': capitalId});
+    final res = await _client.get('address/capitals');
     final data = res.data['data'];
     return _parseList(data, CityModel.fromJson);
   }
 
   Future<List<TownModel>> getTowns({required String cityId}) async {
-    final res = await _client.get('customer/address-info/towns',queryParameters: {'state_code': cityId});
+    final res = await _client.get('address/capitals');
     final data = res.data['data'];
     return _parseList(data, TownModel.fromJson);
   }

@@ -7,6 +7,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/login_required_placeholder.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -27,9 +28,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Scaffold(
       appBar: ScreenAppBar(title: AppLocalizations.of(context)!.myOrders),
       body: BlocBuilder<OrdersCubit, OrdersState>(
@@ -45,35 +43,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
             case OrdersLoaded():
               final orders = state.orders;
               if (orders.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.receipt_long_outlined,
-                        size: 80.r,
-                        color: isDark
-                            ? AppColors.taupe.withValues(alpha: 0.6)
-                            : AppColors.burgundy.withValues(alpha: 0.5),
-                      ),
-                      SizedBox(height: 16.h),
-                      Text(
-                        AppLocalizations.of(context)!.noOrders,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: isDark
-                              ? AppColors.offWhite
-                              : AppColors.burgundy,
-                        ),
-                      ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        AppLocalizations.of(context)!.ordersPrompt,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isDark ? AppColors.taupe : AppColors.black,
-                        ),
-                      ),
-                    ],
-                  ),
+                final l10n = AppLocalizations.of(context)!;
+                return EmptyStateView(
+                  icon: Icons.receipt_long_outlined,
+                  title: l10n.noOrders,
+                  description: l10n.ordersPrompt,
                 );
               }
               return ListView.separated(

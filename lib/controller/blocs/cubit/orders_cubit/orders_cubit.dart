@@ -26,10 +26,10 @@ class OrdersCubit extends Cubit<OrdersState> {
     }
   }
 
-  Future<void> loadOrderById(int categoryId) async {
+  Future<void> loadOrderDetails(int orderId) async {
     emit(OrdersLoading());
     try {
-      final order = await _orderService.getOrderById(categoryId);
+      final order = await _orderService.getOrderDetails(orderId);
       emit(OneOrderLoaded(order: order));
     } catch (e) {
       emit(OrdersFailed(message: e.toString()));

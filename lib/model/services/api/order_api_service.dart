@@ -9,7 +9,7 @@ class OrderApiService {
   final DioClient _client = DioClient();
 
   Future<List<OrderModel>> getOrders() async {
-    final res = await _client.get('orders');
+    final res = await _client.get('orders',queryParameters: {'per_page': 100});
     final data = res.data['data'];
     if (data is List) {
       return data
@@ -19,8 +19,8 @@ class OrderApiService {
     return [];
   }
 
-  Future<OrderModel> getOrderById(int categoryId) async {
-    final res = await _client.get('orders/$categoryId');
+  Future<OrderModel> getOrderDetails(int orderId) async {
+    final res = await _client.get('orders/$orderId');
     final data = res.data['data'];
       return OrderModel.fromJson(data);
   }

@@ -23,6 +23,12 @@ final class AssociationRequestTypesFetched extends AssociationLinkState {
   AssociationRequestTypesFetched({required this.requestTypes});
 }
 
+final class AssociationAttachmentTypesFetched extends AssociationLinkState {
+  final List<AssociationAttachmentType> attachmentTypes;
+
+  AssociationAttachmentTypesFetched({required this.attachmentTypes});
+}
+
 final class AssociationLinkSubmittedSuccessfully extends AssociationLinkState {
   final String successMessage;
 

@@ -50,15 +50,18 @@ class LanguageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: ScreenAppBar(title: AppLocalizations.of(context)!.languageTitle),
-      body: BlocBuilder<LocaleBloc, LocaleBlocState>(
-        builder: (context, state) {
-          final useSystem = state is LocaleFetched && state.useSystemLocale;
-          final currentLocale =
-              state is LocaleFetched ? state.locale.languageCode : PrefKeys.arLocaleKey;
-          final languages = _languages(context);
-          return ListView(
+    return BlocBuilder<LocaleBloc, LocaleBlocState>(
+      builder: (context, state) {
+        final l10n = AppLocalizations.of(context)!;
+        final useSystem = state is LocaleFetched && state.useSystemLocale;
+        final currentLocale = state is LocaleFetched
+            ? state.locale.languageCode
+            : PrefKeys.arLocaleKey;
+        final languages = _languages(context);
+
+        return Scaffold(
+          appBar: ScreenAppBar(title: l10n.languageTitle),
+          body: ListView(
             padding: EdgeInsets.all(16.w),
             children: List.generate(languages.length, (index) {
               final model = languages[index];
@@ -73,9 +76,9 @@ class LanguageScreen extends StatelessWidget {
                 onTap: () => _applyLanguageByCode(context, model.languageCode),
               );
             }),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 }

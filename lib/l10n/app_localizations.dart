@@ -368,6 +368,18 @@ abstract class AppLocalizations {
   /// **'Please sign in to add products to the cart'**
   String get loginRequiredForCart;
 
+  /// No description provided for @loginRequiredForCartView.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to view your cart'**
+  String get loginRequiredForCartView;
+
+  /// No description provided for @cartLoginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in or create an account to view and manage your cart.'**
+  String get cartLoginPrompt;
+
   /// No description provided for @addToCartSuccess.
   ///
   /// In en, this message translates to:
@@ -679,6 +691,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in or create an account to receive order and offer notifications.'**
   String get notificationsLoginPrompt;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get noNotifications;
+
+  /// No description provided for @notificationsEmptyPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'New updates, order alerts, and offers will appear here.'**
+  String get notificationsEmptyPrompt;
+
+  /// No description provided for @notificationRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get notificationRead;
+
+  /// No description provided for @notificationUnread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get notificationUnread;
+
+  /// No description provided for @notificationMandatory.
+  ///
+  /// In en, this message translates to:
+  /// **'Mandatory'**
+  String get notificationMandatory;
 
   /// No description provided for @loginRequiredForOrders.
   ///
@@ -2360,6 +2402,12 @@ abstract class AppLocalizations {
   /// **'Document Name / Description'**
   String get associationLinkAttachmentDescription;
 
+  /// No description provided for @associationLinkAttachmentType.
+  ///
+  /// In en, this message translates to:
+  /// **'Attachment Type'**
+  String get associationLinkAttachmentType;
+
   /// No description provided for @associationLinkEnterFirstName.
   ///
   /// In en, this message translates to:
@@ -2900,6 +2948,18 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to sign out?'**
   String get signOutConfirmation;
 
+  /// No description provided for @loginRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in required'**
+  String get loginRequiredTitle;
+
+  /// No description provided for @settingsLoginRequiredDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in to change your password or reset your WhatsApp number.'**
+  String get settingsLoginRequiredDescription;
+
   /// No description provided for @areYouSureYouWantToSignIn.
   ///
   /// In en, this message translates to:
@@ -3013,6 +3073,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Association link request has been sent successfully'**
   String get linkRequestSentSuccessfully;
+
+  /// No description provided for @requestSentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request has been sent successfully'**
+  String get requestSentSuccessfully;
 
   /// No description provided for @frequentlyAskedQuestion.
   ///

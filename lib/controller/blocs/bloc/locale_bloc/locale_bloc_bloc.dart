@@ -7,27 +7,41 @@ part 'locale_bloc_event.dart';
 part 'locale_bloc_state.dart';
 
 class LocaleBloc extends Bloc<LocaleBlocEvent, LocaleBlocState> {
-  LocaleBloc() : super(LocaleFetched(locale: _getSystemLocale(), useSystemLocale: true)) {
+  LocaleBloc()
+    : super(LocaleFetched(locale: _getSystemLocale(), useSystemLocale: true)) {
     on<GetLocale>((_, emit) async {
       final sp = await SharedPreferences.getInstance();
       final localeSP = sp.getString(PrefKeys.localeKey);
-      final useSystem = localeSP == null || localeSP.isEmpty || localeSP == PrefKeys.systemLocaleKey;
+      final useSystem =
+          localeSP == null ||
+          localeSP.isEmpty ||
+          localeSP == PrefKeys.systemLocaleKey;
       final locale = _getLocaleFromString(localeSP);
       emit(LocaleFetched(locale: locale, useSystemLocale: useSystem));
     });
     on<SetArabicLocale>((_, emit) async {
       final sp = await SharedPreferences.getInstance();
-      sp.setString(PrefKeys.localeKey, PrefKeys.arLocaleKey);
-      emit(LocaleFetched(locale: const Locale(PrefKeys.arLocaleKey), useSystemLocale: false));
+      await sp.setString(PrefKeys.localeKey, PrefKeys.arLocaleKey);
+      emit(
+        LocaleFetched(
+          locale: const Locale(PrefKeys.arLocaleKey),
+          useSystemLocale: false,
+        ),
+      );
     });
     on<SetEnglishLocale>((_, emit) async {
       final sp = await SharedPreferences.getInstance();
-      sp.setString(PrefKeys.localeKey, PrefKeys.enLocaleKey);
-      emit(LocaleFetched(locale: const Locale(PrefKeys.enLocaleKey), useSystemLocale: false));
+      await sp.setString(PrefKeys.localeKey, PrefKeys.enLocaleKey);
+      emit(
+        LocaleFetched(
+          locale: const Locale(PrefKeys.enLocaleKey),
+          useSystemLocale: false,
+        ),
+      );
     });
     on<SetSystemLocale>((_, emit) async {
       final sp = await SharedPreferences.getInstance();
-      sp.setString(PrefKeys.localeKey, PrefKeys.systemLocaleKey);
+      await sp.setString(PrefKeys.localeKey, PrefKeys.systemLocaleKey);
       emit(LocaleFetched(locale: _getSystemLocale(), useSystemLocale: true));
     });
   }
@@ -44,7 +58,9 @@ class LocaleBloc extends Bloc<LocaleBlocEvent, LocaleBlocState> {
   }
 
   Locale _getLocaleFromString(String? locale) {
-    if (locale == null || locale.isEmpty || locale == PrefKeys.systemLocaleKey) {
+    if (locale == null ||
+        locale.isEmpty ||
+        locale == PrefKeys.systemLocaleKey) {
       return _getSystemLocale();
     }
     return switch (locale) {
@@ -53,11 +69,11 @@ class LocaleBloc extends Bloc<LocaleBlocEvent, LocaleBlocState> {
       _ => _getSystemLocale(),
     };
   }
-  
+
   static bool isArabic(LocaleBlocState state) {
-  if (state is LocaleFetched) {
-    return state.locale.languageCode == PrefKeys.arLocaleKey;
+    if (state is LocaleFetched) {
+      return state.locale.languageCode == PrefKeys.arLocaleKey;
+    }
+    return false;
   }
-  return false;
-}
 }

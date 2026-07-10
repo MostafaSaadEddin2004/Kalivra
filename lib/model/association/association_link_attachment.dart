@@ -4,12 +4,12 @@ class AssociationLinkAttachment {
   AssociationLinkAttachment({
     required this.id,
     required this.file,
-    this.description = '',
+    this.attachmentTypeId,
   });
 
   final String id;
   final File file;
-  final String description;
+  final String? attachmentTypeId;
 
   String get fileName {
     final normalized = file.path.replaceAll('\\', '/');
@@ -17,13 +17,11 @@ class AssociationLinkAttachment {
     return index >= 0 ? normalized.substring(index + 1) : normalized;
   }
 
-  AssociationLinkAttachment copyWith({
-    String? description,
-  }) {
+  AssociationLinkAttachment copyWith({String? attachmentTypeId}) {
     return AssociationLinkAttachment(
       id: id,
       file: file,
-      description: description ?? this.description,
+      attachmentTypeId: attachmentTypeId ?? this.attachmentTypeId,
     );
   }
 }

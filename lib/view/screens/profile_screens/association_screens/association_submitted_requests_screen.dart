@@ -9,6 +9,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class AssociationSubmittedRequestsScreen extends StatefulWidget {
   const AssociationSubmittedRequestsScreen({super.key});
@@ -47,53 +48,55 @@ class _AssociationSubmittedRequestsScreenState
       body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
         bloc: _associationCubit..fetchRequests(),
         builder: (context, state) {
-          switch (state) {
-            case AssociationLinkLoading():
-            case AssociationLinkRequestsFetched():
-            case AssociationLinkFailure():
-              
-            default:
-          }
           if (state is AssociationLinkLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Skeletonizer(
+              child: ListView.builder(
+                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return _RequestCard(
+                    request: AssociationRequestSummary(
+                      id: 0,
+                      status: 'status',
+                      createdAt: DateTime.now(),
+                      updatedAt: DateTime.now(),
+                    ),
+                  );
+                },
+              ),
+            );
           }
 
           if (state is AssociationLinkFailure) {
             return _ErrorState(onRetry: _reload);
           }
-
-          final requests = state is AssociationLinkRequestsFetched
-              ? state.linkRequests
-              : <AssociationRequestSummary>[];
-
-          if (requests.isEmpty) {
-            return _EmptyState(
-              onNewRequest: () async {
-                await context.push(AppRoutes.associationRequestsAndServices);
-                await _reload();
-              },
+          if (state is AssociationLinkRequestsFetched) {
+            final requests = state.linkRequests;
+            if (requests.isEmpty) {
+              return _EmptyState(
+                onNewRequest: () async {
+                  await context.push(AppRoutes.associationRequestsAndServices);
+                  await _reload();
+                },
+              );
+            }
+            return RefreshIndicator(
+              onRefresh: _reload,
+              child: ListView.builder(
+                padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
+                itemCount: requests.length,
+                itemBuilder: (context, index) {
+                  return _RequestCard(request: requests[index]);
+                },
+              ),
             );
           }
-
-          return RefreshIndicator(
-            onRefresh: _reload,
-            child: ListView.builder(
-              padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
-              itemCount: requests.length,
-              itemBuilder: (context, index) {
-                return _RequestCard(request: requests[index]);
-              },
-            ),
-          );
+          return const SizedBox.shrink();
         },
       ),
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Request card
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _RequestCard extends StatelessWidget {
   const _RequestCard({required this.request});
@@ -235,10 +238,6 @@ class _RequestCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Status chip
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.request});
 
@@ -284,10 +283,6 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Info line helper
-// ─────────────────────────────────────────────────────────────────────────────
-
 class _InfoLine extends StatelessWidget {
   const _InfoLine({
     required this.icon,
@@ -319,10 +314,6 @@ class _InfoLine extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Empty state
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.onNewRequest});

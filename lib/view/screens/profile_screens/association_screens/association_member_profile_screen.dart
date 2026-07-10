@@ -561,42 +561,8 @@ class _AssociationMemberProfileScreenState
   }
 }
 
-class _AssociationNewsFeedSlider extends StatefulWidget {
+class _AssociationNewsFeedSlider extends StatelessWidget {
   const _AssociationNewsFeedSlider();
-
-  @override
-  State<_AssociationNewsFeedSlider> createState() =>
-      _AssociationNewsFeedSliderState();
-}
-
-class _AssociationNewsFeedSliderState
-    extends State<_AssociationNewsFeedSlider> {
-  late final PageController _pageController;
-  Timer? _timer;
-  int _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      final items = _newsItems(context);
-      if (!mounted || !_pageController.hasClients || items.length < 2) return;
-      final nextIndex = (_currentIndex + 1) % items.length;
-      _pageController.animateToPage(
-        nextIndex,
-        duration: const Duration(milliseconds: 420),
-        curve: Curves.easeOutCubic,
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    _pageController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -604,11 +570,11 @@ class _AssociationNewsFeedSliderState
     final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
     final items = _newsItems(context);
+    final sliderText = _sliderText(context, items);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16.r),
       child: Container(
-        height: 82.h,
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         decoration: BoxDecoration(
           color: isDark
@@ -656,60 +622,16 @@ class _AssociationNewsFeedSliderState
                   SizedBox(height: 6.h),
                   SizedBox(
                     height: 30.h,
-                    child: PageView.builder(
-                      controller: _pageController,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: items.length,
-                      onPageChanged: (index) =>
-                          setState(() => _currentIndex = index),
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        return Row(
-                          children: [
-                            if (item.isImportant) ...[
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 8.w,
-                                  vertical: 4.h,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColors.burgundy.withValues(
-                                    alpha: isDark ? 0.28 : 0.1,
-                                  ),
-                                  borderRadius: BorderRadius.circular(999),
-                                ),
-                                child: Text(
-                                  l10n.associationNewsFeedImportant,
-                                  style: theme.textTheme.labelSmall?.copyWith(
-                                    color: isDark
-                                        ? AppColors.goldLight
-                                        : AppColors.burgundy,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8.w),
-                            ],
-                            Expanded(
-                              child: TextSlider(
-                                key: ValueKey(item.text),
-                                text: item.text,
-                                height: 30.h,
-                                sliderSpeed: 28,
-                                textStyle: theme.textTheme.titleSmall?.copyWith(
-                                  color: isDark
-                                      ? AppColors.offWhite
-                                      : AppColors.black,
-                                  fontWeight: item.isImportant
-                                      ? FontWeight.w800
-                                      : FontWeight.w600,
-                                  height: 1.25,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                    child: TextSlider(
+                      key: ValueKey(sliderText),
+                      text: sliderText,
+                      height: 30.h,
+                      sliderSpeed: 28,
+                      textStyle: theme.textTheme.titleSmall?.copyWith(
+                        color: isDark ? AppColors.offWhite : AppColors.black,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                      ),
                     ),
                   ),
                 ],
@@ -731,6 +653,16 @@ class _AssociationNewsFeedSliderState
       _AssociationNewsItem(text: l10n.associationNewsFeedSample2),
       _AssociationNewsItem(text: l10n.associationNewsFeedSample3),
     ];
+  }
+
+  String _sliderText(BuildContext context, List<_AssociationNewsItem> items) {
+    final l10n = AppLocalizations.of(context)!;
+    return items
+        .map((item) {
+          if (!item.isImportant) return item.text;
+          return '${l10n.associationNewsFeedImportant}: ${item.text}';
+        })
+        .join('   -   ');
   }
 }
 

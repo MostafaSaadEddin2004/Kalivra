@@ -59,6 +59,7 @@ dependencies:
   firebase_messaging: ^16.4.1
   flutter_local_notifications: ^22.0.1
   pretty_dio_logger: ^1.4.0
+  dropdown_search: ^7.0.0
 
 dev_dependencies:
   flutter_test:

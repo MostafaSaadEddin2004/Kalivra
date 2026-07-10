@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
+import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/model/association/association_request_address.dart';
@@ -13,42 +14,30 @@ class AssociationApiService {
   final DioClient _client = DioClient();
 
   Future<List<AssociationRequestSummary>> fetchRequests() async {
-    try {
-      final res = await _client.get('customer/requests');
-      final body = res.data;
-      if (body is! Map) return [];
-      final data = body['data'];
-      if (data is! List) return [];
-      return data
-          .whereType<Map>()
-          .map(
-            (e) => AssociationRequestSummary.fromJson(
-              Map<String, dynamic>.from(e),
-            ),
-          )
-          .toList();
-    } catch (_) {
-      return [];
-    }
+    final res = await _client.get('customer/requests');
+    final body = res.data['data'];
+    final data = (body as List)
+        .map((e) => AssociationRequestSummary.fromJson(e))
+        .toList();
+    return data;
   }
 
   Future<List<AssociationRequestType>> fetchRequestTypes() async {
-    try {
-      final res = await _client.get('customer/requests/types');
-      final body = res.data;
-      if (body is! Map) return [];
-      final data = body['data'];
-      if (data is! List) return [];
-      return data
-          .whereType<Map>()
-          .map(
-            (e) =>
-                AssociationRequestType.fromJson(Map<String, dynamic>.from(e)),
-          )
-          .toList();
-    } catch (_) {
-      return [];
-    }
+    final res = await _client.get('customer/requests/types');
+    final body = res.data['data'];
+    final data = (body as List)
+        .map((e) => AssociationRequestType.fromJson(e))
+        .toList();
+    return data;
+  }
+
+  Future<List<AssociationAttachmentType>> fetchAttachmentTypes() async {
+    final res = await _client.get('customer/requests/attachment-types');
+    final body = res.data['data'];
+    final data = (body as List)
+        .map((e) => AssociationAttachmentType.fromJson(e))
+        .toList();
+    return data;
   }
 
   Future<void> submitLinkRequest({
@@ -67,7 +56,7 @@ class AssociationApiService {
     String? claimedUnitNumber,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
-    final data = {
+    final data = <String, dynamic>{
       'type': type,
       'customer_note': customerNote,
       'father_name': fatherName,
@@ -85,19 +74,22 @@ class AssociationApiService {
       'claimed_priority_number': claimedPriorityNumber,
       'claimed_building_number': claimedBuildingNumber,
       'claimed_unit_number': claimedUnitNumber,
-      'documents': attachments,
     };
 
     final requestDocuments = attachments;
     for (var i = 0; i < requestDocuments.length; i++) {
       final attachment = requestDocuments[i];
-      data['documents[$i][description]'] = attachment.description.trim();
+      data['documents[$i][attachment_type_id]'] = attachment.attachmentTypeId;
       data['documents[$i][file]'] = await MultipartFile.fromFile(
         attachment.file.path,
         filename: CustomerApiService.basename(attachment.file.path),
       );
     }
-    await _client.post('customer/requests', data: FormData.fromMap(data));
+    try {
+  await _client.post('customer/requests', data: FormData.fromMap(data));
+}  catch (e) {
+  throw Exception('Failed to submit link request: $e');
+}
   }
 
   Future<void> submitNormalRequest({
@@ -105,31 +97,27 @@ class AssociationApiService {
     required String customerNot,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
-    final data = {
-      'type': type,
-      'customer_note': customerNot,
-      'documents': attachments,
-    };
+    final data = <String, dynamic>{'type': type, 'customer_note': customerNot};
     final requestDocuments = attachments;
     for (var i = 0; i < requestDocuments.length; i++) {
       final attachment = requestDocuments[i];
-      data['documents[$i][description]'] = attachment.description.trim();
+      data['documents[$i][attachment_type_id]'] = attachment.attachmentTypeId;
       data['documents[$i][file]'] = await MultipartFile.fromFile(
         attachment.file.path,
         filename: CustomerApiService.basename(attachment.file.path),
       );
     }
-    await _client.post('customer/requests', data: FormData.fromMap(data));
+    try {
+      await _client.post('customer/requests', data: FormData.fromMap(data));
+    } catch (e) {
+      throw Exception('Failed to submit normal request: $e');
+    }
   }
 
   Future<AssociationMemberProfileModel> fetchProfile() async {
-    try {
-      final res = await _client.get('customer/association/member');
-      final body = res.data;
-      final data = body['data'];
-      return AssociationMemberProfileModel.fromJson(data);
-    } catch (e) {
-      throw e.toString();
-    }
+    final res = await _client.get('customer/association/member');
+    final body = res.data;
+    final data = body['data'];
+    return AssociationMemberProfileModel.fromJson(data);
   }
 }

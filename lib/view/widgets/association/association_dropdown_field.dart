@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
@@ -34,7 +35,7 @@ class AssociationDropdownField extends StatelessWidget {
         ? AppColors.taupe.withValues(alpha: 0.5)
         : AppColors.burgundy.withValues(alpha: 0.4);
     final fill = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.08)
+        ? AppColors.black.withValues(alpha: 0.08)
         : AppColors.offWhite;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
     final radius = 14.r;
@@ -44,49 +45,58 @@ class AssociationDropdownField extends StatelessWidget {
         ? value
         : null;
 
-    return DropdownButtonFormField<String?>(
+    return AdaptiveDropdownSearch<String>(
+      context: context,
       key: ValueKey('$label-$value-${items.join('|')}'),
-      initialValue: selectedValue,
-      isExpanded: true,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: fill,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-          ),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border.withValues(alpha: 0.35)),
-        ),
-        labelStyle: TextStyle(color: labelColor),
-        hintText: hintText,
-        suffixIcon: trailing,
-        suffixIconConstraints: trailing == null
-            ? null
-            : BoxConstraints(minWidth: 48.w, minHeight: 48.h),
-      ),
-      items: items
-          .map(
-            (item) => DropdownMenuItem<String?>(
-              value: item,
-              child: Text(itemLabelBuilder?.call(item) ?? item),
-            ),
-          )
-          .toList(),
-      onChanged: canSelect ? onChanged : null,
+      selectedItem: selectedValue,
+      enabled: canSelect,
+      items: (_, _) => items,
+      itemAsString: (item) => itemLabelBuilder?.call(item) ?? item,
+      onSelected: onChanged,
       validator: validator,
+      popupProps: AdaptivePopupProps(
+        cupertinoProps: CupertinoPopupProps.bottomSheet(showSearchBox: true),
+        materialProps: PopupProps.menu(showSearchBox: true,fit: FlexFit.tight),
+      ),
+      decoratorProps: DropDownDecoratorProps(
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: fill,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: border),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: border),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(
+              color: isDark ? AppColors.goldLight : AppColors.burgundy,
+            ),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: border.withValues(alpha: 0.35)),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: theme.colorScheme.error),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: theme.colorScheme.error),
+          ),
+          labelStyle: TextStyle(color: labelColor),
+          hintText: hintText,
+          suffixIcon: trailing,
+          suffixIconConstraints: trailing == null
+              ? null
+              : BoxConstraints(minWidth: 48.w, minHeight: 48.h),
+        ),
+      ),
     );
   }
 }

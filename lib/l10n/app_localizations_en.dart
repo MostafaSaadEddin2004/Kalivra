@@ -146,6 +146,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please sign in to add products to the cart';
 
   @override
+  String get loginRequiredForCartView => 'Sign in to view your cart';
+
+  @override
+  String get cartLoginPrompt =>
+      'Sign in or create an account to view and manage your cart.';
+
+  @override
   String addToCartSuccess(String productName) {
     return 'Added \"$productName\" to cart';
   }
@@ -318,6 +325,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get notificationsLoginPrompt =>
       'Sign in or create an account to receive order and offer notifications.';
+
+  @override
+  String get noNotifications => 'No notifications yet';
+
+  @override
+  String get notificationsEmptyPrompt =>
+      'New updates, order alerts, and offers will appear here.';
+
+  @override
+  String get notificationRead => 'Read';
+
+  @override
+  String get notificationUnread => 'Unread';
+
+  @override
+  String get notificationMandatory => 'Mandatory';
 
   @override
   String get loginRequiredForOrders => 'Sign in to view your orders';
@@ -1189,6 +1212,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Document Name / Description';
 
   @override
+  String get associationLinkAttachmentType => 'Attachment Type';
+
+  @override
   String get associationLinkEnterFirstName => 'Please enter your name';
 
   @override
@@ -1477,6 +1503,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signOutConfirmation => 'Are you sure you want to sign out?';
 
   @override
+  String get loginRequiredTitle => 'Sign in required';
+
+  @override
+  String get settingsLoginRequiredDescription =>
+      'Please sign in to change your password or reset your WhatsApp number.';
+
+  @override
   String get areYouSureYouWantToSignIn => 'Are you sure you want to sign in?';
 
   @override
@@ -1534,6 +1567,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get linkRequestSentSuccessfully =>
       'Association link request has been sent successfully';
+
+  @override
+  String get requestSentSuccessfully =>
+      'Your request has been sent successfully';
 
   @override
   String get frequentlyAskedQuestion => 'Frequently asked questions';

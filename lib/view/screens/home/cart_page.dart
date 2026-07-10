@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/cart/cart_items_view.dart';
 import 'package:kalivra/view/widgets/cart/empty_cart_view.dart';
+import 'package:kalivra/view/widgets/login_required_placeholder.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -26,6 +30,15 @@ class _CartPageState extends State<CartPage> {
 
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
+        if (state is CartLoginRequired) {
+          return LoginRequiredPlaceholder(
+            icon: Icons.shopping_cart_outlined,
+            title: AppLocalizations.of(context)!.loginRequiredForCartView,
+            description: AppLocalizations.of(context)!.cartLoginPrompt,
+            onLoginTap: () => context.push(AppRoutes.login),
+          );
+        }
+
         if (state is CartLoading && cartCubit.items.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -34,10 +47,7 @@ class _CartPageState extends State<CartPage> {
         if (items.isEmpty) {
           return EmptyCartView(key: const ValueKey('empty_cart'));
         }
-        return CartItemsView(
-          key: const ValueKey('cart_items'),
-          items: items,
-        );
+        return CartItemsView(key: const ValueKey('cart_items'), items: items);
       },
     );
   }

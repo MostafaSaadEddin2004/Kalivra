@@ -8,6 +8,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/notifications/app_notification.dart';
 import 'package:kalivra/view/widgets/cards/notification_card.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/login_required_placeholder.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
@@ -47,7 +48,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           }
 
           if (state.notifications.isEmpty) {
-            return const _EmptyNotificationsPlaceholder();
+            final l10n = AppLocalizations.of(context)!;
+            return EmptyStateView(
+              icon: Icons.notifications_none_rounded,
+              title: l10n.noNotifications,
+              description: l10n.notificationsEmptyPrompt,
+            );
           }
 
           return CustomScrollView(
@@ -119,37 +125,5 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case AppNotificationType.deliveryFailure:
         return AppRoutes.contact;
     }
-  }
-}
-
-class _EmptyNotificationsPlaceholder extends StatelessWidget {
-  const _EmptyNotificationsPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 32.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.notifications_none_rounded,
-              size: 64.r,
-              color: colorScheme.primary.withValues(alpha: 0.6),
-            ),
-            SizedBox(height: 20.h),
-            Text(
-              AppLocalizations.of(context)!.navNotifications,
-              style: theme.textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -146,6 +146,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'يجب تسجيل الدخول لإضافة المنتجات إلى السلة';
 
   @override
+  String get loginRequiredForCartView => 'يجب تسجيل الدخول لعرض السلة';
+
+  @override
+  String get cartLoginPrompt =>
+      'سجّل الدخول أو أنشئ حساباً لعرض السلة وإدارتها.';
+
+  @override
   String addToCartSuccess(String productName) {
     return 'تمت إضافة \"$productName\" إلى السلة';
   }
@@ -316,6 +323,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get notificationsLoginPrompt =>
       'سجّل الدخول أو أنشئ حساباً لاستلام إشعارات الطلبات والعروض.';
+
+  @override
+  String get noNotifications => 'لا توجد إشعارات بعد';
+
+  @override
+  String get notificationsEmptyPrompt =>
+      'ستظهر هنا التحديثات وتنبيهات الطلبات والعروض الجديدة.';
+
+  @override
+  String get notificationRead => 'مقروء';
+
+  @override
+  String get notificationUnread => 'غير مقروء';
+
+  @override
+  String get notificationMandatory => 'إلزامي';
 
   @override
   String get loginRequiredForOrders => 'يجب تسجيل الدخول لعرض طلباتك';
@@ -1182,6 +1205,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationLinkAttachmentDescription => 'اسم / وصف الوثيقة';
 
   @override
+  String get associationLinkAttachmentType => 'نوع المرفق';
+
+  @override
   String get associationLinkEnterFirstName => 'يرجى إدخال الاسم';
 
   @override
@@ -1468,6 +1494,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signOutConfirmation => 'هل أنت متأكد من أنك تريد تسجيل الخروج؟';
 
   @override
+  String get loginRequiredTitle => 'تسجيل الدخول مطلوب';
+
+  @override
+  String get settingsLoginRequiredDescription =>
+      'يرجى تسجيل الدخول لتغيير كلمة المرور أو إعادة تعيين رقم واتساب.';
+
+  @override
   String get areYouSureYouWantToSignIn =>
       'هل أنت متأكد من أنك تريد تسجيل الدخول؟';
 
@@ -1524,6 +1557,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get linkRequestSentSuccessfully => 'تم إرسال طلب الربط بالجمعية بنجاح';
+
+  @override
+  String get requestSentSuccessfully => 'تم إرسال الطلب بنجاح';
 
   @override
   String get frequentlyAskedQuestion => 'الأسئلة الأكثر شيوعاً';

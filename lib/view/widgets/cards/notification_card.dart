@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class NotificationCard extends StatelessWidget {
   const NotificationCard({
@@ -31,9 +32,10 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
+
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
-      color: isRead ? null : colorScheme.primary.withValues(alpha: 0.08),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         leading: Container(
@@ -46,9 +48,7 @@ class NotificationCard extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: isRead ? FontWeight.w600 : FontWeight.bold,
-          ),
+          style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Padding(
           padding: EdgeInsets.only(top: 4.h),
@@ -63,9 +63,14 @@ class NotificationCard extends StatelessWidget {
                     _NotificationMetaChip(label: typeLabel),
                   _NotificationMetaChip(label: priorityLabel),
                   _NotificationMetaChip(label: statusLabel),
+                  _NotificationReadStatusChip(
+                    label: isRead
+                        ? l10n.notificationRead
+                        : l10n.notificationUnread,
+                    isRead: isRead,
+                  ),
                   if (isMandatory)
-                    const _NotificationMetaChip(label: 'Mandatory'),
-                  if (!isRead) const _NotificationMetaChip(label: 'Unread'),
+                    _NotificationMetaChip(label: l10n.notificationMandatory),
                 ],
               ),
               SizedBox(height: 6.h),
@@ -80,6 +85,41 @@ class NotificationCard extends StatelessWidget {
         ),
         trailing: Text(time, style: Theme.of(context).textTheme.labelSmall),
         onTap: onTap,
+      ),
+    );
+  }
+}
+
+class _NotificationReadStatusChip extends StatelessWidget {
+  const _NotificationReadStatusChip({
+    required this.label,
+    required this.isRead,
+  });
+
+  final String label;
+  final bool isRead;
+
+  @override
+  Widget build(BuildContext context) {
+    final backgroundColor = isRead
+        ? Colors.green.withValues(alpha: 0.14)
+        : Colors.orange.withValues(alpha: 0.16);
+    final foregroundColor = isRead
+        ? Colors.green.shade700
+        : Colors.orange.shade800;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 3.h),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: foregroundColor,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

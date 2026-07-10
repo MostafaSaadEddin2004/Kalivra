@@ -4,86 +4,121 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
+import 'package:kalivra/view/widgets/confirm_dialog.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  Future<void> _openProtectedScreen(
+    BuildContext context,
+    VoidCallback onAuthenticated,
+  ) async {
+    final token = await LocalStore.getToken();
+    if (token != null && token.isNotEmpty) {
+      onAuthenticated();
+      return;
+    }
+
+    if (!context.mounted) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => ConfirmDialog(
+        title: l10n.loginRequiredTitle,
+        message: l10n.settingsLoginRequiredDescription,
+        onConfirm: () {
+          dialogContext.pop();
+          context.go(AppRoutes.login);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      appBar: ScreenAppBar(title: l10n.settingsTitle),
-      body: ListView(
-        padding: EdgeInsets.all(20.w),
-        children: [
-          _SettingsSection(
-            title: l10n.settingsAppearance,
+    return BlocBuilder<LocaleBloc, LocaleBlocState>(
+      builder: (context, localeState) {
+        final l10n = AppLocalizations.of(context)!;
+        final localeLabel = localeState is LocaleFetched
+            ? (localeState.useSystemLocale
+                  ? l10n.languageFollowSystem
+                  : (localeState.locale.languageCode == PrefKeys.arLocaleKey
+                        ? l10n.languageArabic
+                        : l10n.languageEnglish))
+            : l10n.languageFollowSystem;
+
+        return Scaffold(
+          appBar: ScreenAppBar(title: l10n.settingsTitle),
+          body: ListView(
+            padding: EdgeInsets.all(20.w),
             children: [
-              BlocBuilder<ThemeBloc, ThemeBlocState>(
-                buildWhen: (prev, curr) => prev != curr,
-                builder: (context, state) {
-                  final modeLabel = state is ThemeFetched
-                      ? (state.mode == ThemeMode.dark
-                            ? l10n.themeDark
-                            : state.mode == ThemeMode.light
-                            ? l10n.themeLight
-                            : l10n.themeSystem)
-                      : l10n.themeSystem;
-                  return _SettingsTile(
-                    icon: Icons.dark_mode_rounded,
-                    label: l10n.settingsAppearance,
-                    subtitle: modeLabel,
-                    onTap: () => context.push(AppRoutes.themeMode),
-                  );
-                },
-              ),
-              BlocBuilder<LocaleBloc, LocaleBlocState>(
-                builder: (context, state) {
-                  final localeLabel = state is LocaleFetched
-                      ? (state.useSystemLocale
-                            ? l10n.languageFollowSystem
-                            : (state.locale.languageCode == PrefKeys.arLocaleKey
-                                  ? l10n.languageArabic
-                                  : l10n.languageEnglish))
-                      : l10n.languageFollowSystem;
-                  return _SettingsTile(
+              _SettingsSection(
+                title: l10n.settingsAppearance,
+                children: [
+                  BlocBuilder<ThemeBloc, ThemeBlocState>(
+                    buildWhen: (prev, curr) => prev != curr,
+                    builder: (context, state) {
+                      final modeLabel = state is ThemeFetched
+                          ? (state.mode == ThemeMode.dark
+                                ? l10n.themeDark
+                                : state.mode == ThemeMode.light
+                                ? l10n.themeLight
+                                : l10n.themeSystem)
+                          : l10n.themeSystem;
+                      return _SettingsTile(
+                        icon: Icons.dark_mode_rounded,
+                        label: l10n.settingsAppearance,
+                        subtitle: modeLabel,
+                        onTap: () => context.push(AppRoutes.themeMode),
+                      );
+                    },
+                  ),
+                  _SettingsTile(
                     icon: Icons.language_rounded,
                     label: l10n.settingsLanguage,
                     subtitle: localeLabel,
                     onTap: () => context.push(AppRoutes.language),
-                  );
-                },
+                  ),
+                ],
               ),
+              SizedBox(height: 16.h),
+              _SettingsSection(
+                title: l10n.settingsAccountSecurity,
+                children: [
+                  _SettingsTile(
+                    icon: Icons.lock_outline_rounded,
+                    label: l10n.settingsChangePassword,
+                    onTap: () => _openProtectedScreen(
+                      context,
+                      () => context.push(AppRoutes.changePassword),
+                    ),
+                  ),
+                  _SettingsTile(
+                    icon: Icons.phone_android_rounded,
+                    label: l10n.settingsChangePhone,
+                    onTap: () => _openProtectedScreen(
+                      context,
+                      () => context.push(
+                        AppRoutes.otp,
+                        extra: OtpScreenMode.changePhone,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24.h),
             ],
           ),
-          SizedBox(height: 16.h),
-          _SettingsSection(
-            title: l10n.settingsAccountSecurity,
-            children: [
-              _SettingsTile(
-                icon: Icons.lock_outline_rounded,
-                label: l10n.settingsChangePassword,
-                onTap: () => context.push(AppRoutes.changePassword),
-              ),
-              _SettingsTile(
-                icon: Icons.phone_android_rounded,
-                label: l10n.settingsChangePhone,
-                onTap: () => context.push(
-                  AppRoutes.otp,
-                  extra: OtpScreenMode.changePhone,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 24.h),
-        ],
-      ),
+        );
+      },
     );
   }
 }
