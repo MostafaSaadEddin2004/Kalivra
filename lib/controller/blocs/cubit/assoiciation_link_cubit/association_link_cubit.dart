@@ -60,7 +60,6 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     required BuildContext context,
     String customerNote = '',
     required String type,
-    required String requestedMembershipType,
     required String fatherName,
     required String motherName,
     required String nationalId,
@@ -79,7 +78,6 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
       await _api.submitLinkRequest(
         customerNote: customerNote,
         type: type,
-        requestedMembershipType: requestedMembershipType,
         fatherName: fatherName,
         motherName: motherName,
         nationalId: nationalId,

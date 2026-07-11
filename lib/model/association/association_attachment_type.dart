@@ -1,17 +1,28 @@
 class AssociationAttachmentType {
-  const AssociationAttachmentType({required this.id, required this.label});
+  const AssociationAttachmentType({
+    required this.id,
+    required this.name,
+    required this.nameAr,
+    required this.nameEn,
+    required this.description,
+    required this.isRequired,
+  });
 
-  final String id;
-  final String label;
+  final int id;
+  final String name;
+  final String nameAr;
+  final String nameEn;
+  final String? description;
+  final bool isRequired;
 
   factory AssociationAttachmentType.fromJson(Map<String, dynamic> json) {
-    final id = json['id'] ?? json['value'] ?? json['attachment_type_id'];
-    final label =
-        json['label'] ?? json['name'] ?? json['title'] ?? json['description'];
-
     return AssociationAttachmentType(
-      id: id?.toString() ?? '',
-      label: label?.toString() ?? id?.toString() ?? '',
+      id: json['id'] as int,
+      name: json['name'] as String,
+      nameAr: json['name_ar'] as String,
+      nameEn: json['name_en'] as String,
+      description: json['description'] as String?,
+      isRequired: json['is_required'] as bool? ?? false,
     );
   }
 }

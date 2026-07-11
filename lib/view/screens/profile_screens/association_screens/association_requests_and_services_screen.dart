@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
+import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
@@ -16,9 +17,6 @@ import 'package:kalivra/view/widgets/association/association_dropdown_field.dart
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
-
-const String _membershipTypeTourism = 'سياحية';
-const String _membershipTypeResidential = 'سكنية';
 
 class AssociationRequestsAndServicesScreen extends StatefulWidget {
   const AssociationRequestsAndServicesScreen({super.key});
@@ -34,11 +32,13 @@ class _AssociationRequestsAndServicesScreenState
   static const int _maxAttachmentBytes = 15 * 1024 * 1024;
 
   static const List<String> _allowedExtensions = [
-    'jpg',
-    'jpeg',
-    'png',
-    'webp',
-    'pdf',
+    "pdf",
+    "jpg",
+    "jpeg",
+    "png",
+    "webp",
+    "doc",
+    "docx",
   ];
 
   late final AssociationLinkCubit _associationLinkCubit;
@@ -71,7 +71,6 @@ class _AssociationRequestsAndServicesScreenState
   final List<AssociationAttachmentType> _attachmentTypes = [];
 
   String? _requestType;
-  String? _requestedMembershipType;
   String? _selectedGovernorate;
   String? _selectedCity;
   String? _selectedTown;
@@ -197,12 +196,6 @@ class _AssociationRequestsAndServicesScreenState
       _attachments.clear();
 
       _attachmentTypeIds.clear();
-    });
-  }
-
-  void _onRequestedMembershipTypeChanged(String? value) {
-    setState(() {
-      _requestedMembershipType = value;
     });
   }
 
@@ -377,7 +370,6 @@ class _AssociationRequestsAndServicesScreenState
           fatherName: _fatherNameController.text.trim(),
           motherName: _motherNameController.text.trim(),
           nationalId: _nationalIdController.text.trim(),
-          requestedMembershipType: _requestedMembershipType!,
           permanentAddress: _permanentAddress(),
           currentAddress: _currentRequestAddress(),
           additionalAddresses: _additionalRequestAddresses(),
@@ -561,10 +553,6 @@ class _AssociationRequestsAndServicesScreenState
                   ..addAll(state.attachmentTypes);
               });
             }
-
-            if (state is AssociationLinkFailure && _requestTypes.isNotEmpty) {
-              CustomSnackBar.show(context, state.errorMessage);
-            }
           },
           builder: (context, state) {
             return Form(
@@ -591,7 +579,6 @@ class _AssociationRequestsAndServicesScreenState
                       hasCurrentAddress: _hasCurrentAddress,
                       currentAddress: _currentAddress,
                       additionalAddresses: _additionalAddresses,
-                      requestedMembershipType: _requestedMembershipType,
                       membershipNumberController: _membershipNumberController,
                       priorityNumberController: _priorityNumberController,
                       projectNameController: _projectNameController,
@@ -603,8 +590,7 @@ class _AssociationRequestsAndServicesScreenState
                       onGovernorateChanged: _onGovernorateChanged,
                       onCityChanged: _onCityChanged,
                       onTownChanged: _onTownChanged,
-                      onRequestedMembershipTypeChanged:
-                          _onRequestedMembershipTypeChanged,
+
                       onAddAdditionalAddress: _addAdditionalAddress,
                       onRemoveAdditionalAddress: _removeAdditionalAddress,
                       onRemoveCurrentAddress: _removeCurrentAddress,
@@ -657,7 +643,6 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.hasCurrentAddress,
     required this.currentAddress,
     required this.additionalAddresses,
-    required this.requestedMembershipType,
     required this.membershipNumberController,
     required this.priorityNumberController,
     required this.projectNameController,
@@ -669,7 +654,6 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.onGovernorateChanged,
     required this.onCityChanged,
     required this.onTownChanged,
-    required this.onRequestedMembershipTypeChanged,
     required this.onAddAdditionalAddress,
     required this.onRemoveAdditionalAddress,
     required this.onRemoveCurrentAddress,
@@ -700,7 +684,6 @@ class _AssociationLinkRequestSection extends StatefulWidget {
   final bool hasCurrentAddress;
   final _AssociationAddressInput currentAddress;
   final List<_AssociationAddressInput> additionalAddresses;
-  final String? requestedMembershipType;
 
   final TextEditingController membershipNumberController;
   final TextEditingController priorityNumberController;
@@ -715,7 +698,6 @@ class _AssociationLinkRequestSection extends StatefulWidget {
   final ValueChanged<String?> onGovernorateChanged;
   final ValueChanged<String?> onCityChanged;
   final ValueChanged<String?> onTownChanged;
-  final ValueChanged<String?> onRequestedMembershipTypeChanged;
   final VoidCallback onAddAdditionalAddress;
   final ValueChanged<int> onRemoveAdditionalAddress;
   final VoidCallback onRemoveCurrentAddress;
@@ -810,25 +792,6 @@ class _AssociationLinkRequestSectionState
           title: l10n.associationLinkMembershipSection,
           icon: Icons.apartment_outlined,
           children: [
-            AssociationDropdownField(
-              label: l10n.associationRequestedMembershipType,
-              hintText: l10n.associationRequestedMembershipType,
-              value: widget.requestedMembershipType,
-              items: const [_membershipTypeTourism, _membershipTypeResidential],
-              itemLabelBuilder: (value) {
-                return switch (value) {
-                  _membershipTypeTourism =>
-                    l10n.associationMembershipTypeTourism,
-                  _membershipTypeResidential =>
-                    l10n.associationMembershipTypeResidential,
-                  _ => value,
-                };
-              },
-              enabled: !widget.isLocked,
-              onChanged: widget.onRequestedMembershipTypeChanged,
-              validator: (value) => value == null ? l10n.required : null,
-            ),
-            widget.fieldSpacer(),
             Row(
               children: [
                 Expanded(
@@ -1501,9 +1464,15 @@ class AttachmentTile extends StatelessWidget {
             label: l10n.associationLinkAttachmentType,
             hintText: l10n.associationLinkAttachmentType,
             value: selectedAttachmentTypeId,
-            items: attachmentTypes.map((type) => type.id).toList(),
+            items: attachmentTypes.map((type) => type.id.toString()).toList(),
             itemLabelBuilder: (id) {
-              return attachmentTypes.firstWhere((type) => type.id == id).label;
+              final isArabic =
+                  Localizations.localeOf(context).languageCode ==
+                  PrefKeys.arLocaleKey;
+              final attachmentType = attachmentTypes.firstWhere(
+                (type) => type.id.toString() == id,
+              );
+              return isArabic ? attachmentType.nameAr : attachmentType.nameEn;
             },
             enabled: enabled,
             onChanged: onAttachmentTypeChanged,

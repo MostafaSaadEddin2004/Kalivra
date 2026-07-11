@@ -14,13 +14,19 @@ class AddressInfoServices {
   }
 
   Future<List<CityModel>> getCities({required String capitalId}) async {
-    final res = await _client.get('address/capitals');
+    final res = await _client.get(
+      'address/cities',
+      queryParameters: {'capital_id': capitalId},
+    );
     final data = res.data['data'];
     return _parseList(data, CityModel.fromJson);
   }
 
   Future<List<TownModel>> getTowns({required String cityId}) async {
-    final res = await _client.get('address/capitals');
+    final res = await _client.get(
+      'address/towns',
+      queryParameters: {'city_id': cityId},
+    );
     final data = res.data['data'];
     return _parseList(data, TownModel.fromJson);
   }

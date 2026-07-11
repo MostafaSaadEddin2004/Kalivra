@@ -32,7 +32,7 @@ class AssociationApiService {
   }
 
   Future<List<AssociationAttachmentType>> fetchAttachmentTypes() async {
-    final res = await _client.get('customer/requests/attachment-types');
+    final res = await _client.get('customer/profile/documents/definitions');
     final body = res.data['data'];
     final data = (body as List)
         .map((e) => AssociationAttachmentType.fromJson(e))
@@ -43,7 +43,6 @@ class AssociationApiService {
   Future<void> submitLinkRequest({
     String customerNote = '',
     String type = 'association_membership',
-    required String requestedMembershipType,
     required String fatherName,
     required String motherName,
     required String nationalId,
@@ -69,7 +68,6 @@ class AssociationApiService {
             .map((address) => address.toMap(includeDetails: true))
             .toList(),
       },
-      'requested_membership_type': requestedMembershipType,
       'claimed_membership_number': claimedMembershipNumber,
       'claimed_priority_number': claimedPriorityNumber,
       'claimed_building_number': claimedBuildingNumber,
@@ -86,10 +84,10 @@ class AssociationApiService {
       );
     }
     try {
-  await _client.post('customer/requests', data: FormData.fromMap(data));
-}  catch (e) {
-  throw Exception('Failed to submit link request: $e');
-}
+      await _client.post('customer/requests', data: FormData.fromMap(data));
+    } catch (e) {
+      throw Exception('Failed to submit link request: $e');
+    }
   }
 
   Future<void> submitNormalRequest({
