@@ -77,7 +77,7 @@ class _AssociationRequestsAndServicesScreenState
   String? _accountPhone;
 
   bool _hasCurrentAddress = false;
-  bool _isLocked = false;
+  final bool _isLocked = false;
 
   bool get _isMembershipRequest => _requestType == _membershipRequestType;
 
@@ -363,7 +363,6 @@ class _AssociationRequestsAndServicesScreenState
           attachments: _attachmentsWithTypes(),
         );
       }
-
     } catch (e) {
       CustomSnackBar.show(context, e.toString());
     }

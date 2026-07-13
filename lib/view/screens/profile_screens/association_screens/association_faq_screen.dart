@@ -45,127 +45,130 @@ class _AssociationFaqScreenState extends State<AssociationFaqScreen> {
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.frequentlyAskedQuestion),
       body: ListView.separated(
+        clipBehavior: Clip.none,
         padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 32.h),
         itemCount: faqs.length,
         separatorBuilder: (_, _) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
           final faq = faqs[index];
           final isExpanded = _expandedIndex == index;
-          return AnimatedCrossFade(
-            firstChild: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondaryFixed,
-          
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.primaryFixed,
-                    blurRadius: 4,
-                    offset: const Offset(2, 2),
-                  ),
-                ],
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _expandedIndex = isExpanded ? null : index;
-                  });
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 260.w,
-                      child: Text(
-                        faq.question,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: isDark
-                              ? AppColors.goldLight
-                              : AppColors.burgundy,
+          return Padding(
+            padding: EdgeInsets.all(2.r),
+            child: AnimatedCrossFade(
+              firstChild: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondaryFixed,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(
+                    color: theme.colorScheme.primaryFixed.withValues(
+                      alpha: 0.26,
+                    ),
+                  ),        
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _expandedIndex = isExpanded ? null : index;
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      SizedBox(
+                        width: 260.w,
+                        child: Text(
+                          faq.question,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: isDark
+                                ? AppColors.goldLight
+                                : AppColors.burgundy,
+                          ),
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
                         ),
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
                       ),
-                    ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: isExpanded
-                          ? AppColors.goldDark
-                          : theme.iconTheme.color,
-                    ),
-                  ],
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color:isDark
+                                ? AppColors.goldLight
+                                : AppColors.burgundy,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            secondChild: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.secondaryFixed,
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.colorScheme.primaryFixed,
-                    blurRadius: 8,
-                    offset: const Offset(0, 0),
-                  ),
-                ],
-              ),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _expandedIndex = isExpanded ? null : index;
-                  });
-                },
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: 260.w,
-                          child: Text(
-                            faq.answer,
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: isDark
-                                  ? AppColors.goldLight
-                                  : AppColors.burgundy,
+              secondChild: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondaryFixed,
+                  borderRadius: BorderRadius.circular(16.r),
+                   border: Border.all(
+                    color: theme.colorScheme.primaryFixed.withValues(
+                      alpha: 0.26,
+                    ),
+                  ),      
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _expandedIndex = isExpanded ? null : index;
+                    });
+                  },
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 260.w,
+                            child: Text(
+                              faq.answer,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: isDark
+                                    ? AppColors.goldLight
+                                    : AppColors.burgundy,
+                              ),
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
                           ),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_up_rounded,
-                          color: isExpanded
-                              ? AppColors.goldDark
-                              : theme.iconTheme.color,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8.h),
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(
-                        faq.answer,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          height: 1.55,
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.78,
+                          Icon(
+                            Icons.keyboard_arrow_up_rounded,
+                            color: isDark
+                                ? AppColors.goldLight
+                                : AppColors.burgundy,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.h),
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: Text(
+                          faq.answer,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            height: 1.55,
+                            color: isDark
+                                ? AppColors.goldLight.withValues(
+                              alpha: 0.78)
+                                : AppColors.burgundy.withValues(
+                              alpha: 0.78,),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
+              crossFadeState: isExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 400),
+              firstCurve: Curves.easeOut,
+              secondCurve: Curves.easeInToLinear,
             ),
-            crossFadeState: CrossFadeState.showFirst,
-            duration: const Duration(milliseconds: 400),
-            firstCurve: Curves.easeOutCubic,
-            secondCurve: Curves.easeInCubic,
           );
         },
       ),
