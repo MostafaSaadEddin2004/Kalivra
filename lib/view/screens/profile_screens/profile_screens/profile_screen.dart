@@ -6,9 +6,12 @@ import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/customer/customer_api_model.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+
+const String _kMediaOrigin = 'https://test1.zedan-world.com';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -18,6 +21,81 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  static String? _resolveAvatarUrl(String? avatar) {
+    if (avatar == null || avatar.isEmpty) return null;
+    if (avatar.startsWith('http')) return avatar;
+    return avatar.startsWith('/')
+        ? '$_kMediaOrigin$avatar'
+        : '$_kMediaOrigin/$avatar';
+  }
+
+  String _formatBalance(num? value) {
+    if (value == null) return '---';
+    if (value % 1 == 0) return value.toInt().toString();
+    return value.toStringAsFixed(2);
+  }
+
+  List<Widget> _buildAddressCards(
+    BuildContext context,
+    CustomerAddressInformation? addressInfo,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final cards = <Widget>[];
+    final permanent = addressInfo?.permanent;
+    final current = addressInfo?.current;
+    final additional =
+        addressInfo?.additional ?? const <CustomerAddressEntry>[];
+
+    if (permanent != null && permanent.hasContent) {
+      cards.add(
+        _AddressDisplayCard(
+          title: l10n.associationLinkPermanentAddress,
+          address: permanent,
+          icon: Icons.home_work_outlined,
+        ),
+      );
+    }
+
+    if (current != null && current.hasContent) {
+      cards.add(
+        _AddressDisplayCard(
+          title: l10n.associationMemberCurrentAddress,
+          address: current,
+          icon: Icons.location_on_outlined,
+        ),
+      );
+    }
+
+    for (var index = 0; index < additional.length; index++) {
+      final address = additional[index];
+      if (!address.hasContent) continue;
+      cards.add(
+        _AddressDisplayCard(
+          title: '${l10n.associationAdditionalAddress} ${index + 1}',
+          address: address,
+          icon: Icons.add_location_alt_outlined,
+        ),
+      );
+    }
+
+    if (cards.isEmpty) {
+      return [
+        _InfoRow(
+          label: l10n.userLocationInfo,
+          value: '---',
+          icon: Icons.location_off_outlined,
+        ),
+      ];
+    }
+
+    return [
+      for (var index = 0; index < cards.length; index++) ...[
+        if (index > 0) SizedBox(height: 12.h),
+        cards[index],
+      ],
+    ];
+  }
+
   @override
   void initState() {
     super.initState();
@@ -196,6 +274,8 @@ class _ProfileState extends State<Profile> {
               final lastName = customer.lastName ?? '';
               final fullName = '$firstName $lastName'.trim();
               final addressInfo = customer.addressInformation;
+              final avatarUrl = _resolveAvatarUrl(customer.displayImageUrl);
+              final referralCode = customer.referralCode;
               return ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
@@ -207,21 +287,25 @@ class _ProfileState extends State<Profile> {
                           backgroundColor: isDark
                               ? AppColors.burgundy.withValues(alpha: 0.3)
                               : AppColors.burgundy.withValues(alpha: 0.15),
-                          child: Icon(
-                            Icons.person_rounded,
-                            size: 56.r,
-                            color: isDark
-                                ? AppColors.goldLight
-                                : AppColors.burgundy,
-                          ),
+                          backgroundImage: avatarUrl != null
+                              ? NetworkImage(avatarUrl)
+                              : null,
+                          child: avatarUrl == null
+                              ? Icon(
+                                  Icons.person_rounded,
+                                  size: 56.r,
+                                  color: isDark
+                                      ? AppColors.goldLight
+                                      : AppColors.burgundy,
+                                )
+                              : null,
                         ),
                         SizedBox(height: 12.h),
                       ],
                     ),
                   ),
-                  ReferralCard(
-                    referralCode: state.customer.referralCode ?? 'KHDD-5DKD9',
-                  ),
+                  if (referralCode != null && referralCode.isNotEmpty)
+                    ReferralQrCard(referralCode: referralCode),
                   SizedBox(height: 16.h),
                   _SectionCard(
                     title: l10n.accountInfo,
@@ -237,6 +321,11 @@ class _ProfileState extends State<Profile> {
                         label: l10n.fullName,
                         value: fullName.isEmpty ? '---' : fullName,
                         icon: Icons.person_outline_rounded,
+                      ),
+                      _InfoRow(
+                        label: 'User Balance',
+                        value: _formatBalance(customer.userBalance),
+                        icon: Icons.account_balance_wallet_outlined,
                       ),
                       _InfoRow(
                         label: l10n.genderLabel,
@@ -261,12 +350,12 @@ class _ProfileState extends State<Profile> {
                       ),
                       _InfoRow(
                         label: l10n.mobileNumber,
-                        value: customer.whatsappNumber ?? '---',
+                        value: customer.phone ?? '---',
                         icon: Icons.phone_android_rounded,
                       ),
                       _InfoRow(
                         label: l10n.whatsappNumber,
-                        value: customer.phone ?? '---',
+                        value: customer.whatsappNumber ?? '---',
                         icon: Icons.call,
                       ),
                     ],
@@ -274,44 +363,7 @@ class _ProfileState extends State<Profile> {
                   SizedBox(height: 16.h),
                   _SectionCard(
                     title: l10n.userLocationInfo,
-                    children: [
-                      _InfoRow(
-                        label: l10n.associationLinkGovernorate,
-                        value: addressInfo?.officialGovernorate ?? '---',
-                        icon: Icons.email_outlined,
-                      ),
-                      _InfoRow(
-                        label: l10n.profileCity,
-                        value: addressInfo?.officialCity ?? '---',
-                        icon: Icons.phone_android_rounded,
-                      ),
-                      _InfoRow(
-                        label: l10n.associationLinkTown,
-                        value: addressInfo?.officialTown ?? '---',
-                        icon: Icons.call,
-                      ),
-                      _InfoRow(
-                        label: l10n.associationLinkVillage,
-                        value:
-                            addressInfo?.officialMunicipalityVillage ?? '---',
-                        icon: Icons.call,
-                      ),
-                      _InfoRow(
-                        label: l10n.associationLinkStreet,
-                        value: addressInfo?.officialStreet ?? '---',
-                        icon: Icons.phone_android_rounded,
-                      ),
-                      _InfoRow(
-                        label: l10n.associationLinkBuilding,
-                        value: addressInfo?.officialBuilding ?? '---',
-                        icon: Icons.call,
-                      ),
-                      _InfoRow(
-                        label: l10n.associationLinkPermanentAddress,
-                        value: addressInfo?.permanentAddress ?? '---',
-                        icon: Icons.call,
-                      ),
-                    ],
+                    children: _buildAddressCards(context, addressInfo),
                   ),
                   SizedBox(height: 24.h),
                 ],
@@ -322,67 +374,6 @@ class _ProfileState extends State<Profile> {
               return const SizedBox.shrink();
           }
         },
-      ),
-    );
-  }
-}
-
-class _ReferralCardCollapsed extends StatelessWidget {
-  const _ReferralCardCollapsed({
-    required this.primary,
-    required this.isDark,
-    required this.theme,
-  });
-
-  final Color primary;
-  final bool isDark;
-  final ThemeData theme;
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.r),
-        side: BorderSide(color: primary.withValues(alpha: 0.25), width: 1.5),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Row(
-          children: [
-            Flexible(
-              child: Column(
-                spacing: 8.h,
-                children: [
-                  Row(
-                    spacing: 8.w,
-                    children: [
-                      Icon(Icons.qr_code_2_rounded, size: 24.r, color: primary),
-                      Text(
-                        AppLocalizations.of(context)!.referralCode,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: isDark ? AppColors.offWhite : AppColors.black,
-                          fontWeight: FontWeight.w800,
-                        ),
-                        softWrap: true,
-                      ),
-                    ],
-                  ),
-                  Text(
-                    AppLocalizations.of(context)!.referralCodeHint,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      height: 1.35,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.expand_more_rounded, size: 28.r, color: primary),
-          ],
-        ),
       ),
     );
   }
@@ -473,46 +464,214 @@ class _InfoRow extends StatelessWidget {
   }
 }
 
-enum _ProfileMenuAction { editProfile, associationMemberProfile }
+class _AddressDisplayCard extends StatelessWidget {
+  const _AddressDisplayCard({
+    required this.title,
+    required this.address,
+    required this.icon,
+  });
 
-class ReferralCard extends StatefulWidget {
-  const ReferralCard({super.key, required this.referralCode});
-  final String referralCode;
+  final String title;
+  final CustomerAddressEntry address;
+  final IconData icon;
 
-  @override
-  State<ReferralCard> createState() => _ReferralCardState();
-}
+  String _dash(String? value) {
+    final text = value?.trim();
+    return text == null || text.isEmpty ? '---' : text;
+  }
 
-bool _referralCardExpanded = false;
-
-class _ReferralCardState extends State<ReferralCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primary = theme.colorScheme.primary;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () =>
-            setState(() => _referralCardExpanded = !_referralCardExpanded),
-        borderRadius: BorderRadius.circular(20.r),
-        child: AnimatedCrossFade(
-          firstChild: _ReferralCardCollapsed(
-            primary: primary,
-            isDark: isDark,
-            theme: theme,
+    final primary = isDark ? AppColors.goldLight : AppColors.burgundy;
+    final muted = isDark ? AppColors.taupe : AppColors.burgundy;
+    final surface = isDark
+        ? AppColors.burgundy.withValues(alpha: 0.16)
+        : AppColors.burgundy.withValues(alpha: 0.05);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: primary.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 40.r,
+                height: 40.r,
+                decoration: BoxDecoration(
+                  color: primary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: primary, size: 22.r),
+              ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: primary,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      address.displayAddress.isEmpty
+                          ? '---'
+                          : address.displayAddress,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: isDark ? AppColors.offWhite : AppColors.black,
+                        height: 1.35,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          secondChild: ReferralQrCard(referralCode: widget.referralCode),
-          crossFadeState: _referralCardExpanded
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-          duration: const Duration(milliseconds: 280),
-          firstCurve: Curves.decelerate,
-          secondCurve: Curves.easeInOut,
-          sizeCurve: Curves.easeInOut,
+          SizedBox(height: 12.h),
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            children: [
+              if (address.label != null)
+                _AddressChip(
+                  label: l10n.associationAddressLabel,
+                  value: address.label!,
+                ),
+              if (address.type != null)
+                _AddressChip(
+                  label: l10n.associationAddressType,
+                  value: address.type!,
+                ),
+            ],
+          ),
+          if (address.label != null || address.type != null)
+            SizedBox(height: 10.h),
+          _AddressDetailGrid(
+            rows: [
+              _AddressDetail(
+                l10n.associationLinkGovernorate,
+                _dash(address.capital),
+              ),
+              _AddressDetail(l10n.profileCity, _dash(address.city)),
+              _AddressDetail(l10n.associationLinkTown, _dash(address.town)),
+              _AddressDetail(
+                l10n.associationLinkVillage,
+                _dash(address.village),
+              ),
+              _AddressDetail(
+                l10n.associationLinkStreet,
+                _dash(address.streetName),
+              ),
+              _AddressDetail(
+                l10n.associationStreetNumber,
+                _dash(address.streetNumber),
+              ),
+              _AddressDetail(
+                l10n.associationLinkBuilding,
+                _dash(address.building),
+              ),
+              if (address.notes != null)
+                _AddressDetail('Notes', _dash(address.notes)),
+            ],
+            muted: muted,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AddressChip extends StatelessWidget {
+  const _AddressChip({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final color = isDark ? AppColors.goldLight : AppColors.burgundy;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999.r),
+      ),
+      child: Text(
+        '$label: $value',
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
         ),
       ),
     );
   }
 }
+
+class _AddressDetail {
+  const _AddressDetail(this.label, this.value);
+
+  final String label;
+  final String value;
+}
+
+class _AddressDetailGrid extends StatelessWidget {
+  const _AddressDetailGrid({required this.rows, required this.muted});
+
+  final List<_AddressDetail> rows;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final valueColor = isDark ? AppColors.offWhite : AppColors.black;
+    return Column(
+      children: [
+        for (final row in rows)
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 118.w,
+                  child: Text(
+                    row.label,
+                    style: theme.textTheme.bodySmall?.copyWith(color: muted),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    row.value,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: valueColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+enum _ProfileMenuAction { editProfile, associationMemberProfile }

@@ -23,7 +23,7 @@ class AppTextField extends StatelessWidget {
     this.fillColor,
     this.labelColor,
     this.borderRadius,
-    this.textDirection
+    this.textDirection,
   });
 
   final TextEditingController controller;
@@ -50,10 +50,16 @@ class AppTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final border = borderColor ??
-        (isDark ? AppColors.taupe.withValues(alpha: 0.5) : AppColors.burgundy.withValues(alpha: 0.4));
-    final fill = fillColor ??
-        (isDark ? AppColors.burgundy.withValues(alpha: 0.08) : AppColors.offWhite);
+    final border =
+        borderColor ??
+        (isDark
+            ? AppColors.taupe.withValues(alpha: 0.5)
+            : AppColors.burgundy.withValues(alpha: 0.4));
+    final fill =
+        fillColor ??
+        (isDark
+            ? AppColors.burgundy.withValues(alpha: 0.08)
+            : AppColors.offWhite);
     final label = labelColor ?? (isDark ? AppColors.taupe : AppColors.burgundy);
     final radius = borderRadius ?? 14.r;
 
@@ -82,11 +88,11 @@ class AppTextField extends StatelessWidget {
         fillColor: fill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border,),
+          borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border,),
+          borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
@@ -98,6 +104,11 @@ class AppTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(radius),
           borderSide: const BorderSide(color: AppColors.red),
         ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(radius),
+          borderSide: const BorderSide(color: AppColors.red),
+        ),
+        errorStyle: const TextStyle(color: AppColors.red),
         labelStyle: TextStyle(color: label),
         hintStyle: TextStyle(color: label.withValues(alpha: 0.6)),
       ),

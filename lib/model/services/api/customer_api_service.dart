@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
@@ -248,9 +250,13 @@ class CustomerApiService {
   Future<bool> updateProfile({
     required String firstName,
     required String lastName,
+    String? middleName,
+    String? fatherName,
     String? gender,
     String? dateOfBirth,
+    String? email,
     String? phone,
+    String? whatsappNumber,
     String? officialGovernorate,
     String? officialCity,
     String? officialTown,
@@ -258,6 +264,7 @@ class CustomerApiService {
     String? officialStreet,
     String? officialBuilding,
     String? permanentAddress,
+    Map<String, dynamic>? addresses,
     File? imageFile,
   }) async {
     if (imageFile != null) {
@@ -269,37 +276,57 @@ class CustomerApiService {
       }
     }
 
+    final profileAddresses =
+        addresses ??
+        {
+          'permanent': {
+            'capital_id': officialGovernorate,
+            'city_id': officialCity,
+            'town_id': officialTown,
+            'village': officialMunicipalityVillage,
+            'street_name': officialStreet,
+            'building': officialBuilding,
+            'permanent_address': permanentAddress,
+          }..removeWhere((_, value) => value == null || value.isEmpty),
+        };
+
     final Map<String, dynamic> fields = {
-      "first_name": firstName,
-      "last_name": lastName,
-      "gender": gender,
-      "date_of_birth": dateOfBirth,
-      "phone": phone,
-      "official_governorate": officialGovernorate,
-      "official_city": officialCity,
-      "official_town": officialTown,
-      "official_municipality_village": officialMunicipalityVillage,
-      "official_street": officialStreet,
-      "official_building": officialBuilding,
-      "permanent_address": permanentAddress,
+      'personal_information': jsonEncode({
+        'first_name': firstName,
+        'middle_name': middleName ?? '',
+        'last_name': lastName,
+        'father_name': fatherName ?? '',
+        'gender': gender ?? '',
+        'date_of_birth': dateOfBirth ?? '',
+      }),
+      'contact_information': jsonEncode({
+        'email': email ?? '',
+        'phone': phone ?? '',
+        'whatsapp_number': whatsappNumber ?? phone ?? '',
+      }),
+      'addresses': jsonEncode(profileAddresses),
     };
 
-    try {
-      if (imageFile != null) {
-        final formData = FormData.fromMap({
-          ...fields,
-          'image': await MultipartFile.fromFile(
+    if (imageFile != null) {
+      final formData = FormData();
+      formData.fields.addAll(
+        fields.entries.map(
+          (entry) => MapEntry(entry.key, entry.value.toString()),
+        ),
+      );
+      formData.files.add(
+        MapEntry(
+          'image',
+          await MultipartFile.fromFile(
             imageFile.path,
             filename: basename(imageFile.path),
           ),
-        });
-        await _client.put('customer/profile', data: formData);
-      } else {
-        await _client.put('customer/profile', data: fields);
-      }
-      return true;
-    } on DioException catch (e) {
-      return false;
+        ),
+      );
+      await _client.put('customer/profile', data: formData);
+    } else {
+      await _client.put('customer/profile', data: fields);
     }
+    return true;
   }
 }

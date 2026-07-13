@@ -51,86 +51,121 @@ class _AssociationFaqScreenState extends State<AssociationFaqScreen> {
         itemBuilder: (context, index) {
           final faq = faqs[index];
           final isExpanded = _expandedIndex == index;
-          return AnimatedContainer(
-            duration: const Duration(milliseconds: 220),
-            curve: Curves.easeOutCubic,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18.r),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: isExpanded
-                    ? [
-                        AppColors.burgundy.withValues(
-                          alpha: isDark ? 0.55 : 0.12,
-                        ),
-                        AppColors.goldDark.withValues(
-                          alpha: isDark ? 0.22 : 0.1,
-                        ),
-                      ]
-                    : [theme.cardColor, theme.cardColor],
-              ),
-              border: Border.all(
-                color: isExpanded
-                    ? AppColors.goldDark.withValues(alpha: 0.45)
-                    : theme.colorScheme.onSurface.withValues(alpha: 0.08),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: isDark ? 0.18 : 0.06),
-                  blurRadius: 16,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(18.r),
-              child: ExpansionTile(
-                key: PageStorageKey(index),
-                initiallyExpanded: isExpanded,
-                onExpansionChanged: (expanded) {
-                  setState(() => _expandedIndex = expanded ? index : null);
-                },
-                tilePadding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 4.h,
-                ),
-                childrenPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
-                trailing: AnimatedRotation(
-                  turns: isExpanded ? 0.5 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: isExpanded
-                        ? AppColors.goldDark
-                        : theme.iconTheme.color,
-                  ),
-                ),
-                title: Text(
-                  faq.question,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: isExpanded
-                        ? (isDark ? AppColors.goldLight : AppColors.burgundy)
-                        : null,
-                  ),
-                ),
-                children: [
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Text(
-                      faq.answer,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        height: 1.55,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.78,
-                        ),
-                      ),
-                    ),
+          return AnimatedCrossFade(
+            firstChild: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.secondaryFixed,
+          
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.primaryFixed,
+                    blurRadius: 4,
+                    offset: const Offset(2, 2),
                   ),
                 ],
               ),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _expandedIndex = isExpanded ? null : index;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 260.w,
+                      child: Text(
+                        faq.question,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                        ),
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: isExpanded
+                          ? AppColors.goldDark
+                          : theme.iconTheme.color,
+                    ),
+                  ],
+                ),
+              ),
             ),
+            secondChild: Container(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.secondaryFixed,
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: theme.colorScheme.primaryFixed,
+                    blurRadius: 8,
+                    offset: const Offset(0, 0),
+                  ),
+                ],
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _expandedIndex = isExpanded ? null : index;
+                  });
+                },
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: 260.w,
+                          child: Text(
+                            faq.answer,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              color: isDark
+                                  ? AppColors.goldLight
+                                  : AppColors.burgundy,
+                            ),
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                          ),
+                        ),
+                        Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: isExpanded
+                              ? AppColors.goldDark
+                              : theme.iconTheme.color,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8.h),
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+                        faq.answer,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          height: 1.55,
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.78,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            crossFadeState: CrossFadeState.showFirst,
+            duration: const Duration(milliseconds: 400),
+            firstCurve: Curves.easeOutCubic,
+            secondCurve: Curves.easeInCubic,
           );
         },
       ),

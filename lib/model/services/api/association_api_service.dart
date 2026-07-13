@@ -42,7 +42,8 @@ class AssociationApiService {
 
   Future<void> submitLinkRequest({
     String customerNote = '',
-    String type = 'association_membership',
+    String type = 'association-membership',
+    String requestedMembershipType = 'residential',
     required String fatherName,
     required String motherName,
     required String nationalId,
@@ -56,7 +57,7 @@ class AssociationApiService {
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final data = <String, dynamic>{
-      'type': type,
+      'requested_membership_type': requestedMembershipType,
       'customer_note': customerNote,
       'father_name': fatherName,
       'mother_name': motherName,
@@ -77,14 +78,19 @@ class AssociationApiService {
     final requestDocuments = attachments;
     for (var i = 0; i < requestDocuments.length; i++) {
       final attachment = requestDocuments[i];
-      data['documents[$i][attachment_type_id]'] = attachment.attachmentTypeId;
-      data['documents[$i][file]'] = await MultipartFile.fromFile(
+      data['documents[$i][document_definition_id]'] =
+          attachment.attachmentTypeId;
+      data['documents[$i][document]'] = await MultipartFile.fromFile(
         attachment.file.path,
         filename: CustomerApiService.basename(attachment.file.path),
       );
     }
     try {
-      await _client.post('customer/requests', data: FormData.fromMap(data));
+      final endpointType = type.replaceAll('_', '-');
+      await _client.post(
+        'customer/requests/$endpointType',
+        data: FormData.fromMap(data),
+      );
     } catch (e) {
       throw Exception('Failed to submit link request: $e');
     }

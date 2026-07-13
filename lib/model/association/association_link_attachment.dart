@@ -2,12 +2,10 @@ import 'dart:io';
 
 class AssociationLinkAttachment {
   AssociationLinkAttachment({
-    required this.id,
     required this.file,
     this.attachmentTypeId,
   });
 
-  final String id;
   final File file;
   final String? attachmentTypeId;
 
@@ -19,7 +17,6 @@ class AssociationLinkAttachment {
 
   AssociationLinkAttachment copyWith({String? attachmentTypeId}) {
     return AssociationLinkAttachment(
-      id: id,
       file: file,
       attachmentTypeId: attachmentTypeId ?? this.attachmentTypeId,
     );

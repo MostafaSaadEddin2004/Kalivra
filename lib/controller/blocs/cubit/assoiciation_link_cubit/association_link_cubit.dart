@@ -73,8 +73,8 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    try {
       emit(AssociationLinkLoading());
+    try {
       await _api.submitLinkRequest(
         customerNote: customerNote,
         type: type,
@@ -109,8 +109,8 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    try {
       emit(AssociationLinkLoading());
+    try {
       await _api.submitNormalRequest(
         type: type,
         customerNot: customerNote,

@@ -255,22 +255,17 @@ class _AssociationRequestsAndServicesScreenState
       }
 
       setState(() {
-        final id =
-            '${DateTime.now().microsecondsSinceEpoch}_${_attachments.length}';
-
-        _attachments.add(AssociationLinkAttachment(id: id, file: file));
-
-        _attachmentTypeIds[id] = null;
+        _attachments.add(AssociationLinkAttachment(file: file));
       });
     }
   }
 
-  void _removeAttachment(String id) {
+  void _removeAttachment(String name) {
     if (_isLocked) return;
 
     setState(() {
-      _attachments.removeWhere((attachment) => attachment.id == id);
-      _attachmentTypeIds.remove(id);
+      _attachments.removeWhere((attachment) => attachment.fileName == name);
+      _attachmentTypeIds.remove(name);
     });
   }
 
@@ -312,7 +307,7 @@ class _AssociationRequestsAndServicesScreenState
   List<AssociationLinkAttachment> _attachmentsWithTypes() {
     return _attachments.map((attachment) {
       return attachment.copyWith(
-        attachmentTypeId: _attachmentTypeIds[attachment.id],
+        attachmentTypeId: _attachmentTypeIds[attachment.fileName],
       );
     }).toList();
   }
@@ -341,26 +336,7 @@ class _AssociationRequestsAndServicesScreenState
   }
 
   Future<void> _submit() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    if (_requestType == null) {
-      CustomSnackBar.show(
-        context,
-        l10n.associationRequestTypeOrMessageRequired,
-      );
-      return;
-    }
-
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    if (_isMembershipRequest && _attachments.isEmpty) {
-      CustomSnackBar.show(
-        context,
-        l10n.associationRequestTypeOrMessageRequired,
-      );
-      return;
-    }
-
     try {
       if (_isMembershipRequest) {
         await _associationLinkCubit.submitLinkRequest(
@@ -388,15 +364,7 @@ class _AssociationRequestsAndServicesScreenState
         );
       }
 
-      if (!mounted) return;
-
-      CustomSnackBar.show(context, l10n.linkRequestSentSuccessfully);
-
-      setState(() {
-        _isLocked = _isMembershipRequest;
-      });
     } catch (e) {
-      if (!mounted) return;
       CustomSnackBar.show(context, e.toString());
     }
   }
@@ -511,8 +479,8 @@ class _AssociationRequestsAndServicesScreenState
     final isSubmitting =
         state is AssociationLinkLoading && _requestTypes.isNotEmpty;
 
-    return SafeArea(
-      top: false,
+    return Padding(
+      padding: EdgeInsets.only(top: 20.h, bottom: 16.h),
       child: SizedBox(
         width: double.infinity,
         child: FilledButton(
@@ -607,15 +575,14 @@ class _AssociationRequestsAndServicesScreenState
                           _validateOptionalEmail(value, l10n),
                       fieldSpacer: _fieldSpacer,
                     ),
+                    _buildSubmitButton(state: state),
                   ],
-                  if (_hasSelectedGeneralRequest)
+                  if (_hasSelectedGeneralRequest) ...[
                     _buildGeneralRequestFields(
                       l10n: l10n,
                       theme: theme,
                       isDark: isDark,
                     ),
-                  if (_hasSelectedAnyRequest && !_isLocked) ...[
-                    SizedBox(height: 20.h),
                     _buildSubmitButton(state: state),
                   ],
                 ],
@@ -1386,11 +1353,11 @@ class _RequestAttachmentsSection extends StatelessWidget {
           AttachmentTile(
             attachment: attachment,
             attachmentTypes: attachmentTypes,
-            selectedAttachmentTypeId: attachmentTypeIds[attachment.id],
+            selectedAttachmentTypeId: attachmentTypeIds[attachment.fileName],
             enabled: enabled,
-            onDelete: () => onRemoveAttachment(attachment.id),
+            onDelete: () => onRemoveAttachment(attachment.fileName),
             onAttachmentTypeChanged: (value) =>
-                onAttachmentTypeChanged(attachment.id, value),
+                onAttachmentTypeChanged(attachment.fileName, value),
           ),
         ],
         if (enabled) ...[
@@ -1476,7 +1443,6 @@ class AttachmentTile extends StatelessWidget {
             },
             enabled: enabled,
             onChanged: onAttachmentTypeChanged,
-            validator: (value) => value == null ? l10n.required : null,
           ),
         ],
       ),

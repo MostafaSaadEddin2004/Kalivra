@@ -308,9 +308,13 @@ class AuthCubit extends Cubit<AuthState> {
     required String firstName,
     required String lastName,
     required BuildContext context,
+    String? middleName,
+    String? fatherName,
     String? gender,
     String? dateOfBirth,
+    String? email,
     String? phone,
+    String? whatsappNumber,
     String? officialGovernorate,
     String? officialCity,
     String? officialTown,
@@ -318,14 +322,19 @@ class AuthCubit extends Cubit<AuthState> {
     String? officialStreet,
     String? officialBuilding,
     String? permanentAddress,
+    Map<String, dynamic>? addresses,
     File? imageFile,
   }) async {
     emit(AuthLoading());
     try {
       await _customerApiService.updateProfile(
         phone: phone,
+        whatsappNumber: whatsappNumber,
+        email: email,
         firstName: firstName,
+        middleName: middleName,
         lastName: lastName,
+        fatherName: fatherName,
         gender: gender,
         dateOfBirth: dateOfBirth,
         officialGovernorate: officialGovernorate,
@@ -335,6 +344,7 @@ class AuthCubit extends Cubit<AuthState> {
         officialStreet: officialStreet,
         officialBuilding: officialBuilding,
         permanentAddress: permanentAddress,
+        addresses: addresses,
         imageFile: imageFile,
       );
       emit(AuthSuccessed(message: 'تم تحديث البيانات بنجاح'));

@@ -2,6 +2,7 @@ class CustomerApiModel {
   const CustomerApiModel({
     required this.id,
     this.firstName,
+    this.middleName,
     this.lastName,
     this.name,
     this.email,
@@ -17,6 +18,7 @@ class CustomerApiModel {
     this.isVerified,
     this.subscribedToNewsLetter,
     this.referralCode,
+    this.userBalance,
     this.notes,
     this.createdAt,
     this.updatedAt,
@@ -27,6 +29,7 @@ class CustomerApiModel {
 
   final int id;
   final String? firstName;
+  final String? middleName;
   final String? lastName;
   final String? name;
   final String? email;
@@ -42,6 +45,7 @@ class CustomerApiModel {
   final bool? isVerified;
   final bool? subscribedToNewsLetter;
   final String? referralCode;
+  final num? userBalance;
   final String? notes;
   final String? createdAt;
   final String? updatedAt;
@@ -50,7 +54,7 @@ class CustomerApiModel {
   final CustomerAddressInformation? addressInformation;
 
   String? get address =>
-      addressInformation?.permanentAddress ??
+      addressInformation?.permanent?.formatted ??
       addressInformation?.formattedAddress;
 
   String? get avatar => imageUrl;
@@ -58,6 +62,9 @@ class CustomerApiModel {
   String? get displayImageUrl => imageUrl ?? avatar;
 
   String? get fatherName => personalInformation?.fatherName;
+
+  String? get displayMiddleName =>
+      middleName ?? personalInformation?.middleName;
 
   String? get motherName => personalInformation?.motherName;
 
@@ -82,6 +89,7 @@ class CustomerApiModel {
     return CustomerApiModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
       firstName: _nullableString(json['first_name']) ?? personal?.firstName,
+      middleName: _nullableString(json['middle_name']) ?? personal?.middleName,
       lastName: _nullableString(json['last_name']) ?? personal?.lastName,
       name: _nullableString(json['name']) ?? personal?.name,
       email: _nullableString(json['email']) ?? contact?.email,
@@ -99,6 +107,7 @@ class CustomerApiModel {
       isVerified: json['is_verified'] as bool?,
       subscribedToNewsLetter: json['subscribed_to_news_letter'] as bool?,
       referralCode: _nullableString(json['referral_code']),
+      userBalance: _nullableNum(json['user_balance'] ?? json['User Balance']),
       notes: _nullableString(json['notes']),
       createdAt: _nullableString(json['created_at']),
       updatedAt: _nullableString(json['updated_at']),
@@ -120,6 +129,12 @@ class CustomerApiModel {
     return int.tryParse(value.toString().trim());
   }
 
+  static num? _nullableNum(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value;
+    return num.tryParse(value.toString().trim());
+  }
+
   static int? _parseStatus(dynamic value) {
     if (value is bool) return value ? 1 : 0;
     if (value is num) return value.toInt();
@@ -139,6 +154,7 @@ class CustomerApiModel {
 class CustomerPersonalInformation {
   const CustomerPersonalInformation({
     this.firstName,
+    this.middleName,
     this.lastName,
     this.fatherName,
     this.motherName,
@@ -150,6 +166,7 @@ class CustomerPersonalInformation {
   });
 
   final String? firstName;
+  final String? middleName;
   final String? lastName;
   final String? fatherName;
   final String? motherName;
@@ -162,6 +179,7 @@ class CustomerPersonalInformation {
   factory CustomerPersonalInformation.fromJson(Map<String, dynamic> json) {
     return CustomerPersonalInformation(
       firstName: CustomerApiModel._nullableString(json['first_name']),
+      middleName: CustomerApiModel._nullableString(json['middle_name']),
       lastName: CustomerApiModel._nullableString(json['last_name']),
       fatherName: CustomerApiModel._nullableString(json['father_name']),
       motherName: CustomerApiModel._nullableString(json['mother_name']),
@@ -196,68 +214,172 @@ class CustomerContactInformation {
 
 class CustomerAddressInformation {
   const CustomerAddressInformation({
-    this.permanentCapitalId,
-    this.permanentCityId,
-    this.permanentTownId,
-    this.permanentVillageId,
-    this.officialGovernorate,
-    this.officialCity,
-    this.officialTown,
-    this.officialMunicipalityVillage,
-    this.officialStreet,
-    this.officialBuilding,
-    this.permanentAddress,
+    this.permanent,
+    this.current,
+    this.additional = const [],
   });
 
-  final int? permanentCapitalId;
-  final int? permanentCityId;
-  final int? permanentTownId;
-  final int? permanentVillageId;
-  final String? officialGovernorate;
-  final String? officialCity;
-  final String? officialTown;
-  final String? officialMunicipalityVillage;
-  final String? officialStreet;
-  final String? officialBuilding;
-  final String? permanentAddress;
+  final CustomerAddressEntry? permanent;
+  final CustomerAddressEntry? current;
+  final List<CustomerAddressEntry> additional;
+
+  int? get permanentCapitalId => permanent?.capitalId;
+
+  int? get permanentCityId => permanent?.cityId;
+
+  int? get permanentTownId => permanent?.townId;
+
+  int? get permanentVillageId => null;
+
+  String? get officialGovernorate => permanent?.capital;
+
+  String? get officialCity => permanent?.city;
+
+  String? get officialTown => permanent?.town;
+
+  String? get officialMunicipalityVillage => permanent?.village;
+
+  String? get officialStreet => permanent?.streetName;
+
+  String? get officialBuilding => permanent?.building;
+
+  String? get permanentAddress => permanent?.formatted;
 
   String get formattedAddress {
-    final parts = [
-      officialGovernorate,
-      officialCity,
-      officialTown,
-      officialMunicipalityVillage,
-      officialStreet,
-      officialBuilding,
-    ].whereType<String>().where((part) => part.trim().isNotEmpty).toList();
-    return parts.join(' - ');
+    return permanent?.formatted ?? '';
   }
 
   factory CustomerAddressInformation.fromJson(Map<String, dynamic> json) {
+    final permanent = CustomerAddressEntry.fromDynamic(json['permanent']);
+    final current = CustomerAddressEntry.fromDynamic(json['current']);
+    final additional = CustomerAddressEntry.listFromDynamic(json['additional']);
+
+    if (permanent != null || current != null || additional.isNotEmpty) {
+      return CustomerAddressInformation(
+        permanent: permanent,
+        current: current,
+        additional: additional,
+      );
+    }
+
     return CustomerAddressInformation(
-      permanentCapitalId: CustomerApiModel._nullableInt(
-        json['permanent_capital_id'],
+      permanent: CustomerAddressEntry(
+        capitalId: CustomerApiModel._nullableInt(json['permanent_capital_id']),
+        cityId: CustomerApiModel._nullableInt(json['permanent_city_id']),
+        townId: CustomerApiModel._nullableInt(json['permanent_town_id']),
+        capital: CustomerApiModel._nullableString(json['official_governorate']),
+        city: CustomerApiModel._nullableString(json['official_city']),
+        town: CustomerApiModel._nullableString(json['official_town']),
+        village: CustomerApiModel._nullableString(
+          json['official_municipality_village'],
+        ),
+        streetName: CustomerApiModel._nullableString(json['official_street']),
+        building: CustomerApiModel._nullableString(json['official_building']),
+        formatted: CustomerApiModel._nullableString(json['permanent_address']),
       ),
-      permanentCityId: CustomerApiModel._nullableInt(json['permanent_city_id']),
-      permanentTownId: CustomerApiModel._nullableInt(json['permanent_town_id']),
-      permanentVillageId: CustomerApiModel._nullableInt(
-        json['permanent_village_id'],
-      ),
-      officialGovernorate: CustomerApiModel._nullableString(
-        json['official_governorate'],
-      ),
-      officialCity: CustomerApiModel._nullableString(json['official_city']),
-      officialTown: CustomerApiModel._nullableString(json['official_town']),
-      officialMunicipalityVillage: CustomerApiModel._nullableString(
-        json['official_municipality_village'],
-      ),
-      officialStreet: CustomerApiModel._nullableString(json['official_street']),
-      officialBuilding: CustomerApiModel._nullableString(
-        json['official_building'],
-      ),
-      permanentAddress: CustomerApiModel._nullableString(
-        json['permanent_address'],
-      ),
+    );
+  }
+}
+
+class CustomerAddressEntry {
+  const CustomerAddressEntry({
+    this.id,
+    this.type,
+    this.label,
+    this.capitalId,
+    this.cityId,
+    this.townId,
+    this.village,
+    this.streetName,
+    this.streetNumber,
+    this.building,
+    this.notes,
+    this.capital,
+    this.city,
+    this.town,
+    this.formatted,
+  });
+
+  final int? id;
+  final String? type;
+  final String? label;
+  final int? capitalId;
+  final int? cityId;
+  final int? townId;
+  final String? village;
+  final String? streetName;
+  final String? streetNumber;
+  final String? building;
+  final String? notes;
+  final String? capital;
+  final String? city;
+  final String? town;
+  final String? formatted;
+
+  List<String> get addressParts {
+    return [
+      capital,
+      city,
+      town,
+      village,
+      streetName,
+      streetNumber,
+      building,
+    ].whereType<String>().where((part) => part.trim().isNotEmpty).toList();
+  }
+
+  String get displayAddress {
+    final address = formatted?.trim();
+    if (address != null && address.isNotEmpty) return address;
+    return addressParts.join(', ');
+  }
+
+  bool get hasContent {
+    return [
+      label,
+      type,
+      displayAddress,
+      notes,
+    ].any((value) => value != null && value.trim().isNotEmpty);
+  }
+
+  static CustomerAddressEntry? fromDynamic(dynamic raw) {
+    if (raw is Map<String, dynamic>) return CustomerAddressEntry.fromJson(raw);
+    if (raw is Map) {
+      return CustomerAddressEntry.fromJson(Map<String, dynamic>.from(raw));
+    }
+    return null;
+  }
+
+  static List<CustomerAddressEntry> listFromDynamic(dynamic raw) {
+    if (raw is List) {
+      return raw
+          .map(CustomerAddressEntry.fromDynamic)
+          .whereType<CustomerAddressEntry>()
+          .toList();
+    }
+
+    final single = fromDynamic(raw);
+    return single == null ? const [] : [single];
+  }
+
+  factory CustomerAddressEntry.fromJson(Map<String, dynamic> json) {
+    return CustomerAddressEntry(
+      id: CustomerApiModel._nullableInt(json['id']),
+      type: CustomerApiModel._nullableString(json['type']),
+      label: CustomerApiModel._nullableString(json['label']),
+      capitalId: CustomerApiModel._nullableInt(json['capital_id']),
+      cityId: CustomerApiModel._nullableInt(json['city_id']),
+      townId: CustomerApiModel._nullableInt(json['town_id']),
+      village: CustomerApiModel._nullableString(json['village']),
+      streetName: CustomerApiModel._nullableString(json['street_name']),
+      streetNumber: CustomerApiModel._nullableString(json['street_number']),
+      building: CustomerApiModel._nullableString(json['building']),
+      notes: CustomerApiModel._nullableString(json['notes']),
+      capital: CustomerApiModel._nullableString(json['capital']),
+      city: CustomerApiModel._nullableString(json['city']),
+      town: CustomerApiModel._nullableString(json['town']),
+      formatted: CustomerApiModel._nullableString(json['formatted']),
     );
   }
 }
