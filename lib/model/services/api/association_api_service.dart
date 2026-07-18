@@ -3,6 +3,7 @@ import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
+import 'package:kalivra/model/association/association_news_model.dart';
 import 'package:kalivra/model/association/association_request_address.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
@@ -123,5 +124,23 @@ class AssociationApiService {
     final body = res.data;
     final data = body['data'];
     return AssociationMemberProfileModel.fromJson(data);
+  }
+
+  Future<List<AssociationNewsModel>> getNews() async {
+    final res = await _client.get('customer/association/news');
+    final data = res.data['data'];
+    if (data is! List) return const [];
+    final news =
+        data
+            .whereType<Map>()
+            .map(
+              (item) => AssociationNewsModel.fromJson(
+                Map<String, dynamic>.from(item),
+              ),
+            )
+            .where((item) => item.text.isNotEmpty)
+            .toList()
+          ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return news;
   }
 }

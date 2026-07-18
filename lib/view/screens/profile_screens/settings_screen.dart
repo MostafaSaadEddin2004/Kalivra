@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
@@ -90,29 +91,38 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16.h),
-              _SettingsSection(
-                title: l10n.settingsAccountSecurity,
-                children: [
-                  _SettingsTile(
-                    icon: Icons.lock_outline_rounded,
-                    label: l10n.settingsChangePassword,
-                    onTap: () => _openProtectedScreen(
-                      context,
-                      () => context.push(AppRoutes.changePassword),
-                    ),
-                  ),
-                  _SettingsTile(
-                    icon: Icons.phone_android_rounded,
-                    label: l10n.settingsChangePhone,
-                    onTap: () => _openProtectedScreen(
-                      context,
-                      () => context.push(
-                        AppRoutes.otp,
-                        extra: OtpScreenMode.changePhone,
-                      ),
-                    ),
-                  ),
-                ],
+              BlocBuilder<AuthCubit, AuthState>(bloc: AuthCubit()..loadProfile(context),
+                builder: (context, state) {
+                  switch (state) {
+                    case UnAuthinticated():
+                      return const SizedBox.shrink();
+                    default:
+                      return _SettingsSection(
+                        title: l10n.settingsAccountSecurity,
+                        children: [
+                          _SettingsTile(
+                            icon: Icons.lock_outline_rounded,
+                            label: l10n.settingsChangePassword,
+                            onTap: () => _openProtectedScreen(
+                              context,
+                              () => context.push(AppRoutes.changePassword),
+                            ),
+                          ),
+                          _SettingsTile(
+                            icon: Icons.phone_android_rounded,
+                            label: l10n.settingsChangePhone,
+                            onTap: () => _openProtectedScreen(
+                              context,
+                              () => context.push(
+                                AppRoutes.otp,
+                                extra: OtpScreenMode.changePhone,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                  }
+                },
               ),
               SizedBox(height: 24.h),
             ],

@@ -24,6 +24,8 @@ class AppTextField extends StatelessWidget {
     this.labelColor,
     this.borderRadius,
     this.textDirection,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final TextEditingController controller;
@@ -45,6 +47,8 @@ class AppTextField extends StatelessWidget {
   final Color? labelColor;
   final double? borderRadius;
   final TextDirection? textDirection;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +77,8 @@ class AppTextField extends StatelessWidget {
       onChanged: onChanged,
       maxLines: obscureText ? 1 : maxLines,
       enabled: enabled,
+      readOnly: readOnly,
+      onTap: onTap,
       textInputAction: textInputAction,
       textCapitalization: textCapitalization,
       maxLength: maxLength,

@@ -9,6 +9,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
+import 'package:kalivra/model/association/association_news_model.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
@@ -23,7 +24,7 @@ class AssociationMemberProfileScreen extends StatefulWidget {
 
 class _AssociationMemberProfileScreenState
     extends State<AssociationMemberProfileScreen> {
-  int? _selectedYear;
+  int _selectedMembershipIndex = 0;
 
   @override
   void initState() {
@@ -221,18 +222,15 @@ class _AssociationMemberProfileScreenState
             );
           }
 
-          final years = _resolveYears(profile);
-          final selectedYear = _selectedYear ?? years.firstOrNull;
-          final filteredInstallments = _filterByYear(
-            profile.installments,
-            selectedYear,
-            (item) => item.year,
-          );
-          final filteredOtherPayments = _filterByYear(
-            profile.otherPayments,
-            selectedYear,
-            (item) => item.year,
-          );
+          final memberships = profile.memberships;
+          final selectedIndex = memberships.isEmpty
+              ? 0
+              : _selectedMembershipIndex
+                    .clamp(0, memberships.length - 1)
+                    .toInt();
+          final selectedMembership = memberships.isEmpty
+              ? null
+              : memberships[selectedIndex];
 
           return RefreshIndicator(
             onRefresh: _reload,
@@ -241,278 +239,26 @@ class _AssociationMemberProfileScreenState
               children: [
                 _ProfileHeaderCard(profile: profile, isDark: isDark),
                 SizedBox(height: 16.h),
-                const _AssociationNewsFeedSlider(),
+                _AssociationNewsFeedSlider(news: state.news),
                 SizedBox(height: 16.h),
-                _ProgressCard(
-                  title: l10n.associationMemberMembershipStatus,
-                  value: profile.membershipStatusPercent,
-                  color: AppColors.burgundy,
-                ),
-                SizedBox(height: 12.h),
-                _ProgressCard(
-                  title: l10n.associationMemberPaymentCommitment,
-                  value: profile.paymentCommitmentPercent,
-                  color: AppColors.goldDark,
-                ),
-                SizedBox(height: 16.h),
-                AssociationFormSection(
-                  title: l10n.associationLinkContactSection,
-                  icon: Icons.contact_phone_outlined,
-                  children: [
-                    _InfoRow(
-                      label: l10n.associationLinkFirstName,
-                      value: profile.personal.fullName,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkMembershipNumber,
-                      value: profile.personal.membershipNumber,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkMobile,
-                      value: profile.personal.mobile,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkWhatsApp,
-                      value: profile.personal.whatsApp,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkEmail,
-                      value: profile.personal.email,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationMemberCurrentAddress,
-                      value: profile.personal.currentAddress,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkPermanentAddress,
-                      value: profile.personal.permanentAddress,
-                    ),
-                  ],
-                ),
-                AssociationFormSection(
-                  title: l10n.associationLinkMembershipSection,
-                  icon: Icons.badge_outlined,
-                  children: [
-                    _InfoRow(
-                      label: l10n.associationLinkPriorityNumber,
-                      value: profile.personal.priorityNumber,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkProjectName,
-                      value: profile.personal.projectName,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkHousingUnit,
-                      value: profile.personal.housingUnit,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkGovernorate,
-                      value: profile.personal.governorate,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkCity,
-                      value: profile.personal.city,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkTown,
-                      value: profile.personal.town,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkVillage,
-                      value: profile.personal.village,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkStreet,
-                      value: profile.personal.street,
-                    ),
-                    _InfoRow(
-                      label: l10n.associationLinkBuilding,
-                      value: profile.personal.building,
-                    ),
-                  ],
-                ),
-                if (years.isNotEmpty) ...[
-                  _SectionTitle(
-                    title: l10n.associationMemberPaymentsByYear,
-                    icon: Icons.calendar_month_outlined,
-                  ),
-                  SizedBox(height: 8.h),
-                  Wrap(
-                    spacing: 8.w,
-                    runSpacing: 8.h,
-                    children: years.map((year) {
-                      final selected = year == selectedYear;
-                      return FilterChip(
-                        label: Text(year.toString()),
-                        selected: selected,
-                        onSelected: (_) => setState(() => _selectedYear = year),
-                      );
-                    }).toList(),
+                if (memberships.isEmpty)
+                  _AcceptedLinkEmptyMemberships(profile: profile)
+                else ...[
+                  _MembershipTabs(
+                    memberships: memberships,
+                    selectedIndex: selectedIndex,
+                    onSelected: (index) {
+                      setState(() => _selectedMembershipIndex = index);
+                    },
                   ),
                   SizedBox(height: 16.h),
+                  _MemberContactSection(profile: profile),
+                  if (selectedMembership != null)
+                    _MembershipDetailsSection(
+                      profile: profile,
+                      membership: selectedMembership,
+                    ),
                 ],
-                AssociationFormSection(
-                  title: l10n.associationMemberFinancialSummary,
-                  icon: Icons.account_balance_wallet_outlined,
-                  children: [
-                    _SummaryTile(
-                      label: l10n.associationMemberTotalAmount,
-                      value: _formatMoney(profile.financialSummary.totalAmount),
-                    ),
-                    _SummaryTile(
-                      label: l10n.associationMemberPaidAmount,
-                      value: _formatMoney(profile.financialSummary.paidAmount),
-                    ),
-                    _SummaryTile(
-                      label: l10n.associationMemberRemainingInstallments,
-                      value: profile.financialSummary.remainingInstallments
-                          .toString(),
-                    ),
-                  ],
-                ),
-                _DataSection(
-                  title: l10n.associationMemberInstallments,
-                  icon: Icons.payments_outlined,
-                  emptyMessage: l10n.associationMemberNoData,
-                  rows: filteredInstallments.isEmpty
-                      ? const []
-                      : filteredInstallments
-                            .map(
-                              (item) => [
-                                item.label,
-                                _formatMoney(item.amount),
-                                item.date,
-                                item.status,
-                                item.notes,
-                              ],
-                            )
-                            .toList(),
-                  headers: [
-                    l10n.associationMemberPayment,
-                    l10n.associationMemberAmount,
-                    l10n.associationMemberDate,
-                    l10n.associationMemberStatus,
-                    l10n.associationMemberNotes,
-                  ],
-                ),
-                _DataSection(
-                  title: l10n.associationMemberOtherPayments,
-                  icon: Icons.receipt_long_outlined,
-                  emptyMessage: l10n.associationMemberNoData,
-                  rows: filteredOtherPayments.isEmpty
-                      ? const []
-                      : filteredOtherPayments
-                            .map(
-                              (item) => [
-                                _formatMoney(item.amount),
-                                item.date,
-                                item.method,
-                                item.bank,
-                                item.receipt,
-                                item.notes,
-                              ],
-                            )
-                            .toList(),
-                  headers: [
-                    l10n.associationMemberAmount,
-                    l10n.associationMemberDate,
-                    l10n.associationMemberMethod,
-                    l10n.associationMemberBank,
-                    l10n.associationMemberReceipt,
-                    l10n.associationMemberNotes,
-                  ],
-                ),
-                _DataSection(
-                  title: l10n.associationMemberNotifications,
-                  icon: Icons.notifications_outlined,
-                  emptyMessage: l10n.associationMemberNoData,
-                  rows: profile.notifications
-                      .map(
-                        (item) => [
-                          item.date,
-                          item.type,
-                          item.title,
-                          item.isRead
-                              ? l10n.associationMemberReadStatus
-                              : l10n.associationMemberUnread,
-                        ],
-                      )
-                      .toList(),
-                  headers: [
-                    l10n.associationMemberDate,
-                    l10n.associationMemberType,
-                    l10n.associationMemberTitle,
-                    l10n.associationMemberRead,
-                  ],
-                ),
-                _DataSection(
-                  title: l10n.associationMemberEvents,
-                  icon: Icons.event_outlined,
-                  emptyMessage: l10n.associationMemberNoData,
-                  rows: profile.events
-                      .map(
-                        (item) => [
-                          item.date,
-                          item.title,
-                          item.location,
-                          item.status,
-                        ],
-                      )
-                      .toList(),
-                  headers: [
-                    l10n.associationMemberDate,
-                    l10n.associationMemberEvent,
-                    l10n.associationMemberLocation,
-                    l10n.associationMemberStatus,
-                  ],
-                ),
-                _DataSection(
-                  title: l10n.associationMemberMeasurements,
-                  icon: Icons.straighten_outlined,
-                  emptyMessage: l10n.associationMemberNoData,
-                  rows: profile.measurements
-                      .map((item) => [item.date, item.value, item.notes])
-                      .toList(),
-                  headers: [
-                    l10n.associationMemberDate,
-                    l10n.associationMemberValue,
-                    l10n.associationMemberNotes,
-                  ],
-                ),
-                AssociationFormSection(
-                  title: l10n.associationMemberAttachments,
-                  icon: Icons.attach_file_rounded,
-                  children: profile.attachments.isEmpty
-                      ? [
-                          Text(
-                            l10n.associationMemberNoData,
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        ]
-                      : profile.attachments
-                            .map(
-                              (item) => ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: Icon(
-                                  _attachmentIcon(item.type),
-                                  color: isDark
-                                      ? AppColors.goldLight
-                                      : AppColors.burgundy,
-                                ),
-                                title: Text(
-                                  item.name.isEmpty ? item.type : item.name,
-                                ),
-                                subtitle: item.url.isEmpty
-                                    ? null
-                                    : Text(
-                                        item.url,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                              ),
-                            )
-                            .toList(),
-                ),
               ],
             ),
           );
@@ -520,49 +266,12 @@ class _AssociationMemberProfileScreenState
       ),
     );
   }
-
-  List<int> _resolveYears(AssociationMemberProfileModel profile) {
-    if (profile.paymentYears.isNotEmpty) {
-      return [...profile.paymentYears]..sort();
-    }
-    final years = <int>{};
-    for (final item in profile.installments) {
-      if (item.year != null) years.add(item.year!);
-    }
-    for (final item in profile.otherPayments) {
-      if (item.year != null) years.add(item.year!);
-    }
-    final sorted = years.toList()..sort();
-    return sorted;
-  }
-
-  List<T> _filterByYear<T>(
-    List<T> items,
-    int? year,
-    int? Function(T item) yearOf,
-  ) {
-    if (year == null) return items;
-    return items.where((item) => yearOf(item) == year).toList();
-  }
-
-  String _formatMoney(double value) {
-    if (value == 0) return '0';
-    return value.toStringAsFixed(value.truncateToDouble() == value ? 0 : 2);
-  }
-
-  IconData _attachmentIcon(String type) {
-    final normalized = type.toLowerCase();
-    if (normalized.contains('pdf')) return Icons.picture_as_pdf_outlined;
-    if (normalized.contains('img') || normalized.contains('image')) {
-      return Icons.image_outlined;
-    }
-    if (normalized.contains('doc')) return Icons.description_outlined;
-    return Icons.insert_drive_file_outlined;
-  }
 }
 
 class _AssociationNewsFeedSlider extends StatelessWidget {
-  const _AssociationNewsFeedSlider();
+  const _AssociationNewsFeedSlider({required this.news});
+
+  final List<AssociationNewsModel> news;
 
   @override
   Widget build(BuildContext context) {
@@ -644,6 +353,9 @@ class _AssociationNewsFeedSlider extends StatelessWidget {
   }
 
   List<_AssociationNewsItem> _newsItems(BuildContext context) {
+    if (news.isNotEmpty) {
+      return news.map((item) => _AssociationNewsItem(text: item.text)).toList();
+    }
     final l10n = AppLocalizations.of(context)!;
     return [
       _AssociationNewsItem(
@@ -673,108 +385,599 @@ class _AssociationNewsItem {
   final bool isImportant;
 }
 
-extension _AssociationMemberProfileModelView on AssociationMemberProfileModel {
-  _AssociationMemberPersonalView get personal =>
-      _AssociationMemberPersonalView(person, associationMember, memberships);
+class _AcceptedLinkEmptyMemberships extends StatelessWidget {
+  const _AcceptedLinkEmptyMemberships({required this.profile});
 
-  double get membershipStatusPercent => hasActiveMemberships ? 1 : 0;
+  final AssociationMemberProfileModel profile;
 
-  double get paymentCommitmentPercent => isAssociationMember ? 1 : 0;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final personName = profile.person.displayName.isEmpty
+        ? _localizedText(context, arabic: 'العضو', english: 'the member')
+        : profile.person.displayName;
 
-  List<int> get paymentYears => const [];
-
-  List<dynamic> get installments => const [];
-
-  List<dynamic> get otherPayments => const [];
-
-  List<dynamic> get notifications => const [];
-
-  List<dynamic> get events => const [];
-
-  List<dynamic> get measurements => const [];
-
-  List<dynamic> get attachments => const [];
-
-  _AssociationMemberFinancialSummaryView get financialSummary =>
-      const _AssociationMemberFinancialSummaryView();
-}
-
-class _AssociationMemberPersonalView {
-  const _AssociationMemberPersonalView(
-    this.person,
-    this.associationMember,
-    this.memberships,
-  );
-
-  final dynamic person;
-  final dynamic associationMember;
-  final List<dynamic> memberships;
-
-  String get fullName =>
-      _readString(person, const ['full_name', 'name', 'first_name']);
-
-  String get membershipNumber {
-    final direct = _readString(associationMember, const ['membership_number']);
-    if (direct.isNotEmpty) return direct;
-    if (memberships.isEmpty) return '';
-    return _readString(memberships.first, const ['membership_number']);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(22.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.burgundy.withValues(alpha: 0.12)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(
+          color: isDark
+              ? AppColors.taupe.withValues(alpha: 0.32)
+              : AppColors.burgundy.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 64.r,
+            height: 64.r,
+            decoration: BoxDecoration(
+              color: isDark
+                  ? AppColors.goldLight.withValues(alpha: 0.14)
+                  : AppColors.burgundy.withValues(alpha: 0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.verified_user_outlined,
+              size: 34.r,
+              color: isDark ? AppColors.goldLight : AppColors.burgundy,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          Text(
+            _localizedText(
+              context,
+              arabic: 'تم قبول طلب الربط',
+              english: 'Linking request accepted',
+            ),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: isDark ? AppColors.offWhite : AppColors.burgundy,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Text(
+            _localizedText(
+              context,
+              arabic:
+                  'تم قبول طلب الربط من السيد $personName، وسيتم عرض المعلومات الخاصة بالعضويات الخاصة بك عند الانتهاء من استكمالها.',
+              english:
+                  'Your linking request for Mr. $personName has been accepted. Your membership information will appear once it is completed.',
+            ),
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
+          ),
+        ],
+      ),
+    );
   }
-
-  String get mobile => _readString(person, const ['mobile', 'phone']);
-
-  String get whatsApp =>
-      _readString(person, const ['whatsapp', 'whats_app', 'phone']);
-
-  String get email => _readString(person, const ['email']);
-
-  String get currentAddress =>
-      _readString(person, const ['current_address', 'address']);
-
-  String get permanentAddress =>
-      _readString(person, const ['permanent_address']);
-
-  String get priorityNumber =>
-      _readString(associationMember, const ['priority_number']);
-
-  String get projectName =>
-      _readString(associationMember, const ['project_name']);
-
-  String get housingUnit =>
-      _readString(associationMember, const ['housing_unit', 'unit_number']);
-
-  String get governorate => _readString(person, const ['governorate']);
-
-  String get city => _readString(person, const ['city']);
-
-  String get town => _readString(person, const ['town']);
-
-  String get village => _readString(person, const ['village']);
-
-  String get street => _readString(person, const ['street']);
-
-  String get building => _readString(person, const ['building']);
 }
 
-class _AssociationMemberFinancialSummaryView {
-  const _AssociationMemberFinancialSummaryView();
+class _MembershipTabs extends StatelessWidget {
+  const _MembershipTabs({
+    required this.memberships,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
 
-  double get totalAmount => 0;
+  final List<AssociationMembership> memberships;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
 
-  double get paidAmount => 0;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-  int get remainingInstallments => 0;
-}
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(memberships.length, (index) {
+          final membership = memberships[index];
+          final selected = index == selectedIndex;
+          final color = isDark ? AppColors.goldLight : AppColors.burgundy;
+          final label = membership.displayType.isEmpty
+              ? _localizedText(
+                  context,
+                  arabic: 'عضوية ${index + 1}',
+                  english: 'Membership ${index + 1}',
+                )
+              : membership.displayType;
 
-String _readString(Object? source, List<String> keys) {
-  if (source is! Map) return '';
-
-  for (final key in keys) {
-    final value = source[key];
-    final text = value?.toString().trim() ?? '';
-    if (text.isNotEmpty) return text;
+          return Padding(
+            padding: EdgeInsetsDirectional.only(end: 10.w),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14.r),
+              onTap: () => onSelected(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? color.withValues(alpha: isDark ? 0.18 : 0.1)
+                      : (isDark
+                            ? AppColors.burgundy.withValues(alpha: 0.08)
+                            : Colors.white),
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(
+                    color: selected
+                        ? color
+                        : color.withValues(alpha: isDark ? 0.22 : 0.16),
+                    width: selected ? 1.4 : 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _membershipIcon(membership.membershipType),
+                      size: 21.r,
+                      color: color,
+                    ),
+                    SizedBox(width: 8.w),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          label,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: isDark ? AppColors.offWhite : color,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        if (membership.membershipNumber.isNotEmpty) ...[
+                          SizedBox(height: 2.h),
+                          Text(
+                            '#${membership.membershipNumber}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDark ? AppColors.taupe : AppColors.black,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
   }
+}
 
-  return '';
+class _MemberContactSection extends StatelessWidget {
+  const _MemberContactSection({required this.profile});
+
+  final AssociationMemberProfileModel profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final person = profile.person;
+
+    return AssociationFormSection(
+      title: l10n.associationLinkContactSection,
+      icon: Icons.contact_phone_outlined,
+      children: [
+        _InfoRow(
+          label: l10n.associationLinkFirstName,
+          value: person.displayName,
+        ),
+        _InfoRow(
+          label: l10n.associationLinkFatherName,
+          value: person.fatherName,
+        ),
+        _InfoRow(
+          label: l10n.associationLinkMotherName,
+          value: person.motherName,
+        ),
+        _InfoRow(
+          label: l10n.associationLinkNationalId,
+          value: person.nationalId,
+        ),
+        _InfoRow(
+          label: l10n.genderLabel,
+          value: _genderLabel(context, person.gender),
+        ),
+        _InfoRow(label: l10n.associationLinkMobile, value: person.phone),
+        _InfoRow(
+          label: l10n.associationLinkWhatsApp,
+          value: person.whatsappNumber,
+        ),
+        _InfoRow(label: l10n.associationLinkEmail, value: person.email),
+        _InfoRow(
+          label: l10n.associationMemberCurrentAddress,
+          value: person.address,
+        ),
+      ],
+    );
+  }
+}
+
+class _MembershipDetailsSection extends StatelessWidget {
+  const _MembershipDetailsSection({
+    required this.profile,
+    required this.membership,
+  });
+
+  final AssociationMemberProfileModel profile;
+  final AssociationMembership membership;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final project = membership.project;
+    final building = membership.building ?? membership.unit?.building;
+    final unit = membership.unit;
+    final lifecycle = profile.membershipLifecycle;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _MembershipSummaryCard(membership: membership),
+        SizedBox(height: 16.h),
+        AssociationFormSection(
+          title: l10n.associationLinkMembershipSection,
+          icon: Icons.badge_outlined,
+          children: [
+            _InfoRow(
+              label: l10n.associationLinkMembershipNumber,
+              value: membership.membershipNumber,
+            ),
+            _InfoRow(
+              label: l10n.associationMemberType,
+              value: membership.displayType,
+            ),
+            _InfoRow(
+              label: l10n.associationMemberStatus,
+              value: membership.displayStatus,
+            ),
+            _InfoRow(
+              label: l10n.associationMemberFinancialSummary,
+              value: membership.displayFinancialStatus,
+            ),
+            _InfoRow(
+              label: l10n.associationMemberDate,
+              value: membership.joinDate,
+            ),
+            _InfoRow(
+              label: l10n.associationLinkPriorityNumber,
+              value: _formatNullableNumber(membership.priorityNumber),
+            ),
+            _InfoRow(
+              label: _localizedText(
+                context,
+                arabic: 'حالة الدور',
+                english: 'Priority Status',
+              ),
+              value: membership.priorityStatusLabel.isNotEmpty
+                  ? membership.priorityStatusLabel
+                  : membership.priorityStatus,
+            ),
+            _InfoRow(
+              label: _localizedText(
+                context,
+                arabic: 'قرار العضوية',
+                english: 'Membership Decision',
+              ),
+              value: membership.membershipDecision,
+            ),
+            _InfoRow(
+              label: _localizedText(
+                context,
+                arabic: 'وثائق الانتساب',
+                english: 'Join Documents',
+              ),
+              value: membership.joinDocuments,
+            ),
+            _InfoRow(
+              label: _localizedText(
+                context,
+                arabic: 'تاريخ الإغلاق',
+                english: 'Closed At',
+              ),
+              value: membership.closedAt,
+            ),
+            _InfoRow(
+              label: l10n.associationMemberPaidAmount,
+              value: _formatNullableNumber(membership.totalPaymentsMade),
+            ),
+          ],
+        ),
+        if (lifecycle != null)
+          AssociationFormSection(
+            title: _localizedText(
+              context,
+              arabic: 'حالة الملف',
+              english: 'Profile Status',
+            ),
+            icon: Icons.route_outlined,
+            children: [
+              _InfoRow(
+                label: l10n.associationMemberStatus,
+                value: lifecycle.title,
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'المرحلة',
+                  english: 'Stage',
+                ),
+                value: lifecycle.statusLabel.isNotEmpty
+                    ? lifecycle.statusLabel
+                    : lifecycle.stage,
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'الرسالة',
+                  english: 'Message',
+                ),
+                value: lifecycle.message,
+              ),
+              _InfoRow(
+                label: l10n.associationMemberNotes,
+                value: lifecycle.adminNotes,
+              ),
+            ],
+          ),
+        if (project != null)
+          AssociationFormSection(
+            title: l10n.associationLinkProjectName,
+            icon: Icons.apartment_rounded,
+            children: [
+              _InfoRow(
+                label: l10n.associationLinkProjectName,
+                value: project.name,
+              ),
+              _InfoRow(
+                label: l10n.associationMemberType,
+                value: project.typeLabel.isNotEmpty
+                    ? project.typeLabel
+                    : project.type,
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'الوصف',
+                  english: 'Subtitle',
+                ),
+                value: project.subtitle,
+              ),
+              _InfoRow(
+                label: l10n.associationMemberAmount,
+                value: _formatNullableNumber(project.price),
+              ),
+              _InfoRow(
+                label: l10n.associationMemberStatus,
+                value: project.status,
+              ),
+            ],
+          ),
+        if (building != null)
+          AssociationFormSection(
+            title: l10n.associationLinkBuilding,
+            icon: Icons.business_rounded,
+            children: [
+              _InfoRow(
+                label: l10n.associationLinkBuilding,
+                value: building.name,
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'الوصف',
+                  english: 'Description',
+                ),
+                value: building.description,
+              ),
+            ],
+          ),
+        if (unit != null)
+          AssociationFormSection(
+            title: l10n.unit,
+            icon: Icons.home_work_outlined,
+            children: [
+              _InfoRow(label: l10n.unit, value: unit.unitNumber),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'الطابق',
+                  english: 'Floor',
+                ),
+                value: _formatNullableNumber(unit.floorNumber),
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'الاتجاه',
+                  english: 'Orientation',
+                ),
+                value: unit.orientationLabel.isNotEmpty
+                    ? unit.orientationLabel
+                    : unit.orientation,
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'المساحة',
+                  english: 'Area',
+                ),
+                value: _formatNullableNumber(unit.area),
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'مساحة الحديقة / التراس',
+                  english: 'Garden / Terrace Area',
+                ),
+                value: _formatNullableNumber(unit.gardenTerraceArea),
+              ),
+              _InfoRow(
+                label: l10n.associationMemberAmount,
+                value: _formatNullableNumber(unit.price),
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'المواصفات',
+                  english: 'Specifications',
+                ),
+                value: unit.specifications,
+              ),
+              _InfoRow(
+                label: l10n.associationMemberStatus,
+                value: unit.statusLabel,
+              ),
+              _InfoRow(
+                label: _localizedText(
+                  context,
+                  arabic: 'مخطط الوحدة',
+                  english: 'Unit Plan',
+                ),
+                value: unit.unitPlanUrl,
+              ),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _MembershipSummaryCard extends StatelessWidget {
+  const _MembershipSummaryCard({required this.membership});
+
+  final AssociationMembership membership;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
+
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.burgundy.withValues(alpha: 0.1)
+            : AppColors.goldLight.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(color: accent.withValues(alpha: 0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                _membershipIcon(membership.membershipType),
+                size: 24.r,
+                color: accent,
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: Text(
+                  membership.displayType,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: isDark ? AppColors.offWhite : AppColors.burgundy,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              _StatusPill(
+                label: membership.isActive
+                    ? _localizedText(
+                        context,
+                        arabic: 'فعالة',
+                        english: 'Active',
+                      )
+                    : _localizedText(
+                        context,
+                        arabic: 'غير فعالة',
+                        english: 'Inactive',
+                      ),
+                color: membership.isActive ? Colors.green : AppColors.red,
+              ),
+            ],
+          ),
+          SizedBox(height: 14.h),
+          Wrap(
+            spacing: 8.w,
+            runSpacing: 8.h,
+            children: [
+              _StatusPill(label: membership.displayStatus, color: accent),
+              _StatusPill(
+                label: membership.displayFinancialStatus,
+                color: AppColors.goldDark,
+              ),
+              _StatusPill(
+                label: membership.isAssignedToProject
+                    ? _localizedText(
+                        context,
+                        arabic: 'مخصص لمشروع',
+                        english: 'Assigned to project',
+                      )
+                    : _localizedText(
+                        context,
+                        arabic: 'غير مخصص لمشروع',
+                        english: 'No project assignment',
+                      ),
+                color: membership.isAssignedToProject ? accent : AppColors.red,
+              ),
+              _StatusPill(
+                label: membership.isAssignedToUnit
+                    ? _localizedText(
+                        context,
+                        arabic: 'مخصص لوحدة',
+                        english: 'Assigned to unit',
+                      )
+                    : _localizedText(
+                        context,
+                        arabic: 'غير مخصص لوحدة',
+                        english: 'No unit assignment',
+                      ),
+                color: membership.isAssignedToUnit ? accent : AppColors.red,
+              ),
+            ].where((item) => item.label.trim().isNotEmpty).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
 }
 
 class _ProfileHeaderCard extends StatelessWidget {
@@ -787,9 +990,15 @@ class _ProfileHeaderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final name = profile.personal.fullName.trim().isEmpty
+    final name = profile.person.displayName.trim().isEmpty
         ? l10n.associationMemberNoData
-        : profile.personal.fullName;
+        : profile.person.displayName;
+    final membershipNumber =
+        profile.associationMember?.membershipNumber.isNotEmpty == true
+        ? profile.associationMember!.membershipNumber
+        : (profile.memberships.isEmpty
+              ? ''
+              : profile.memberships.first.membershipNumber);
 
     return Container(
       width: double.infinity,
@@ -833,10 +1042,10 @@ class _ProfileHeaderCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    if (profile.personal.membershipNumber.isNotEmpty) ...[
+                    if (membershipNumber.isNotEmpty) ...[
                       SizedBox(height: 4.h),
                       Text(
-                        '${l10n.associationLinkMembershipNumber}: ${profile.personal.membershipNumber}',
+                        '${l10n.associationLinkMembershipNumber}: $membershipNumber',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: AppColors.offWhite.withValues(alpha: 0.9),
                         ),
@@ -861,95 +1070,6 @@ enum _AccosiciationMemberProfileMenuActions {
   announcements,
 }
 
-class _ProgressCard extends StatelessWidget {
-  const _ProgressCard({
-    required this.title,
-    required this.value,
-    required this.color,
-  });
-
-  final String title;
-  final double value;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final percent = (value * 100).round();
-
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                Text(
-                  '$percent%',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.h),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                minHeight: 10.h,
-                value: value.clamp(0, 1),
-                backgroundColor: color.withValues(alpha: 0.12),
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title, required this.icon});
-
-  final String title;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 22.r,
-          color: isDark ? AppColors.goldLight : AppColors.burgundy,
-        ),
-        SizedBox(width: 8.w),
-        Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            color: isDark ? AppColors.offWhite : AppColors.burgundy,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _InfoRow extends StatelessWidget {
   const _InfoRow({required this.label, required this.value});
 
@@ -960,7 +1080,7 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final display = value.trim().isEmpty ? '—' : value.trim();
+    final display = value.trim().isEmpty ? '-' : value.trim();
 
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
@@ -982,107 +1102,6 @@ class _InfoRow extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SummaryTile extends StatelessWidget {
-  const _SummaryTile({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: 10.h),
-      child: Row(
-        children: [
-          Expanded(child: Text(label, style: theme.textTheme.bodyMedium)),
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: isDark ? AppColors.goldLight : AppColors.burgundy,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DataSection extends StatelessWidget {
-  const _DataSection({
-    required this.title,
-    required this.icon,
-    required this.headers,
-    required this.rows,
-    required this.emptyMessage,
-  });
-
-  final String title;
-  final IconData icon;
-  final List<String> headers;
-  final List<List<dynamic>> rows;
-  final String emptyMessage;
-
-  @override
-  Widget build(BuildContext context) {
-    return AssociationFormSection(
-      title: title,
-      icon: icon,
-      children: [
-        if (rows.isEmpty)
-          Text(emptyMessage)
-        else
-          ...rows.map(
-            (row) => Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(bottom: 10.h),
-              padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                color: Theme.of(
-                  context,
-                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
-              ),
-              child: Column(
-                children: List.generate(headers.length, (index) {
-                  final cell = index < row.length
-                      ? row[index]?.toString() ?? ''
-                      : '';
-                  if (cell.trim().isEmpty) return const SizedBox.shrink();
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 8.h),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: 110.w,
-                          child: Text(
-                            headers[index],
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            cell,
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
@@ -1125,6 +1144,34 @@ class _MessageState extends StatelessWidget {
   }
 }
 
-extension _FirstOrNull<E> on List<E> {
-  E? get firstOrNull => isEmpty ? null : first;
+String _localizedText(
+  BuildContext context, {
+  required String arabic,
+  required String english,
+}) {
+  final locale = Localizations.localeOf(context).languageCode.toLowerCase();
+  return locale == 'ar' ? arabic : english;
+}
+
+String _genderLabel(BuildContext context, String gender) {
+  final normalized = gender.toLowerCase();
+  if (normalized == 'male') return AppLocalizations.of(context)!.genderMale;
+  if (normalized == 'female') return AppLocalizations.of(context)!.genderFemale;
+  return gender;
+}
+
+IconData _membershipIcon(String type) {
+  final normalized = type.toLowerCase();
+  if (normalized.contains('residential')) return Icons.home_work_outlined;
+  if (normalized.contains('tourism')) return Icons.luggage_outlined;
+  return Icons.badge_outlined;
+}
+
+String _formatNullableNumber(num? value) {
+  if (value == null) return '';
+  final asDouble = value.toDouble();
+  if (asDouble == asDouble.truncateToDouble()) {
+    return asDouble.toInt().toString();
+  }
+  return asDouble.toStringAsFixed(2);
 }

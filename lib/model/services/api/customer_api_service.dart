@@ -70,7 +70,7 @@ class CustomerApiService {
     final Map<String, dynamic> body = {
       'first_name': firstName,
       'last_name': lastName,
-      'email': email,
+      // 'email': email,
       'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,
@@ -255,6 +255,7 @@ class CustomerApiService {
     String? gender,
     String? dateOfBirth,
     String? email,
+    String? countryCode,
     String? phone,
     String? whatsappNumber,
     String? officialGovernorate,
@@ -301,6 +302,7 @@ class CustomerApiService {
       }),
       'contact_information': jsonEncode({
         'email': email ?? '',
+        'country_code': countryCode ?? '',
         'phone': phone ?? '',
         'whatsapp_number': whatsappNumber ?? phone ?? '',
       }),

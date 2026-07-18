@@ -7,8 +7,9 @@ final class AssociationLinkLoading extends AssociationLinkState {}
 
 final class AssociationProfileFetched extends AssociationLinkState {
   final AssociationMemberProfileModel memberInfo;
+  final List<AssociationNewsModel> news;
 
-  AssociationProfileFetched({required this.memberInfo});
+  AssociationProfileFetched({required this.memberInfo, this.news = const []});
 }
 
 final class AssociationLinkRequestsFetched extends AssociationLinkState {

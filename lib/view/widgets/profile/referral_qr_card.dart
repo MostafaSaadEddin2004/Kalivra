@@ -6,12 +6,18 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class ReferralQrCard extends StatelessWidget {
+class ReferralQrCard extends StatefulWidget {
   const ReferralQrCard({super.key, required this.referralCode, this.onCopy});
 
   final String referralCode;
   final VoidCallback? onCopy;
 
+  @override
+  State<ReferralQrCard> createState() => _ReferralQrCardState();
+}
+
+class _ReferralQrCardState extends State<ReferralQrCard> {
+  bool isExpanded = false;
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -21,17 +27,29 @@ class ReferralQrCard extends StatelessWidget {
         ? AppColors.burgundy.withValues(alpha: 0.2)
         : AppColors.burgundy.withValues(alpha: 0.06);
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.r),
-        side: BorderSide(color: primary.withValues(alpha: 0.25), width: 1.5),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          children: [
-            Row(
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isExpanded = !isExpanded;
+        });
+      },
+      child: AnimatedCrossFade(
+        crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+        duration: Duration(milliseconds: 400),
+        secondCurve: Curves.linear,
+        firstCurve: Curves.linear,
+        firstChild: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadiusGeometry.circular(20.r),
+            side: BorderSide(
+              color: primary.withValues(alpha: 0.25),
+              width: 1.5,
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsetsGeometry.all(16.w),
+            child: Row(
               children: [
                 Flexible(
                   child: Column(
@@ -69,80 +87,147 @@ class ReferralQrCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.expand_less_rounded, size: 28.r, color: primary),
+                Icon(Icons.expand_more_rounded, size: 28.r, color: primary),
               ],
             ),
-            SizedBox(height: 24.h),
-            Container(
-              padding: EdgeInsets.all(20.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16.r),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.06),
-                    blurRadius: 12.r,
-                    offset: Offset(0, 4.h),
-                  ),
-                ],
-              ),
-              child: QrImageView(
-                data: referralCode,
-                version: QrVersions.auto,
-                size: 180.r,
-                backgroundColor: Colors.white,
-                eyeStyle: QrEyeStyle(
-                  eyeShape: QrEyeShape.square,
-                  color: AppColors.black,
-                ),
-                dataModuleStyle: QrDataModuleStyle(
-                  dataModuleShape: QrDataModuleShape.square,
-                  color: AppColors.black,
-                ),
-              ),
+          ),
+        ),
+        secondChild: Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.r),
+            side: BorderSide(
+              color: primary.withValues(alpha: 0.25),
+              width: 1.5,
             ),
-            SizedBox(height: 20.h),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              decoration: BoxDecoration(
-                color: surfaceColor,
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    referralCode,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  InkWell(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(text: referralCode));
-                      CustomSnackBar.show(
-                        context,
-                        AppLocalizations.of(context)!.codeCopied,
-                      );
-                      onCopy?.call();
-                    },
-                    borderRadius: BorderRadius.circular(10.r),
-                    child: Padding(
-                      padding: EdgeInsets.all(8.w),
-                      child: Icon(
-                        Icons.copy_rounded,
-                        size: 22.r,
-                        color: primary,
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Column(
+                        spacing: 8.h,
+                        children: [
+                          Row(
+                            spacing: 8.w,
+                            children: [
+                              Icon(
+                                Icons.qr_code_2_rounded,
+                                size: 24.r,
+                                color: primary,
+                              ),
+                              Text(
+                                AppLocalizations.of(context)!.referralCode,
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: isDark
+                                      ? AppColors.offWhite
+                                      : AppColors.black,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                softWrap: true,
+                              ),
+                            ],
+                          ),
+                          Text(
+                            AppLocalizations.of(context)!.referralCodeHint,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDark
+                                  ? AppColors.taupe
+                                  : AppColors.burgundy,
+                              height: 1.35,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
+                    Icon(Icons.expand_less_rounded, size: 28.r, color: primary),
+                  ],
+                ),
+                SizedBox(height: 24.h),
+                Container(
+                  padding: EdgeInsets.all(20.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 12.r,
+                        offset: Offset(0, 4.h),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                  child: QrImageView(
+                    data: widget.referralCode,
+                    version: QrVersions.auto,
+                    size: 180.r,
+                    backgroundColor: Colors.white,
+                    eyeStyle: QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: AppColors.black,
+                    ),
+                    dataModuleStyle: QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: AppColors.black,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.h),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 12.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(12.r),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.referralCode,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      InkWell(
+                        onTap: () {
+                          Clipboard.setData(
+                            ClipboardData(text: widget.referralCode),
+                          );
+                          CustomSnackBar.show(
+                            context,
+                            AppLocalizations.of(context)!.codeCopied,
+                          );
+                          widget.onCopy?.call();
+                        },
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: Padding(
+                          padding: EdgeInsets.all(8.w),
+                          child: Icon(
+                            Icons.copy_rounded,
+                            size: 22.r,
+                            color: primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

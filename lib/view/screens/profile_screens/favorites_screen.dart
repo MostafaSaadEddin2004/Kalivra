@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
@@ -35,7 +36,17 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: ScreenAppBar(title: l10n.favorites),
+      appBar: ScreenAppBar(
+        title: l10n.favorites,
+        actions: [
+          IconButton(
+            onPressed: () {
+              context.read<WishlistCubit>().clearWishlist(context: context);
+            },
+            icon: Icon(Icons.delete_sharp, color: AppColors.offWhite),
+          ),
+        ],
+      ),
       body: BlocBuilder<WishlistCubit, WishlistState>(
         builder: (context, state) {
           switch (state) {
@@ -61,7 +72,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: EdgeInsets.only(bottom: 12.h),
-                    child: ProductCard(product: products[index]),
+                    child: ProductCard(
+                      product: products[index].product,
+                      itemId: products[index].id,
+                    ),
                   );
                 },
               );

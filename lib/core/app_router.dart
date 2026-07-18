@@ -23,7 +23,6 @@ import 'package:kalivra/view/screens/profile_screens/rate_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/confirm_new_phone_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/language_screen.dart';
-import 'package:kalivra/view/screens/profile_screens/otp_code_entry_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/otp_phone_entry_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/settings_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/set_new_password_screen.dart';
@@ -278,21 +277,6 @@ abstract class AppRouter {
               return OtpPhoneEntryScreen(
                 mode: extra as OtpScreenMode? ?? OtpScreenMode.changePhone,
               );
-            },
-          ),
-          GoRoute(
-            path: AppRoutes.otpVerify,
-            name: AppRoutesName.otpVerify,
-            builder: (context, state) {
-              final args = state.extra as OtpOnboardingArgs?;
-              if (args == null) {
-                return Scaffold(
-                  body: Center(
-                    child: Text(AppLocalizations.of(context)!.errorMissingData),
-                  ),
-                );
-              }
-              return OtpCodeEntryScreen(args: args);
             },
           ),
           GoRoute(

@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
-import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/wishlist_api_service.dart';
+import 'package:kalivra/view/widgets/confirm_dialog.dart';
+import 'package:kalivra/view/widgets/login_dialog.dart';
 
 export 'wishlist_state.dart';
 
@@ -12,62 +15,99 @@ class WishlistCubit extends Cubit<WishlistState> {
   final WishlistApiService _wishlistService = WishlistApiService();
 
   Future<void> loadWishlist() async {
-    emit(WishlistLoading());
     final token = await LocalStore.getToken();
     if (token == null || token.isEmpty) {
       emit(WishlistLoginRequired());
       return;
     }
+    emit(WishlistLoading());
 
     try {
       final list = await _wishlistService.getWishlist();
-      final products = <ProductModel>[];
-      for (final w in list) {
-        if (w.product != null) {
-          try {
-            final p = ProductModel.fromJson(w.product!);
-            products.add(p);
-          } catch (_) {}
-        }
-      }
-      emit(WishlistLoaded(wishlist: products));
+
+      emit(WishlistLoaded(wishlist: list));
     } catch (e) {
       emit(WishlistFailed(message: e.toString()));
     }
   }
 
-  Future<void> add(int productId) async {
-    await _wishlistService.addToWishlist(productId);
-  }
-
-  Future<int?> findWishlistItemId(int productId) async {
-    final list = await _wishlistService.getWishlist();
-    for (final item in list) {
-      if (item.productId == productId) return item.id;
-    }
-    return null;
-  }
-
-  Future<void> toggleWishlist({
+  Future<bool> addToWishlist({
     required int productId,
-    required bool isCurrentlyInWishlist,
+    required String productName,
+    required BuildContext context,
   }) async {
-    if (isCurrentlyInWishlist) {
-      final itemId = await findWishlistItemId(productId);
-      if (itemId != null) {
-        await remove(itemId);
-      }
-    } else {
-      await add(productId);
+    final l10n = AppLocalizations.of(context)!;
+    final token = await LocalStore.getToken();
+    if (token == null || token.isEmpty) {
+      emit(WishlistLoginRequired());
+      showDialog(context: context, builder: (context) => GoToLoginDialog());
+      return false;
+    }
+
+    try {
+      await _wishlistService.addToWishlist(productId: productId);
+      emit(
+        AddedToWishlistSuccessfully(
+          message: l10n.addToWishlistSuccess(productName),
+        ),
+      );
+      return true;
+    } catch (e) {
+      emit(WishlistFailed(message: e.toString()));
+      return false;
     }
   }
 
-  Future<void> remove(int itemId) async {
+  Future<bool> removeFromWishlist({required int itemId}) async {
     try {
-      await _wishlistService.removeFromWishlist(itemId);
-      loadWishlist();
-    } catch (_) {
-      rethrow;
+      await _wishlistService.removeFromWishlist(itemId: itemId);
+      await loadWishlist();
+      return true;
+    } catch (e) {
+      emit(WishlistFailed(message: e.toString()));
+      return false;
     }
+  }
+
+  Future<bool> removeProductFromWishlist({required int productId}) async {
+    try {
+      final list = await _wishlistService.getWishlist();
+      for (final item in list) {
+        if (item.product.id == productId) {
+          await _wishlistService.removeFromWishlist(itemId: item.id);
+          await loadWishlist();
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      emit(WishlistFailed(message: e.toString()));
+      return false;
+    }
+  }
+
+  void clearWishlist({required BuildContext context}) {
+    final l10n = AppLocalizations.of(context);
+    bool isLoading = false;
+    showDialog(
+      context: context,
+      builder: (context) => ConfirmDialog(
+        title: l10n!.warning,
+        message: l10n.clearWishlist,
+        isLoading: isLoading,
+        onConfirm: () async {
+          emit(WishlistLoading());
+          isLoading = true;
+          try {
+            await _wishlistService.clearWishlist();
+            isLoading = false;
+            loadWishlist();
+          } catch (e) {
+            emit(WishlistFailed(message: e.toString()));
+            isLoading = false;
+          }
+        },
+      ),
+    );
   }
 }

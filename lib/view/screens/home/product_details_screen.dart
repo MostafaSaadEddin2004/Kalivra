@@ -9,10 +9,12 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
 import 'package:kalivra/view/widgets/product/wishlist_icon.dart';
+import 'package:kalivra/view/widgets/rating_stars.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
@@ -24,8 +26,11 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+  final _reviewTitleController = TextEditingController();
+  final _reviewCommentController = TextEditingController();
   late bool _isWishlist;
   bool _wishlistLoading = false;
+  int _selectedRating = 0;
 
   @override
   void initState() {
@@ -34,10 +39,40 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     context.read<ProductsCubit>().loadProductById(widget.product.id);
   }
 
-  List<ProductImage> get _galleryImages {
-    if (widget.product.images.isNotEmpty) return widget.product.images;
-    if (widget.product.baseImage != null) return [widget.product.baseImage!];
+  @override
+  void dispose() {
+    _reviewTitleController.dispose();
+    _reviewCommentController.dispose();
+    super.dispose();
+  }
+
+  List<ProductImage> _galleryImages(ProductModel product) {
+    if (product.images.isNotEmpty) return product.images;
+    if (product.baseImage != null) return [product.baseImage!];
     return [];
+  }
+
+  void _submitProductReview(ProductModel product) {
+    final l10n = AppLocalizations.of(context)!;
+    final title = _reviewTitleController.text.trim();
+    final comment = _reviewCommentController.text.trim();
+
+    if (_selectedRating == 0) {
+      CustomSnackBar.show(context, l10n.selectRating);
+      return;
+    }
+
+    if (title.isEmpty || comment.isEmpty) {
+      CustomSnackBar.show(context, l10n.required);
+      return;
+    }
+
+    context.read<ProductsCubit>().postProductReview(
+      productId: product.id,
+      title: title,
+      comment: comment,
+      rating: _selectedRating,
+    );
   }
 
   Future<void> _toggleWishlist() async {
@@ -48,15 +83,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     setState(() => _wishlistLoading = true);
     try {
-      await context.read<WishlistCubit>().toggleWishlist(
-        productId: widget.product.id,
-        isCurrentlyInWishlist: wasInWishlist,
-      );
+      final changed = wasInWishlist
+          ? await context.read<WishlistCubit>().removeProductFromWishlist(
+              productId: widget.product.id,
+            )
+          : await context.read<WishlistCubit>().addToWishlist(
+              productId: widget.product.id,
+              productName: widget.product.name,
+              context: context,
+            );
       if (!mounted) return;
       setState(() {
-        _isWishlist = !wasInWishlist;
+        _isWishlist = changed ? !wasInWishlist : wasInWishlist;
         _wishlistLoading = false;
       });
+      if (!changed) return;
       CustomSnackBar.show(
         context,
         wasInWishlist
@@ -71,24 +112,47 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final product = widget.product;
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final viewData = ProductViewData.fromProduct(product, l10n);
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.productDetails),
-      body: BlocBuilder<ProductsCubit, ProductsState>(
+      body: BlocConsumer<ProductsCubit, ProductsState>(
+        listenWhen: (previous, current) {
+          if (current is! ProductVariantSelected) return false;
+          if (previous is! ProductVariantSelected) return true;
+          return previous.reviewStatus != current.reviewStatus;
+        },
+        listener: (context, state) {
+          if (state is! ProductVariantSelected) return;
+
+          if (state.reviewStatus == ProductReviewStatus.submitted) {
+            _reviewTitleController.clear();
+            _reviewCommentController.clear();
+            setState(() => _selectedRating = 0);
+            CustomSnackBar.show(context, l10n.thanksForRating);
+          } else if (state.reviewStatus == ProductReviewStatus.loginRequired) {
+            CustomSnackBar.show(context, l10n.loginRequiredForRating);
+          } else if (state.reviewStatus == ProductReviewStatus.failure) {
+            CustomSnackBar.show(
+              context,
+              state.reviewError ?? l10n.unexpectedError,
+            );
+          }
+        },
         builder: (context, state) {
-          final variantState =
-              state is ProductVariantSelected ? state : null;
+          final variantState = state is ProductVariantSelected ? state : null;
+          final product = variantState?.product ?? widget.product;
+          final viewData = ProductViewData.fromProduct(product, l10n);
+          final isReviewSubmitting =
+              variantState?.reviewStatus == ProductReviewStatus.submitting;
 
           return ListView(
             padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
             children: [
               GallerySection(
-                galleryImages: _galleryImages,
+                galleryImages: _galleryImages(product),
                 isDark: isDark,
                 isWishlist: _isWishlist,
                 wishlistLoading: _wishlistLoading,
@@ -99,6 +163,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 product: product,
                 viewData: viewData,
                 isDark: isDark,
+              ),
+              SizedBox(height: 16.h),
+              ProductRatingCard(
+                product: product,
+                isDark: isDark,
+                selectedRating: _selectedRating,
+                titleController: _reviewTitleController,
+                commentController: _reviewCommentController,
+                isSubmitting: isReviewSubmitting,
+                onRatingChanged: (rating) =>
+                    setState(() => _selectedRating = rating),
+                onSubmit: () => _submitProductReview(product),
               ),
 
               if (variantState != null &&
@@ -142,8 +218,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               FilledButton.icon(
                 onPressed: product.isSaleable
                     ? () => context.read<CartCubit>().addItem(
-                          widget.product.id.toString(),
-                        )
+                        (variantState?.selectedColor?.variantId ?? product.id)
+                            .toString(),
+                        color: variantState?.selectedColor?.colorName ?? '',
+                        size: variantState?.selectedSize?.sizeName ?? '',
+                      )
                     : null,
                 icon: Icon(Icons.add_shopping_cart_rounded, size: 24.r),
                 label: Text(
@@ -169,8 +248,168 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 }
 
+class ProductRatingCard extends StatelessWidget {
+  const ProductRatingCard({
+    super.key,
+    required this.product,
+    required this.isDark,
+    required this.selectedRating,
+    required this.titleController,
+    required this.commentController,
+    required this.isSubmitting,
+    required this.onRatingChanged,
+    required this.onSubmit,
+  });
+
+  final ProductModel product;
+  final bool isDark;
+  final int selectedRating;
+  final TextEditingController titleController;
+  final TextEditingController commentController;
+  final bool isSubmitting;
+  final ValueChanged<int> onRatingChanged;
+  final VoidCallback onSubmit;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
+    final hasRating = product.ratings.total > 0;
+    final average = double.tryParse(product.ratings.average) ?? 0;
+    final averageLabel = product.ratings.average.trim().isEmpty
+        ? average.toStringAsFixed(1)
+        : product.ratings.average.trim();
+    final averageStars = average.round().clamp(0, 5).toInt();
+
+    return ProductSectionCardShell(
+      isDark: isDark,
+      title: l10n.productRating,
+      icon: Icons.star_rounded,
+      child: Padding(
+        padding: EdgeInsets.all(14.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (hasRating) ...[
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(14.w),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? AppColors.black.withValues(alpha: 0.25)
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(14.r),
+                  border: Border.all(color: accent.withValues(alpha: 0.12)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 54.r,
+                      height: 54.r,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        averageLabel,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: accent,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RatingStars(
+                            rating: averageStars,
+                            enabled: false,
+                            size: 22.r,
+                            spacing: 0,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            l10n.productRatingSummary(
+                              averageLabel,
+                              product.ratings.total,
+                            ),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: isDark
+                                  ? AppColors.taupe
+                                  : AppColors.burgundy,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 18.h),
+            ],
+            Center(
+              child: RatingStars(
+                rating: selectedRating,
+                enabled: !isSubmitting,
+                onRatingChanged: onRatingChanged,
+              ),
+            ),
+            SizedBox(height: 18.h),
+            AppTextField(
+              controller: titleController,
+              label: l10n.subjectLabel,
+              hint: product.name,
+              enabled: !isSubmitting,
+              textInputAction: TextInputAction.next,
+              maxLength: 80,
+            ),
+            SizedBox(height: 12.h),
+            AppTextField(
+              controller: commentController,
+              label: l10n.ratingComment,
+              hint: l10n.ratingCommentHint,
+              enabled: !isSubmitting,
+              maxLines: 4,
+              textInputAction: TextInputAction.newline,
+            ),
+            SizedBox(height: 18.h),
+            FilledButton.icon(
+              onPressed: isSubmitting ? null : onSubmit,
+              icon: isSubmitting
+                  ? SizedBox(
+                      width: 18.r,
+                      height: 18.r,
+                      child: const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.offWhite,
+                      ),
+                    )
+                  : Icon(Icons.rate_review_rounded, size: 20.r),
+              label: Text(l10n.submitRating),
+              style: FilledButton.styleFrom(
+                minimumSize: Size(double.infinity, 50.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14.r),
+                ),
+                elevation: 0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ProductVariantsSection extends StatelessWidget {
-  const ProductVariantsSection({super.key, 
+  const ProductVariantsSection({
+    super.key,
     required this.variantState,
     required this.isDark,
     required this.onSizeSelected,
@@ -240,9 +479,7 @@ class ProductVariantsSection extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isSelected
                             ? Colors.white
-                            : (isDark
-                                ? AppColors.offWhite
-                                : AppColors.black),
+                            : (isDark ? AppColors.offWhite : AppColors.black),
                         fontWeight: isSelected
                             ? FontWeight.w700
                             : FontWeight.w500,
@@ -273,11 +510,11 @@ class ProductVariantsSection extends StatelessWidget {
                   final isSelected =
                       selectedColor?.colorId == color.colorId &&
                       selectedColor?.parentSizeId == color.parentSizeId;
-                  final hasHex =
-                      color.hex != null && color.hex!.isNotEmpty;
+                  final hasHex = color.hex != null && color.hex!.isNotEmpty;
                   final bgColor = hasHex
-                      ? Color(int.parse(
-                          '0xFF${color.hex!.replaceAll('#', '')}'))
+                      ? Color(
+                          int.parse('0xFF${color.hex!.replaceAll('#', '')}'),
+                        )
                       : accent.withValues(alpha: 0.15);
 
                   return GestureDetector(
@@ -295,11 +532,10 @@ class ProductVariantsSection extends StatelessWidget {
                             ),
                       decoration: BoxDecoration(
                         color: bgColor,
-                        shape: hasHex
-                            ? BoxShape.circle
-                            : BoxShape.rectangle,
-                        borderRadius:
-                            hasHex ? null : BorderRadius.circular(10.r),
+                        shape: hasHex ? BoxShape.circle : BoxShape.rectangle,
+                        borderRadius: hasHex
+                            ? null
+                            : BorderRadius.circular(10.r),
                         border: Border.all(
                           color: isSelected
                               ? accent
@@ -318,12 +554,12 @@ class ProductVariantsSection extends StatelessWidget {
                       ),
                       child: hasHex
                           ? (isSelected
-                              ? Icon(
-                                  Icons.check,
-                                  size: 18.r,
-                                  color: Colors.white,
-                                )
-                              : null)
+                                ? Icon(
+                                    Icons.check,
+                                    size: 18.r,
+                                    color: Colors.white,
+                                  )
+                                : null)
                           : Text(
                               color.colorName,
                               style: theme.textTheme.bodyMedium?.copyWith(
@@ -367,6 +603,7 @@ class ProductVariantsSection extends StatelessWidget {
     );
   }
 }
+
 class ProductViewData {
   const ProductViewData({
     required this.descriptionText,
@@ -440,15 +677,6 @@ class ProductViewData {
           label: l10n.productMinPriceLabel,
           value: product.minPrice!.trim(),
         ),
-      if (product.ratings.total > 0)
-        ProductSpecEntry(
-          icon: Icons.star_rounded,
-          label: l10n.productRating,
-          value: l10n.productRatingSummary(
-            product.ratings.average,
-            product.ratings.total,
-          ),
-        ),
       if (product.reviews.total > 0)
         ProductSpecEntry(
           icon: Icons.rate_review_outlined,
@@ -508,7 +736,8 @@ class ProductSpecEntry {
 }
 
 class GallerySection extends StatelessWidget {
-  const GallerySection({super.key, 
+  const GallerySection({
+    super.key,
     required this.galleryImages,
     required this.isDark,
     required this.isWishlist,
@@ -588,7 +817,8 @@ class GallerySection extends StatelessWidget {
 }
 
 class ProductHeaderSection extends StatelessWidget {
-  const ProductHeaderSection({super.key, 
+  const ProductHeaderSection({
+    super.key,
     required this.product,
     required this.viewData,
     required this.isDark,
@@ -661,8 +891,7 @@ class ProductHeaderSection extends StatelessWidget {
               ],
             ),
           ],
-          if (viewData.regularPrice != null ||
-              viewData.salePrice != null) ...[
+          if (viewData.regularPrice != null || viewData.salePrice != null) ...[
             SizedBox(height: 16.h),
             ProductPriceBlock(viewData: viewData, isDark: isDark),
           ],
@@ -706,7 +935,11 @@ class ProductBadgeChip extends StatelessWidget {
 }
 
 class ProductPriceBlock extends StatelessWidget {
-  const ProductPriceBlock({super.key, required this.viewData, required this.isDark});
+  const ProductPriceBlock({
+    super.key,
+    required this.viewData,
+    required this.isDark,
+  });
 
   final ProductViewData viewData;
   final bool isDark;
@@ -755,7 +988,8 @@ class ProductPriceBlock extends StatelessWidget {
 }
 
 class ProductSectionCard extends StatelessWidget {
-  const ProductSectionCard({super.key, 
+  const ProductSectionCard({
+    super.key,
     required this.isDark,
     required this.title,
     required this.icon,
@@ -786,7 +1020,8 @@ class ProductSectionCard extends StatelessWidget {
 }
 
 class ProductInfoCard extends StatelessWidget {
-  const ProductInfoCard({super.key, 
+  const ProductInfoCard({
+    super.key,
     required this.isDark,
     required this.sectionTitle,
     required this.entries,
@@ -819,7 +1054,8 @@ class ProductInfoCard extends StatelessWidget {
 }
 
 class ProductSectionCardShell extends StatelessWidget {
-  const ProductSectionCardShell({super.key, 
+  const ProductSectionCardShell({
+    super.key,
     required this.isDark,
     required this.title,
     required this.icon,
@@ -867,7 +1103,8 @@ class ProductSectionCardShell extends StatelessWidget {
               SizedBox(width: 10.w),
               Text(
                 title,
-                style: titleStyle ??
+                style:
+                    titleStyle ??
                     theme.textTheme.titleMedium?.copyWith(
                       color: accent,
                       fontWeight: FontWeight.w700,
@@ -891,7 +1128,8 @@ class ProductSectionCardShell extends StatelessWidget {
 }
 
 class ProductSpecListTile extends StatelessWidget {
-  const ProductSpecListTile({super.key, 
+  const ProductSpecListTile({
+    super.key,
     required this.icon,
     required this.label,
     required this.value,
@@ -943,8 +1181,7 @@ class ProductSpecListTile extends StatelessWidget {
                     Text(
                       label,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            isDark ? AppColors.taupe : AppColors.burgundy,
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -952,9 +1189,7 @@ class ProductSpecListTile extends StatelessWidget {
                     Text(
                       value,
                       style: theme.textTheme.titleSmall?.copyWith(
-                        color: isDark
-                            ? AppColors.offWhite
-                            : AppColors.black,
+                        color: isDark ? AppColors.offWhite : AppColors.black,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

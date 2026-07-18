@@ -198,7 +198,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String addToWishlistSuccess(String productName) {
-    return 'Added \"$productName\" to favorites';
+    return 'Added \"$productName\" to favorites successfully';
   }
 
   @override
@@ -235,6 +235,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get removeFromWishlistFailed =>
       'Failed to remove product from favorites';
+
+  @override
+  String get clearWishlist => 'Are you sure you want to clear the wishlist?';
+
+  @override
+  String get warning => 'Warning!';
 
   @override
   String get addToCart => 'Add to Cart';

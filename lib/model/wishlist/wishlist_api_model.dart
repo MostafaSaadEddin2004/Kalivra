@@ -1,25 +1,23 @@
+import 'package:kalivra/model/product/product_model.dart';
+
 class WishlistApiModel {
   const WishlistApiModel({
     required this.id,
-    this.productId,
-    this.customerId,
-    this.product,
-    this.createdAt,
+    required this.product,
+    required this.options,
   });
 
   final int id;
-  final int? productId;
-  final int? customerId;
-  final Map<String, dynamic>? product;
-  final String? createdAt;
+  final ProductModel product;
+  final List<Map<String, dynamic>> options;
 
   factory WishlistApiModel.fromJson(Map<String, dynamic> json) {
     return WishlistApiModel(
       id: json['id'] as int,
-      productId: json['product_id'] as int?,
-      customerId: json['customer_id'] as int?,
-      product: json['product'] as Map<String, dynamic>?,
-      createdAt: json['created_at'] as String?,
+      product: ProductModel.fromJson(json['product'] as Map<String, dynamic>),
+      options: (json['options'] as List? ?? [])
+          .whereType<Map<String, dynamic>>()
+          .toList(),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -22,22 +23,45 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: EdgeInsets.all(16.w),
       children: [
-        ProfilePageItem(
-          icon: Icons.person_outline_rounded,
-          label: AppLocalizations.of(context)!.drawerMyAccount,
-          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.account),
-        ),
-        ProfilePageItem(
-          icon: Icons.receipt_long_outlined,
-          label: AppLocalizations.of(context)!.drawerMyOrders,
-          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.orders),
-        ),
-        ProfilePageItem(
-          icon: Icons.favorite_border_rounded,
-          label: AppLocalizations.of(context)!.drawerFavorites,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.favorites),
+        BlocBuilder<AuthCubit, AuthState>(
+          bloc: AuthCubit()..loadProfile(context),
+          builder: (context, state) {
+            switch (state) {
+              case UnAuthinticated():
+                return const SizedBox.shrink();
+              default:
+                return Column(
+                  children: [
+                    ProfilePageItem(
+                      icon: Icons.person_outline_rounded,
+                      label: AppLocalizations.of(context)!.drawerMyAccount,
+                      onTap: () => AppRouter.openScreenWithPop(
+                        context,
+                        AppRoutes.account,
+                      ),
+                    ),
+                    ProfilePageItem(
+                      icon: Icons.receipt_long_outlined,
+                      label: AppLocalizations.of(context)!.drawerMyOrders,
+                      onTap: () => AppRouter.openScreenWithPop(
+                        context,
+                        AppRoutes.orders,
+                      ),
+                    ),
+                    ProfilePageItem(
+                      icon: Icons.favorite_border_rounded,
+                      label: AppLocalizations.of(context)!.drawerFavorites,
+                      onTap: () => AppRouter.openScreenWithPop(
+                        context,
+                        AppRoutes.favorites,
+                      ),
+                    ),
+                  ],
+                );
+            }
+          },
         ),
         ProfilePageItem(
           icon: Icons.settings_outlined,
@@ -71,10 +95,21 @@ class ProfilePage extends StatelessWidget {
           label: AppLocalizations.of(context)!.drawerShare,
           onTap: () => _shareApp(context),
         ),
-        ProfilePageItem(
-          icon: Icons.star_rounded,
-          label: AppLocalizations.of(context)!.rateTitle,
-          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.rate),
+        BlocBuilder<AuthCubit, AuthState>(
+          bloc: AuthCubit()..loadProfile(context),
+          builder: (context, state) {
+            switch (state) {
+              case UnAuthinticated():
+                return const SizedBox.shrink();
+              default:
+                return ProfilePageItem(
+                  icon: Icons.star_rounded,
+                  label: AppLocalizations.of(context)!.rateTitle,
+                  onTap: () =>
+                      AppRouter.openScreenWithPop(context, AppRoutes.rate),
+                );
+            }
+          },
         ),
         BlocBuilder<MiddlewareCubit, MiddlewareState>(
           bloc: MiddlewareCubit()..getLoinOrLogoutButton(context),

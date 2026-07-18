@@ -141,11 +141,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             : _permanentAddressController.text.trim(),
         imageFile: f,
       );
-      if (!mounted) return;
-      CustomSnackBar.show(context, l10n.profileSaved);
       context.pop();
     } catch (_) {
-      if (!mounted) return;
       final msg = context.read<AuthCubit>().state;
       if (msg is AuthFailed) {
         CustomSnackBar.show(context, msg.message);

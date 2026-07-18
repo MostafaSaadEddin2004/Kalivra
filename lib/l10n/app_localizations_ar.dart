@@ -198,7 +198,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String addToWishlistSuccess(String productName) {
-    return 'تمت إضافة \"$productName\" إلى المفضلة';
+    return 'تمت إضافة \"$productName\" إلى المفضلة بنجاح';
   }
 
   @override
@@ -234,6 +234,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get removeFromWishlistFailed => 'فشل إزالة المنتج من المفضلة';
+
+  @override
+  String get clearWishlist => 'هل أنت متأكد من إفراغ قائمة المفضلة؟';
+
+  @override
+  String get warning => 'تحذير!';
 
   @override
   String get addToCart => 'إضافة إلى السلة';

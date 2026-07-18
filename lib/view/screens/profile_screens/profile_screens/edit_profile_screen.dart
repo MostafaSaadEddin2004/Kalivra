@@ -29,12 +29,9 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
-  final _middleNameController = TextEditingController();
   final _lastNameController = TextEditingController();
-  final _fatherNameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _countryCodeController = TextEditingController(text: '+963');
   final _phoneController = TextEditingController();
-  final _whatsappController = TextEditingController();
   final _dobController = TextEditingController();
   final _streetController = TextEditingController();
   final _streetNumberController = TextEditingController();
@@ -55,12 +52,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _firstNameController.dispose();
-    _middleNameController.dispose();
     _lastNameController.dispose();
-    _fatherNameController.dispose();
-    _emailController.dispose();
+    _countryCodeController.dispose();
     _phoneController.dispose();
-    _whatsappController.dispose();
     _dobController.dispose();
     _streetController.dispose();
     _streetNumberController.dispose();
@@ -96,23 +90,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _applyCustomer(CustomerApiModel c) {
     final nameParts = (c.name ?? '').trim().split(RegExp(r'\s+'));
     final fn = c.firstName ?? (nameParts.isNotEmpty ? nameParts.first : '');
-    final mn =
-        c.displayMiddleName ??
-        (nameParts.length > 2
-            ? nameParts.sublist(1, nameParts.length - 1).join(' ')
-            : '');
     final ln =
         c.lastName ??
         (nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '');
     final addressInfo = c.addressInformation;
     _firstNameController.text = fn;
-    _middleNameController.text = mn;
     _lastNameController.text = ln;
-    _fatherNameController.text = c.fatherName ?? '';
-    _emailController.text = c.email ?? '';
-    _phoneController.text = c.phone ?? '';
-    _whatsappController.text = c.whatsappNumber ?? '';
-    _dobController.text = c.dateOfBirth ?? '';
+    final phoneParts = _splitPhoneNumber(c.phone ?? c.whatsappNumber ?? '');
+    _countryCodeController.text = phoneParts.countryCode;
+    _phoneController.text = phoneParts.number;
+    _dobController.text = _formatDateForField(c.dateOfBirth);
     _selectedGovernorate =
         addressInfo?.permanentCapitalId?.toString() ??
         addressInfo?.officialGovernorate;
@@ -195,6 +182,75 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return SizedBox(height: 14.h);
   }
 
+  static _PhoneParts _splitPhoneNumber(String value) {
+    final normalized = value.trim().replaceAll(RegExp(r'\s+'), '');
+    if (normalized.startsWith('+963')) {
+      return _PhoneParts(countryCode: '+963', number: normalized.substring(4));
+    }
+    if (normalized.startsWith('963')) {
+      return _PhoneParts(countryCode: '+963', number: normalized.substring(3));
+    }
+    if (normalized.startsWith('+')) {
+      final match = RegExp(r'^\+(\d{1,3})(.*)$').firstMatch(normalized);
+      if (match != null) {
+        return _PhoneParts(
+          countryCode: '+${match.group(1)}',
+          number: match.group(2) ?? '',
+        );
+      }
+    }
+    return _PhoneParts(
+      countryCode: '+963',
+      number: normalized.replaceFirst(RegExp(r'^0+'), ''),
+    );
+  }
+
+  static String _formatDateForField(String? value) {
+    if (value == null || value.trim().isEmpty) return '';
+    final parsed = DateTime.tryParse(value.trim());
+    if (parsed == null) return value.trim();
+    return _formatDate(parsed);
+  }
+
+  static String _formatDate(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+
+  Future<void> _pickDateOfBirth() async {
+    final now = DateTime.now();
+    final currentValue = DateTime.tryParse(_dobController.text.trim());
+    final initialDate = currentValue != null && !currentValue.isAfter(now)
+        ? currentValue
+        : DateTime(now.year - 18, now.month, now.day);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: isDark ? AppColors.taupe : AppColors.burgundy,
+              onPrimary: AppColors.offWhite,
+              surface: isDark ? AppColors.black : Colors.white,
+              onSurface: isDark ? AppColors.offWhite : AppColors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate == null || !mounted) return;
+    setState(() {
+      _dobController.text = _formatDate(pickedDate);
+    });
+  }
+
   Map<String, dynamic> _permanentAddressMap() {
     return _ProfileAddressInput.toCleanMap(
       capitalId: _selectedGovernorate,
@@ -257,13 +313,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       await context.read<AuthCubit>().updateProfile(
         context: context,
-        email: _emailController.text.trim(),
+        countryCode: _countryCodeController.text.trim(),
         phone: _phoneController.text.trim(),
-        whatsappNumber: _whatsappController.text.trim(),
+        whatsappNumber: _phoneController.text.trim(),
         firstName: _firstNameController.text.trim(),
-        middleName: _middleNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
-        fatherName: _fatherNameController.text.trim(),
         gender: _gender,
         dateOfBirth: _dobController.text.trim().isEmpty
             ? null
@@ -390,17 +444,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     SizedBox(height: 16.h),
                     AppTextField(
-                      controller: _middleNameController,
-                      label: 'Middle Name',
-                      hint: 'Middle Name',
-                      prefixIcon: Icon(
-                        Icons.badge_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
                       controller: _lastNameController,
                       label: l10n.lastName,
                       hint: l10n.lastName,
@@ -412,17 +455,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? l10n.enterLastName
                           : null,
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _fatherNameController,
-                      label: l10n.associationLinkFatherName,
-                      hint: l10n.associationLinkFatherName,
-                      prefixIcon: Icon(
-                        Icons.badge_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
                     ),
                     SizedBox(height: 16.h),
                     AssociationDropdownField(
@@ -446,6 +478,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),
                       keyboardType: TextInputType.datetime,
+                      readOnly: true,
+                      onTap: _pickDateOfBirth,
                     ),
                   ],
                 ),
@@ -454,43 +488,52 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   title: l10n.contactInfo,
                   icon: Icons.contact_phone_outlined,
                   children: [
-                    AppTextField(
-                      controller: _emailController,
-                      label: l10n.email,
-                      hint: l10n.email,
-                      prefixIcon: Icon(
-                        Icons.email_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _phoneController,
-                      label: l10n.mobileNumber,
-                      hint: '+963 9XX XXX XXX',
-                      prefixIcon: Icon(
-                        Icons.phone_android_rounded,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.phone,
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? l10n.enterPhone
-                          : null,
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _whatsappController,
-                      label: l10n.whatsappNumber,
-                      hint: '+963 9XX XXX XXX',
-                      prefixIcon: Icon(
-                        Icons.call,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.phone,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      textDirection: TextDirection.ltr,
+                      children: [
+                        SizedBox(
+                          width: 82.w,
+                          child: AppTextField(
+                            textDirection: TextDirection.ltr,
+                            enabled: false,
+                            controller: _countryCodeController,
+                            keyboardType: TextInputType.phone,
+                            borderRadius: 22.r,
+                            fillColor: isDark
+                                ? AppColors.burgundy.withValues(alpha: 0.08)
+                                : AppColors.offWhite,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: AppTextField(
+                            textDirection: TextDirection.ltr,
+                            controller: _phoneController,
+                            label: l10n.mobileNumber,
+                            hint: '9XX XXX XXX',
+                            prefixIcon: Icon(
+                              Icons.phone_android_rounded,
+                              size: 22.r,
+                              color: isDark
+                                  ? AppColors.taupe
+                                  : AppColors.burgundy,
+                            ),
+                            keyboardType: TextInputType.phone,
+                            maxLength: 9,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+                              if (value.isEmpty) {
+                                return l10n.enterPhoneNumber;
+                              }
+                              if (value.length < 8) {
+                                return l10n.invalidPhone;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -561,6 +604,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       },
     );
   }
+}
+
+class _PhoneParts {
+  const _PhoneParts({required this.countryCode, required this.number});
+
+  final String countryCode;
+  final String number;
 }
 
 class _ProfileAddressInput {
@@ -914,13 +964,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
     });
   }
 
-  String? _requiredValue(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return AppLocalizations.of(context)!.required;
-    }
-    return null;
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -954,7 +997,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
             controller: labelController,
             label: l10n.associationAddressLabel,
             enabled: widget.enabled,
-            validator: _requiredValue,
           ),
           widget.fieldSpacer(),
           AppTextField(
@@ -1003,7 +1045,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
                         )
                       : null,
                   onChanged: _onGovernorateChanged,
-                  validator: (value) => value == null ? l10n.required : null,
                 ),
                 SizedBox(height: 16.h),
                 AssociationDropdownField(
@@ -1030,7 +1071,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
                         )
                       : null,
                   onChanged: _onCityChanged,
-                  validator: (value) => value == null ? l10n.required : null,
                 ),
                 SizedBox(height: 16.h),
                 AssociationDropdownField(
@@ -1056,7 +1096,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
                         )
                       : null,
                   onChanged: _onTownChanged,
-                  validator: (value) => value == null ? l10n.required : null,
                 ),
               ],
             );
@@ -1073,7 +1112,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
           controller: widget.streetController,
           label: l10n.associationLinkStreet,
           enabled: widget.enabled,
-          validator: _requiredValue,
         ),
         widget.fieldSpacer(),
         AppTextField(
@@ -1086,7 +1124,6 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
           controller: widget.buildingController,
           label: l10n.associationLinkBuilding,
           enabled: widget.enabled,
-          validator: _requiredValue,
         ),
       ],
     );

@@ -71,7 +71,7 @@
 
   "productDetails": "تفاصيل المنتج",
   "invalidProductId": "معرّف المنتج غير صالح",
-  "addToWishlistSuccess": "تمت إضافة \"{productName}\" إلى المفضلة",
+  "addToWishlistSuccess": "تمت إضافة \"{productName}\" إلى المفضلة بنجاح",
   "addToWishlistFailed": "فشل إضافة المنتج إلى المفضلة",
   "unit": "الوحدة",
   "maxOrderLimit": "الحد الأقصى للطلب",
@@ -84,6 +84,8 @@
   "removeFromWishlistSuccess": "تمت إزالة \"{productName}\" من المفضلة",
   "@removeFromWishlistSuccess": {"placeholders": {"productName": {"type": "String"}}},
   "removeFromWishlistFailed": "فشل إزالة المنتج من المفضلة",
+  "clearWishlist": "هل أنت متأكد من إفراغ قائمة المفضلة؟",
+  "warning": "تحذير!",
   "addToCart": "إضافة إلى السلة",
   "productSku": "رمز المنتج",
   "productDescription": "الوصف",

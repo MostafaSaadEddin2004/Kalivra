@@ -16,16 +16,19 @@ class CartApiService {
   }
 
   Future<CartApiModel?> addToCart({
-    required int productId,
+    required int cartItemId,
     required int quantity,
+    String color = '',
+    String size = '',
     bool isBuyNow = false,
   }) async {
     final res = await _client.post(
       'checkout/cart',
       data: {
-        'product_id': productId.toString(),
-        'is_buy_now': isBuyNow ? '1' : '0',
-        'quantity': quantity.toString(),
+        'cart_item_id': cartItemId,
+        'quantity': quantity,
+        'color': color,
+        'size': size,
       },
     );
     final data = res.data['data'];
@@ -43,10 +46,6 @@ class CartApiService {
   }
 
   Future<void> removeSelectedItems(List<int> cartItemIds) async {
-    if (cartItemIds.isEmpty) return;
-    await _client.delete(
-      'checkout/cart/selected',
-      data: {'ids': cartItemIds},
-    );
+    await _client.delete('checkout/cart/all');
   }
 }

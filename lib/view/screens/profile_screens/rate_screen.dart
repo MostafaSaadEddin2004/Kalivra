@@ -8,9 +8,9 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
-import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/login_required_placeholder.dart';
+import 'package:kalivra/view/widgets/rating_stars.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
 class RateScreen extends StatefulWidget {
@@ -49,6 +49,11 @@ class _RateScreenState extends State<RateScreen> {
     );
   }
 
+  void _clearRatingForm() {
+    _commentController.clear();
+    setState(() => _selectedRating = 0);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -60,6 +65,7 @@ class _RateScreenState extends State<RateScreen> {
       body: BlocConsumer<AppInfoCubit, AppInfoState>(
         listener: (context, state) {
           if (state is AppRatingSubmitted) {
+            _clearRatingForm();
             CustomSnackBar.show(context, l10n.thanksForRating);
           } else if (state is AppInfoFailure) {
             CustomSnackBar.show(context, state.errorMessage);
@@ -108,35 +114,11 @@ class _RateScreenState extends State<RateScreen> {
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 24.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (i) {
-                        final rating = i + 1;
-                        final isSelected = rating <= _selectedRating;
-
-                        return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4.w),
-                          child: CustomIconButton(
-                            icon: isSelected
-                                ? Icons.star_rounded
-                                : Icons.star_border_rounded,
-                            iconSize: 40.r,
-                            color: isSelected
-                                ? (isDark
-                                      ? AppColors.goldLight
-                                      : AppColors.burgundy)
-                                : (isDark
-                                      ? AppColors.taupe
-                                      : AppColors.burgundy.withValues(
-                                          alpha: 0.4,
-                                        )),
-                            onPressed: isSubmitting
-                                ? null
-                                : () =>
-                                      setState(() => _selectedRating = rating),
-                          ),
-                        );
-                      }),
+                    RatingStars(
+                      rating: _selectedRating,
+                      enabled: !isSubmitting,
+                      onRatingChanged: (rating) =>
+                          setState(() => _selectedRating = rating),
                     ),
                     SizedBox(height: 24.h),
                     AppTextField(

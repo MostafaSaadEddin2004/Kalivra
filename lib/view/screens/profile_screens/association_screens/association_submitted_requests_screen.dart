@@ -348,10 +348,9 @@ class _EmptyState extends StatelessWidget {
               ),
             ),
             SizedBox(height: 24.h),
-            FilledButton.icon(
+            FilledButton(
               onPressed: onNewRequest,
-              icon: const Icon(Icons.send_outlined),
-              label: Text(l10n.associationLinkSubmit),
+              child: Text(l10n.associationLinkSubmit),
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 // products_cubit.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_state.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/model/services/api/product_api_service.dart';
 
@@ -19,6 +20,7 @@ class ProductsCubit extends Cubit<ProductsState> {
       emit(ProductsFailed(message: e.toString()));
     }
   }
+
   Future<void> loadSaleProducts() async {
     emit(ProductsLoading());
     try {
@@ -29,17 +31,18 @@ class ProductsCubit extends Cubit<ProductsState> {
     }
   }
 
-
   Future<void> loadProductById(int productId) async {
     emit(ProductsLoading());
     try {
       final product = await _productService.getProductById(productId);
       final firstSize = product.variants?.variantsBySize.firstOrNull;
-      emit(ProductVariantSelected(
-        product: product,
-        selectedSize: firstSize,
-        selectedColor: null,
-      ));
+      emit(
+        ProductVariantSelected(
+          product: product,
+          selectedSize: firstSize,
+          selectedColor: null,
+        ),
+      );
     } catch (e) {
       emit(ProductsFailed(message: e.toString()));
     }
@@ -58,12 +61,71 @@ class ProductsCubit extends Cubit<ProductsState> {
   void selectSize(VariantBySize size) {
     final current = state;
     if (current is! ProductVariantSelected) return;
-    emit(current.copyWith(selectedSize: size, clearColor: true));
+    emit(
+      current.copyWith(
+        selectedSize: size,
+        clearColor: true,
+        reviewStatus: ProductReviewStatus.idle,
+        clearReviewError: true,
+      ),
+    );
   }
 
   void selectColor(ColorVariant color) {
     final current = state;
     if (current is! ProductVariantSelected) return;
-    emit(current.copyWith(selectedColor: color));
+    emit(
+      current.copyWith(
+        selectedColor: color,
+        reviewStatus: ProductReviewStatus.idle,
+        clearReviewError: true,
+      ),
+    );
+  }
+
+  Future<void> postProductReview({
+    required int productId,
+    required String title,
+    required String comment,
+    required int rating,
+  }) async {
+    final current = state;
+    if (current is! ProductVariantSelected) return;
+
+    try {
+      final token = await LocalStore.getToken();
+      if (token == null || token.isEmpty) {
+        emit(current.copyWith(reviewStatus: ProductReviewStatus.loginRequired));
+        return;
+      }
+
+      emit(
+        current.copyWith(
+          reviewStatus: ProductReviewStatus.submitting,
+          clearReviewError: true,
+        ),
+      );
+      await _productService.postProductReview(
+        productId: productId,
+        title: title,
+        comment: comment,
+        rating: rating,
+      );
+      final updatedProduct = await _productService.getProductById(productId);
+      emit(
+        current.copyWith(
+          product: updatedProduct,
+          reviewStatus: ProductReviewStatus.submitted,
+          clearReviewError: true,
+        ),
+      );
+    } catch (e) {
+      emit(
+        current.copyWith(
+          reviewStatus: ProductReviewStatus.failure,
+          reviewError: e.toString(),
+        ),
+      );
+    }
   }
 }

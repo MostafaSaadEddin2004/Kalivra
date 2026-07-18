@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppColors {
   AppColors._();
-
   static const Color black = Color(0xFF0A0908);
   static const Color burgundy = Color(0xFF49111C);
   static const Color offWhite = Color(0xFFF2F4F3);

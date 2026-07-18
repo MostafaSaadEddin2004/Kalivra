@@ -12,7 +12,7 @@ class ProductApiService {
         .toList();
     return data;
   }
-  
+
   Future<List<ProductModel>> getSaleProducts() async {
     final res = await _client.get('products/sale');
     final data = (res.data['data'] as List<dynamic>)
@@ -25,6 +25,18 @@ class ProductApiService {
     final res = await _client.get('products/$productId');
     final data = res.data['data'];
     return ProductModel.fromJson(data);
+  }
+
+  Future<void> postProductReview({
+    required int productId,
+    required String title,
+    required String comment,
+    required int rating,
+  }) async {
+    await _client.post(
+      'product/$productId/review',
+      data: {'title': title, 'comment': comment, 'rating': rating},
+    );
   }
 
   Future<List<ProductModel>> getProductsByCategoryId(int categoryId) async {

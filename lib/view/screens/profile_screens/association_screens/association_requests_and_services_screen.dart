@@ -718,13 +718,6 @@ class _AssociationLinkRequestSectionState
               controller: widget.nationalIdController,
               label: l10n.associationLinkNationalId,
               keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.required;
-                }
-
-                return null;
-              },
             ),
           ],
         ),
@@ -765,6 +758,9 @@ class _AssociationLinkRequestSectionState
                     controller: widget.membershipNumberController,
                     label: l10n.associationLinkMembershipNumber,
                     keyboardType: TextInputType.number,
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? l10n.required
+                        : null,
                   ),
                 ),
                 SizedBox(width: 16.w),
@@ -773,6 +769,9 @@ class _AssociationLinkRequestSectionState
                     controller: widget.priorityNumberController,
                     label: l10n.associationLinkPriorityNumber,
                     keyboardType: TextInputType.number,
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? l10n.required
+                        : null,
                   ),
                 ),
               ],
@@ -786,6 +785,8 @@ class _AssociationLinkRequestSectionState
             AppTextField(
               controller: widget.housingUnitController,
               label: l10n.associationLinkHousingUnit,
+              validator: (value) =>
+                  value == null || value.trim().isEmpty ? l10n.required : null,
             ),
             widget.fieldSpacer(),
           ],
@@ -945,6 +946,7 @@ class _AssociationAddressesSection extends StatelessWidget {
           streetController: streetController,
           streetNumberController: streetNumberController,
           buildingController: buildingController,
+          isBuildingRequired: true,
           enabled: enabled,
           fieldSpacer: fieldSpacer,
           onGovernorateChanged: onGovernorateChanged,
@@ -962,6 +964,7 @@ class _AssociationAddressesSection extends StatelessWidget {
             streetController: currentAddress.streetController,
             streetNumberController: currentAddress.streetNumberController,
             buildingController: currentAddress.buildingController,
+            isBuildingRequired: false,
             enabled: enabled,
             fieldSpacer: fieldSpacer,
             onRemove: onRemoveCurrentAddress,
@@ -991,6 +994,7 @@ class _AssociationAddressesSection extends StatelessWidget {
             streetNumberController:
                 additionalAddresses[index].streetNumberController,
             buildingController: additionalAddresses[index].buildingController,
+            isBuildingRequired: false,
             labelController: additionalAddresses[index].labelController,
             typeController: additionalAddresses[index].typeController,
             enabled: enabled,
@@ -1037,6 +1041,7 @@ class _AddressFormFields extends StatefulWidget {
     required this.streetController,
     required this.streetNumberController,
     required this.buildingController,
+    required this.isBuildingRequired,
     required this.enabled,
     required this.fieldSpacer,
     required this.onGovernorateChanged,
@@ -1055,6 +1060,7 @@ class _AddressFormFields extends StatefulWidget {
   final TextEditingController streetController;
   final TextEditingController streetNumberController;
   final TextEditingController buildingController;
+  final bool isBuildingRequired;
   final TextEditingController? labelController;
   final TextEditingController? typeController;
   final bool enabled;
@@ -1173,7 +1179,6 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
             controller: labelController,
             label: l10n.associationAddressLabel,
             enabled: widget.enabled,
-            validator: _requiredValue,
           ),
           widget.fieldSpacer(),
           AppTextField(
@@ -1222,7 +1227,6 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                         )
                       : null,
                   onChanged: _onGovernorateChanged,
-                  validator: (value) => value == null ? l10n.required : null,
                 ),
                 SizedBox(height: 16.h),
                 AssociationDropdownField(
@@ -1249,7 +1253,6 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                         )
                       : null,
                   onChanged: _onCityChanged,
-                  validator: (value) => value == null ? l10n.required : null,
                 ),
                 SizedBox(height: 16.h),
                 AssociationDropdownField(
@@ -1275,7 +1278,6 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                         )
                       : null,
                   onChanged: _onTownChanged,
-                  validator: (value) => value == null ? l10n.required : null,
                 ),
               ],
             );
@@ -1292,7 +1294,6 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
           controller: widget.streetController,
           label: l10n.associationLinkStreet,
           enabled: widget.enabled,
-          validator: _requiredValue,
         ),
         widget.fieldSpacer(),
         AppTextField(
@@ -1305,7 +1306,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
           controller: widget.buildingController,
           label: l10n.associationLinkBuilding,
           enabled: widget.enabled,
-          validator: _requiredValue,
+          validator: widget.isBuildingRequired ? _requiredValue : null,
         ),
       ],
     );

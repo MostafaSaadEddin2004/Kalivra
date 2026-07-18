@@ -73,7 +73,12 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> addItem(String productId, {int quantity = 1}) async {
+  Future<void> addItem(
+    String cartItemId, {
+    int quantity = 1,
+    String color = '',
+    String size = '',
+  }) async {
     if (quantity < 1) return;
 
     final token = await LocalStore.getToken();
@@ -85,8 +90,10 @@ class CartCubit extends Cubit<CartState> {
     emit(CartLoading());
     try {
       final cart = await _cartService.addToCart(
-        productId: int.parse(productId),
+        cartItemId: int.parse(cartItemId),
         quantity: quantity.clamp(1, 5),
+        color: color,
+        size: size,
       );
       await _emitLoaded(cart);
       if (cart != null) {
@@ -112,19 +119,12 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> removeSelectedItems(List<int> cartItemIds) async {
-    if (cartItemIds.isEmpty) {
-      emit(DeleteCartSuccessed(message: 'cleared'));
-      _cart = null;
-      emit(CartLoaded(cart: const CartApiModel()));
-      return;
-    }
-
     emit(CartLoading());
     try {
       await _cartService.removeSelectedItems(cartItemIds);
-      final cart = await _cartService.getCart();
-      await _emitLoaded(cart);
+      _cart = null;
       emit(DeleteCartSuccessed(message: 'cleared'));
+      emit(CartLoaded(cart: const CartApiModel()));
     } catch (e) {
       emit(CartFailure(message: e.toString()));
     }

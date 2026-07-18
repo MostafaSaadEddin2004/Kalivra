@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
@@ -26,9 +29,17 @@ class OtpPhoneEntryScreen extends StatefulWidget {
 }
 
 class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
+  static const int _initialCooldownSeconds = 30;
+  static const int _resendCooldownSeconds = 60;
+
   late final TextEditingController _phoneController;
   final _formKey = GlobalKey<FormState>();
+  Timer? _cooldownTimer;
+  int _secondsRemaining = _initialCooldownSeconds;
+  bool _canResend = false;
+  bool _codeSent = false;
   bool _isLoading = false;
+  bool _isResending = false;
 
   @override
   void initState() {
@@ -40,6 +51,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
 
   @override
   void dispose() {
+    _cooldownTimer?.cancel();
     _phoneController.dispose();
     super.dispose();
   }
@@ -56,6 +68,45 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
 
   int get _stepTotal => widget.signUpArgs != null ? 2 : 3;
 
+  String get _otpPurpose {
+    if (widget.signUpArgs != null ||
+        widget._effectiveMode == OtpScreenMode.signUp) {
+      return 'register';
+    }
+    if (widget._effectiveMode == OtpScreenMode.forgotPassword) {
+      return 'reset_password';
+    }
+    return 'change_whatsapp';
+  }
+
+  String _formatCooldown(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    final seconds = totalSeconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:'
+        '${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _startCooldown([int seconds = _initialCooldownSeconds]) {
+    _cooldownTimer?.cancel();
+    setState(() {
+      _secondsRemaining = seconds;
+      _canResend = false;
+    });
+
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_secondsRemaining <= 1) {
+        timer.cancel();
+        setState(() => _canResend = true);
+      } else {
+        setState(() => _secondsRemaining--);
+      }
+    });
+  }
+
   Future<void> _sendCode() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final whatsappNumber = _phoneController.text.trim();
@@ -69,7 +120,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
           whatsappNumber: whatsappNumber,
           email: widget.signUpArgs?.email,
           token: widget.signUpArgs?.token,
-          purpose: 'register',
+          purpose: _otpPurpose,
         );
       } else if (widget._effectiveMode == OtpScreenMode.forgotPassword) {
         await context.read<AuthCubit>().sendPasswordOtp(
@@ -84,7 +135,11 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
       }
 
       if (!mounted) return;
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _codeSent = true;
+      });
+      _startCooldown();
       CustomSnackBar.show(context, l10n.codeSentViaWhatsApp(whatsappNumber));
       context.push(
         AppRoutes.otpVerify,
@@ -112,11 +167,86 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
     }
   }
 
+  Future<void> _resendCode() async {
+    if (!_codeSent || !_canResend || _isResending) return;
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final whatsappNumber = _phoneController.text.trim();
+    final l10n = AppLocalizations.of(context)!;
+
+    setState(() => _isResending = true);
+    try {
+      await context.read<AuthCubit>().resendOtp(
+        context: context,
+        whatsappNumber: whatsappNumber,
+        email: widget.signUpArgs?.email,
+        token: widget.signUpArgs?.token,
+        purpose: _otpPurpose,
+      );
+      if (!mounted) return;
+      _startCooldown(_resendCooldownSeconds);
+    } catch (_) {
+      if (mounted) {
+        CustomSnackBar.show(context, l10n.authOtpResendFailed);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isResending = false);
+      }
+    }
+  }
+
+  Widget _buildResendSection(
+    ThemeData theme,
+    bool isDark,
+    AppLocalizations l10n,
+  ) {
+    if (!_codeSent) return const SizedBox.shrink();
+
+    final textColor = isDark ? AppColors.taupe : AppColors.burgundy;
+
+    if (!_canResend) {
+      return Text(
+        l10n.authOtpResendIn(_formatCooldown(_secondsRemaining)),
+        textAlign: TextAlign.center,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: textColor,
+          height: 1.4,
+        ),
+      );
+    }
+
+    return Center(
+      child: TextButton(
+        onPressed: _isResending ? null : _resendCode,
+        child: _isResending
+            ? SizedBox(
+                width: 18.r,
+                height: 18.r,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: textColor,
+                ),
+              )
+            : Text(
+                l10n.authOtpResendCode,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: textColor,
+                  decoration: TextDecoration.underline,
+                  decorationColor: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
+    final l10n = AppLocalizations.of(context)!;
 
     return PopScopeExitApp(
       child: Scaffold(
@@ -174,8 +304,8 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                               ? SizedBox(
                                   width: 20.r,
                                   height: 20.r,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
+                                  child: SpinKitFadingCircle(
+                                    size: 20.r,
                                     color: AppColors.offWhite,
                                   ),
                                 )
@@ -192,6 +322,10 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                           ),
                         ),
                       ),
+                      if (_codeSent) ...[
+                        SizedBox(height: 12.h),
+                        _buildResendSection(theme, isDark, l10n),
+                      ],
                     ],
                   ),
                 ),

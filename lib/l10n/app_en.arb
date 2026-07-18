@@ -73,7 +73,7 @@
 
   "productDetails": "Product Details",
   "invalidProductId": "Invalid product ID",
-  "addToWishlistSuccess": "Added \"{productName}\" to favorites",
+  "addToWishlistSuccess": "Added \"{productName}\" to favorites successfully",
   "@addToWishlistSuccess": {"placeholders": {"productName": {"type": "String"}}},
   "addToWishlistFailed": "Failed to add product to favorites",
   "unit": "Unit",
@@ -87,6 +87,8 @@
   "removeFromWishlistSuccess": "Removed \"{productName}\" from favorites",
   "@removeFromWishlistSuccess": {"placeholders": {"productName": {"type": "String"}}},
   "removeFromWishlistFailed": "Failed to remove product from favorites",
+  "clearWishlist": "Are you sure you want to clear the wishlist?",
+  "warning": "Warning!",
   "addToCart": "Add to Cart",
   "productSku": "SKU",
   "productDescription": "Description",

@@ -4,6 +4,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
+import 'package:kalivra/model/association/association_news_model.dart';
 import 'package:kalivra/model/association/association_request_address.dart';
 import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/association/association_request_type.dart';
@@ -20,7 +21,11 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     try {
       emit(AssociationLinkLoading());
       final profileInfo = await _api.fetchProfile();
-      emit(AssociationProfileFetched(memberInfo: profileInfo));
+      var news = const <AssociationNewsModel>[];
+      try {
+        news = await _api.getNews();
+      } catch (_) {}
+      emit(AssociationProfileFetched(memberInfo: profileInfo, news: news));
     } catch (e) {
       emit(AssociationLinkFailure(errorMessage: e.toString()));
     }
@@ -73,7 +78,7 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final l10n = AppLocalizations.of(context)!;
-      emit(AssociationLinkLoading());
+    emit(AssociationLinkLoading());
     try {
       await _api.submitLinkRequest(
         customerNote: customerNote,
@@ -109,7 +114,7 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final l10n = AppLocalizations.of(context)!;
-      emit(AssociationLinkLoading());
+    emit(AssociationLinkLoading());
     try {
       await _api.submitNormalRequest(
         type: type,

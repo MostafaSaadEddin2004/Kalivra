@@ -467,7 +467,7 @@ abstract class AppLocalizations {
   /// No description provided for @addToWishlistSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Added \"{productName}\" to favorites'**
+  /// **'Added \"{productName}\" to favorites successfully'**
   String addToWishlistSuccess(String productName);
 
   /// No description provided for @addToWishlistFailed.
@@ -529,6 +529,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to remove product from favorites'**
   String get removeFromWishlistFailed;
+
+  /// No description provided for @clearWishlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear the wishlist?'**
+  String get clearWishlist;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning!'**
+  String get warning;
 
   /// No description provided for @addToCart.
   ///

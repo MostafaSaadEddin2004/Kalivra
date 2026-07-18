@@ -313,6 +313,7 @@ class AuthCubit extends Cubit<AuthState> {
     String? gender,
     String? dateOfBirth,
     String? email,
+    String? countryCode,
     String? phone,
     String? whatsappNumber,
     String? officialGovernorate,
@@ -329,6 +330,7 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _customerApiService.updateProfile(
         phone: phone,
+        countryCode: countryCode,
         whatsappNumber: whatsappNumber,
         email: email,
         firstName: firstName,

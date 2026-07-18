@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
@@ -13,14 +14,95 @@ import 'package:kalivra/view/screens/home/product_details_screen.dart';
 import 'package:kalivra/view/widgets/buttons/cart_button.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 
-class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product, });
+class ProductCard extends StatefulWidget {
+  const ProductCard({super.key, required this.product, this.itemId});
 
   final ProductModel product;
+  final int? itemId;
+
+  @override
+  State<ProductCard> createState() => _ProductCardState();
+}
+
+class _ProductCardState extends State<ProductCard> {
+  late bool _isWishlist;
+  bool _wishlistLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isWishlist = widget.product.isWishlist;
+  }
+
+  @override
+  void didUpdateWidget(covariant ProductCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.product.id != widget.product.id ||
+        oldWidget.product.isWishlist != widget.product.isWishlist) {
+      _isWishlist = widget.product.isWishlist;
+    }
+  }
+
+  Future<void> _onWishlistTap() async {
+    if (_wishlistLoading) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    final wishlistCubit = context.read<WishlistCubit>();
+
+    setState(() => _wishlistLoading = true);
+
+    if (!_isWishlist) {
+      final added = await wishlistCubit.addToWishlist(
+        productId: widget.product.id,
+        productName: widget.product.name,
+        context: context,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        _isWishlist = added ? true : _isWishlist;
+        _wishlistLoading = false;
+      });
+
+      if (added) {
+        CustomSnackBar.show(
+          context,
+          l10n.addToWishlistSuccess(widget.product.name),
+        );
+      } else if (wishlistCubit.state is WishlistFailed) {
+        CustomSnackBar.show(context, l10n.addToWishlistFailed);
+      }
+      return;
+    }
+
+    final itemId = widget.itemId;
+    final removed = itemId == null
+        ? await wishlistCubit.removeProductFromWishlist(
+            productId: widget.product.id,
+          )
+        : await wishlistCubit.removeFromWishlist(itemId: itemId);
+    if (!mounted) return;
+
+    setState(() {
+      _isWishlist = removed ? false : _isWishlist;
+      _wishlistLoading = false;
+    });
+
+    if (removed) {
+      CustomSnackBar.show(
+        context,
+        l10n.removeFromWishlistSuccess(widget.product.name),
+      );
+    } else if (wishlistCubit.state is WishlistFailed) {
+      CustomSnackBar.show(context, l10n.removeFromWishlistFailed);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final product = widget.product;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final surfaceColor = isDark
@@ -32,7 +114,8 @@ class ProductCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-      child: SizedBox(width: 160.w,
+      child: SizedBox(
+        width: 160.w,
         child: InkWell(
           onTap: () => context.push(AppRoutes.productDetails, extra: product),
           borderRadius: BorderRadius.circular(16.r),
@@ -54,29 +137,40 @@ class ProductCard extends StatelessWidget {
                   ),
                   Positioned(
                     top: 8.h,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {},
-                        borderRadius: BorderRadius.circular(20.r),
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 8.w),
-                          padding: EdgeInsets.all(6.r),
-                          decoration: BoxDecoration(
-                            color: theme.scaffoldBackgroundColor.withValues(
-                              alpha: 0.9,
+                    child: InkWell(
+                      onTap: _onWishlistTap,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 8.w),
+                        padding: EdgeInsets.all(6.r),
+                        decoration: BoxDecoration(
+                          color: AppColors.black.withValues(alpha: 0.3),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 6,
+                              offset: const Offset(0, 1),
                             ),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.08),
-                                blurRadius: 6,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Icon(Icons.favorite_border_rounded, size: 22.r),
+                          ],
                         ),
+                        child: _wishlistLoading
+                            ? SizedBox(
+                                height: 22.r,
+                                width: 22.r,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2.r,
+                                  color: AppColors.offWhite,
+                                ),
+                              )
+                            : Icon(
+                                _isWishlist
+                                    ? Icons.favorite_rounded
+                                    : Icons.favorite_border_rounded,
+                                size: 22.r,
+                                color: _isWishlist
+                                    ? AppColors.red
+                                    : AppColors.offWhite,
+                              ),
                       ),
                     ),
                   ),
@@ -116,15 +210,15 @@ class ProductCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextSlider(text: product.name,),
+                    TextSlider(text: product.name),
                     if (product.prices.final_?.price != null)
                       ProductBadgeChip(
-                              badge: ProductBadgeData(
-                                label: _salePercent(),
-                                icon: Icons.percent,
-                                color: AppColors.red,
-                              ),
-                            ),
+                        badge: ProductBadgeData(
+                          label: _salePercent(),
+                          icon: Icons.percent,
+                          color: AppColors.red,
+                        ),
+                      ),
                     SizedBox(height: 4.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,8 +243,8 @@ class ProductCard extends StatelessWidget {
   }
 
   String _salePercent() {
-    final regularStr = product.prices.regular.price;
-    final finalStr = product.prices.final_!.price;
+    final regularStr = widget.product.prices.regular.price;
+    final finalStr = widget.product.prices.final_!.price;
 
     final regular = double.tryParse(regularStr);
     final finalP = double.tryParse(finalStr);
