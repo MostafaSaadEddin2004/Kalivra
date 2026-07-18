@@ -993,12 +993,6 @@ class _ProfileHeaderCard extends StatelessWidget {
     final name = profile.person.displayName.trim().isEmpty
         ? l10n.associationMemberNoData
         : profile.person.displayName;
-    final membershipNumber =
-        profile.associationMember?.membershipNumber.isNotEmpty == true
-        ? profile.associationMember!.membershipNumber
-        : (profile.memberships.isEmpty
-              ? ''
-              : profile.memberships.first.membershipNumber);
 
     return Container(
       width: double.infinity,
@@ -1032,27 +1026,13 @@ class _ProfileHeaderCard extends StatelessWidget {
               ),
               SizedBox(width: 14.w),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+                child: Text(
                       name,
                       style: theme.textTheme.titleLarge?.copyWith(
                         color: AppColors.offWhite,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    if (membershipNumber.isNotEmpty) ...[
-                      SizedBox(height: 4.h),
-                      Text(
-                        '${l10n.associationLinkMembershipNumber}: $membershipNumber',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.offWhite.withValues(alpha: 0.9),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
               ),
             ],
           ),
