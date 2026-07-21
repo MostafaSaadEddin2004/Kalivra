@@ -16,7 +16,7 @@ class CartApiService {
   }
 
   Future<CartApiModel?> addToCart({
-    required int cartItemId,
+    required int productId,
     required int quantity,
     String color = '',
     String size = '',
@@ -25,7 +25,7 @@ class CartApiService {
     final res = await _client.post(
       'checkout/cart',
       data: {
-        'cart_item_id': cartItemId,
+        'product_id': productId,
         'quantity': quantity,
         'color': color,
         'size': size,

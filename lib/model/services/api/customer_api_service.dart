@@ -70,7 +70,7 @@ class CustomerApiService {
     final Map<String, dynamic> body = {
       'first_name': firstName,
       'last_name': lastName,
-      // 'email': email,
+      'email': email,
       'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,

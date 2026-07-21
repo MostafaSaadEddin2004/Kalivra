@@ -40,6 +40,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     super.initState();
     _isWishlist = widget.product.isWishlist;
     context.read<ProductsCubit>().loadProductById(widget.product.id);
+    context.read<WishlistCubit>().ensureWishlistLoaded();
   }
 
   @override
@@ -183,21 +184,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     _ratingDialogContext = null;
   }
 
-  Future<void> _toggleWishlist() async {
+  bool _isProductInWishlistState(ProductModel product, WishlistState state) {
+    return state is WishlistLoaded &&
+        state.wishlist.any((item) => item.product.id == product.id);
+  }
+
+  bool _effectiveWishlist(ProductModel product, WishlistState state) {
+    return _isWishlist || _isProductInWishlistState(product, state);
+  }
+
+  Future<void> _toggleWishlist(ProductModel product) async {
     if (_wishlistLoading) return;
 
     final l10n = AppLocalizations.of(context)!;
-    final wasInWishlist = _isWishlist;
+    final wishlistCubit = context.read<WishlistCubit>();
+    final wasInWishlist = _effectiveWishlist(product, wishlistCubit.state);
 
     setState(() => _wishlistLoading = true);
     try {
       final changed = wasInWishlist
-          ? await context.read<WishlistCubit>().removeProductFromWishlist(
-              productId: widget.product.id,
-            )
-          : await context.read<WishlistCubit>().addToWishlist(
-              productId: widget.product.id,
-              productName: widget.product.name,
+          ? await wishlistCubit.removeProductFromWishlist(productId: product.id)
+          : await wishlistCubit.addToWishlist(
+              productId: product.id,
+              productName: product.name,
               context: context,
             );
       if (!mounted) return;
@@ -223,6 +232,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final wishlistState = context.watch<WishlistCubit>().state;
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.productDetails),
@@ -257,6 +267,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         builder: (context, state) {
           final variantState = state is ProductVariantSelected ? state : null;
           final product = variantState?.product ?? widget.product;
+          final isWishlist = _effectiveWishlist(product, wishlistState);
           final viewData = ProductViewData.fromProduct(product, l10n);
 
           return ListView(
@@ -265,9 +276,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               GallerySection(
                 galleryImages: _galleryImages(product),
                 isDark: isDark,
-                isWishlist: _isWishlist,
+                isWishlist: isWishlist,
                 wishlistLoading: _wishlistLoading,
-                onToggleWishlist: _toggleWishlist,
+                onToggleWishlist: () => _toggleWishlist(product),
               ),
               SizedBox(height: 20.h),
               ProductHeaderSection(

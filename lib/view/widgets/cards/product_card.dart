@@ -34,7 +34,8 @@ class _ProductCardState extends State<ProductCard> {
   @override
   void initState() {
     super.initState();
-    _isWishlist = widget.product.isWishlist;
+    _isWishlist = _initialWishlistValue();
+    context.read<WishlistCubit>().ensureWishlistLoaded();
   }
 
   @override
@@ -42,8 +43,22 @@ class _ProductCardState extends State<ProductCard> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.product.id != widget.product.id ||
         oldWidget.product.isWishlist != widget.product.isWishlist) {
-      _isWishlist = widget.product.isWishlist;
+      _isWishlist = _initialWishlistValue();
     }
+  }
+
+  bool _initialWishlistValue() =>
+      widget.product.isWishlist || widget.itemId != null;
+
+  bool _isProductInWishlistState(WishlistState state) {
+    return state is WishlistLoaded &&
+        state.wishlist.any((item) => item.product.id == widget.product.id);
+  }
+
+  bool _effectiveWishlist(WishlistState state) {
+    return _isWishlist ||
+        widget.itemId != null ||
+        _isProductInWishlistState(state);
   }
 
   Future<void> _onWishlistTap() async {
@@ -51,10 +66,11 @@ class _ProductCardState extends State<ProductCard> {
 
     final l10n = AppLocalizations.of(context)!;
     final wishlistCubit = context.read<WishlistCubit>();
+    final wasInWishlist = _effectiveWishlist(wishlistCubit.state);
 
     setState(() => _wishlistLoading = true);
 
-    if (!_isWishlist) {
+    if (!wasInWishlist) {
       final added = await wishlistCubit.addToWishlist(
         productId: widget.product.id,
         productName: widget.product.name,
@@ -104,6 +120,11 @@ class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+    final wishlistState = context.watch<WishlistCubit>().state;
+    final isWishlist = _effectiveWishlist(wishlistState);
+    final displayProduct = product.isWishlist == isWishlist
+        ? product
+        : product.copyWith(isWishlist: isWishlist);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final surfaceColor = isDark
@@ -118,7 +139,8 @@ class _ProductCardState extends State<ProductCard> {
       child: SizedBox(
         width: 160.w,
         child: InkWell(
-          onTap: () => context.push(AppRoutes.productDetails, extra: product),
+          onTap: () =>
+              context.push(AppRoutes.productDetails, extra: displayProduct),
           borderRadius: BorderRadius.circular(16.r),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -164,11 +186,11 @@ class _ProductCardState extends State<ProductCard> {
                                 ),
                               )
                             : Icon(
-                                _isWishlist
+                                isWishlist
                                     ? Icons.favorite_rounded
                                     : Icons.favorite_border_rounded,
                                 size: 22.r,
-                                color: _isWishlist
+                                color: isWishlist
                                     ? AppColors.red
                                     : AppColors.offWhite,
                               ),

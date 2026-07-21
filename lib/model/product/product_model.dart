@@ -104,6 +104,50 @@ class ProductModel {
     'reviews': reviews.toJson(),
     'variants': variants?.toJson(),
   };
+
+  ProductModel copyWith({
+    int? id,
+    String? sku,
+    String? name,
+    String? description,
+    String? urlKey,
+    BrandModel? brand,
+    ProductImage? baseImage,
+    List<ProductImage>? images,
+    bool? isNew,
+    bool? isFeatured,
+    bool? onSale,
+    bool? isSaleable,
+    bool? isWishlist,
+    String? minPrice,
+    ProductPrices? prices,
+    String? priceHtml,
+    ProductRatings? ratings,
+    ProductReviews? reviews,
+    ProductVariants? variants,
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      sku: sku ?? this.sku,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      urlKey: urlKey ?? this.urlKey,
+      brand: brand ?? this.brand,
+      baseImage: baseImage ?? this.baseImage,
+      images: images ?? this.images,
+      isNew: isNew ?? this.isNew,
+      isFeatured: isFeatured ?? this.isFeatured,
+      onSale: onSale ?? this.onSale,
+      isSaleable: isSaleable ?? this.isSaleable,
+      isWishlist: isWishlist ?? this.isWishlist,
+      minPrice: minPrice ?? this.minPrice,
+      prices: prices ?? this.prices,
+      priceHtml: priceHtml ?? this.priceHtml,
+      ratings: ratings ?? this.ratings,
+      reviews: reviews ?? this.reviews,
+      variants: variants ?? this.variants,
+    );
+  }
 }
 
 class ProductImage {

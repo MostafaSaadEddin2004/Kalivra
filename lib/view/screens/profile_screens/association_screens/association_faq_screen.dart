@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/app_info/faq_item_model.dart';
 import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/faq/faq_list.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class AssociationFaqScreen extends StatelessWidget {
   const AssociationFaqScreen({super.key});
@@ -36,7 +38,33 @@ class AssociationFaqScreen extends StatelessWidget {
                   description: state.errorMessage,
                 );
               case AssociationLinkLoading():
-                return const Center(child: CircularProgressIndicator());
+                return Skeletonizer(
+                  child: FaqList(
+                    faqs: [
+                      FaqItemModel(
+                        id: 1,
+                        category: 'category',
+                        question: 'question',
+                        answer: 'answer',
+                        sortOrder: 1,
+                      ),
+                      FaqItemModel(
+                        id: 1,
+                        category: 'category',
+                        question: 'question',
+                        answer: 'answer',
+                        sortOrder: 1,
+                      ),
+                      FaqItemModel(
+                        id: 1,
+                        category: 'category',
+                        question: 'question',
+                        answer: 'answer',
+                        sortOrder: 1,
+                      ),
+                    ],
+                  ),
+                );
               default:
                 return const SizedBox.shrink();
             }

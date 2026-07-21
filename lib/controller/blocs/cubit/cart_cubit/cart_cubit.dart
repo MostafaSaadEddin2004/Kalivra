@@ -74,7 +74,7 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<void> addItem(
-    String cartItemId, {
+    String productId, {
     int quantity = 1,
     String color = '',
     String size = '',
@@ -90,7 +90,7 @@ class CartCubit extends Cubit<CartState> {
     emit(CartLoading());
     try {
       final cart = await _cartService.addToCart(
-        cartItemId: int.parse(cartItemId),
+        productId: int.parse(productId),
         quantity: quantity.clamp(1, 5),
         color: color,
         size: size,

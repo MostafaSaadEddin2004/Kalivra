@@ -14,11 +14,24 @@ class WishlistCubit extends Cubit<WishlistState> {
   WishlistCubit() : super(WishlistLoading());
 
   final WishlistApiService _wishlistService = WishlistApiService();
+  bool _isLoadingWishlist = false;
+
+  Future<void> ensureWishlistLoaded() async {
+    if (_isLoadingWishlist ||
+        state is WishlistLoaded ||
+        state is WishlistLoginRequired) {
+      return;
+    }
+    await loadWishlist();
+  }
 
   Future<void> loadWishlist() async {
+    if (_isLoadingWishlist) return;
+    _isLoadingWishlist = true;
     final token = await LocalStore.getToken();
     if (token == null || token.isEmpty) {
       emit(WishlistLoginRequired());
+      _isLoadingWishlist = false;
       return;
     }
     emit(WishlistLoading());
@@ -29,6 +42,8 @@ class WishlistCubit extends Cubit<WishlistState> {
       emit(WishlistLoaded(wishlist: list));
     } catch (e) {
       emit(WishlistFailed(message: e.toString()));
+    } finally {
+      _isLoadingWishlist = false;
     }
   }
 
@@ -52,6 +67,7 @@ class WishlistCubit extends Cubit<WishlistState> {
           message: l10n.addToWishlistSuccess(productName),
         ),
       );
+      await loadWishlist();
       return true;
     } catch (e) {
       emit(WishlistFailed(message: e.toString()));
