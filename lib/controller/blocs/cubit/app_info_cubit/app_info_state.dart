@@ -29,6 +29,12 @@ final class AppTermsConditionsFetched extends AppInfoState {
   AppTermsConditionsFetched({required this.termaConditionsData});
 }
 
+final class AppFaqsFetched extends AppInfoState {
+  final List<FaqItemModel> faqs;
+
+  AppFaqsFetched({required this.faqs});
+}
+
 final class AppRatingAuthChecking extends AppInfoState {}
 
 final class AppRatingReady extends AppInfoState {}

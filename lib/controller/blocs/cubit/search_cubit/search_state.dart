@@ -1,8 +1,17 @@
+import 'package:kalivra/model/search/search_history_model.dart';
 import 'package:kalivra/model/search/search_result_model.dart';
 
 abstract class SearchState {}
 
 final class SearchInitial extends SearchState {}
+
+final class SearchHistoryLoading extends SearchState {}
+
+final class SearchHistoryLoaded extends SearchState {
+  SearchHistoryLoaded({required this.history});
+
+  final List<SearchHistoryModel> history;
+}
 
 final class SearchLoading extends SearchState {
   SearchLoading({required this.query});

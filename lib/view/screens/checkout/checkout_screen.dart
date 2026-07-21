@@ -125,7 +125,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           context.read<CheckoutCubit>().reset();
         }
         if (state is CheckoutOrderPlaced) {
-          context.read<CartCubit>().clear();
+          context.read<CartCubit>().clearCart();
           if (context.mounted) context.pop();
           context.read<CheckoutCubit>().reset();
         }

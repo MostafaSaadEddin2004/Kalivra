@@ -348,10 +348,10 @@
   "enterCode4To6": "Enter the 4-6 digit code",
   "rateTitle": "Rate",
   "rateQuestion": "How would you rate your experience with us?",
-  "submitRating": "Submit Rating",
+  "submitRating": "Rate",
   "thanksForRating": "Thanks for your rating",
   "ratingComment": "Comment",
-  "ratingCommentHint": "Tell us more about your experience",
+  "ratingCommentHint": "Tell us about your opinion",
   "selectRating": "Please select a rating",
   "loginRequiredForRating": "Sign in to rate the app",
   "ratingLoginPrompt": "Sign in or create an account to share your app experience.",
@@ -359,6 +359,7 @@
   "size": "Size",
   "color": "Color",
   "dash": "—",
+  "submit": "Submit",
 
   "confirmOrder": "Confirm Order",
 

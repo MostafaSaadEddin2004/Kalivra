@@ -35,7 +35,6 @@ class RatingStars extends StatelessWidget {
         inactiveColor ??
         (isDark ? AppColors.taupe : AppColors.burgundy.withValues(alpha: 0.4));
     final starSize = size ?? 40.r;
-    final starSpacing = spacing ?? 4.w;
 
     return Row(
       mainAxisAlignment: mainAxisAlignment,
@@ -44,16 +43,13 @@ class RatingStars extends StatelessWidget {
         final value = index + 1;
         final isSelected = value <= rating;
 
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: starSpacing),
-          child: CustomIconButton(
-            icon: isSelected ? Icons.star_rounded : Icons.star_border_rounded,
-            iconSize: starSize,
-            color: isSelected ? selectedColor : unselectedColor,
-            onPressed: enabled && onRatingChanged != null
-                ? () => onRatingChanged!(value)
-                : null,
-          ),
+        return CustomIconButton(
+          icon: isSelected ? Icons.star_rounded : Icons.star_border_rounded,
+          iconSize: starSize,
+          color: isSelected ? selectedColor : unselectedColor,
+          onPressed: enabled && onRatingChanged != null
+              ? () => onRatingChanged!(value)
+              : null,
         );
       }),
     );

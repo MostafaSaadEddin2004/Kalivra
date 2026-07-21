@@ -45,7 +45,7 @@ class CartApiService {
     );
   }
 
-  Future<void> removeSelectedItems(List<int> cartItemIds) async {
+  Future<void> clearCart() async {
     await _client.delete('checkout/cart/all');
-  }
+   }
 }

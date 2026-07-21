@@ -1925,7 +1925,7 @@ abstract class AppLocalizations {
   /// No description provided for @submitRating.
   ///
   /// In en, this message translates to:
-  /// **'Submit Rating'**
+  /// **'Rate'**
   String get submitRating;
 
   /// No description provided for @thanksForRating.
@@ -1943,7 +1943,7 @@ abstract class AppLocalizations {
   /// No description provided for @ratingCommentHint.
   ///
   /// In en, this message translates to:
-  /// **'Tell us more about your experience'**
+  /// **'Tell us about your opinion'**
   String get ratingCommentHint;
 
   /// No description provided for @selectRating.
@@ -1981,6 +1981,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'—'**
   String get dash;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
 
   /// No description provided for @confirmOrder.
   ///

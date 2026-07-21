@@ -342,10 +342,10 @@
   "enterCode4To6": "أدخل الرمز المكون من 4-6 أرقام",
   "rateTitle": "تقييم",
   "rateQuestion": "كيف تقيم تجربتك معنا؟",
-  "submitRating": "إرسال التقييم",
+  "submitRating": "تقييم",
   "thanksForRating": "شكراً لتقييمك",
   "ratingComment": "التعليق",
-  "ratingCommentHint": "أخبرنا المزيد عن تجربتك",
+  "ratingCommentHint": "أخبرنا عن رأيك",
   "selectRating": "يرجى اختيار تقييم",
   "loginRequiredForRating": "يجب تسجيل الدخول لتقييم التطبيق",
   "ratingLoginPrompt": "سجّل الدخول أو أنشئ حساباً لمشاركة تجربتك مع التطبيق.",
@@ -353,6 +353,7 @@
   "size": "الحجم",
   "color": "اللون",
   "dash": "—",
+  "submit": "إرسال",
 
   "confirmOrder": "تأكيد الطلب",
 

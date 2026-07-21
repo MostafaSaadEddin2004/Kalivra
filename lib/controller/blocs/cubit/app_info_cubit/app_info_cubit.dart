@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:kalivra/model/app_info/about_api_model.dart';
 import 'package:kalivra/model/app_info/contact_api_model.dart';
+import 'package:kalivra/model/app_info/faq_item_model.dart';
 import 'package:kalivra/model/app_info/privacy_policy_api_model.dart';
 import 'package:kalivra/model/app_info/terms_conditions_api_model.dart';
 import 'package:kalivra/model/services/api/app_info_services.dart';
@@ -48,6 +49,16 @@ class AppInfoCubit extends Cubit<AppInfoState> {
       emit(AppInfoLoading());
       final contactData = await AppInfoServices().getContactInfo();
       emit(AppContactFetched(contactData: contactData));
+    } catch (e) {
+      emit(AppInfoFailure(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> getKalivraFaqs() async {
+    try {
+      emit(AppInfoLoading());
+      final faqs = await AppInfoServices().getKalivraFaqs();
+      emit(AppFaqsFetched(faqs: faqs));
     } catch (e) {
       emit(AppInfoFailure(errorMessage: e.toString()));
     }

@@ -30,6 +30,12 @@ final class AssociationAttachmentTypesFetched extends AssociationLinkState {
   AssociationAttachmentTypesFetched({required this.attachmentTypes});
 }
 
+final class AssociationFaqsFetched extends AssociationLinkState {
+  final List<FaqItemModel> faqs;
+
+  AssociationFaqsFetched({required this.faqs});
+}
+
 final class AssociationLinkSubmittedSuccessfully extends AssociationLinkState {
   final String successMessage;
 

@@ -5,21 +5,47 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/search_cubit/search_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/search/search_history_model.dart';
 import 'package:kalivra/view/widgets/cards/search_result_card.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class SearchPage extends StatelessWidget {
-  const SearchPage({super.key});
+  const SearchPage({super.key, required this.onHistorySelected});
+
+  final ValueChanged<String> onHistorySelected;
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SearchCubit, SearchState>(
       builder: (context, state) {
-        if (state is SearchLoading) {
-          return const Center(child: CircularProgressIndicator());
+        if (state is SearchLoading || state is SearchHistoryLoading) {
+          return Skeletonizer(
+            child: ListView.separated(
+              itemCount: 3,
+              separatorBuilder: (context, index) => SizedBox(height: 8.h),
+              itemBuilder: (context, index) {
+                return SearchResultCard(
+                  label: 'label',
+                  resultType: 'type',
+                  onTap: () => {},
+                );
+              },
+            ),
+          );
         }
 
         if (state is SearchFailed) {
           return _MessageView(message: state.message);
+        }
+
+        if (state is SearchHistoryLoaded) {
+          if (state.history.isEmpty) {
+            return const _SuggestionsView();
+          }
+          return _HistoryView(
+            history: state.history,
+            onHistorySelected: onHistorySelected,
+          );
         }
 
         if (state is SearchLoaded) {
@@ -100,6 +126,36 @@ class _SuggestionsView extends StatelessWidget {
   }
 }
 
+class _HistoryView extends StatelessWidget {
+  const _HistoryView({required this.history, required this.onHistorySelected});
+
+  final List<SearchHistoryModel> history;
+  final ValueChanged<String> onHistorySelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 16.h),
+          sliver: SliverList.separated(
+            itemCount: history.length,
+            separatorBuilder: (context, index) => SizedBox(height: 8.h),
+            itemBuilder: (context, index) {
+              final item = history[index];
+              return SearchResultCard(
+                label: item.query,
+                resultType: 'History',
+                onTap: () => onHistorySelected(item.query),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _SearchItem {
   const _SearchItem({
     required this.label,
@@ -119,24 +175,33 @@ class _SearchItem {
         (product) => _SearchItem(
           label: product.name,
           type: l10n.searchResultProduct,
-          onTap: () => context.push(AppRoutes.productDetails, extra: product),
+          onTap: () {
+            context.read<SearchCubit>().recordSearchHistory(state.query);
+            context.push(AppRoutes.productDetails, extra: product);
+          },
         ),
       ),
       ...state.result.brands.map(
         (brand) => _SearchItem(
           label: brand.name,
           type: l10n.searchResultBrand,
-          onTap: () => context.push(AppRoutes.brandDetails, extra: brand),
+          onTap: () {
+            context.read<SearchCubit>().recordSearchHistory(state.query);
+            context.push(AppRoutes.brandDetails, extra: brand);
+          },
         ),
       ),
       ...state.result.categories.map(
         (category) => _SearchItem(
           label: category.name,
           type: l10n.searchResultCategory,
-          onTap: () => context.go(
-            '${AppRoutes.home}?categoryId=${category.id}',
-            extra: category,
-          ),
+          onTap: () {
+            context.read<SearchCubit>().recordSearchHistory(state.query);
+            context.go(
+              '${AppRoutes.home}?categoryId=${category.id}',
+              extra: category,
+            );
+          },
         ),
       ),
     ];

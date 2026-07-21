@@ -91,6 +91,12 @@ class ProfilePage extends StatelessWidget {
               AppRouter.openScreenWithPop(context, AppRoutes.termsConditions),
         ),
         ProfilePageItem(
+          icon: Icons.help_outline_rounded,
+          label: AppLocalizations.of(context)!.frequentlyAskedQuestion,
+          onTap: () =>
+              AppRouter.openScreenWithPop(context, AppRoutes.kalivraFaq),
+        ),
+        ProfilePageItem(
           icon: Icons.share_rounded,
           label: AppLocalizations.of(context)!.drawerShare,
           onTap: () => _shareApp(context),

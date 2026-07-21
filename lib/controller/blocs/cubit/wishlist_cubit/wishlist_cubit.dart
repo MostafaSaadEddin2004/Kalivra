@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -101,6 +102,7 @@ class WishlistCubit extends Cubit<WishlistState> {
           try {
             await _wishlistService.clearWishlist();
             isLoading = false;
+            context.pop();
             loadWishlist();
           } catch (e) {
             emit(WishlistFailed(message: e.toString()));

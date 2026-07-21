@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
+import 'package:kalivra/model/app_info/faq_item_model.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
@@ -142,5 +143,25 @@ class AssociationApiService {
             .toList()
           ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
     return news;
+  }
+
+  Future<List<FaqItemModel>> getFaqs() async {
+    final res = await _client.get('faq/association');
+    final data = res.data['data'];
+    if (data is! List) return const [];
+    final faqs =
+        data
+            .whereType<Map>()
+            .map(
+              (item) => FaqItemModel.fromJson(Map<String, dynamic>.from(item)),
+            )
+            .where(
+              (item) =>
+                  item.question.trim().isNotEmpty &&
+                  item.answer.trim().isNotEmpty,
+            )
+            .toList()
+          ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return faqs;
   }
 }

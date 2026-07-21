@@ -1,9 +1,12 @@
+import 'package:kalivra/model/brand/brand_model.dart';
+
 class ProductModel {
   final int id;
   final String sku;
   final String name;
   final String? description;
   final String urlKey;
+  final BrandModel? brand;
   final ProductImage? baseImage;
   final List<ProductImage> images;
   final bool isNew;
@@ -13,6 +16,7 @@ class ProductModel {
   final bool isWishlist;
   final String? minPrice;
   final ProductPrices prices;
+  final String? priceHtml;
   final ProductRatings ratings;
   final ProductReviews reviews;
   final ProductVariants? variants;
@@ -23,6 +27,7 @@ class ProductModel {
     required this.name,
     this.description,
     required this.urlKey,
+    this.brand,
     this.baseImage,
     required this.images,
     required this.isNew,
@@ -32,6 +37,7 @@ class ProductModel {
     required this.isWishlist,
     this.minPrice,
     required this.prices,
+    this.priceHtml,
     required this.ratings,
     required this.reviews,
     this.variants,
@@ -44,11 +50,14 @@ class ProductModel {
       name: json['name'] as String,
       description: json['description'],
       urlKey: json['url_key'],
+      brand: json['brand'] != null
+          ? BrandModel.fromJson(Map<String, dynamic>.from(json['brand']))
+          : null,
       baseImage: json['base_image'] != null
-    ? ProductImage.fromJson(json['base_image'])
-    : null,
-      images: (json['images'] as List)
-          .map((e) => ProductImage.fromJson(e))
+          ? ProductImage.fromJson(Map<String, dynamic>.from(json['base_image']))
+          : null,
+      images: (json['images'] as List? ?? [])
+          .map((e) => ProductImage.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
       isNew: json['is_new'] as bool? ?? false,
       isFeatured: json['is_featured'] as bool? ?? false,
@@ -56,11 +65,20 @@ class ProductModel {
       isSaleable: json['is_saleable'] as bool? ?? false,
       isWishlist: json['is_wishlist'] as bool? ?? false,
       minPrice: json['min_price'] as String?,
-      prices: ProductPrices.fromJson(json['prices']),
-      ratings: ProductRatings.fromJson(json['ratings']),
-      reviews: ProductReviews.fromJson(json['reviews']),
+      prices: ProductPrices.fromJson(
+        Map<String, dynamic>.from(json['prices'] ?? const {}),
+      ),
+      priceHtml: json['price_html'] as String?,
+      ratings: ProductRatings.fromJson(
+        Map<String, dynamic>.from(json['ratings'] ?? const {}),
+      ),
+      reviews: ProductReviews.fromJson(
+        Map<String, dynamic>.from(json['reviews'] ?? const {}),
+      ),
       variants: json['variants'] != null
-          ? ProductVariants.fromJson(json['variants'])
+          ? ProductVariants.fromJson(
+              Map<String, dynamic>.from(json['variants']),
+            )
           : null,
     );
   }
@@ -71,6 +89,7 @@ class ProductModel {
     'name': name,
     'description': description,
     'url_key': urlKey,
+    'brand': brand?.toJson(),
     'base_image': baseImage?.toJson(),
     'images': images.map((e) => e.toJson()).toList(),
     'is_new': isNew,
@@ -80,8 +99,10 @@ class ProductModel {
     'is_wishlist': isWishlist,
     'min_price': minPrice,
     'prices': prices.toJson(),
+    'price_html': priceHtml,
     'ratings': ratings.toJson(),
     'reviews': reviews.toJson(),
+    'variants': variants?.toJson(),
   };
 }
 
@@ -122,13 +143,15 @@ class ProductPrices {
   ProductPrices({required this.regular, this.final_});
 
   factory ProductPrices.fromJson(Map<String, dynamic> json) {
-  return ProductPrices(
-    regular: PriceDetail.fromJson(json['regular']),
-    final_: json['final'] != null
-        ? PriceDetail.fromJson(json['final'])
-        : null,
-  );
-}
+    return ProductPrices(
+      regular: json['regular'] != null
+          ? PriceDetail.fromJson(Map<String, dynamic>.from(json['regular']))
+          : PriceDetail(price: ''),
+      final_: json['final'] != null
+          ? PriceDetail.fromJson(Map<String, dynamic>.from(json['final']))
+          : null,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'regular': regular.toJson(),
@@ -184,23 +207,26 @@ class ProductReviews {
 }
 
 class ProductVariants {
-  final String measurementType;
+  final String? measurementType;
   final List<String> measurementTypes;
   final List<VariantBySize> variantsBySize;
+  final int? stockQty;
 
   ProductVariants({
-    required this.measurementType,
-    required this.measurementTypes,
-    required this.variantsBySize,
+    this.measurementType,
+    this.measurementTypes = const [],
+    this.variantsBySize = const [],
+    this.stockQty,
   });
 
   factory ProductVariants.fromJson(Map<String, dynamic> json) {
     return ProductVariants(
-      measurementType: json['measurement_type'] ?? '',
+      measurementType: json['measurement_type'] as String?,
       measurementTypes: List<String>.from(json['measurement_types'] ?? []),
       variantsBySize: (json['variants_by_size'] as List? ?? [])
-          .map((e) => VariantBySize.fromJson(e))
+          .map((e) => VariantBySize.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
+      stockQty: json['stock_qty'] as int?,
     );
   }
 
@@ -208,6 +234,7 @@ class ProductVariants {
     'measurement_type': measurementType,
     'measurement_types': measurementTypes,
     'variants_by_size': variantsBySize.map((e) => e.toJson()).toList(),
+    'stock_qty': stockQty,
   };
 }
 
@@ -227,7 +254,7 @@ class VariantBySize {
       sizeId: json['size_id'] as int,
       sizeName: json['size_name'] as String,
       colors: (json['colors'] as List? ?? [])
-          .map((e) => ColorVariant.fromJson(e))
+          .map((e) => ColorVariant.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
     );
   }

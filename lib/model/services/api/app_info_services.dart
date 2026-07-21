@@ -1,6 +1,7 @@
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/app_info/about_api_model.dart';
 import 'package:kalivra/model/app_info/contact_api_model.dart';
+import 'package:kalivra/model/app_info/faq_item_model.dart';
 import 'package:kalivra/model/app_info/privacy_policy_api_model.dart';
 import 'package:kalivra/model/app_info/terms_conditions_api_model.dart';
 
@@ -27,6 +28,26 @@ class AppInfoServices {
   Future<ContactApiModel> getContactInfo() async {
     final res = await _client.get('contact');
     return ContactApiModel.fromJson((res.data['data']));
+  }
+
+  Future<List<FaqItemModel>> getKalivraFaqs() async {
+    final res = await _client.get('faq/kalivra');
+    final data = res.data['data'];
+    if (data is! List) return const [];
+    final faqs =
+        data
+            .whereType<Map>()
+            .map(
+              (item) => FaqItemModel.fromJson(Map<String, dynamic>.from(item)),
+            )
+            .where(
+              (item) =>
+                  item.question.trim().isNotEmpty &&
+                  item.answer.trim().isNotEmpty,
+            )
+            .toList()
+          ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
+    return faqs;
   }
 
   Future<void> postAppRating({

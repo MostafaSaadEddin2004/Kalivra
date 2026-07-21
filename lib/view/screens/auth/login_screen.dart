@@ -189,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: FilledButton(
                         onPressed: () {
                           if (_formKey.currentState?.validate() != true) {
-                            return;
                           }
                           context.read<AuthCubit>().login(
                             context: context,

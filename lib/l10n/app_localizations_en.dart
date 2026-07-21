@@ -965,7 +965,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rateQuestion => 'How would you rate your experience with us?';
 
   @override
-  String get submitRating => 'Submit Rating';
+  String get submitRating => 'Rate';
 
   @override
   String get thanksForRating => 'Thanks for your rating';
@@ -974,7 +974,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ratingComment => 'Comment';
 
   @override
-  String get ratingCommentHint => 'Tell us more about your experience';
+  String get ratingCommentHint => 'Tell us about your opinion';
 
   @override
   String get selectRating => 'Please select a rating';
@@ -994,6 +994,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dash => '—';
+
+  @override
+  String get submit => 'Submit';
 
   @override
   String get confirmOrder => 'Confirm Order';

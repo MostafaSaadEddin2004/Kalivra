@@ -118,10 +118,10 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> removeSelectedItems(List<int> cartItemIds) async {
+  Future<void> clearCart() async {
     emit(CartLoading());
     try {
-      await _cartService.removeSelectedItems(cartItemIds);
+      await _cartService.clearCart();
       _cart = null;
       emit(DeleteCartSuccessed(message: 'cleared'));
       emit(CartLoaded(cart: const CartApiModel()));
@@ -147,10 +147,6 @@ class CartCubit extends Cubit<CartState> {
     }
   }
 
-  Future<void> clear() async {
-    final ids = items.map((e) => e.cartItemId).whereType<int>().toList();
-    await removeSelectedItems(ids);
-  }
 
   void clearLoginRequired() {
     if (_cart != null) {

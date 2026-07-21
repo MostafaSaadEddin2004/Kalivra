@@ -57,7 +57,11 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      throw e.response!.data['message'] ?? 'Something wrong';
+      if(e.response!.requestOptions.connectTimeout != null) {
+        throw 'Connection timeout';
+      }else{
+        throw e.response!.data['message'] ?? 'Something wrong';
+      }
     }
   }
 
@@ -66,7 +70,11 @@ class DioClient {
       final response = await _dio.post(path, data: data);
       return response;
     } on DioException catch (e) {
-      throw e.response!.data['message'] ?? 'Something wrong';
+     if(e.response!.requestOptions.connectTimeout != null) {
+        throw 'Connection timeout';
+      }else{
+        throw e.response!.data['message'] ?? 'Something wrong';
+      }
     }
   }
 
@@ -87,7 +95,11 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      throw e.response!.data['message'] ?? 'Something wrong';
+       if(e.response!.requestOptions.connectTimeout != null) {
+        throw 'Connection timeout';
+      }else{
+        throw e.response!.data['message'] ?? 'Something wrong';
+      }
     }
   }
 
@@ -108,7 +120,11 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      throw e.response!.data['message'] ?? 'Something wrong';
+      if(e.response!.requestOptions.connectTimeout != null) {
+        throw 'Connection timeout';
+      }else{
+        throw e.response!.data['message'] ?? 'Something wrong';
+      }
     }
   }
 }

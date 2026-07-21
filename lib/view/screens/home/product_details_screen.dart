@@ -1,7 +1,8 @@
-// product_details_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
@@ -10,6 +11,7 @@ import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
+import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
@@ -28,6 +30,7 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   final _reviewTitleController = TextEditingController();
   final _reviewCommentController = TextEditingController();
+  BuildContext? _ratingDialogContext;
   late bool _isWishlist;
   bool _wishlistLoading = false;
   int _selectedRating = 0;
@@ -69,10 +72,115 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     context.read<ProductsCubit>().postProductReview(
       productId: product.id,
-      title: title,
       comment: comment,
       rating: _selectedRating,
     );
+  }
+
+  Future<void> _showRatingDialog(ProductModel fallbackProduct) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        _ratingDialogContext = dialogContext;
+        return BlocBuilder<ProductsCubit, ProductsState>(
+          bloc: context.read<ProductsCubit>(),
+          builder: (context, state) {
+            final variantState = state is ProductVariantSelected ? state : null;
+            final product = variantState?.product ?? fallbackProduct;
+            final isReviewSubmitting =
+                variantState?.reviewStatus == ProductReviewStatus.submitting;
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final theme = Theme.of(context);
+
+            return StatefulBuilder(
+              builder: (context, dialogSetState) {
+                return Dialog(
+                  insetPadding: EdgeInsets.symmetric(
+                    horizontal: 18.w,
+                    vertical: 24.h,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(22.r),
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.sizeOf(context).height * 0.86,
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 16.h),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 28.r,
+                                    height: 28.r,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          (isDark
+                                                  ? AppColors.goldLight
+                                                  : AppColors.burgundy)
+                                              .withValues(alpha: 0.12),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.star_border_outlined,
+                                      color: isDark
+                                          ? AppColors.goldLight
+                                          : AppColors.burgundy,
+                                      size: 16.r,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10.w),
+                                  Text(
+                                    AppLocalizations.of(context)!.submitRating,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                onPressed: () => context.pop(),
+                                icon: Icon(
+                                  Icons.close_rounded,
+                                  size: 24.r,
+                                  color: theme.colorScheme.onTertiary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          ProductRatingCard(
+                            product: product,
+                            isDark: isDark,
+                            selectedRating: _selectedRating,
+                            titleController: _reviewTitleController,
+                            commentController: _reviewCommentController,
+                            isSubmitting: isReviewSubmitting,
+                            onRatingChanged: (rating) {
+                              setState(() => _selectedRating = rating);
+                              dialogSetState(() {});
+                            },
+                            onSubmit: () => _submitProductReview(product),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+    _ratingDialogContext = null;
   }
 
   Future<void> _toggleWishlist() async {
@@ -130,6 +238,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           if (state.reviewStatus == ProductReviewStatus.submitted) {
             _reviewTitleController.clear();
             _reviewCommentController.clear();
+            final dialogContext = _ratingDialogContext;
+            if (dialogContext != null && Navigator.of(dialogContext).canPop()) {
+              Navigator.of(dialogContext).pop();
+              _ratingDialogContext = null;
+            }
             setState(() => _selectedRating = 0);
             CustomSnackBar.show(context, l10n.thanksForRating);
           } else if (state.reviewStatus == ProductReviewStatus.loginRequired) {
@@ -145,8 +258,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           final variantState = state is ProductVariantSelected ? state : null;
           final product = variantState?.product ?? widget.product;
           final viewData = ProductViewData.fromProduct(product, l10n);
-          final isReviewSubmitting =
-              variantState?.reviewStatus == ProductReviewStatus.submitting;
 
           return ListView(
             padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
@@ -163,19 +274,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 product: product,
                 viewData: viewData,
                 isDark: isDark,
+                onRatePressed: () => _showRatingDialog(product),
               ),
-              SizedBox(height: 16.h),
-              ProductRatingCard(
-                product: product,
-                isDark: isDark,
-                selectedRating: _selectedRating,
-                titleController: _reviewTitleController,
-                commentController: _reviewCommentController,
-                isSubmitting: isReviewSubmitting,
-                onRatingChanged: (rating) =>
-                    setState(() => _selectedRating = rating),
-                onSubmit: () => _submitProductReview(product),
-              ),
+              if (product.brand != null) ...[
+                SizedBox(height: 16.h),
+                ProductBrandSummaryCard(product: product, isDark: isDark),
+              ],
 
               if (variantState != null &&
                   (variantState.product.variants?.variantsBySize ?? [])
@@ -248,6 +352,35 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 }
 
+class ProductRateButton extends StatelessWidget {
+  const ProductRateButton({
+    super.key,
+    required this.product,
+    required this.onPressed,
+  });
+
+  final ProductModel product;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return FilledButton.icon(
+      onPressed: onPressed,
+      icon: Icon(Icons.star_rate_outlined, size: 18.r),
+      label: Text(l10n.submitRating),
+      style: FilledButton.styleFrom(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.r),
+        ),
+        elevation: 0,
+      ),
+    );
+  }
+}
+
 class ProductRatingCard extends StatelessWidget {
   const ProductRatingCard({
     super.key,
@@ -282,126 +415,104 @@ class ProductRatingCard extends StatelessWidget {
         : product.ratings.average.trim();
     final averageStars = average.round().clamp(0, 5).toInt();
 
-    return ProductSectionCardShell(
-      isDark: isDark,
-      title: l10n.productRating,
-      icon: Icons.star_rounded,
-      child: Padding(
-        padding: EdgeInsets.all(14.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (hasRating) ...[
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(14.w),
-                decoration: BoxDecoration(
-                  color: isDark
-                      ? AppColors.black.withValues(alpha: 0.25)
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(14.r),
-                  border: Border.all(color: accent.withValues(alpha: 0.12)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 54.r,
-                      height: 54.r,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: accent.withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
+    return Padding(
+      padding: EdgeInsets.all(14.w),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (hasRating) ...[
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(14.w),
+              decoration: BoxDecoration(
+                color: isDark
+                    ? AppColors.black.withValues(alpha: 0.25)
+                    : Colors.white,
+                borderRadius: BorderRadius.circular(14.r),
+                border: Border.all(color: accent.withValues(alpha: 0.12)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 54.r,
+                    height: 54.r,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: accent.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      averageLabel,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: accent,
+                        fontWeight: FontWeight.w800,
                       ),
-                      child: Text(
-                        averageLabel,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: accent,
-                          fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RatingStars(
+                          rating: averageStars,
+                          enabled: false,
+                          size: 22.r,
+                          spacing: 0,
+                          mainAxisAlignment: MainAxisAlignment.start,
                         ),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RatingStars(
-                            rating: averageStars,
-                            enabled: false,
-                            size: 22.r,
-                            spacing: 0,
-                            mainAxisAlignment: MainAxisAlignment.start,
+                        SizedBox(height: 4.h),
+                        Text(
+                          l10n.productRatingSummary(
+                            averageLabel,
+                            product.ratings.total,
                           ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            l10n.productRatingSummary(
-                              averageLabel,
-                              product.ratings.total,
-                            ),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: isDark
-                                  ? AppColors.taupe
-                                  : AppColors.burgundy,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: isDark
+                                ? AppColors.taupe
+                                : AppColors.burgundy,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 18.h),
-            ],
-            Center(
-              child: RatingStars(
-                rating: selectedRating,
-                enabled: !isSubmitting,
-                onRatingChanged: onRatingChanged,
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 18.h),
-            AppTextField(
-              controller: titleController,
-              label: l10n.subjectLabel,
-              hint: product.name,
-              enabled: !isSubmitting,
-              textInputAction: TextInputAction.next,
-              maxLength: 80,
-            ),
-            SizedBox(height: 12.h),
-            AppTextField(
-              controller: commentController,
-              label: l10n.ratingComment,
-              hint: l10n.ratingCommentHint,
-              enabled: !isSubmitting,
-              maxLines: 4,
-              textInputAction: TextInputAction.newline,
-            ),
-            SizedBox(height: 18.h),
-            FilledButton.icon(
-              onPressed: isSubmitting ? null : onSubmit,
-              icon: isSubmitting
-                  ? SizedBox(
-                      width: 18.r,
-                      height: 18.r,
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.offWhite,
-                      ),
-                    )
-                  : Icon(Icons.rate_review_rounded, size: 20.r),
-              label: Text(l10n.submitRating),
-              style: FilledButton.styleFrom(
-                minimumSize: Size(double.infinity, 50.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-                elevation: 0,
-              ),
-            ),
           ],
-        ),
+          Center(
+            child: RatingStars(
+              rating: selectedRating,
+              enabled: !isSubmitting,
+              onRatingChanged: onRatingChanged,
+            ),
+          ),
+          SizedBox(height: 12.h),
+          AppTextField(
+            controller: commentController,
+            label: l10n.ratingComment,
+            hint: l10n.ratingCommentHint,
+            enabled: !isSubmitting,
+            maxLines: 4,
+            textInputAction: TextInputAction.newline,
+          ),
+          SizedBox(height: 18.h),
+          FilledButton(
+            onPressed: isSubmitting ? null : onSubmit,
+            style: FilledButton.styleFrom(
+              minimumSize: Size(double.infinity, 50.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              elevation: 0,
+            ),
+            child: isSubmitting
+                ? SpinKitFadingCircle(size: 20.r, color: AppColors.offWhite)
+                : Text(l10n.submit),
+          ),
+        ],
       ),
     );
   }
@@ -521,7 +632,6 @@ class ProductVariantsSection extends StatelessWidget {
                     onTap: () => onColorSelected(color),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      // circle when hex available, pill when text only
                       width: hasHex ? 36.r : null,
                       height: hasHex ? 36.r : null,
                       padding: hasHex
@@ -677,6 +787,24 @@ class ProductViewData {
           label: l10n.productMinPriceLabel,
           value: product.minPrice!.trim(),
         ),
+      if (product.variants?.stockQty != null)
+        ProductSpecEntry(
+          icon: Icons.inventory_2_outlined,
+          label: 'Stock quantity',
+          value: product.variants!.stockQty.toString(),
+        ),
+      if (_hasText(product.variants?.measurementType))
+        ProductSpecEntry(
+          icon: Icons.straighten_outlined,
+          label: 'Measurement type',
+          value: product.variants!.measurementType!.trim(),
+        ),
+      if ((product.variants?.measurementTypes ?? []).isNotEmpty)
+        ProductSpecEntry(
+          icon: Icons.format_list_bulleted_rounded,
+          label: 'Measurement types',
+          value: product.variants!.measurementTypes.join(', '),
+        ),
       if (product.reviews.total > 0)
         ProductSpecEntry(
           icon: Icons.rate_review_outlined,
@@ -708,6 +836,103 @@ class ProductViewData {
     if (_hasText(formatted)) return formatted!.trim();
     if (_hasText(raw)) return raw!.trim();
     return null;
+  }
+}
+
+class ProductBrandSummaryCard extends StatelessWidget {
+  const ProductBrandSummaryCard({
+    super.key,
+    required this.product,
+    required this.isDark,
+  });
+
+  final ProductModel product;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final brand = product.brand;
+    if (brand == null) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
+    final hasBanner = ProductViewData._hasText(brand.banner);
+    final hasLogo = ProductViewData._hasText(brand.logo);
+
+    return ProductSectionCardShell(
+      isDark: isDark,
+      title: 'Brand',
+      icon: Icons.storefront_outlined,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (hasBanner)
+            SizedBox(
+              height: 112.h,
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(14.r)),
+                child: CustomNetworkImage(
+                  imageUrl: brand.banner,
+                  defaultIcon: Icons.store_rounded,
+                ),
+              ),
+            ),
+          Padding(
+            padding: EdgeInsets.all(14.w),
+            child: Row(
+              children: [
+                Container(
+                  width: 58.r,
+                  height: 58.r,
+                  decoration: BoxDecoration(
+                    color: hasLogo
+                        ? Colors.white
+                        : accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(color: accent.withValues(alpha: 0.12)),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: hasLogo
+                      ? CustomNetworkImage(
+                          imageUrl: brand.logo,
+                          defaultIcon: Icons.store_rounded,
+                        )
+                      : Icon(Icons.store_rounded, size: 30.r, color: accent),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        brand.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: isDark ? AppColors.offWhite : AppColors.black,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (brand.isActive != null) ...[
+                        SizedBox(height: 4.h),
+                        Text(
+                          brand.isActive! ? 'Active brand' : 'Inactive brand',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: isDark
+                                ? AppColors.taupe
+                                : AppColors.burgundy,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -799,11 +1024,9 @@ class GallerySection extends StatelessWidget {
                     ? SizedBox(
                         width: 22.r,
                         height: 22.r,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: isDark
-                              ? AppColors.goldLight
-                              : AppColors.burgundy,
+                        child: SpinKitFadingCircle(
+                          size: 20.r,
+                          color: AppColors.offWhite,
                         ),
                       )
                     : WishlistIcon(isActive: isWishlist),
@@ -822,11 +1045,13 @@ class ProductHeaderSection extends StatelessWidget {
     required this.product,
     required this.viewData,
     required this.isDark,
+    required this.onRatePressed,
   });
 
   final ProductModel product;
   final ProductViewData viewData;
   final bool isDark;
+  final VoidCallback onRatePressed;
 
   @override
   Widget build(BuildContext context) {
@@ -893,7 +1118,13 @@ class ProductHeaderSection extends StatelessWidget {
           ],
           if (viewData.regularPrice != null || viewData.salePrice != null) ...[
             SizedBox(height: 16.h),
-            ProductPriceBlock(viewData: viewData, isDark: isDark),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ProductPriceBlock(viewData: viewData, isDark: isDark),
+                ProductRateButton(product: product, onPressed: onRatePressed),
+              ],
+            ),
           ],
         ],
       ),

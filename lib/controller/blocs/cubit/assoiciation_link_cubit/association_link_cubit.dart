@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/app_info/faq_item_model.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
@@ -56,6 +57,16 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
       emit(AssociationLinkLoading());
       final attachmentTypes = await _api.fetchAttachmentTypes();
       emit(AssociationAttachmentTypesFetched(attachmentTypes: attachmentTypes));
+    } catch (e) {
+      emit(AssociationLinkFailure(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> fetchFaqs() async {
+    try {
+      emit(AssociationLinkLoading());
+      final faqs = await _api.getFaqs();
+      emit(AssociationFaqsFetched(faqs: faqs));
     } catch (e) {
       emit(AssociationLinkFailure(errorMessage: e.toString()));
     }

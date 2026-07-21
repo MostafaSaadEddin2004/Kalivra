@@ -15,6 +15,7 @@ import 'package:kalivra/view/screens/profile_screens/contact_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_member_profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/profile_screens/edit_profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/favorites_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/kalivra_faq_screen.dart';
 import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/view/screens/profile_screens/orders_screens/order_details_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/orders_screens/orders_screen.dart';
@@ -59,6 +60,7 @@ abstract class AppRoutes {
   static const String about = '/about';
   static const String privacyPolicy = '/privacyPolicy';
   static const String termsConditions = '/termsConditions';
+  static const String kalivraFaq = '/kalivra-faq';
   static const String rate = '/rate';
   static const String editProfile = '/edit-profile';
   static const String orderDetails = '/order-details';
@@ -106,6 +108,7 @@ abstract class AppRoutesName {
   static const String about = 'about';
   static const String privacyPolicy = 'privacyPolicy';
   static const String termsConditions = 'termsConditions';
+  static const String kalivraFaq = 'kalivra-faq';
   static const String rate = 'rate';
   static const String editProfile = 'edit-profile';
   static const String orderDetails = 'order-details';
@@ -314,6 +317,11 @@ abstract class AppRouter {
             path: AppRoutes.termsConditions,
             name: AppRoutesName.termsConditions,
             builder: (_, _) => const TermsConditionsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.kalivraFaq,
+            name: AppRoutesName.kalivraFaq,
+            builder: (_, _) => const KalivraFaqScreen(),
           ),
           GoRoute(
             path: AppRoutes.rate,

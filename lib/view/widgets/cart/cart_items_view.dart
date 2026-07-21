@@ -36,7 +36,7 @@ class CartItemsView extends StatelessWidget {
                     item: item,
                     onQuantityChanged: (q) =>
                         cartCubit.updateQuantity(item.product.id.toString(), q),
-                    onRemove: () => cartCubit.removeItem(item.product.id.toString()),
+                    onRemove: () => cartCubit.removeCartItem( item.product.id),
                   );
                 },
               ),
@@ -60,8 +60,7 @@ class CartItemsView extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: () {
-                    cartCubit.clear();
-                    if (context.mounted) context.pop();
+                    cartCubit.clearCart();
                   },
                   icon: Icon(Icons.delete_outline_rounded, size: 22.r),
                   label: Text(AppLocalizations.of(context)!.emptyCart),

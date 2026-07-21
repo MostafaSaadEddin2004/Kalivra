@@ -960,7 +960,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rateQuestion => 'كيف تقيم تجربتك معنا؟';
 
   @override
-  String get submitRating => 'إرسال التقييم';
+  String get submitRating => 'تقييم';
 
   @override
   String get thanksForRating => 'شكراً لتقييمك';
@@ -969,7 +969,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ratingComment => 'التعليق';
 
   @override
-  String get ratingCommentHint => 'أخبرنا المزيد عن تجربتك';
+  String get ratingCommentHint => 'أخبرنا عن رأيك';
 
   @override
   String get selectRating => 'يرجى اختيار تقييم';
@@ -989,6 +989,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get dash => '—';
+
+  @override
+  String get submit => 'إرسال';
 
   @override
   String get confirmOrder => 'تأكيد الطلب';

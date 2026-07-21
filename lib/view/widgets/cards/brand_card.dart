@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
+import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
 
 class BrandCard extends StatelessWidget {
@@ -34,10 +35,9 @@ class BrandCard extends StatelessWidget {
                 color: colorScheme.surfaceContainerHighest.withValues(
                   alpha: 0.5,
                 ),
-                child: Icon(
-                  Icons.store_rounded,
-                  size: 28.r,
-                  color: colorScheme.primary.withValues(alpha: 0.6),
+                child: CustomNetworkImage(
+                  imageUrl: brand.logo,
+                  defaultIcon: Icons.store_rounded,
                 ),
               ),
               Padding(

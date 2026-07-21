@@ -27,10 +27,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     context.read<WishlistCubit>().loadWishlist();
   }
 
-  // void _addToCart(BuildContext context, ProductModel product) {
-  //   context.read<CartCubit>().addItem(product);
-  // }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -66,18 +62,23 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   description: l10n.favoritesPrompt,
                 );
               }
-              return ListView.builder(
-                padding: EdgeInsets.all(16.w),
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: ProductCard(
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12.h,
+                    crossAxisSpacing: 12.w,
+                    childAspectRatio: 0.72,
+                  ),
+                  itemBuilder: (context, index) {
+                    return ProductCard(
                       product: products[index].product,
                       itemId: products[index].id,
-                    ),
-                  );
-                },
+                    );
+                  },
+                  itemCount: products.length,
+                ),
               );
             case WishlistFailed():
               return Center(child: Text(state.message));

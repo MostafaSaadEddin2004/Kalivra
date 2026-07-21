@@ -29,13 +29,12 @@ class ProductApiService {
 
   Future<void> postProductReview({
     required int productId,
-    required String title,
     required String comment,
     required int rating,
   }) async {
     await _client.post(
       'product/$productId/review',
-      data: {'title': title, 'comment': comment, 'rating': rating},
+      data: { 'comment': comment, 'rating': rating},
     );
   }
 

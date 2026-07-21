@@ -85,7 +85,6 @@ class ProductsCubit extends Cubit<ProductsState> {
 
   Future<void> postProductReview({
     required int productId,
-    required String title,
     required String comment,
     required int rating,
   }) async {
@@ -107,7 +106,6 @@ class ProductsCubit extends Cubit<ProductsState> {
       );
       await _productService.postProductReview(
         productId: productId,
-        title: title,
         comment: comment,
         rating: rating,
       );
