@@ -20,6 +20,11 @@ class CurrentCategoryCubit extends Cubit<CurrentCategoryState> {
   }
 
   void changeCurrentCategory(int index, int categoryId) {
+    if (categoryId < 0) {
+      selectAll();
+      return;
+    }
+
     emit(
       CurrentCategoryFetched(
         currentIndex: index,

@@ -418,8 +418,39 @@ class AssociationProject {
     this.typeLabel = '',
     this.price,
     this.status = '',
+    this.statusLabel = '',
     this.subtitle = '',
     this.subtitleTranslations = const {},
+    this.imageUrl = '',
+    this.images = const [],
+    this.galleryImages = const [],
+    this.latitude,
+    this.longitude,
+    this.governorate = '',
+    this.region = '',
+    this.address = '',
+    this.completionPercentage,
+    this.numberOfBuildings,
+    this.totalNumberOfUnits,
+    this.launchDate = '',
+    this.licenseNumber = '',
+    this.licenseDate = '',
+    this.estimatedCost,
+    this.estimatedDurationMonths,
+    this.projectEngineer = '',
+    this.numberOfApartments,
+    this.landArea,
+    this.licensedBuildingArea,
+    this.masterPlanUrl = '',
+    this.isActive = false,
+    this.totalUnits,
+    this.availableUnits,
+    this.allocatedUnits,
+    this.deliveredUnits,
+    this.remainingUnits,
+    this.createdAt = '',
+    this.stages = const [],
+    this.buildings = const [],
   });
 
   final int? id;
@@ -428,8 +459,57 @@ class AssociationProject {
   final String typeLabel;
   final num? price;
   final String status;
+  final String statusLabel;
   final String subtitle;
   final Map<String, String> subtitleTranslations;
+  final String imageUrl;
+  final List<String> images;
+  final List<String> galleryImages;
+  final num? latitude;
+  final num? longitude;
+  final String governorate;
+  final String region;
+  final String address;
+  final num? completionPercentage;
+  final int? numberOfBuildings;
+  final int? totalNumberOfUnits;
+  final String launchDate;
+  final String licenseNumber;
+  final String licenseDate;
+  final num? estimatedCost;
+  final int? estimatedDurationMonths;
+  final String projectEngineer;
+  final int? numberOfApartments;
+  final num? landArea;
+  final num? licensedBuildingArea;
+  final String masterPlanUrl;
+  final bool isActive;
+  final int? totalUnits;
+  final int? availableUnits;
+  final int? allocatedUnits;
+  final int? deliveredUnits;
+  final int? remainingUnits;
+  final String createdAt;
+  final List<AssociationProjectStage> stages;
+  final List<AssociationBuilding> buildings;
+
+  String get displayStatus {
+    if (statusLabel.isNotEmpty &&
+        !statusLabel.startsWith('panel.') &&
+        !statusLabel.contains('.')) {
+      return statusLabel;
+    }
+    return status;
+  }
+
+  List<String> get allImages {
+    return [
+      imageUrl,
+      ...images,
+      ...galleryImages,
+      masterPlanUrl,
+    ].where((item) => item.trim().isNotEmpty).toSet().toList();
+  }
 
   factory AssociationProject.fromJson(Map<String, dynamic> json) {
     return AssociationProject(
@@ -439,8 +519,39 @@ class AssociationProject {
       typeLabel: _stringValue(json['type_label']),
       price: _numValue(json['price']),
       status: _stringValue(json['status']),
+      statusLabel: _stringValue(json['status_label']),
       subtitle: _stringValue(json['subtitle']),
       subtitleTranslations: _stringMap(json['subtitle_translations']),
+      imageUrl: _stringValue(json['image_url']),
+      images: _stringList(json['images']),
+      galleryImages: _stringList(json['gallery_images']),
+      latitude: _numValue(json['latitude']),
+      longitude: _numValue(json['longitude']),
+      governorate: _stringValue(json['governorate']),
+      region: _stringValue(json['region']),
+      address: _stringValue(json['address']),
+      completionPercentage: _numValue(json['completion_percentage']),
+      numberOfBuildings: _intValue(json['number_of_buildings']),
+      totalNumberOfUnits: _intValue(json['total_number_of_units']),
+      launchDate: _stringValue(json['launch_date']),
+      licenseNumber: _stringValue(json['license_number']),
+      licenseDate: _stringValue(json['license_date']),
+      estimatedCost: _numValue(json['estimated_cost']),
+      estimatedDurationMonths: _intValue(json['estimated_duration_months']),
+      projectEngineer: _stringValue(json['project_engineer']),
+      numberOfApartments: _intValue(json['number_of_apartments']),
+      landArea: _numValue(json['land_area']),
+      licensedBuildingArea: _numValue(json['licensed_building_area']),
+      masterPlanUrl: _stringValue(json['master_plan_url']),
+      isActive: _boolValue(json['is_active']),
+      totalUnits: _intValue(json['total_units']),
+      availableUnits: _intValue(json['available_units']),
+      allocatedUnits: _intValue(json['allocated_units']),
+      deliveredUnits: _intValue(json['delivered_units']),
+      remainingUnits: _intValue(json['remaining_units']),
+      createdAt: _stringValue(json['created_at']),
+      stages: _listOf(json['stages'], AssociationProjectStage.fromJson),
+      buildings: _listOf(json['buildings'], AssociationBuilding.fromJson),
     );
   }
 
@@ -452,8 +563,39 @@ class AssociationProject {
       'type_label': typeLabel,
       'price': price,
       'status': status,
+      'status_label': statusLabel,
       'subtitle': subtitle,
       'subtitle_translations': subtitleTranslations,
+      'image_url': imageUrl,
+      'images': images,
+      'gallery_images': galleryImages,
+      'latitude': latitude,
+      'longitude': longitude,
+      'governorate': governorate,
+      'region': region,
+      'address': address,
+      'completion_percentage': completionPercentage,
+      'number_of_buildings': numberOfBuildings,
+      'total_number_of_units': totalNumberOfUnits,
+      'launch_date': launchDate,
+      'license_number': licenseNumber,
+      'license_date': licenseDate,
+      'estimated_cost': estimatedCost,
+      'estimated_duration_months': estimatedDurationMonths,
+      'project_engineer': projectEngineer,
+      'number_of_apartments': numberOfApartments,
+      'land_area': landArea,
+      'licensed_building_area': licensedBuildingArea,
+      'master_plan_url': masterPlanUrl,
+      'is_active': isActive,
+      'total_units': totalUnits,
+      'available_units': availableUnits,
+      'allocated_units': allocatedUnits,
+      'delivered_units': deliveredUnits,
+      'remaining_units': remainingUnits,
+      'created_at': createdAt,
+      'stages': stages.map((item) => item.toJson()).toList(),
+      'buildings': buildings.map((item) => item.toJson()).toList(),
     };
   }
 }
@@ -462,21 +604,79 @@ class AssociationBuilding {
   const AssociationBuilding({
     this.id,
     this.projectId,
+    this.buildingNumber = '',
     this.name = '',
     this.description = '',
+    this.physicalAddress = '',
+    this.latitude,
+    this.longitude,
+    this.numberOfFloors,
+    this.numberOfUnits,
+    this.buildingPlanUrl = '',
+    this.floorPlanImages = const [],
+    this.galleryImages = const [],
+    this.specifications = '',
+    this.completionPercentage,
+    this.totalUnits,
+    this.availableUnits,
+    this.allocatedUnits,
+    this.deliveredUnits,
+    this.stages = const [],
   });
 
   final int? id;
   final int? projectId;
+  final String buildingNumber;
   final String name;
   final String description;
+  final String physicalAddress;
+  final num? latitude;
+  final num? longitude;
+  final int? numberOfFloors;
+  final int? numberOfUnits;
+  final String buildingPlanUrl;
+  final List<String> floorPlanImages;
+  final List<String> galleryImages;
+  final String specifications;
+  final num? completionPercentage;
+  final int? totalUnits;
+  final int? availableUnits;
+  final int? allocatedUnits;
+  final int? deliveredUnits;
+  final List<AssociationProjectStage> stages;
+
+  String get displayName => name.isNotEmpty ? name : buildingNumber;
+
+  List<String> get allImages {
+    return [
+      buildingPlanUrl,
+      ...floorPlanImages,
+      ...galleryImages,
+    ].where((item) => item.trim().isNotEmpty).toSet().toList();
+  }
 
   factory AssociationBuilding.fromJson(Map<String, dynamic> json) {
     return AssociationBuilding(
       id: _intValue(json['id']),
       projectId: _intValue(json['project_id']),
+      buildingNumber: _stringValue(json['building_number']),
       name: _stringValue(json['name']),
       description: _stringValue(json['description']),
+      physicalAddress: _stringValue(json['physical_address']),
+      latitude: _numValue(json['latitude']),
+      longitude: _numValue(json['longitude']),
+      numberOfFloors: _intValue(json['number_of_floors']),
+      numberOfUnits: _intValue(json['number_of_units']),
+      buildingPlanUrl: _stringValue(json['building_plan_url']),
+      floorPlanImages: _stringList(json['floor_plan_images']),
+      galleryImages: _stringList(json['gallery_images']),
+      specifications: _stringValue(json['specifications']),
+      completionPercentage: _numValue(json['completion_percentage']),
+      totalUnits: _intValue(json['total_units']),
+      availableUnits: _intValue(json['available_units']),
+      allocatedUnits: _intValue(json['allocated_units']),
+      deliveredUnits: _intValue(json['delivered_units']),
+      stages: _listOf(json['stages'], AssociationProjectStage.fromJson),
     );
   }
 
@@ -484,8 +684,24 @@ class AssociationBuilding {
     return {
       'id': id,
       'project_id': projectId,
+      'building_number': buildingNumber,
       'name': name,
       'description': description,
+      'physical_address': physicalAddress,
+      'latitude': latitude,
+      'longitude': longitude,
+      'number_of_floors': numberOfFloors,
+      'number_of_units': numberOfUnits,
+      'building_plan_url': buildingPlanUrl,
+      'floor_plan_images': floorPlanImages,
+      'gallery_images': galleryImages,
+      'specifications': specifications,
+      'completion_percentage': completionPercentage,
+      'total_units': totalUnits,
+      'available_units': availableUnits,
+      'allocated_units': allocatedUnits,
+      'delivered_units': deliveredUnits,
+      'stages': stages.map((item) => item.toJson()).toList(),
     };
   }
 }
@@ -503,6 +719,8 @@ class AssociationUnit {
     this.price,
     this.specifications = '',
     this.unitPlanUrl = '',
+    this.galleryImages = const [],
+    this.images = const [],
     this.status = '',
     this.statusLabel = '',
     this.building,
@@ -519,9 +737,19 @@ class AssociationUnit {
   final num? price;
   final String specifications;
   final String unitPlanUrl;
+  final List<String> galleryImages;
+  final List<String> images;
   final String status;
   final String statusLabel;
   final AssociationBuilding? building;
+
+  List<String> get allImages {
+    return [
+      unitPlanUrl,
+      ...images,
+      ...galleryImages,
+    ].where((item) => item.trim().isNotEmpty).toSet().toList();
+  }
 
   factory AssociationUnit.fromJson(Map<String, dynamic> json) {
     return AssociationUnit(
@@ -536,6 +764,8 @@ class AssociationUnit {
       price: _numValue(json['price']),
       specifications: _stringValue(json['specifications']),
       unitPlanUrl: _stringValue(json['unit_plan_url']),
+      galleryImages: _stringList(json['gallery_images']),
+      images: _stringList(json['images']),
       status: _stringValue(json['status']),
       statusLabel: _stringValue(json['status_label']),
       building: _mapOrNull(json['building'], AssociationBuilding.fromJson),
@@ -555,9 +785,63 @@ class AssociationUnit {
       'price': price,
       'specifications': specifications,
       'unit_plan_url': unitPlanUrl,
+      'gallery_images': galleryImages,
+      'images': images,
       'status': status,
       'status_label': statusLabel,
       'building': building?.toJson(),
+    };
+  }
+}
+
+class AssociationProjectStage {
+  const AssociationProjectStage({
+    this.id,
+    this.stageDefinitionId,
+    this.stageName = '',
+    this.startDate = '',
+    this.endDate = '',
+    this.completionPercentage,
+    this.actualOrder,
+    this.isActive = false,
+    this.notes = '',
+  });
+
+  final int? id;
+  final int? stageDefinitionId;
+  final String stageName;
+  final String startDate;
+  final String endDate;
+  final num? completionPercentage;
+  final int? actualOrder;
+  final bool isActive;
+  final String notes;
+
+  factory AssociationProjectStage.fromJson(Map<String, dynamic> json) {
+    return AssociationProjectStage(
+      id: _intValue(json['id']),
+      stageDefinitionId: _intValue(json['stage_definition_id']),
+      stageName: _stringValue(json['stage_name']),
+      startDate: _stringValue(json['start_date']),
+      endDate: _stringValue(json['end_date']),
+      completionPercentage: _numValue(json['completion_percentage']),
+      actualOrder: _intValue(json['actual_order']),
+      isActive: _boolValue(json['is_active']),
+      notes: _stringValue(json['notes']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'stage_definition_id': stageDefinitionId,
+      'stage_name': stageName,
+      'start_date': startDate,
+      'end_date': endDate,
+      'completion_percentage': completionPercentage,
+      'actual_order': actualOrder,
+      'is_active': isActive,
+      'notes': notes,
     };
   }
 }

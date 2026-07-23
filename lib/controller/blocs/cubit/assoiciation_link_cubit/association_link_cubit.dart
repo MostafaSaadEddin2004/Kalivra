@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/app_info/faq_item_model.dart';
+import 'package:kalivra/model/association/association_announcement_model.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
@@ -67,6 +68,26 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
       emit(AssociationLinkLoading());
       final faqs = await _api.getFaqs();
       emit(AssociationFaqsFetched(faqs: faqs));
+    } catch (e) {
+      emit(AssociationLinkFailure(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> fetchAnnouncements({int perPage = 15}) async {
+    try {
+      emit(AssociationLinkLoading());
+      final announcements = await _api.getAnnouncements(perPage: perPage);
+      emit(AssociationAnnouncementsFetched(announcements: announcements));
+    } catch (e) {
+      emit(AssociationLinkFailure(errorMessage: e.toString()));
+    }
+  }
+
+  Future<void> fetchAnnouncement(int id) async {
+    try {
+      emit(AssociationLinkLoading());
+      final announcement = await _api.getAnnouncement(id);
+      emit(AssociationAnnouncementDetailsFetched(announcement: announcement));
     } catch (e) {
       emit(AssociationLinkFailure(errorMessage: e.toString()));
     }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,8 +12,11 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/model/association/association_news_model.dart';
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
+import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
+import 'package:kalivra/view/widgets/files/network_file_action_tile.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AssociationMemberProfileScreen extends StatefulWidget {
   const AssociationMemberProfileScreen({super.key});
@@ -625,6 +629,8 @@ class _MembershipDetailsSection extends StatelessWidget {
       children: [
         _MembershipSummaryCard(membership: membership),
         SizedBox(height: 16.h),
+        _FinancialOverviewCard(membership: membership),
+        SizedBox(height: 16.h),
         AssociationFormSection(
           title: l10n.associationLinkMembershipSection,
           icon: Icons.badge_outlined,
@@ -670,6 +676,19 @@ class _MembershipDetailsSection extends StatelessWidget {
                 english: 'Membership Decision',
               ),
               value: membership.membershipDecision,
+            ),
+            _ProfileFilesSection(
+              title: _localizedText(
+                context,
+                arabic: 'وثائق الانتساب',
+                english: 'Join Documents',
+              ),
+              fileUrls: _fileUrlsFromValue(membership.joinDocuments),
+              fallbackName: _localizedText(
+                context,
+                arabic: 'وثيقة انتساب',
+                english: 'Join document',
+              ),
             ),
             _InfoRow(
               label: _localizedText(
@@ -730,125 +749,1119 @@ class _MembershipDetailsSection extends StatelessWidget {
               ),
             ],
           ),
-        if (project != null)
-          AssociationFormSection(
-            title: l10n.associationLinkProjectName,
-            icon: Icons.apartment_rounded,
-            children: [
-              _InfoRow(
-                label: l10n.associationLinkProjectName,
-                value: project.name,
-              ),
-              _InfoRow(
-                label: l10n.associationMemberType,
-                value: project.typeLabel.isNotEmpty
-                    ? project.typeLabel
-                    : project.type,
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'الوصف',
-                  english: 'Subtitle',
-                ),
-                value: project.subtitle,
-              ),
-              _InfoRow(
-                label: l10n.associationMemberAmount,
-                value: _formatNullableNumber(project.price),
-              ),
-              _InfoRow(
-                label: l10n.associationMemberStatus,
-                value: project.status,
-              ),
-            ],
-          ),
-        if (building != null)
-          AssociationFormSection(
-            title: l10n.associationLinkBuilding,
-            icon: Icons.business_rounded,
-            children: [
-              _InfoRow(
-                label: l10n.associationLinkBuilding,
-                value: building.name,
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'الوصف',
-                  english: 'Description',
-                ),
-                value: building.description,
-              ),
-            ],
-          ),
-        if (unit != null)
-          AssociationFormSection(
-            title: l10n.unit,
-            icon: Icons.home_work_outlined,
-            children: [
-              _InfoRow(label: l10n.unit, value: unit.unitNumber),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'الطابق',
-                  english: 'Floor',
-                ),
-                value: _formatNullableNumber(unit.floorNumber),
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'الاتجاه',
-                  english: 'Orientation',
-                ),
-                value: unit.orientationLabel.isNotEmpty
-                    ? unit.orientationLabel
-                    : unit.orientation,
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'المساحة',
-                  english: 'Area',
-                ),
-                value: _formatNullableNumber(unit.area),
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'مساحة الحديقة / التراس',
-                  english: 'Garden / Terrace Area',
-                ),
-                value: _formatNullableNumber(unit.gardenTerraceArea),
-              ),
-              _InfoRow(
-                label: l10n.associationMemberAmount,
-                value: _formatNullableNumber(unit.price),
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'المواصفات',
-                  english: 'Specifications',
-                ),
-                value: unit.specifications,
-              ),
-              _InfoRow(
-                label: l10n.associationMemberStatus,
-                value: unit.statusLabel,
-              ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'مخطط الوحدة',
-                  english: 'Unit Plan',
-                ),
-                value: unit.unitPlanUrl,
-              ),
-            ],
-          ),
+        if (project != null) _ProjectDetailsSection(project: project),
+        if (building != null) _BuildingDetailsSection(building: building),
+        if (unit != null) _UnitDetailsSection(unit: unit),
       ],
+    );
+  }
+}
+
+class _FinancialOverviewCard extends StatelessWidget {
+  const _FinancialOverviewCard({required this.membership});
+
+  final AssociationMembership membership;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final total = membership.unit?.price ?? membership.project?.price;
+    final paid = membership.totalPaymentsMade;
+    final remaining = total != null && paid != null ? total - paid : null;
+    final progress = total == null || total == 0 || paid == null
+        ? null
+        : (paid / total).clamp(0, 1).toDouble();
+
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.burgundy.withValues(alpha: 0.12)
+            : Colors.white,
+        borderRadius: BorderRadius.circular(18.r),
+        border: Border.all(
+          color: isDark
+              ? AppColors.taupe.withValues(alpha: 0.32)
+              : AppColors.burgundy.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.account_balance_wallet_outlined,
+                color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                size: 24.r,
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: Text(
+                  l10n.associationMemberFinancialSummary,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: isDark ? AppColors.offWhite : AppColors.burgundy,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (progress != null) ...[
+            SizedBox(height: 14.h),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 9.h,
+                backgroundColor: isDark
+                    ? AppColors.taupe.withValues(alpha: 0.22)
+                    : AppColors.burgundy.withValues(alpha: 0.08),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  isDark ? AppColors.goldLight : AppColors.goldDark,
+                ),
+              ),
+            ),
+          ],
+          SizedBox(height: 14.h),
+          Wrap(
+            spacing: 10.w,
+            runSpacing: 10.h,
+            children: [
+              _FinanceMetric(
+                label: l10n.associationMemberTotalAmount,
+                value: _formatNullableNumber(total),
+                icon: Icons.request_quote_outlined,
+              ),
+              _FinanceMetric(
+                label: l10n.associationMemberPaidAmount,
+                value: _formatNullableNumber(paid),
+                icon: Icons.check_circle_outline_rounded,
+              ),
+              _FinanceMetric(
+                label: l10n.associationMemberRemainingInstallments,
+                value: _formatNullableNumber(remaining),
+                icon: Icons.pending_actions_outlined,
+              ),
+              _FinanceMetric(
+                label: l10n.associationMemberPaymentCommitment,
+                value: membership.displayFinancialStatus,
+                icon: Icons.verified_outlined,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinanceMetric extends StatelessWidget {
+  const _FinanceMetric({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  final String label;
+  final String value;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      width: 145.w,
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.taupe.withValues(alpha: 0.1)
+            : AppColors.burgundy.withValues(alpha: 0.045),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            size: 20.r,
+            color: isDark ? AppColors.goldLight : AppColors.burgundy,
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            value.trim().isEmpty ? '-' : value,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 3.h),
+          Text(
+            label,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProjectDetailsSection extends StatelessWidget {
+  const _ProjectDetailsSection({required this.project});
+
+  final AssociationProject project;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AssociationFormSection(
+      title: l10n.associationLinkProjectName,
+      icon: Icons.apartment_rounded,
+      children: [
+        _MediaGallery(
+          title: _localizedText(
+            context,
+            arabic: 'معرض المشروع',
+            english: 'Project Gallery',
+          ),
+          imageUrl: project.imageUrl,
+          galleryImages: [...project.images, ...project.galleryImages],
+          fallbackIcon: Icons.apartment_rounded,
+        ),
+        _ProgressBlock(
+          label: _localizedText(
+            context,
+            arabic: 'نسبة الإنجاز',
+            english: 'Completion',
+          ),
+          value: project.completionPercentage,
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'نسبة الإنجاز',
+            english: 'Completion Percentage',
+          ),
+          value: _formatNullablePercent(project.completionPercentage),
+        ),
+        _InfoRow(label: l10n.associationLinkProjectName, value: project.name),
+        _InfoRow(
+          label: l10n.associationMemberType,
+          value: project.typeLabel.isNotEmpty
+              ? project.typeLabel
+              : project.type,
+        ),
+        _InfoRow(
+          label: _localizedText(context, arabic: 'الوصف', english: 'Subtitle'),
+          value: project.subtitle,
+        ),
+        _InfoRow(
+          label: l10n.associationMemberAmount,
+          value: _formatNullableNumber(project.price),
+        ),
+        _InfoRow(
+          label: l10n.associationMemberStatus,
+          value: project.displayStatus,
+        ),
+        _InfoRow(
+          label: l10n.associationMemberLocation,
+          value: _joinValues([
+            project.governorate,
+            project.region,
+            project.address,
+          ]),
+        ),
+        _ProjectLocationButton(project: project),
+        _ProfileFilesSection(
+          title: _localizedText(
+            context,
+            arabic: 'مخطط المشروع',
+            english: 'Project Master Plan',
+          ),
+          fileUrls: _fileUrlsFromValue(project.masterPlanUrl),
+          fallbackName: _localizedText(
+            context,
+            arabic: 'مخطط المشروع',
+            english: 'Project master plan',
+          ),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'عدد الأبنية',
+            english: 'Buildings',
+          ),
+          value: _formatNullableNumber(
+            project.numberOfBuildings ?? project.buildings.length,
+          ),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'إجمالي الوحدات',
+            english: 'Total Units',
+          ),
+          value: _formatNullableNumber(
+            project.totalUnits ?? project.totalNumberOfUnits,
+          ),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوحدات المتاحة',
+            english: 'Available Units',
+          ),
+          value: _formatNullableNumber(project.availableUnits),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوحدات المخصصة',
+            english: 'Allocated Units',
+          ),
+          value: _formatNullableNumber(project.allocatedUnits),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوحدات المسلمة',
+            english: 'Delivered Units',
+          ),
+          value: _formatNullableNumber(project.deliveredUnits),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوحدات المتبقية',
+            english: 'Remaining Units',
+          ),
+          value: _formatNullableNumber(project.remainingUnits),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الكلفة التقديرية',
+            english: 'Estimated Cost',
+          ),
+          value: _formatNullableNumber(project.estimatedCost),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'المهندس',
+            english: 'Engineer',
+          ),
+          value: project.projectEngineer,
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'مساحة الأرض',
+            english: 'Land Area',
+          ),
+          value: _formatNullableNumber(project.landArea),
+        ),
+        _StagesTimeline(stages: project.stages),
+        _ProjectBuildingsGallery(buildings: project.buildings),
+      ],
+    );
+  }
+}
+
+class _ProjectLocationButton extends StatelessWidget {
+  const _ProjectLocationButton({required this.project});
+
+  final AssociationProject project;
+
+  @override
+  Widget build(BuildContext context) {
+    final latitude = project.latitude;
+    final longitude = project.longitude;
+    if (!_hasValidCoordinates(latitude, longitude)) {
+      return const SizedBox.shrink();
+    }
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 16.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.taupe.withValues(alpha: 0.12)
+            : AppColors.burgundy.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(
+          color: isDark
+              ? AppColors.taupe.withValues(alpha: 0.24)
+              : AppColors.burgundy.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 42.r,
+            height: 42.r,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.colorScheme.primary.withValues(alpha: 0.12),
+            ),
+            child: Icon(
+              Icons.location_on_rounded,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _localizedText(
+                    context,
+                    arabic: 'موقع المشروع',
+                    english: 'Project Location',
+                  ),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  '${_formatCoordinate(latitude!)}, ${_formatCoordinate(longitude!)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: isDark ? AppColors.taupe : AppColors.burgundy,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 8.w),
+          IconButton.filledTonal(
+            tooltip: _localizedText(
+              context,
+              arabic: 'فتح في خرائط Google',
+              english: 'Open in Google Maps',
+            ),
+            onPressed: () => _openProjectLocation(context, project),
+            icon: const Icon(Icons.map_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BuildingDetailsSection extends StatelessWidget {
+  const _BuildingDetailsSection({required this.building});
+
+  final AssociationBuilding building;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AssociationFormSection(
+      title: l10n.associationLinkBuilding,
+      icon: Icons.business_rounded,
+      children: [
+        _MediaGallery(
+          title: _localizedText(
+            context,
+            arabic: 'معرض البناء',
+            english: 'Building Gallery',
+          ),
+          imageUrl: building.buildingPlanUrl,
+          galleryImages: [
+            ...building.floorPlanImages,
+            ...building.galleryImages,
+          ],
+          fallbackIcon: Icons.business_rounded,
+        ),
+        _ProgressBlock(
+          label: _localizedText(
+            context,
+            arabic: 'نسبة الإنجاز',
+            english: 'Completion',
+          ),
+          value: building.completionPercentage,
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'نسبة الإنجاز',
+            english: 'Completion Percentage',
+          ),
+          value: _formatNullablePercent(building.completionPercentage),
+        ),
+        _InfoRow(
+          label: l10n.associationLinkBuilding,
+          value: building.displayName,
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'رقم البناء',
+            english: 'Building Number',
+          ),
+          value: building.buildingNumber,
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوصف',
+            english: 'Description',
+          ),
+          value: building.description,
+        ),
+        _InfoRow(
+          label: l10n.associationMemberLocation,
+          value: building.physicalAddress,
+        ),
+        _ProfileFilesSection(
+          title: _localizedText(
+            context,
+            arabic: 'مخطط البناء',
+            english: 'Building Plan',
+          ),
+          fileUrls: _fileUrlsFromValue(building.buildingPlanUrl),
+          fallbackName: _localizedText(
+            context,
+            arabic: 'مخطط البناء',
+            english: 'Building plan',
+          ),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'عدد الطوابق',
+            english: 'Floors',
+          ),
+          value: _formatNullableNumber(building.numberOfFloors),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'عدد الوحدات',
+            english: 'Units',
+          ),
+          value: _formatNullableNumber(
+            building.numberOfUnits ?? building.totalUnits,
+          ),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوحدات المتاحة',
+            english: 'Available Units',
+          ),
+          value: _formatNullableNumber(building.availableUnits),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الوحدات المخصصة',
+            english: 'Allocated Units',
+          ),
+          value: _formatNullableNumber(building.allocatedUnits),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'المواصفات',
+            english: 'Specifications',
+          ),
+          value: building.specifications,
+        ),
+        _StagesTimeline(stages: building.stages),
+      ],
+    );
+  }
+}
+
+class _UnitDetailsSection extends StatelessWidget {
+  const _UnitDetailsSection({required this.unit});
+
+  final AssociationUnit unit;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AssociationFormSection(
+      title: l10n.unit,
+      icon: Icons.home_work_outlined,
+      children: [
+        _MediaGallery(
+          title: _localizedText(
+            context,
+            arabic: 'معرض الوحدة',
+            english: 'Unit Gallery',
+          ),
+          imageUrl: unit.unitPlanUrl,
+          galleryImages: [...unit.images, ...unit.galleryImages],
+          fallbackIcon: Icons.home_work_outlined,
+        ),
+        _InfoRow(label: l10n.unit, value: unit.unitNumber),
+        _InfoRow(
+          label: _localizedText(context, arabic: 'الطابق', english: 'Floor'),
+          value: _formatNullableNumber(unit.floorNumber),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الاتجاه',
+            english: 'Orientation',
+          ),
+          value: unit.orientationLabel.isNotEmpty
+              ? unit.orientationLabel
+              : unit.orientation,
+        ),
+        _InfoRow(
+          label: _localizedText(context, arabic: 'المساحة', english: 'Area'),
+          value: _formatNullableNumber(unit.area),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'مساحة الحديقة / التراس',
+            english: 'Garden / Terrace Area',
+          ),
+          value: _formatNullableNumber(unit.gardenTerraceArea),
+        ),
+        _InfoRow(
+          label: l10n.associationMemberAmount,
+          value: _formatNullableNumber(unit.price),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'المواصفات',
+            english: 'Specifications',
+          ),
+          value: unit.specifications,
+        ),
+        _InfoRow(
+          label: l10n.associationMemberStatus,
+          value: unit.statusLabel.isNotEmpty ? unit.statusLabel : unit.status,
+        ),
+        _ProfileFilesSection(
+          title: _localizedText(
+            context,
+            arabic: 'مخطط الوحدة',
+            english: 'Unit Plan',
+          ),
+          fileUrls: _fileUrlsFromValue(unit.unitPlanUrl),
+          fallbackName: _localizedText(
+            context,
+            arabic: 'مخطط الوحدة',
+            english: 'Unit plan',
+          ),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'مخطط الوحدة',
+            english: 'Unit Plan',
+          ),
+          value: unit.unitPlanUrl,
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileFilesSection extends StatelessWidget {
+  const _ProfileFilesSection({
+    required this.title,
+    required this.fileUrls,
+    required this.fallbackName,
+  });
+
+  final String title;
+  final List<String> fileUrls;
+  final String fallbackName;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleFiles = fileUrls
+        .where((fileUrl) => fileUrl.trim().isNotEmpty)
+        .toSet()
+        .toList();
+    if (visibleFiles.isEmpty) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 14.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 8.h),
+          for (var index = 0; index < visibleFiles.length; index++)
+            NetworkFileActionTile(
+              name: visibleFiles.length == 1
+                  ? fallbackName
+                  : '$fallbackName ${index + 1}',
+              url: visibleFiles[index],
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MediaGallery extends StatefulWidget {
+  const _MediaGallery({
+    required this.title,
+    required this.imageUrl,
+    required this.galleryImages,
+    required this.fallbackIcon,
+  });
+
+  final String title;
+  final String imageUrl;
+  final List<String> galleryImages;
+  final IconData fallbackIcon;
+
+  @override
+  State<_MediaGallery> createState() => _MediaGalleryState();
+}
+
+class _MediaGalleryState extends State<_MediaGallery> {
+  late final PageController _pageController;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MediaGallery oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.imageUrl != widget.imageUrl ||
+        oldWidget.galleryImages != widget.galleryImages) {
+      _currentIndex = 0;
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _goToPage(int index) {
+    if (index == _currentIndex) return;
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final galleryImages = widget.galleryImages
+        .where((image) => image.trim().isNotEmpty)
+        .toSet()
+        .toList();
+    final fallbackImage = widget.imageUrl.trim();
+    final visibleImages = galleryImages.isNotEmpty
+        ? galleryImages
+        : fallbackImage.isNotEmpty
+        ? [fallbackImage]
+        : const <String>[];
+    if (visibleImages.isEmpty) return const SizedBox.shrink();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          SizedBox(
+            height: visibleImages.length == 1 ? 220.h : 290.h,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 220.h,
+                  width: double.infinity,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: visibleImages.length,
+                    onPageChanged: (index) {
+                      setState(() => _currentIndex = index);
+                    },
+                    itemBuilder: (context, index) {
+                      final imageUrl = visibleImages[index];
+                      return _GalleryMainImage(
+                        title: widget.title,
+                        imageUrl: imageUrl,
+                        index: index,
+                        fallbackIcon: widget.fallbackIcon,
+                      );
+                    },
+                  ),
+                ),
+                if (visibleImages.length > 1) ...[
+                  SizedBox(height: 12.h),
+                  SizedBox(
+                    height: 58.h,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: visibleImages.length,
+                      separatorBuilder: (context, index) =>
+                          SizedBox(width: 8.w),
+                      itemBuilder: (context, index) {
+                        final isSelected = index == _currentIndex;
+                        final imageUrl = visibleImages[index];
+                        return GestureDetector(
+                          onTap: () => _goToPage(index),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeInOut,
+                            width: 58.w,
+                            height: 58.h,
+                            padding: EdgeInsets.all(isSelected ? 3.w : 0),
+                            decoration: BoxDecoration(
+                              border: isSelected
+                                  ? Border.all(
+                                      color: theme.colorScheme.primary,
+                                      width: 2.w,
+                                    )
+                                  : null,
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10.r),
+                              child: CustomNetworkImage(
+                                imageUrl: imageUrl,
+                                defaultIcon: widget.fallbackIcon,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _GalleryMainImage extends StatelessWidget {
+  const _GalleryMainImage({
+    required this.title,
+    required this.imageUrl,
+    required this.index,
+    required this.fallbackIcon,
+  });
+
+  final String title;
+  final String imageUrl;
+  final int index;
+  final IconData fallbackIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16.r),
+        onTap: () => handleNetworkFileTap(
+          context,
+          name: '$title ${index + 1}',
+          url: imageUrl,
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16.r),
+          child: CustomNetworkImage(
+            imageUrl: imageUrl,
+            defaultIcon: fallbackIcon,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ProgressBlock extends StatelessWidget {
+  const _ProgressBlock({required this.label, required this.value});
+
+  final String label;
+  final num? value;
+
+  @override
+  Widget build(BuildContext context) {
+    if (value == null) return const SizedBox.shrink();
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final progress = (value! / 100).clamp(0, 1).toDouble();
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Text(
+                '${_formatNullableNumber(value)}%',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8.h,
+              backgroundColor: isDark
+                  ? AppColors.taupe.withValues(alpha: 0.2)
+                  : AppColors.burgundy.withValues(alpha: 0.08),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isDark ? AppColors.goldLight : AppColors.goldDark,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StagesTimeline extends StatelessWidget {
+  const _StagesTimeline({required this.stages});
+
+  final List<AssociationProjectStage> stages;
+
+  @override
+  Widget build(BuildContext context) {
+    if (stages.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(top: 4.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _localizedText(context, arabic: 'مراحل التنفيذ', english: 'Stages'),
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          ...stages.map((stage) => _StageTile(stage: stage)),
+        ],
+      ),
+    );
+  }
+}
+
+class _StageTile extends StatelessWidget {
+  const _StageTile({required this.stage});
+
+  final AssociationProjectStage stage;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 10.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            stage.isActive ? Icons.radio_button_checked : Icons.check_circle,
+            size: 20.r,
+            color: stage.isActive ? AppColors.goldDark : Colors.green,
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  stage.stageName,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 3.h),
+                Text(
+                  _joinValues([
+                    stage.startDate,
+                    stage.endDate,
+                    '${_formatNullableNumber(stage.completionPercentage)}%',
+                    stage.notes,
+                  ]),
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProjectBuildingsGallery extends StatelessWidget {
+  const _ProjectBuildingsGallery({required this.buildings});
+
+  final List<AssociationBuilding> buildings;
+
+  @override
+  Widget build(BuildContext context) {
+    if (buildings.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(top: 8.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _localizedText(
+              context,
+              arabic: 'الأبنية ضمن المشروع',
+              english: 'Project Buildings',
+            ),
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          ...buildings.map(
+            (building) => _BuildingSummaryCard(building: building),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BuildingSummaryCard extends StatelessWidget {
+  const _BuildingSummaryCard({required this.building});
+
+  final AssociationBuilding building;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.taupe.withValues(alpha: 0.1)
+            : AppColors.burgundy.withValues(alpha: 0.045),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12.r),
+            child: SizedBox(
+              width: 74.r,
+              height: 74.r,
+              child: CustomNetworkImage(
+                imageUrl: building.allImages.isEmpty
+                    ? null
+                    : building.allImages.first,
+                defaultIcon: Icons.business_rounded,
+              ),
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  building.displayName,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  _joinValues([
+                    building.physicalAddress,
+                    _formatNullableNumber(building.numberOfFloors),
+                    _formatNullableNumber(
+                      building.numberOfUnits ?? building.totalUnits,
+                    ),
+                  ]),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall,
+                ),
+                _ProgressBlock(
+                  label: _localizedText(
+                    context,
+                    arabic: 'الإنجاز',
+                    english: 'Progress',
+                  ),
+                  value: building.completionPercentage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1027,12 +2040,12 @@ class _ProfileHeaderCard extends StatelessWidget {
               SizedBox(width: 14.w),
               Expanded(
                 child: Text(
-                      name,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: AppColors.offWhite,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
+                  name,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: AppColors.offWhite,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
             ],
           ),
@@ -1061,6 +2074,9 @@ class _InfoRow extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final display = value.trim().isEmpty ? '-' : value.trim();
+    if (_looksLikeFileReference(display)) {
+      return const SizedBox.shrink();
+    }
 
     return Padding(
       padding: EdgeInsets.only(bottom: 12.h),
@@ -1154,4 +2170,131 @@ String _formatNullableNumber(num? value) {
     return asDouble.toInt().toString();
   }
   return asDouble.toStringAsFixed(2);
+}
+
+String _formatNullablePercent(num? value) {
+  final formatted = _formatNullableNumber(value);
+  return formatted.isEmpty ? '' : '$formatted%';
+}
+
+List<String> _fileUrlsFromValue(Object? value) {
+  final text = value?.toString().trim() ?? '';
+  if (text.isEmpty || text == '-' || text == '[]' || text == '{}') {
+    return const [];
+  }
+
+  if (text.startsWith('[') || text.startsWith('{')) {
+    try {
+      return _fileUrlsFromDecodedValue(jsonDecode(text));
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  return text
+      .split(RegExp(r'[\n,]'))
+      .map((item) => item.trim())
+      .where((item) => item.isNotEmpty)
+      .toSet()
+      .toList();
+}
+
+List<String> _fileUrlsFromDecodedValue(Object? value) {
+  if (value is List) {
+    return value.expand(_fileUrlsFromDecodedValue).toSet().toList();
+  }
+
+  if (value is Map) {
+    final fileUrl =
+        value['url'] ??
+        value['file_url'] ??
+        value['download_url'] ??
+        value['full_url'] ??
+        value['media_url'] ??
+        value['src'] ??
+        value['link'] ??
+        value['path'] ??
+        value['file'];
+    return _fileUrlsFromDecodedValue(fileUrl);
+  }
+
+  final text = value?.toString().trim() ?? '';
+  return text.isEmpty ? const [] : [text];
+}
+
+bool _looksLikeFileReference(String value) {
+  final text = value.trim();
+  if (text.isEmpty || text == '-') return false;
+
+  final uri = Uri.tryParse(text);
+  if (uri != null && uri.hasScheme) return true;
+  if (text.startsWith('/storage/') || text.startsWith('storage/')) {
+    return true;
+  }
+
+  return RegExp(
+    r'\.(pdf|docx?|xlsx?|pptx?|png|jpe?g|webp|gif|zip|rar)(\?.*)?$',
+    caseSensitive: false,
+  ).hasMatch(text);
+}
+
+bool _hasValidCoordinates(num? latitude, num? longitude) {
+  if (latitude == null || longitude == null) return false;
+  return latitude >= -90 &&
+      latitude <= 90 &&
+      longitude >= -180 &&
+      longitude <= 180;
+}
+
+String _formatCoordinate(num value) {
+  return value.toDouble().toStringAsFixed(6);
+}
+
+Future<void> _openProjectLocation(
+  BuildContext context,
+  AssociationProject project,
+) async {
+  final latitude = project.latitude;
+  final longitude = project.longitude;
+  if (!_hasValidCoordinates(latitude, longitude)) {
+    _showProjectLocationError(context);
+    return;
+  }
+
+  final uri = Uri.https('www.google.com', '/maps/search/', {
+    'api': '1',
+    'query': '$latitude,$longitude',
+  });
+
+  try {
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && context.mounted) {
+      _showProjectLocationError(context);
+    }
+  } catch (_) {
+    if (context.mounted) {
+      _showProjectLocationError(context);
+    }
+  }
+}
+
+void _showProjectLocationError(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        _localizedText(
+          context,
+          arabic: 'تعذر فتح موقع المشروع',
+          english: 'Could not open the project location',
+        ),
+      ),
+    ),
+  );
+}
+
+String _joinValues(List<Object?> values) {
+  return values
+      .map((value) => value?.toString().trim() ?? '')
+      .where((value) => value.isNotEmpty && value != '-')
+      .join(' • ');
 }

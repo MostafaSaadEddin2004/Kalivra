@@ -10,93 +10,119 @@ import 'package:kalivra/view/widgets/buttons/show_all_button.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class ProductsSection extends StatelessWidget {
+class ProductsSection extends StatefulWidget {
   const ProductsSection({super.key});
+
+  @override
+  State<ProductsSection> createState() => _ProductsSectionState();
+}
+
+class _ProductsSectionState extends State<ProductsSection> {
+  late final ProductsCubit _productsCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsCubit = ProductsCubit()..loadProducts();
+  }
+
+  @override
+  void dispose() {
+    _productsCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
-    final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(l10n.products, style: textTheme.titleMedium),
-              ShowAllButton(
-                onShowAllTap: () => context.push(AppRoutes.allProducts),
-                l10n: l10n,
-                textTheme: textTheme,
-                colorScheme: colorScheme,
-              ),
-            ],
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Text(l10n.products, style: textTheme.titleMedium),
           ),
         ),
-        SizedBox(
-          height: 224.h,
-          child: BlocBuilder<ProductsCubit, ProductsState>(
-            bloc: ProductsCubit()..loadProducts(),
-            builder: (context, state) {
-              switch (state) {
-                case ProductsFailed():
-                  debugPrint(state.message);
-                  return Center(child: Text(state.message));
-                case ProductsLoaded():
-                  final products = state.products;
-                  return ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                    itemCount: products.length,
-                    itemBuilder: (context, index) {
-                      return ProductCard(product: products[index]);
-                    },
+        SliverToBoxAdapter(child: SizedBox(height: 12.h)),
+        BlocBuilder<ProductsCubit, ProductsState>(
+          bloc: _productsCubit,
+          builder: (context, state) {
+            switch (state) {
+              case ProductsFailed():
+                debugPrint(state.message);
+                return SliverToBoxAdapter(
+                  child: Center(child: Text(state.message)),
+                );
+
+              case ProductsLoaded():
+                final products = state.products;
+                if (products.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24.h),
+                      child: Center(child: Text(l10n.noProducts)),
+                    ),
                   );
-                default:
-                  return ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                    itemCount: 2,
-                    itemBuilder: (context, index) {
-                      return Skeletonizer(
-                        child: SizedBox(
-                          width: 160.w,
-                          height: 220.h,
-                          child: Skeletonizer(
-                            child: ProductCard(
-                              product: ProductModel(
-                                id: 0,
-                                sku: '',
-                                name: '',
-                                urlKey: '',
-                                images: [],
-                                isNew: true,
-                                prices: ProductPrices(
-                                  regular: PriceDetail(price: ''),
-                                ),
-                                isFeatured: true,
-                                onSale: true,
-                                isSaleable: true,
-                                isWishlist: true,
-                                ratings: ProductRatings(average: '', total: 0),
-                                reviews: ProductReviews(total: 0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-              }
-            },
-          ),
+                }
+
+                return _ProductsGrid(
+                  childCount: products.length,
+                  itemBuilder: (context, index) {
+                    return ProductCard(product: products[index]);
+                  },
+                );
+
+              default:
+                return _ProductsGrid(
+                  childCount: 4,
+                  itemBuilder: (context, index) {
+                    return Skeletonizer(
+                      child: ProductCard(product: _skeletonProduct),
+                    );
+                  },
+                );
+            }
+          },
         ),
       ],
     );
   }
 }
+
+class _ProductsGrid extends SliverPadding {
+  _ProductsGrid({
+    required int childCount,
+    required NullableIndexedWidgetBuilder itemBuilder,
+  }) : super(
+         padding: EdgeInsets.symmetric(horizontal: 16.w),
+         sliver: SliverGrid(
+           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+             crossAxisCount: 2,
+             mainAxisSpacing: 12.h,
+             crossAxisSpacing: 12.w,
+             childAspectRatio: 0.72,
+           ),
+           delegate: SliverChildBuilderDelegate(
+             itemBuilder,
+             childCount: childCount,
+           ),
+         ),
+       );
+}
+
+final _skeletonProduct = ProductModel(
+  id: 0,
+  sku: '',
+  name: '',
+  urlKey: '',
+  images: const [],
+  isNew: true,
+  prices: ProductPrices(regular: PriceDetail(price: '')),
+  isFeatured: true,
+  onSale: true,
+  isSaleable: true,
+  isWishlist: true,
+  ratings: ProductRatings(average: '', total: 0),
+  reviews: ProductReviews(total: 0),
+);

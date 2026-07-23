@@ -36,6 +36,18 @@ final class AssociationFaqsFetched extends AssociationLinkState {
   AssociationFaqsFetched({required this.faqs});
 }
 
+final class AssociationAnnouncementsFetched extends AssociationLinkState {
+  final List<AssociationAnnouncementModel> announcements;
+
+  AssociationAnnouncementsFetched({required this.announcements});
+}
+
+final class AssociationAnnouncementDetailsFetched extends AssociationLinkState {
+  final AssociationAnnouncementModel announcement;
+
+  AssociationAnnouncementDetailsFetched({required this.announcement});
+}
+
 final class AssociationLinkSubmittedSuccessfully extends AssociationLinkState {
   final String successMessage;
 

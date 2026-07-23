@@ -1648,6 +1648,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationAnnouncementNoAttachments => 'لا توجد مرفقات';
 
   @override
+  String get associationAnnouncementShowDetails => 'عرض التفاصيل';
+
+  @override
+  String get associationAnnouncementDetailsTitle => 'تفاصيل البلاغ';
+
+  @override
+  String get associationAnnouncementReferenceNumber => 'رقم البلاغ';
+
+  @override
+  String get associationAnnouncementDate => 'تاريخ البلاغ';
+
+  @override
+  String get associationAnnouncementDeliveredAt => 'وقت التبليغ';
+
+  @override
+  String get associationAnnouncementEmptyTitle => 'لا توجد بلاغات';
+
+  @override
+  String get associationAnnouncementEmptyDescription =>
+      'لا توجد بلاغات رسمية متاحة حالياً.';
+
+  @override
   String get associationAnnouncementCategoryElectronic => 'بلاغ إلكتروني';
 
   @override

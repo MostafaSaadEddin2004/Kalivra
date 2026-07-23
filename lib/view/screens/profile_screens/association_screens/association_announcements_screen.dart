@@ -1,44 +1,128 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/association/association_announcement_model.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
-class AssociationAnnouncementsScreen extends StatelessWidget {
+class AssociationAnnouncementsScreen extends StatefulWidget {
   const AssociationAnnouncementsScreen({super.key});
+
+  @override
+  State<AssociationAnnouncementsScreen> createState() =>
+      _AssociationAnnouncementsScreenState();
+}
+
+class _AssociationAnnouncementsScreenState
+    extends State<AssociationAnnouncementsScreen> {
+  late final AssociationLinkCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = AssociationLinkCubit()..fetchAnnouncements();
+  }
+
+  @override
+  void dispose() {
+    _cubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final announcements = _Announcement.samples(l10n);
-    final deliveredCount = announcements
-        .where((item) => item.status == l10n.associationAnnouncementDelivered)
-        .length;
-    final pendingCount = announcements.length - deliveredCount;
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.associationAnnouncementsTitle),
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
-        children: [
-          _AnnouncementsHeader(
-            totalCount: announcements.length,
-            deliveredCount: deliveredCount,
-            pendingCount: pendingCount,
-          ),
-          SizedBox(height: 18.h),
-          Text(
-            l10n.associationAnnouncementsHint,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          SizedBox(height: 14.h),
-          ...announcements.map(
-            (announcement) => Padding(
-              padding: EdgeInsets.only(bottom: 12.h),
-              child: _AnnouncementCard(announcement: announcement),
+      body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
+        bloc: _cubit,
+        builder: (context, state) {
+          if (state is AssociationAnnouncementsFetched) {
+            return _AnnouncementsList(
+              announcements: state.announcements,
+              onRetry: _cubit.fetchAnnouncements,
+            );
+          }
+
+          if (state is AssociationLinkFailure) {
+            return _FailureView(
+              message: state.errorMessage,
+              onRetry: _cubit.fetchAnnouncements,
+            );
+          }
+
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+}
+
+class _AnnouncementsList extends StatelessWidget {
+  const _AnnouncementsList({
+    required this.announcements,
+    required this.onRetry,
+  });
+
+  final List<AssociationAnnouncementModel> announcements;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (announcements.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () async => onRetry(),
+        child: ListView(
+          children: [
+            SizedBox(height: 120.h),
+            EmptyStateView(
+              icon: Icons.campaign_outlined,
+              title: l10n.associationAnnouncementEmptyTitle,
+              description: l10n.associationAnnouncementEmptyDescription,
             ),
-          ),
-        ],
+          ],
+        ),
+      );
+    }
+
+    final deliveredCount = announcements
+        .where((announcement) => announcement.isDelivered)
+        .length;
+    final pendingCount = announcements.length - deliveredCount;
+
+    return RefreshIndicator(
+      onRefresh: () async => onRetry(),
+      child: ListView.separated(
+        padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+        itemCount: announcements.length + 2,
+        separatorBuilder: (context, index) => SizedBox(height: 12.h),
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return _AnnouncementsHeader(
+              totalCount: announcements.length,
+              deliveredCount: deliveredCount,
+              pendingCount: pendingCount,
+            );
+          }
+
+          if (index == 1) {
+            return Text(
+              l10n.associationAnnouncementsHint,
+              style: Theme.of(context).textTheme.bodyMedium,
+            );
+          }
+
+          return _AnnouncementCard(announcement: announcements[index - 2]);
+        },
       ),
     );
   }
@@ -192,15 +276,14 @@ class _HeaderStat extends StatelessWidget {
 class _AnnouncementCard extends StatelessWidget {
   const _AnnouncementCard({required this.announcement});
 
-  final _Announcement announcement;
+  final AssociationAnnouncementModel announcement;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final statusColor =
-        announcement.status == l10n.associationAnnouncementDelivered
+    final statusColor = announcement.isDelivered
         ? Colors.green
         : AppColors.goldDark;
 
@@ -220,7 +303,11 @@ class _AnnouncementCard extends StatelessWidget {
               color: statusColor.withValues(alpha: isDark ? 0.22 : 0.12),
               borderRadius: BorderRadius.circular(14.r),
             ),
-            child: Icon(Icons.article_outlined, color: statusColor, size: 24.r),
+            child: Icon(
+              _typeIcon(announcement.type),
+              color: statusColor,
+              size: 24.r,
+            ),
           ),
           title: Text(
             announcement.title,
@@ -236,13 +323,18 @@ class _AnnouncementCard extends StatelessWidget {
               children: [
                 _InfoChip(
                   icon: Icons.confirmation_number_outlined,
-                  label: announcement.number,
+                  label: announcement.referenceNumber,
                 ),
                 _InfoChip(
                   icon: Icons.calendar_today_outlined,
-                  label: announcement.date,
+                  label: _dateLabel(context, announcement.announcementDate),
                 ),
-                _StatusChip(label: announcement.status, color: statusColor),
+                _StatusChip(
+                  label: announcement.isDelivered
+                      ? l10n.associationAnnouncementDelivered
+                      : l10n.associationAnnouncementPending,
+                  color: statusColor,
+                ),
               ],
             ),
           ),
@@ -252,38 +344,30 @@ class _AnnouncementCard extends StatelessWidget {
                 _DetailRow(
                   icon: Icons.category_outlined,
                   label: l10n.associationAnnouncementCategory,
-                  value: announcement.category,
+                  value: announcement.category ?? l10n.associationMemberNoData,
                 ),
                 _DetailRow(
                   icon: Icons.label_outline_rounded,
                   label: l10n.associationAnnouncementType,
-                  value: announcement.type,
-                ),
-                _DetailRow(
-                  icon: Icons.groups_outlined,
-                  label: l10n.associationAnnouncementRecipients,
-                  value: announcement.recipients,
+                  value: announcement.typeLabel.isNotEmpty
+                      ? announcement.typeLabel
+                      : announcement.type,
                 ),
                 _DetailRow(
                   icon: Icons.hourglass_bottom_outlined,
                   label: l10n.associationAnnouncementDeadline,
-                  value: announcement.deadline,
+                  value: _dateLabel(context, announcement.legalDeadline),
                 ),
-                _DetailRow(
-                  icon: Icons.link_outlined,
-                  label: l10n.associationAnnouncementRelatedEntity,
-                  value: announcement.relatedEntity,
+                _ContentPreview(content: announcement.content),
+                SizedBox(height: 8.h),
+                FilledButton.icon(
+                  onPressed: () => context.push(
+                    AppRoutes.associationAnnouncementDetails,
+                    extra: announcement,
+                  ),
+                  icon: const Icon(Icons.open_in_new_rounded),
+                  label: Text(l10n.associationAnnouncementShowDetails),
                 ),
-                _DetailRow(
-                  icon: Icons.outgoing_mail,
-                  label: l10n.associationAnnouncementChannels,
-                  value: announcement.channels.join(', '),
-                ),
-                _ContentBlock(
-                  title: l10n.associationAnnouncementContent,
-                  content: announcement.content,
-                ),
-                _AttachmentsBlock(attachments: announcement.attachments),
               ],
             ),
           ],
@@ -311,7 +395,10 @@ class _DetailsPanel extends StatelessWidget {
             ? AppColors.taupe.withValues(alpha: 0.12)
             : AppColors.burgundy.withValues(alpha: 0.045),
       ),
-      child: Column(children: children),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
     );
   }
 }
@@ -365,79 +452,33 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
-class _ContentBlock extends StatelessWidget {
-  const _ContentBlock({required this.title, required this.content});
+class _ContentPreview extends StatelessWidget {
+  const _ContentPreview({required this.content});
 
-  final String title;
-  final String content;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: EdgeInsets.only(top: 2.h, bottom: 12.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(content, style: theme.textTheme.bodyMedium),
-        ],
-      ),
-    );
-  }
-}
-
-class _AttachmentsBlock extends StatelessWidget {
-  const _AttachmentsBlock({required this.attachments});
-
-  final List<String> attachments;
+  final String? content;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final value = content?.trim();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.associationAnnouncementAttachments,
+          l10n.associationAnnouncementContent,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
         ),
         SizedBox(height: 8.h),
-        if (attachments.isEmpty)
-          Text(
-            l10n.associationAnnouncementNoAttachments,
-            style: theme.textTheme.bodyMedium,
-          )
-        else
-          ...attachments.map(
-            (attachment) => Padding(
-              padding: EdgeInsets.only(bottom: 8.h),
-              child: Row(
-                children: [
-                  Icon(Icons.attach_file_rounded, size: 18.r),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: Text(
-                      attachment,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        Text(
+          value?.isNotEmpty == true ? value! : l10n.associationMemberNoData,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
+        ),
       ],
     );
   }
@@ -496,92 +537,57 @@ class _StatusChip extends StatelessWidget {
   }
 }
 
-class _Announcement {
-  const _Announcement({
-    required this.number,
-    required this.date,
-    required this.title,
-    required this.category,
-    required this.type,
-    required this.status,
-    required this.recipients,
-    required this.deadline,
-    required this.relatedEntity,
-    required this.channels,
-    required this.content,
-    required this.attachments,
-  });
+class _FailureView extends StatelessWidget {
+  const _FailureView({required this.message, required this.onRetry});
 
-  final String number;
-  final String date;
-  final String title;
-  final String category;
-  final String type;
-  final String status;
-  final String recipients;
-  final String deadline;
-  final String relatedEntity;
-  final List<String> channels;
-  final String content;
-  final List<String> attachments;
+  final String message;
+  final VoidCallback onRetry;
 
-  static List<_Announcement> samples(AppLocalizations l10n) {
-    return [
-      _Announcement(
-        number: 'ANN-2026-014',
-        date: '2026-07-01',
-        title: l10n.associationAnnouncementSampleTitle1,
-        category: l10n.associationAnnouncementCategoryElectronic,
-        type: l10n.associationAnnouncementTypePaymentNotice,
-        status: l10n.associationAnnouncementPending,
-        recipients: l10n.associationAnnouncementSampleRecipients1,
-        deadline: l10n.associationAnnouncementSampleDeadline1,
-        relatedEntity: l10n.associationAnnouncementSampleRelated1,
-        channels: [
-          l10n.associationAnnouncementChannelInApp,
-          l10n.associationAnnouncementChannelWhatsapp,
-        ],
-        content: l10n.associationAnnouncementSampleContent1,
-        attachments: [
-          l10n.associationAnnouncementSampleAttachment1,
-          l10n.associationAnnouncementSampleAttachment2,
-        ],
-      ),
-      _Announcement(
-        number: 'ANN-2026-009',
-        date: '2026-06-18',
-        title: l10n.associationAnnouncementSampleTitle2,
-        category: l10n.associationAnnouncementCategoryOfficial,
-        type: l10n.associationAnnouncementTypeMeetingInvitation,
-        status: l10n.associationAnnouncementDelivered,
-        recipients: l10n.associationAnnouncementSampleRecipients2,
-        deadline: l10n.associationAnnouncementSampleDeadline2,
-        relatedEntity: l10n.associationAnnouncementSampleRelated2,
-        channels: [
-          l10n.associationAnnouncementChannelInApp,
-          l10n.associationAnnouncementChannelSms,
-          l10n.associationAnnouncementChannelEmail,
-        ],
-        content: l10n.associationAnnouncementSampleContent2,
-        attachments: [l10n.associationAnnouncementSampleAttachment3],
-      ),
-      _Announcement(
-        number: 'ANN-2026-003',
-        date: '2026-05-27',
-        title: l10n.associationAnnouncementSampleTitle3,
-        category: l10n.associationAnnouncementCategoryElectronic,
-        type: l10n.associationAnnouncementTypeDecisionNotice,
-        status: l10n.associationAnnouncementDelivered,
-        recipients: l10n.associationAnnouncementSampleRecipients3,
-        deadline: l10n.associationAnnouncementNoDeadline,
-        relatedEntity: l10n.associationAnnouncementSampleRelated3,
-        channels: [
-          l10n.associationAnnouncementChannelInApp,
-          l10n.associationAnnouncementChannelEmail,
-        ],
-        content: l10n.associationAnnouncementSampleContent3,
-        attachments: const [],
-      ),
-    ];
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Column(
+      children: [
+        Expanded(
+          child: EmptyStateView(
+            icon: Icons.error_outline_rounded,
+            title: l10n.associationMemberNoData,
+            description: message,
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(20.w, 0, 20.w, 24.h),
+          child: FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded),
+            label: Text(l10n.retry),
+          ),
+        ),
+      ],
+    );
   }
+}
+
+IconData _typeIcon(String type) {
+  switch (type) {
+    case 'payment_notice':
+      return Icons.payments_outlined;
+    case 'meeting':
+      return Icons.groups_2_outlined;
+    case 'decision':
+      return Icons.gavel_outlined;
+    case 'warning':
+      return Icons.warning_amber_rounded;
+    case 'administrative':
+      return Icons.admin_panel_settings_outlined;
+    default:
+      return Icons.campaign_outlined;
+  }
+}
+
+String _dateLabel(BuildContext context, DateTime? date) {
+  final l10n = AppLocalizations.of(context)!;
+  if (date == null) return l10n.associationMemberNoData;
+  return DateFormat.yMMMd().format(date.toLocal());
 }

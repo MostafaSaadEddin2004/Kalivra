@@ -10,18 +10,26 @@ class CustomNetworkImage extends StatelessWidget {
     this.width,
     this.height,
     this.defaultIcon,
+    this.defaultIconColor,
   });
 
   final String? imageUrl;
   final double? width;
   final double? height;
   final IconData? defaultIcon;
+  final Color? defaultIconColor;
 
   @override
   Widget build(BuildContext context) {
     if (imageUrl == null || imageUrl!.isEmpty) {
       return Center(
-        child: Icon(defaultIcon ?? Icons.image_outlined, size: 35.sp),
+        child: Icon(
+          defaultIcon ?? Icons.image_outlined,
+          size: 35.sp,
+          color:
+              defaultIconColor ??
+              Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
       );
     } else {
       return CachedNetworkImage(

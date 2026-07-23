@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:kalivra/core/network/dio_client.dart';
+import 'package:kalivra/model/association/association_announcement_model.dart';
 import 'package:kalivra/model/app_info/faq_item_model.dart';
 import 'package:kalivra/model/association/association_attachment_type.dart';
 import 'package:kalivra/model/association/association_link_attachment.dart';
@@ -163,5 +164,39 @@ class AssociationApiService {
             .toList()
           ..sort((a, b) => a.sortOrder.compareTo(b.sortOrder));
     return faqs;
+  }
+
+  Future<List<AssociationAnnouncementModel>> getAnnouncements({
+    int perPage = 15,
+  }) async {
+    final res = await _client.get(
+      'customer/association/reports',
+      queryParameters: {'per_page': perPage},
+    );
+    final data = res.data['data'];
+    if (data is! List) return const [];
+
+    return data
+        .whereType<Map>()
+        .map(
+          (item) => AssociationAnnouncementModel.fromJson(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+        .toList();
+  }
+
+  Future<AssociationAnnouncementModel> getAnnouncement(int id) async {
+    final res = await _client.get('customer/association/reports/$id');
+    final data = res.data['data'];
+    if (data is Map) {
+      return AssociationAnnouncementModel.fromJson(
+        Map<String, dynamic>.from(data),
+      );
+    }
+
+    return AssociationAnnouncementModel.fromJson(
+      Map<String, dynamic>.from(res.data as Map),
+    );
   }
 }

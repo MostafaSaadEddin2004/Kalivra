@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/model/association/association_announcement_model.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcement_details_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcements_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_contact_us_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_faq_screen.dart';
@@ -30,6 +32,8 @@ import 'package:kalivra/view/screens/profile_screens/set_new_password_screen.dar
 import 'package:kalivra/view/screens/profile_screens/theme_mode_screen.dart';
 import 'package:kalivra/view/screens/home/product_details_screen.dart';
 import 'package:kalivra/view/screens/home/brand_details_screen.dart';
+import 'package:kalivra/view/screens/home/all_categories_screen.dart';
+import 'package:kalivra/view/screens/home/category_products_screen.dart';
 import 'package:kalivra/view/screens/home/all_brands_screen.dart';
 import 'package:kalivra/view/screens/home/all_products_screen.dart';
 import 'package:kalivra/view/screens/home/all_sale_products_screen.dart';
@@ -73,6 +77,8 @@ abstract class AppRoutes {
   static const String themeMode = '/theme-mode';
   static const String productDetails = '/product-details';
   static const String brandDetails = '/brand-details';
+  static const String allCategories = '/all-categories';
+  static const String categoryProducts = '/category-products';
   static const String allBrands = '/all-brands';
   static const String allProducts = '/all-products';
   static const String allSaleProducts = '/all-sale-products';
@@ -95,6 +101,8 @@ abstract class AppRoutes {
   static const String associationRequestsAndServices =
       '/association-requests-and-services';
   static const String associationAnnouncements = '/association-announcements';
+  static const String associationAnnouncementDetails =
+      '/association-announcement-details';
 }
 
 abstract class AppRoutesName {
@@ -121,6 +129,8 @@ abstract class AppRoutesName {
   static const String themeMode = 'theme-mode';
   static const String productDetails = 'product-details';
   static const String brandDetails = 'brand-details';
+  static const String allCategories = 'all-categories';
+  static const String categoryProducts = 'categoryProducts';
   static const String allBrands = 'all-brands';
   static const String allProducts = 'all-products';
   static const String allSaleProducts = 'all-sale-products';
@@ -143,6 +153,8 @@ abstract class AppRoutesName {
   static const String associationRequestsAndServices =
       'association-requests-and-services';
   static const String associationAnnouncements = 'association-announcements';
+  static const String associationAnnouncementDetails =
+      'association-announcement-details';
 }
 
 abstract class AppRouter {
@@ -360,6 +372,26 @@ abstract class AppRouter {
             },
           ),
           GoRoute(
+            path: AppRoutes.allCategories,
+            name: AppRoutesName.allCategories,
+            builder: (_, _) => const AllCategoriesScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.categoryProducts,
+            name: AppRoutesName.categoryProducts,
+            builder: (context, state) {
+              final category = state.extra as CategoryApiModel?;
+              if (category == null) {
+                return Scaffold(
+                  body: Center(
+                    child: Text(AppLocalizations.of(context)!.navCategories),
+                  ),
+                );
+              }
+              return CategoryProductsScreen(category: category);
+            },
+          ),
+          GoRoute(
             path: AppRoutes.allBrands,
             name: AppRoutesName.allBrands,
             builder: (_, _) => const AllBrandsScreen(),
@@ -437,6 +469,30 @@ abstract class AppRouter {
             path: AppRoutes.associationAnnouncements,
             name: AppRoutesName.associationAnnouncements,
             builder: (context, state) => const AssociationAnnouncementsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationAnnouncementDetails,
+            name: AppRoutesName.associationAnnouncementDetails,
+            builder: (context, state) {
+              final extra = state.extra;
+              final announcement = extra is AssociationAnnouncementModel
+                  ? extra
+                  : null;
+              final id = announcement?.id ?? (extra is int ? extra : 0);
+
+              if (id == 0) {
+                return Scaffold(
+                  body: Center(
+                    child: Text(AppLocalizations.of(context)!.errorMissingData),
+                  ),
+                );
+              }
+
+              return AssociationAnnouncementDetailsScreen(
+                announcementId: id,
+                initialAnnouncement: announcement,
+              );
+            },
           ),
         ],
       ),

@@ -1659,6 +1659,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationAnnouncementNoAttachments => 'No attachments';
 
   @override
+  String get associationAnnouncementShowDetails => 'Show details';
+
+  @override
+  String get associationAnnouncementDetailsTitle => 'Announcement details';
+
+  @override
+  String get associationAnnouncementReferenceNumber => 'Reference number';
+
+  @override
+  String get associationAnnouncementDate => 'Announcement date';
+
+  @override
+  String get associationAnnouncementDeliveredAt => 'Delivered at';
+
+  @override
+  String get associationAnnouncementEmptyTitle => 'No announcements';
+
+  @override
+  String get associationAnnouncementEmptyDescription =>
+      'There are no official announcements available right now.';
+
+  @override
   String get associationAnnouncementCategoryElectronic =>
       'Electronic announcement';
 

@@ -3242,6 +3242,48 @@ abstract class AppLocalizations {
   /// **'No attachments'**
   String get associationAnnouncementNoAttachments;
 
+  /// No description provided for @associationAnnouncementShowDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Show details'**
+  String get associationAnnouncementShowDetails;
+
+  /// No description provided for @associationAnnouncementDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement details'**
+  String get associationAnnouncementDetailsTitle;
+
+  /// No description provided for @associationAnnouncementReferenceNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference number'**
+  String get associationAnnouncementReferenceNumber;
+
+  /// No description provided for @associationAnnouncementDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement date'**
+  String get associationAnnouncementDate;
+
+  /// No description provided for @associationAnnouncementDeliveredAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered at'**
+  String get associationAnnouncementDeliveredAt;
+
+  /// No description provided for @associationAnnouncementEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No announcements'**
+  String get associationAnnouncementEmptyTitle;
+
+  /// No description provided for @associationAnnouncementEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no official announcements available right now.'**
+  String get associationAnnouncementEmptyDescription;
+
   /// No description provided for @associationAnnouncementCategoryElectronic.
   ///
   /// In en, this message translates to:

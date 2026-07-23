@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/categories_cubit/categories_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/current_category_cubit/current_category_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/widgets/buttons/show_all_button.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:kalivra/view/widgets/category/category_button.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -64,7 +67,7 @@ class _CategoriesPageBody extends StatelessWidget {
         if (state is CurrentCategoryFetched) {
           final productsCubit = context.read<ProductsCubit>();
 
-          if (state.isAll) {
+          if (state.isAll || state.categoryId < 0) {
             productsCubit.loadProducts();
           } else {
             productsCubit.loadProductByCategoryId(state.categoryId);
@@ -95,60 +98,86 @@ class _CategoriesPageBody extends StatelessWidget {
                       ...loadedCategories,
                     ];
 
-                    return SizedBox(
-                      height: 48.h,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
-                        itemCount: categories.length,
-                        separatorBuilder: (_, _) => SizedBox(width: 10.w),
-                        itemBuilder: (context, index) {
-                          return BlocBuilder<
-                            CurrentCategoryCubit,
-                            CurrentCategoryState
-                          >(
-                            builder: (context, currentCategoryState) {
-                              int currentIndex = 0;
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                l10n.navCategories,
+                                style: textTheme.titleMedium,
+                              ),
+                              ShowAllButton(
+                                onShowAllTap: () =>
+                                    context.push(AppRoutes.allCategories),
+                                l10n: l10n,
+                                textTheme: textTheme,
+                                colorScheme: colorScheme,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 102.h,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                            itemCount: categories.length,
+                            separatorBuilder: (_, _) => SizedBox(width: 10.w),
+                            itemBuilder: (context, index) {
+                              return BlocBuilder<
+                                CurrentCategoryCubit,
+                                CurrentCategoryState
+                              >(
+                                builder: (context, currentCategoryState) {
+                                  int currentIndex = 0;
 
-                              if (currentCategoryState
-                                  is CurrentCategoryFetched) {
-                                currentIndex = currentCategoryState.isAll
-                                    ? 0
-                                    : categories.indexWhere(
-                                        (category) =>
-                                            category.id ==
-                                            currentCategoryState.categoryId,
-                                      );
+                                  if (currentCategoryState
+                                      is CurrentCategoryFetched) {
+                                    currentIndex = currentCategoryState.isAll
+                                        ? 0
+                                        : categories.indexWhere(
+                                            (category) =>
+                                                category.id ==
+                                                currentCategoryState.categoryId,
+                                          );
 
-                                if (currentIndex < 0) {
-                                  currentIndex =
-                                      currentCategoryState.currentIndex;
-                                }
-                              }
-
-                              return CategoryButton(
-                                category: categories[index],
-                                currentIndex: currentIndex,
-                                index: index,
-                                onTap: () {
-                                  if (index == 0) {
-                                    context
-                                        .read<CurrentCategoryCubit>()
-                                        .selectAll();
-                                  } else {
-                                    context
-                                        .read<CurrentCategoryCubit>()
-                                        .changeCurrentCategory(
-                                          index,
-                                          categories[index].id,
-                                        );
+                                    if (currentIndex < 0) {
+                                      currentIndex =
+                                          currentCategoryState.currentIndex;
+                                    }
                                   }
+
+                                  return CategoryButton(
+                                    category: categories[index],
+                                    currentIndex: currentIndex,
+                                    index: index,
+                                    onTap: () {
+                                      if (index == 0) {
+                                        context
+                                            .read<ProductsCubit>()
+                                            .loadProducts();
+                                        context
+                                            .read<CurrentCategoryCubit>()
+                                            .selectAll();
+                                      } else {
+                                        context
+                                            .read<CurrentCategoryCubit>()
+                                            .changeCurrentCategory(
+                                              index,
+                                              categories[index].id,
+                                            );
+                                      }
+                                    },
+                                  );
                                 },
                               );
                             },
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      ],
                     );
 
                   case CategoriesFailed():
@@ -156,7 +185,7 @@ class _CategoriesPageBody extends StatelessWidget {
 
                   default:
                     return SizedBox(
-                      height: 48.h,
+                      height: 92.h,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(horizontal: 20.w),

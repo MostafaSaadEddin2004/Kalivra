@@ -132,6 +132,7 @@ class _ProductCardState extends State<ProductCard> {
         : AppColors.burgundy.withValues(alpha: 0.06);
 
     final l10n = AppLocalizations.of(context)!;
+    final salePercent = _salePercent();
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
@@ -143,7 +144,6 @@ class _ProductCardState extends State<ProductCard> {
               context.push(AppRoutes.productDetails, extra: displayProduct),
           borderRadius: BorderRadius.circular(16.r),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
               Stack(
@@ -218,7 +218,7 @@ class _ProductCardState extends State<ProductCard> {
                                 badge: ProductBadgeData(
                                   label: l10n.productNew,
                                   icon: Icons.fiber_new_rounded,
-                                  color: AppColors.goldDark,
+                                  color: AppColors.offWhite,
                                 ),
                               ),
                             );
@@ -234,15 +234,15 @@ class _ProductCardState extends State<ProductCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextSlider(text: product.name),
-                    if (product.prices.final_?.price != null)
+                    if (product.onSale && salePercent.isNotEmpty)
                       ProductBadgeChip(
                         badge: ProductBadgeData(
-                          label: _salePercent(),
+                          label: salePercent,
                           icon: Icons.percent,
                           color: AppColors.red,
                         ),
                       ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: salePercent.isEmpty ? 20.h : 4.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -266,8 +266,11 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   String _salePercent() {
+    final finalPrice = widget.product.prices.final_;
+    if (finalPrice == null) return '';
+
     final regularStr = widget.product.prices.regular.price;
-    final finalStr = widget.product.prices.final_!.price;
+    final finalStr = finalPrice.price;
 
     final regular = double.tryParse(regularStr);
     final finalP = double.tryParse(finalStr);
@@ -316,7 +319,6 @@ class _PriceBlock extends StatelessWidget {
             fontSize: 12.sp,
           ),
         ),
-        SizedBox(height: 2.h),
         Text(
           product.prices.final_!.formattedPrice.toString(),
           style: theme.textTheme.bodyLarge?.copyWith(
