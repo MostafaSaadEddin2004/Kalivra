@@ -63,7 +63,9 @@ class _ReferralCodeFieldState extends State<ReferralCodeField> {
         borderColor,
         fillColor,
       ),
-      crossFadeState: _expanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+      crossFadeState: _expanded
+          ? CrossFadeState.showSecond
+          : CrossFadeState.showFirst,
       duration: const Duration(milliseconds: 280),
       firstCurve: Curves.decelerate,
       secondCurve: Curves.easeInOut,
@@ -84,22 +86,14 @@ class _ReferralCodeFieldState extends State<ReferralCodeField> {
         padding: EdgeInsets.symmetric(vertical: 8.h),
         child: Row(
           children: [
-            Icon(
-              Icons.card_giftcard_rounded,
-              size: 22.r,
-              color: labelColor,
-            ),
+            Icon(Icons.card_giftcard_rounded, size: 22.r, color: labelColor),
             SizedBox(width: 10.w),
             Text(
               AppLocalizations.of(context)!.inviteCodeQuestion,
-              style: theme.textTheme.titleSmall
+              style: theme.textTheme.titleSmall,
             ),
             const Spacer(),
-            Icon(
-              Icons.expand_more_rounded,
-              size: 22.r,
-              color: labelColor,
-            ),
+            Icon(Icons.expand_more_rounded, size: 22.r, color: labelColor),
           ],
         ),
       ),
@@ -139,11 +133,7 @@ class _ReferralCodeFieldState extends State<ReferralCodeField> {
                   ),
                 ),
                 const Spacer(),
-                Icon(
-                  Icons.expand_less_rounded,
-                  size: 22.r,
-                  color: labelColor,
-                ),
+                Icon(Icons.expand_less_rounded, size: 22.r, color: labelColor),
               ],
             ),
           ),

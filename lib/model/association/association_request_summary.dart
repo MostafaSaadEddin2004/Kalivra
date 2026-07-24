@@ -21,9 +21,11 @@ class AssociationRequestSummary {
     return AssociationRequestSummary(
       id: (json['id'] as num).toInt(),
       status: json['status']?.toString() ?? '',
-      createdAt: DateTime.tryParse(json['created_at']?.toString() ?? '') ??
+      createdAt:
+          DateTime.tryParse(json['created_at']?.toString() ?? '') ??
           DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
+      updatedAt:
+          DateTime.tryParse(json['updated_at']?.toString() ?? '') ??
           DateTime.now(),
       documentDefinition: json['document_definition']?.toString(),
       documentUrl: json['document_url']?.toString(),

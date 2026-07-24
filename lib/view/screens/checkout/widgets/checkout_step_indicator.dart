@@ -22,7 +22,12 @@ class CheckoutStepIndicator extends StatelessWidget {
 
   static List<String> _labels(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return [l10n.checkoutStepAddress, l10n.checkoutStepShipping, l10n.checkoutStepPayment, l10n.checkoutStepComplete];
+    return [
+      l10n.checkoutStepAddress,
+      l10n.checkoutStepShipping,
+      l10n.checkoutStepPayment,
+      l10n.checkoutStepComplete,
+    ];
   }
 
   @override

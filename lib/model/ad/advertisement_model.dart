@@ -18,16 +18,22 @@ class AdvertisementModel {
   final String subtitle;
   final Color gradientStart;
   final Color gradientEnd;
+
   /// Company or brand name.
   final String? companyName;
+
   /// What the company sells (e.g. product category or list).
   final String? whatTheySell;
+
   /// Company address or location.
   final String? location;
+
   /// Company phone number.
   final String? phone;
+
   /// Company website URL.
   final String? website;
+
   /// Additional description or details.
   final String? description;
 }

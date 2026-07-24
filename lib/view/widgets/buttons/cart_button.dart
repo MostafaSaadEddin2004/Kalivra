@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CardButton extends StatelessWidget {
-  const CardButton({
-    super.key,
-    required this.onTap,
-  });
+  const CardButton({super.key, required this.onTap});
 
   final VoidCallback? onTap;
 
@@ -22,7 +19,7 @@ class CardButton extends StatelessWidget {
         child: Icon(
           Icons.add_shopping_cart_rounded,
           size: 18.r,
-          color:  Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).colorScheme.primary,
         ),
       ),
     );

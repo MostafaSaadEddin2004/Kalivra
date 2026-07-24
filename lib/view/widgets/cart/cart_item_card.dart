@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/model/cart/cart_item_model.dart';
-import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
+import 'package:kalivra/model/cart/cart_api_model.dart';
+import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 
 class CartItemCard extends StatelessWidget {
   const CartItemCard({
     super.key,
     required this.item,
-    required this.onQuantityChanged,
-    required this.onRemove,
+    required this.onEdit,
+    required this.onDelete,
+    this.isLoading = false,
   });
 
-  final CartItem item;
-  final void Function(int quantity) onQuantityChanged;
-  final VoidCallback onRemove;
+  final CartItemApiModel item;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -22,15 +24,18 @@ class CartItemCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final productName = item.name?.trim().isNotEmpty == true
+        ? item.name!.trim()
+        : l10n.productDetails;
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: colorScheme.surface.withValues(alpha: 0.1),
+        color: theme.cardTheme.color ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: colorScheme.primary.withValues(alpha: 0.2),
+          color: colorScheme.primary.withValues(alpha: 0.18),
           width: 1,
         ),
         boxShadow: [
@@ -41,11 +46,10 @@ class CartItemCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Column(
-            spacing: 8.h,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.r),
@@ -53,68 +57,170 @@ class CartItemCard extends StatelessWidget {
                   width: 88.w,
                   height: 88.w,
                   color: colorScheme.tertiaryFixed,
-                  child: item.product.baseImage?.largeImageUrl != null
-                      ? Image.asset(
-                          item.product.baseImage?.largeImageUrl ?? '',
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => Icon(
-                            Icons.inventory_2_outlined,
-                            size: 36.r,
-                            color: colorScheme.primary.withValues(alpha: 0.6),
-                          ),
-                        )
-                      : Icon(
-                          Icons.inventory_2_outlined,
-                          size: 36.r,
-                          color: colorScheme.primary.withValues(alpha: 0.6),
-                        ),
+                  child: CustomNetworkImage(
+                    imageUrl: item.imageUrl,
+                    width: 88.w,
+                    height: 88.w,
+                    defaultIcon: Icons.inventory_2_outlined,
+                  ),
                 ),
               ),
-              // QuantityCounter(
-              //   value: item.quantity,
-              //   maxQuantity: item.product.variants?.qty ?? 0,
-              //   onChanged: onQuantityChanged,
-              // ),
-            ],
-          ),
-          SizedBox(width: 12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        item.product.name.toUpperCase(),
-                        style: textTheme.titleMedium,
-                        overflow: TextOverflow.ellipsis,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            productName,
+                            style: textTheme.titleMedium,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        PopupMenuButton<_CartItemAction>(
+                          enabled: !isLoading,
+                          tooltip: l10n.menu,
+                          icon: Icon(Icons.more_vert_rounded, size: 22.r),
+                          onSelected: (action) {
+                            switch (action) {
+                              case _CartItemAction.edit:
+                                onEdit();
+                                break;
+                              case _CartItemAction.delete:
+                                onDelete();
+                                break;
+                            }
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: _CartItemAction.edit,
+                              child: _MenuItem(
+                                icon: Icons.edit_outlined,
+                                label: l10n.editItem,
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: _CartItemAction.delete,
+                              child: _MenuItem(
+                                icon: Icons.delete_outline_rounded,
+                                label: l10n.deleteItem,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 6.h),
+                    ...item.options.map(
+                      (option) => Padding(
+                        padding: EdgeInsets.only(bottom: 3.h),
+                        child: Text(
+                          '${option.attributeName ?? ''}: ${option.optionLabel ?? ''}',
+                          style: textTheme.bodySmall,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                     ),
-                    CustomIconButton(
-                      icon: Icons.delete_outline_rounded,
-                      iconSize: 22.r,
-                      color: colorScheme.onError,
-                      onPressed: onRemove,
-                      tooltip: l10n.remove,
+                    SizedBox(height: 8.h),
+                    _DetailLine(
+                      label: l10n.unitPrice,
+                      value:
+                          item.formattedPrice ?? item.price?.toString() ?? '',
+                    ),
+                    SizedBox(height: 4.h),
+                    _DetailLine(
+                      label: l10n.quantity,
+                      value: (item.quantity ?? 1).toString(),
+                    ),
+                    SizedBox(height: 4.h),
+                    _DetailLine(
+                      label: l10n.total,
+                      value:
+                          item.formattedTotal ?? item.total?.toString() ?? '',
+                      bold: true,
                     ),
                   ],
                 ),
-
-                Text(l10n.sizePlaceholder, style: textTheme.bodySmall),
-                SizedBox(height: 4.h),
-                Text(l10n.colorPlaceholder, style: textTheme.bodySmall),
-                SizedBox(height: 8.h),
-                Text(
-                  '${item.unitPrice.toStringAsFixed(0)} ${l10n.currencySYP}',
-                  style: textTheme.bodyLarge,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
+          if (isLoading)
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Center(
+                  child: SizedBox(
+                    width: 22.r,
+                    height: 22.r,
+                    child: const CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
   }
 }
+
+class _DetailLine extends StatelessWidget {
+  const _DetailLine({
+    required this.label,
+    required this.value,
+    this.bold = false,
+  });
+
+  final String label;
+  final String value;
+  final bool bold;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+    );
+
+    return Row(
+      children: [
+        Expanded(child: Text(label, style: style)),
+        SizedBox(width: 8.w),
+        Flexible(
+          child: Text(
+            value,
+            style: style,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MenuItem extends StatelessWidget {
+  const _MenuItem({required this.icon, required this.label});
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 18.r),
+        SizedBox(width: 10.w),
+        Text(label),
+      ],
+    );
+  }
+}
+
+enum _CartItemAction { edit, delete }

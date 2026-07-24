@@ -25,13 +25,12 @@ class ConfirmDialog extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AlertDialog(
-      
       title: Text(title, style: theme.textTheme.titleLarge),
       content: Text(message, style: theme.textTheme.bodyMedium),
       actions: [
         TextButton(onPressed: () => context.pop(), child: Text(l10n.no)),
         Container(
-        constraints: BoxConstraints(maxWidth: 80.w),
+          constraints: BoxConstraints(maxWidth: 80.w),
           child: FilledButton(
             onPressed: onConfirm,
             child: isLoading

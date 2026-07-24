@@ -38,7 +38,9 @@ class BrandCard extends StatelessWidget {
                 child: CustomNetworkImage(
                   imageUrl: brand.logo,
                   defaultIcon: Icons.store_rounded,
-                  defaultIconColor: Theme.of(context).colorScheme.inversePrimary,
+                  defaultIconColor: Theme.of(
+                    context,
+                  ).colorScheme.inversePrimary,
                 ),
               ),
               Padding(

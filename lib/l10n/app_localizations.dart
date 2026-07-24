@@ -452,6 +452,162 @@ abstract class AppLocalizations {
   /// **'Proceed'**
   String get proceed;
 
+  /// No description provided for @chooseCartOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose options'**
+  String get chooseCartOptions;
+
+  /// No description provided for @editItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit item'**
+  String get editItem;
+
+  /// No description provided for @deleteItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete item'**
+  String get deleteItem;
+
+  /// No description provided for @clearCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear cart'**
+  String get clearCart;
+
+  /// No description provided for @quantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get quantity;
+
+  /// No description provided for @colour.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get colour;
+
+  /// No description provided for @unitPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit price'**
+  String get unitPrice;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @removeItemConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove \"{productName}\" from your cart? This item will be removed from your order.'**
+  String removeItemConfirmation(String productName);
+
+  /// No description provided for @clearCartConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove all items from your cart? This will clear the complete cart.'**
+  String get clearCartConfirmation;
+
+  /// No description provided for @itemUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Cart item updated successfully'**
+  String get itemUpdatedSuccessfully;
+
+  /// No description provided for @itemDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Cart item deleted successfully'**
+  String get itemDeletedSuccessfully;
+
+  /// No description provided for @cartClearedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Cart cleared successfully'**
+  String get cartClearedSuccessfully;
+
+  /// No description provided for @noChangesDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes detected'**
+  String get noChangesDetected;
+
+  /// No description provided for @invalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid quantity'**
+  String get invalidQuantity;
+
+  /// No description provided for @selectRequiredOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the required options'**
+  String get selectRequiredOptions;
+
+  /// No description provided for @unableToAddItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to add item to cart'**
+  String get unableToAddItem;
+
+  /// No description provided for @unableToUpdateItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to update item'**
+  String get unableToUpdateItem;
+
+  /// No description provided for @unableToDeleteItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to delete item'**
+  String get unableToDeleteItem;
+
+  /// No description provided for @unableToClearCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to clear cart'**
+  String get unableToClearCart;
+
+  /// No description provided for @quantityReadOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity cannot be changed for this item.'**
+  String get quantityReadOnly;
+
+  /// No description provided for @availableQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Available: {count}'**
+  String availableQuantity(int count);
+
+  /// No description provided for @quantityLimitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity limit'**
+  String get quantityLimitTitle;
+
+  /// No description provided for @quantityLimitMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Only {count} items are available for this selection.'**
+  String quantityLimitMessage(int count);
+
+  /// No description provided for @noSizeOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'No size options'**
+  String get noSizeOptions;
+
+  /// No description provided for @noColourOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'No colour options'**
+  String get noColourOptions;
+
   /// No description provided for @productDetails.
   ///
   /// In en, this message translates to:
@@ -637,6 +793,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Product link'**
   String get productUrlKey;
+
+  /// No description provided for @productStockQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock quantity'**
+  String get productStockQuantity;
+
+  /// No description provided for @productMeasurementType.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement type'**
+  String get productMeasurementType;
+
+  /// No description provided for @productMeasurementTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement types'**
+  String get productMeasurementTypes;
+
+  /// No description provided for @brand.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand'**
+  String get brand;
+
+  /// No description provided for @activeBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Active brand'**
+  String get activeBrand;
+
+  /// No description provided for @inactiveBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive brand'**
+  String get inactiveBrand;
 
   /// No description provided for @notificationsWelcomeTitle.
   ///

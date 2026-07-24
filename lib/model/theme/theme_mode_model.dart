@@ -14,6 +14,7 @@ class ThemeModeModel {
   final String subtitle;
   final IconData icon;
   final int index;
+
   /// Value stored in prefs (e.g. PrefKeys.darkModeKey).
   final String prefValue;
 }

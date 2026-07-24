@@ -17,6 +17,7 @@ final class AddedToWishlistSuccessfully extends WishlistState {
 
   AddedToWishlistSuccessfully({required this.message});
 }
+
 final class WishlistFailed extends WishlistState {
   final String message;
 

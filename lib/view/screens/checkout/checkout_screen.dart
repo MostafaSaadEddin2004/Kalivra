@@ -83,9 +83,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _showStepError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   String _stepTitle(BuildContext context, int index) {
@@ -121,7 +121,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return BlocConsumer<CheckoutCubit, CheckoutState>(
       listener: (context, state) {
         if (state.hasError) {
-         
           context.read<CheckoutCubit>().reset();
         }
         if (state is CheckoutOrderPlaced) {
@@ -134,7 +133,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         final isPlacing = checkoutState.isLoading;
         final shippingMethods = checkoutState.shippingMethods;
         final paymentMethods = checkoutState.paymentMethods;
-
+    
         return Stack(
           children: [
             Scaffold(
@@ -142,7 +141,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 elevation: 0,
                 leading: CustomIconButton(
                   icon: Icons.arrow_back_rounded,
-                  color: theme.appBarTheme.foregroundColor ?? AppColors.offWhite,
+                  color:
+                      theme.appBarTheme.foregroundColor ?? AppColors.offWhite,
                   iconSize: 28.r,
                   onPressed: isPlacing ? null : _goBack,
                   tooltip: AppLocalizations.of(context)!.back,

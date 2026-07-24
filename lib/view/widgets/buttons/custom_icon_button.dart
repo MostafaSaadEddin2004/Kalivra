@@ -21,7 +21,8 @@ class CustomIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(padding: EdgeInsets.all(0.w),
+    return IconButton(
+      padding: EdgeInsets.all(0.w),
       style: ButtonStyle(
         backgroundColor: WidgetStatePropertyAll(backgroundColor),
       ),

@@ -46,7 +46,9 @@ class CheckoutStep extends StatelessWidget {
               ? Center(
                   child: Text(
                     l10n.emptyCart,
-                    style: theme.textTheme.bodyLarge?.copyWith(color: textColor),
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: textColor,
+                    ),
                   ),
                 )
               : ListView.builder(
@@ -70,24 +72,21 @@ class CheckoutStep extends StatelessWidget {
                                   children: [
                                     Text(
                                       item.product.name,
-                                      style: theme.textTheme.titleSmall?.copyWith(
-                                        color: textColor,
-                                      ),
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(color: textColor),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(height: 4.h),
                                     Text(
                                       l10n.quantityLabel(item.quantity),
-                                      style: theme.textTheme.bodySmall?.copyWith(
-                                        color: AppColors.taupe,
-                                      ),
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(color: AppColors.taupe),
                                     ),
                                     Text(
                                       '${item.lineTotal.toStringAsFixed(0)} ${l10n.currencySYP}',
-                                      style: theme.textTheme.labelMedium?.copyWith(
-                                        color: textColor,
-                                      ),
+                                      style: theme.textTheme.labelMedium
+                                          ?.copyWith(color: textColor),
                                     ),
                                   ],
                                 ),
@@ -108,9 +107,7 @@ class CheckoutStep extends StatelessWidget {
                 ? const Color(0xFF1A1918)
                 : AppColors.offWhite.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(
-              color: AppColors.taupe.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: AppColors.taupe.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -130,7 +127,10 @@ class CheckoutStep extends StatelessWidget {
                 ),
               ],
               SizedBox(height: 12.h),
-              Divider(height: 1.h, color: AppColors.taupe.withValues(alpha: 0.4)),
+              Divider(
+                height: 1.h,
+                color: AppColors.taupe.withValues(alpha: 0.4),
+              ),
               SizedBox(height: 12.h),
               _SummaryRow(
                 label: l10n.total,
@@ -154,7 +154,8 @@ class _ItemImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = item.product.baseImage?.largeImageUrl ??
+    final imageUrl =
+        item.product.baseImage?.largeImageUrl ??
         item.product.baseImage?.originalImageUrl;
     if (imageUrl != null && imageUrl.isNotEmpty) {
       return ClipRRect(
@@ -172,14 +173,14 @@ class _ItemImage extends StatelessWidget {
 }
 
 Widget _imagePlaceholder(double size) => Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: AppColors.taupe.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Icon(Icons.inventory_2_outlined, color: AppColors.taupe),
-    );
+  width: size,
+  height: size,
+  decoration: BoxDecoration(
+    color: AppColors.taupe.withValues(alpha: 0.3),
+    borderRadius: BorderRadius.circular(8.r),
+  ),
+  child: Icon(Icons.inventory_2_outlined, color: AppColors.taupe),
+);
 
 class _SummaryRow extends StatelessWidget {
   const _SummaryRow({

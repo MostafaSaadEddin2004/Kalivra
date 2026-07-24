@@ -30,6 +30,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final cartCubit = context.read<CartCubit>();
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
@@ -45,19 +46,29 @@ class _CartScreenState extends State<CartScreen> {
           );
         }
 
-        if (state is CartLoading && cartCubit.items.isEmpty) {
+        if (state is CartLoading && cartCubit.apiItems.isEmpty) {
           return Scaffold(
             appBar: _CartAppBar(title: AppLocalizations.of(context)!.cart),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
 
-        final items = cartCubit.items;
+        if (state is CartFailure && state.cart == null) {
+          return Scaffold(
+            appBar: _CartAppBar(title: l10n.cart),
+            body: Center(
+              child: Text(state.message.isEmpty ? l10n.error : state.message),
+            ),
+          );
+        }
+
+        final cart = state is CartLoaded ? state.cart : cartCubit.cart;
+        final items = cart?.items ?? const [];
         return Scaffold(
-          appBar: _CartAppBar(title: AppLocalizations.of(context)!.cart),
+          appBar: _CartAppBar(title: l10n.cart),
           body: items.isEmpty
               ? const EmptyCartView()
-              : CartItemsView(items: items),
+              : CartItemsView(cart: cart!),
         );
       },
     );

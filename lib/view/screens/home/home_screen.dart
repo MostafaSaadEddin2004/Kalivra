@@ -29,7 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     List<NavItemModel> navItems = [
-      NavItemModel(icon: Icons.home_rounded, index: NavCubit.home, title: l10n.navHome),
+      NavItemModel(
+        icon: Icons.home_rounded,
+        index: NavCubit.home,
+        title: l10n.navHome,
+      ),
       NavItemModel(
         icon: Icons.category_rounded,
         index: NavCubit.categories,

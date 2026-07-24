@@ -47,8 +47,14 @@ void showReferralCodeSourceSheet(
               SizedBox(height: 24.h),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
-                  child: Icon(Icons.photo_library_rounded, color: theme.colorScheme.primaryFixed, size: 26.r),
+                  backgroundColor: theme.colorScheme.primaryFixed.withValues(
+                    alpha: 0.1,
+                  ),
+                  child: Icon(
+                    Icons.photo_library_rounded,
+                    color: theme.colorScheme.primaryFixed,
+                    size: 26.r,
+                  ),
                 ),
                 title: Text(
                   'من المعرض',
@@ -65,14 +71,24 @@ void showReferralCodeSourceSheet(
                 ),
                 onTap: () async {
                   Navigator.pop(sheetContext);
-                  await _pickFromGallery(context, onCode: onCode, onError: onError);
+                  await _pickFromGallery(
+                    context,
+                    onCode: onCode,
+                    onError: onError,
+                  );
                 },
               ),
               SizedBox(height: 8.h),
               ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
-                  child: Icon(Icons.qr_code_scanner_rounded, color: theme.colorScheme.primaryFixed, size: 26.r),
+                  backgroundColor: theme.colorScheme.primaryFixed.withValues(
+                    alpha: 0.1,
+                  ),
+                  child: Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: theme.colorScheme.primaryFixed,
+                    size: 26.r,
+                  ),
                 ),
                 title: Text(
                   'مسح بالكاميرا',
@@ -89,7 +105,11 @@ void showReferralCodeSourceSheet(
                 ),
                 onTap: () async {
                   Navigator.pop(sheetContext);
-                  await _scanWithCamera(context, onCode: onCode, onError: onError);
+                  await _scanWithCamera(
+                    context,
+                    onCode: onCode,
+                    onError: onError,
+                  );
                 },
               ),
             ],
@@ -100,7 +120,10 @@ void showReferralCodeSourceSheet(
   );
 }
 
-Future<void> _requestPhotoPermission(BuildContext context, {required void Function(String)? onError}) async {
+Future<void> _requestPhotoPermission(
+  BuildContext context, {
+  required void Function(String)? onError,
+}) async {
   final status = await Permission.photos.status;
   if (status.isGranted) return;
   if (status.isPermanentlyDenied) {
@@ -114,7 +137,10 @@ Future<void> _requestPhotoPermission(BuildContext context, {required void Functi
   }
 }
 
-Future<void> _requestCameraPermission(BuildContext context, {required void Function(String)? onError}) async {
+Future<void> _requestCameraPermission(
+  BuildContext context, {
+  required void Function(String)? onError,
+}) async {
   final status = await Permission.camera.status;
   if (status.isGranted) return;
   if (status.isPermanentlyDenied) {
@@ -136,7 +162,10 @@ Future<void> _pickFromGallery(
   await _requestPhotoPermission(context, onError: onError);
   if (!context.mounted) return;
   final picker = ImagePicker();
-  final xFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
+  final xFile = await picker.pickImage(
+    source: ImageSource.gallery,
+    imageQuality: 100,
+  );
   if (xFile == null || !context.mounted) return;
   final path = xFile.path;
   if (path.isEmpty) {

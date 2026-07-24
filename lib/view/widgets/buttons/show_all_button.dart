@@ -23,7 +23,8 @@ class ShowAllButton extends StatelessWidget {
         l10n.showAll,
         style: textTheme.bodySmall?.copyWith(
           color: colorScheme.onTertiaryFixed,
-          decoration: TextDecoration.underline,decorationColor: colorScheme.onTertiaryFixed
+          decoration: TextDecoration.underline,
+          decorationColor: colorScheme.onTertiaryFixed,
         ),
       ),
     );

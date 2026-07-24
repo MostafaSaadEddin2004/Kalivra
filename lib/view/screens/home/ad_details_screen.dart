@@ -16,9 +16,7 @@ class AdDetailsScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: ScreenAppBar(
-        title: ad.companyName ?? ad.title,
-      ),
+      appBar: ScreenAppBar(title: ad.companyName ?? ad.title),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
         child: Column(
@@ -57,8 +55,9 @@ class AdDetailsScreen extends StatelessWidget {
                         child: Icon(
                           Icons.campaign_rounded,
                           size: 40.r,
-                          color:
-                              isDark ? AppColors.goldLight : AppColors.burgundy,
+                          color: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
                         ),
                       ),
                       SizedBox(width: 20.w),
@@ -79,10 +78,9 @@ class AdDetailsScreen extends StatelessWidget {
                             Text(
                               ad.subtitle,
                               style: theme.textTheme.bodyLarge?.copyWith(
-                                color: (isDark
-                                        ? AppColors.offWhite
-                                        : Colors.white)
-                                    .withValues(alpha: 0.95),
+                                color:
+                                    (isDark ? AppColors.offWhite : Colors.white)
+                                        .withValues(alpha: 0.95),
                               ),
                             ),
                           ],
@@ -107,7 +105,9 @@ class AdDetailsScreen extends StatelessWidget {
                     Text(
                       'تفاصيل الشركة',
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                        color: isDark
+                            ? AppColors.goldLight
+                            : AppColors.burgundy,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -179,7 +179,9 @@ class AdDetailsScreen extends StatelessWidget {
                         child: Text(
                           'لا توجد تفاصيل إضافية لهذا الإعلان',
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isDark ? AppColors.taupe : AppColors.burgundy,
+                            color: isDark
+                                ? AppColors.taupe
+                                : AppColors.burgundy,
                           ),
                         ),
                       ),

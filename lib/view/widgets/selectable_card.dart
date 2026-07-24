@@ -42,7 +42,9 @@ class SelectableCard extends StatelessWidget {
                 Icon(
                   icon,
                   size: 24.r,
-                  color: isSelected ? theme.colorScheme.inversePrimary : AppColors.taupe,
+                  color: isSelected
+                      ? theme.colorScheme.inversePrimary
+                      : AppColors.taupe,
                 ),
               if (icon != null) SizedBox(width: 12.w),
               Expanded(

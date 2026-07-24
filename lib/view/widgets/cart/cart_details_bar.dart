@@ -66,7 +66,10 @@ class CartDetailsBar extends StatelessWidget {
             SizedBox(height: 12.h),
             CustomButton(
               onTap: () {},
-              title: Text(AppLocalizations.of(context)!.confirmOrder,style: theme.textTheme.displayLarge,),
+              title: Text(
+                AppLocalizations.of(context)!.confirmOrder,
+                style: theme.textTheme.displayLarge,
+              ),
             ),
           ],
         ),

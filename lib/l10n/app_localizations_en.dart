@@ -191,6 +191,91 @@ class AppLocalizationsEn extends AppLocalizations {
   String get proceed => 'Proceed';
 
   @override
+  String get chooseCartOptions => 'Choose options';
+
+  @override
+  String get editItem => 'Edit item';
+
+  @override
+  String get deleteItem => 'Delete item';
+
+  @override
+  String get clearCart => 'Clear cart';
+
+  @override
+  String get quantity => 'Quantity';
+
+  @override
+  String get colour => 'Colour';
+
+  @override
+  String get unitPrice => 'Unit price';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String removeItemConfirmation(String productName) {
+    return 'Are you sure you want to remove \"$productName\" from your cart? This item will be removed from your order.';
+  }
+
+  @override
+  String get clearCartConfirmation =>
+      'Remove all items from your cart? This will clear the complete cart.';
+
+  @override
+  String get itemUpdatedSuccessfully => 'Cart item updated successfully';
+
+  @override
+  String get itemDeletedSuccessfully => 'Cart item deleted successfully';
+
+  @override
+  String get cartClearedSuccessfully => 'Cart cleared successfully';
+
+  @override
+  String get noChangesDetected => 'No changes detected';
+
+  @override
+  String get invalidQuantity => 'Enter a valid quantity';
+
+  @override
+  String get selectRequiredOptions => 'Select the required options';
+
+  @override
+  String get unableToAddItem => 'Unable to add item to cart';
+
+  @override
+  String get unableToUpdateItem => 'Unable to update item';
+
+  @override
+  String get unableToDeleteItem => 'Unable to delete item';
+
+  @override
+  String get unableToClearCart => 'Unable to clear cart';
+
+  @override
+  String get quantityReadOnly => 'Quantity cannot be changed for this item.';
+
+  @override
+  String availableQuantity(int count) {
+    return 'Available: $count';
+  }
+
+  @override
+  String get quantityLimitTitle => 'Quantity limit';
+
+  @override
+  String quantityLimitMessage(int count) {
+    return 'Only $count items are available for this selection.';
+  }
+
+  @override
+  String get noSizeOptions => 'No size options';
+
+  @override
+  String get noColourOptions => 'No colour options';
+
+  @override
   String get productDetails => 'Product Details';
 
   @override
@@ -293,6 +378,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get productUrlKey => 'Product link';
+
+  @override
+  String get productStockQuantity => 'Stock quantity';
+
+  @override
+  String get productMeasurementType => 'Measurement type';
+
+  @override
+  String get productMeasurementTypes => 'Measurement types';
+
+  @override
+  String get brand => 'Brand';
+
+  @override
+  String get activeBrand => 'Active brand';
+
+  @override
+  String get inactiveBrand => 'Inactive brand';
 
   @override
   String get notificationsWelcomeTitle => 'Welcome to Kalivra';

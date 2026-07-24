@@ -1,11 +1,6 @@
 /// GET /api/shop/v1/themes – theme config (optional).
 class ThemeApiModel {
-  const ThemeApiModel({
-    this.code,
-    this.name,
-    this.previewImage,
-    this.default_,
-  });
+  const ThemeApiModel({this.code, this.name, this.previewImage, this.default_});
 
   final String? code;
   final String? name;

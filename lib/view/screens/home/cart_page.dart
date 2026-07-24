@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
@@ -26,28 +28,36 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    final cartCubit = context.read<CartCubit>();
-
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return BlocBuilder<CartCubit, CartState>(
       builder: (context, state) {
-        if (state is CartLoginRequired) {
-          return LoginRequiredPlaceholder(
-            icon: Icons.shopping_cart_outlined,
-            title: AppLocalizations.of(context)!.loginRequiredForCartView,
-            description: AppLocalizations.of(context)!.cartLoginPrompt,
-            onLoginTap: () => context.push(AppRoutes.login),
-          );
+        switch (state) {
+          case CartLoginRequired():
+            return LoginRequiredPlaceholder(
+              icon: Icons.shopping_cart_outlined,
+              title: AppLocalizations.of(context)!.loginRequiredForCartView,
+              description: AppLocalizations.of(context)!.cartLoginPrompt,
+              onLoginTap: () => context.push(AppRoutes.login),
+            );
+          case CartLoading():
+            return SpinKitFadingCircle(
+              color: theme.colorScheme.onTertiaryFixed,
+              size: 40.r,
+            );
+          case CartLoaded():
+            final items = state.cart.items;
+            if (items.isEmpty) {
+              return EmptyCartView();
+            }
+            else{return CartItemsView(cart: state.cart);}
+          case CartFailure():
+            return Center(
+              child: Text(state.message.isEmpty ? l10n.error : state.message),
+            );
+          default:
+            return Center(child: Text(l10n.error));
         }
-
-        if (state is CartLoading && cartCubit.items.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final items = cartCubit.items;
-        if (items.isEmpty) {
-          return EmptyCartView(key: const ValueKey('empty_cart'));
-        }
-        return CartItemsView(key: const ValueKey('cart_items'), items: items);
       },
     );
   }

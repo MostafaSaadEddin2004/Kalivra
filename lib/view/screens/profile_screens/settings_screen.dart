@@ -91,7 +91,8 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 16.h),
-              BlocBuilder<AuthCubit, AuthState>(bloc: AuthCubit()..loadProfile(context),
+              BlocBuilder<AuthCubit, AuthState>(
+                bloc: AuthCubit()..loadProfile(context),
                 builder: (context, state) {
                   switch (state) {
                     case UnAuthinticated():

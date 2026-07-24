@@ -12,7 +12,9 @@ import 'package:kalivra/view/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/view/widgets/slider_widgets/custom_indicator.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-List<({AdsModel carousel, AdsInfoModel slide})> _flattenSlides(List<AdsModel> ads) {
+List<({AdsModel carousel, AdsInfoModel slide})> _flattenSlides(
+  List<AdsModel> ads,
+) {
   final out = <({AdsModel carousel, AdsInfoModel slide})>[];
   for (final carousel in ads) {
     for (final slide in carousel.adsInfo) {
@@ -82,9 +84,14 @@ class AdSliderState extends State<AdSlider> {
     );
   }
 
-  void _openDetails(BuildContext context, AdsModel carousel, AdsInfoModel slide) {
-    final title =
-        slide.title.trim().isNotEmpty ? slide.title.trim() : carousel.name;
+  void _openDetails(
+    BuildContext context,
+    AdsModel carousel,
+    AdsInfoModel slide,
+  ) {
+    final title = slide.title.trim().isNotEmpty
+        ? slide.title.trim()
+        : carousel.name;
     context.push(
       AppRoutes.adDetails,
       extra: AdvertisementModel(
@@ -103,7 +110,7 @@ class AdSliderState extends State<AdSlider> {
       builder: (context, state) {
         switch (state) {
           case AdsFailed():
-          debugPrint(state.errorMessage);
+            debugPrint(state.errorMessage);
             return Center(child: Text(state.errorMessage));
           case AdsFetched():
             final entries = _flattenSlides(state.ads);
@@ -126,11 +133,8 @@ class AdSliderState extends State<AdSlider> {
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: AdCard(
                           imageUrl: item.slide.image,
-                          onTap: () => _openDetails(
-                            context,
-                            item.carousel,
-                            item.slide,
-                          ),
+                          onTap: () =>
+                              _openDetails(context, item.carousel, item.slide),
                         ),
                       );
                     },

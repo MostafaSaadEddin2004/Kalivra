@@ -21,10 +21,7 @@ class CheckoutApiService {
   }) async {
     final res = await _client.post(
       'checkout/onepage/addresses',
-      data: {
-        'billing': billing,
-        'shipping': shipping,
-      },
+      data: {'billing': billing, 'shipping': shipping},
     );
     final data = res.data;
     if (data is Map<String, dynamic>) {

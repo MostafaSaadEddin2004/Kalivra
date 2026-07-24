@@ -15,11 +15,13 @@ final class AuthFetchedData extends AuthState {
 
   AuthFetchedData({required this.customer});
 }
+
 final class AuthFailed extends AuthState {
   final String message;
 
   AuthFailed({required this.message});
 }
+
 final class VerifySuccessed extends AuthState {
   final String message;
 

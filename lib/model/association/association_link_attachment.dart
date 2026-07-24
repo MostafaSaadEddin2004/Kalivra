@@ -1,10 +1,7 @@
 import 'dart:io';
 
 class AssociationLinkAttachment {
-  AssociationLinkAttachment({
-    required this.file,
-    this.attachmentTypeId,
-  });
+  AssociationLinkAttachment({required this.file, this.attachmentTypeId});
 
   final File file;
   final String? attachmentTypeId;

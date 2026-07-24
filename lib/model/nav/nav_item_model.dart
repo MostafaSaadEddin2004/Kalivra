@@ -5,5 +5,5 @@ class NavItemModel {
   final String title;
   final IconData icon;
 
-  NavItemModel({required this.index,required this.title,  required this.icon});
+  NavItemModel({required this.index, required this.title, required this.icon});
 }

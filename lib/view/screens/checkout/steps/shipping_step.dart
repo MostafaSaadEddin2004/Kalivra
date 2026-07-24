@@ -6,10 +6,7 @@ import 'package:kalivra/model/checkout/checkout_summary_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class ShippingStep extends StatefulWidget {
-  const ShippingStep({
-    super.key,
-    required this.methods,
-  });
+  const ShippingStep({super.key, required this.methods});
 
   final List<CheckoutShippingMethodModel> methods;
 
@@ -84,7 +81,8 @@ class ShippingStepState extends State<ShippingStep> {
             return Padding(
               padding: EdgeInsets.only(bottom: 12.h),
               child: InkWell(
-                onTap: () => setState(() => _selectedMethodCode = method.method),
+                onTap: () =>
+                    setState(() => _selectedMethodCode = method.method),
                 borderRadius: BorderRadius.circular(12.r),
                 child: Container(
                   padding: EdgeInsets.all(16.w),
@@ -107,7 +105,9 @@ class ShippingStepState extends State<ShippingStep> {
                             ? Icons.radio_button_checked
                             : Icons.radio_button_off,
                         color: selected
-                            ? (isDark ? AppColors.goldLight : AppColors.burgundy)
+                            ? (isDark
+                                  ? AppColors.goldLight
+                                  : AppColors.burgundy)
                             : AppColors.taupe,
                         size: 24.r,
                       ),
@@ -158,7 +158,8 @@ class ShippingStepState extends State<ShippingStep> {
               final date = await showDatePicker(
                 context: context,
                 initialDate:
-                    _preferredDate ?? DateTime.now().add(const Duration(days: 3)),
+                    _preferredDate ??
+                    DateTime.now().add(const Duration(days: 3)),
                 firstDate: DateTime.now(),
                 lastDate: DateTime.now().add(const Duration(days: 60)),
               );

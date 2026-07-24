@@ -140,9 +140,7 @@ class _HeaderCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -159,7 +157,10 @@ class _HeaderCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 14.w,
+                    vertical: 6.h,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10.r),
@@ -217,9 +218,7 @@ class _SectionCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(20.w),
         child: Column(
@@ -342,18 +341,12 @@ class _TotalsCard extends StatelessWidget {
 
     return Card(
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.r),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
         padding: EdgeInsets.all(20.w),
         child: Column(
           children: [
-            _TotalRow(
-              label: l10n.subtotal,
-              value: subtotal,
-              isDark: isDark,
-            ),
+            _TotalRow(label: l10n.subtotal, value: subtotal, isDark: isDark),
             SizedBox(height: 10.h),
             _TotalRow(
               label: l10n.shipping,
@@ -361,7 +354,12 @@ class _TotalsCard extends StatelessWidget {
               isDark: isDark,
             ),
             SizedBox(height: 14.h),
-            Divider(height: 1, color: isDark ? AppColors.taupe.withValues(alpha: 0.3) : AppColors.burgundy.withValues(alpha: 0.3)),
+            Divider(
+              height: 1,
+              color: isDark
+                  ? AppColors.taupe.withValues(alpha: 0.3)
+                  : AppColors.burgundy.withValues(alpha: 0.3),
+            ),
             SizedBox(height: 14.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

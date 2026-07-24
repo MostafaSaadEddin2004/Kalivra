@@ -96,7 +96,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'الاسم الأول*',
               hint: 'الاسم الأول',
               textCapitalization: TextCapitalization.words,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
@@ -104,7 +105,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'الاسم الأخير*',
               hint: 'الاسم الأخير',
               textCapitalization: TextCapitalization.words,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
@@ -131,7 +133,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'الهاتف*',
               hint: 'الهاتف',
               keyboardType: TextInputType.phone,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
@@ -139,7 +142,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'الشارع*',
               hint: 'عنوان الشارع',
               textCapitalization: TextCapitalization.words,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
@@ -147,7 +151,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'الرمز البريدي*',
               hint: 'الرمز البريدي',
               keyboardType: TextInputType.streetAddress,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
@@ -155,7 +160,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'المحافظة*',
               hint: 'المحافظة',
               textCapitalization: TextCapitalization.words,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
@@ -163,7 +169,8 @@ class AddressStepState extends State<AddressStep> {
               label: 'المدينة*',
               hint: 'المدينة',
               textCapitalization: TextCapitalization.words,
-              validator: (v) => (v == null || v.trim().isEmpty) ? _required : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? _required : null,
             ),
             SizedBox(height: 24.h),
             SizedBox(

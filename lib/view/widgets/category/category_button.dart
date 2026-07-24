@@ -45,7 +45,7 @@ class CategoryButton extends StatelessWidget {
                 height: circleSize,
                 width: circleSize,
                 decoration: BoxDecoration(
-                  color:  colorScheme.onTertiaryFixed,
+                  color: colorScheme.onTertiaryFixed,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: isSelected
@@ -53,14 +53,13 @@ class CategoryButton extends StatelessWidget {
                         : Colors.transparent,
                     width: isSelected ? 2.5.w : 0,
                   ),
-                 
                 ),
                 child: ClipOval(
                   child: isAllCategory
                       ? Center(
                           child: Icon(
                             Icons.apps_rounded,
-                            color:colorScheme.onSurfaceVariant,
+                            color: colorScheme.onSurfaceVariant,
                             size: iconSize,
                           ),
                         )
@@ -77,9 +76,7 @@ class CategoryButton extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style:
-                    (isSelected
-                            ? textTheme.labelMedium
-                            : textTheme.labelSmall)
+                    (isSelected ? textTheme.labelMedium : textTheme.labelSmall)
                         ?.copyWith(
                           color: isSelected
                               ? colorScheme.onTertiary

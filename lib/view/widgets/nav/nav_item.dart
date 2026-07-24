@@ -32,11 +32,7 @@ class NavItem extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 24.r,
-              color: color,
-            ),
+            Icon(icon, size: 24.r, color: color),
             SizedBox(height: 4.h),
             Text(
               title,

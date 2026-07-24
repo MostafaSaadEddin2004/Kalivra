@@ -12,6 +12,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
+import 'package:kalivra/view/widgets/cart/cart_item_edit_dialog.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
@@ -227,6 +228,39 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
+  Future<void> _showAddToCartDialog(
+    ProductModel product, {
+    VariantBySize? initialSize,
+    ColorVariant? initialColor,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final cartCubit = context.read<CartCubit>();
+    var dialogProduct = product;
+
+    if (dialogProduct.variants == null) {
+      try {
+        dialogProduct = await cartCubit.loadProduct(product.id);
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+    final added = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => BlocProvider.value(
+        value: cartCubit,
+        child: CartItemEditDialog.add(
+          product: dialogProduct,
+          initialSize: initialSize,
+          initialColor: initialColor,
+        ),
+      ),
+    );
+
+    if (!mounted || added != true) return;
+    CustomSnackBar.show(context, l10n.addToCartSuccess(dialogProduct.name));
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -332,11 +366,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               SizedBox(height: 24.h),
               FilledButton.icon(
                 onPressed: product.isSaleable
-                    ? () => context.read<CartCubit>().addItem(
-                        (variantState?.selectedColor?.variantId ?? product.id)
-                            .toString(),
-                        color: variantState?.selectedColor?.colorName ?? '',
-                        size: variantState?.selectedSize?.sizeName ?? '',
+                    ? () => _showAddToCartDialog(
+                        product,
+                        initialSize: variantState?.selectedSize,
+                        initialColor: variantState?.selectedColor,
                       )
                     : null,
                 icon: Icon(Icons.add_shopping_cart_rounded, size: 24.r),
@@ -801,19 +834,19 @@ class ProductViewData {
       if (product.variants?.stockQty != null)
         ProductSpecEntry(
           icon: Icons.inventory_2_outlined,
-          label: 'Stock quantity',
+          label: l10n.productStockQuantity,
           value: product.variants!.stockQty.toString(),
         ),
       if (_hasText(product.variants?.measurementType))
         ProductSpecEntry(
           icon: Icons.straighten_outlined,
-          label: 'Measurement type',
+          label: l10n.productMeasurementType,
           value: product.variants!.measurementType!.trim(),
         ),
       if ((product.variants?.measurementTypes ?? []).isNotEmpty)
         ProductSpecEntry(
           icon: Icons.format_list_bulleted_rounded,
-          label: 'Measurement types',
+          label: l10n.productMeasurementTypes,
           value: product.variants!.measurementTypes.join(', '),
         ),
       if (product.reviews.total > 0)
@@ -872,7 +905,7 @@ class ProductBrandSummaryCard extends StatelessWidget {
 
     return ProductSectionCardShell(
       isDark: isDark,
-      title: 'Brand',
+      title: AppLocalizations.of(context)!.brand,
       icon: Icons.storefront_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -926,7 +959,9 @@ class ProductBrandSummaryCard extends StatelessWidget {
                       if (brand.isActive != null) ...[
                         SizedBox(height: 4.h),
                         Text(
-                          brand.isActive! ? 'Active brand' : 'Inactive brand',
+                          brand.isActive!
+                              ? AppLocalizations.of(context)!.activeBrand
+                              : AppLocalizations.of(context)!.inactiveBrand,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: isDark
                                 ? AppColors.taupe

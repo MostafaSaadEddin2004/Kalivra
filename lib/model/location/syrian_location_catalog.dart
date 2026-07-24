@@ -1,4 +1,5 @@
-const Map<String, Map<String, Map<String, List<String>>>> _syrianLocationCatalog = {
+const Map<String, Map<String, Map<String, List<String>>>>
+_syrianLocationCatalog = {
   'دمشق': {
     'دمشق': {
       'المزة': ['المزة السكانية', 'المزة فيلات'],
@@ -157,7 +158,9 @@ abstract class SyrianLocationCatalog {
   }
 
   static List<String> withSavedValue(List<String> items, String? savedValue) {
-    if (savedValue == null || savedValue.isEmpty || items.contains(savedValue)) {
+    if (savedValue == null ||
+        savedValue.isEmpty ||
+        items.contains(savedValue)) {
       return items;
     }
     return [...items, savedValue];

@@ -191,6 +191,91 @@ class AppLocalizationsAr extends AppLocalizations {
   String get proceed => 'متابعة';
 
   @override
+  String get chooseCartOptions => 'اختيار الخيارات';
+
+  @override
+  String get editItem => 'تعديل المنتج';
+
+  @override
+  String get deleteItem => 'حذف المنتج';
+
+  @override
+  String get clearCart => 'إفراغ السلة';
+
+  @override
+  String get quantity => 'الكمية';
+
+  @override
+  String get colour => 'اللون';
+
+  @override
+  String get unitPrice => 'سعر الوحدة';
+
+  @override
+  String get cancel => 'إلغاء';
+
+  @override
+  String removeItemConfirmation(String productName) {
+    return 'هل أنت متأكد أنك تريد إزالة \"$productName\" من السلة؟ سيتم حذف هذا المنتج من طلبك.';
+  }
+
+  @override
+  String get clearCartConfirmation =>
+      'هل تريد حذف جميع المنتجات من السلة؟ سيتم إفراغ السلة بالكامل.';
+
+  @override
+  String get itemUpdatedSuccessfully => 'تم تحديث المنتج في السلة بنجاح';
+
+  @override
+  String get itemDeletedSuccessfully => 'تم حذف المنتج من السلة بنجاح';
+
+  @override
+  String get cartClearedSuccessfully => 'تم إفراغ السلة بنجاح';
+
+  @override
+  String get noChangesDetected => 'لا توجد تغييرات';
+
+  @override
+  String get invalidQuantity => 'أدخل كمية صالحة';
+
+  @override
+  String get selectRequiredOptions => 'اختر الخيارات المطلوبة';
+
+  @override
+  String get unableToAddItem => 'تعذر إضافة المنتج إلى السلة';
+
+  @override
+  String get unableToUpdateItem => 'تعذر تحديث المنتج';
+
+  @override
+  String get unableToDeleteItem => 'تعذر حذف المنتج';
+
+  @override
+  String get unableToClearCart => 'تعذر إفراغ السلة';
+
+  @override
+  String get quantityReadOnly => 'لا يمكن تعديل الكمية لهذا المنتج.';
+
+  @override
+  String availableQuantity(int count) {
+    return 'المتوفر: $count';
+  }
+
+  @override
+  String get quantityLimitTitle => 'حد الكمية';
+
+  @override
+  String quantityLimitMessage(int count) {
+    return 'المتوفر لهذا الاختيار هو $count فقط.';
+  }
+
+  @override
+  String get noSizeOptions => 'لا توجد خيارات حجم';
+
+  @override
+  String get noColourOptions => 'لا توجد خيارات لون';
+
+  @override
   String get productDetails => 'تفاصيل المنتج';
 
   @override
@@ -292,6 +377,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get productUrlKey => 'رابط المنتج';
+
+  @override
+  String get productStockQuantity => 'كمية المخزون';
+
+  @override
+  String get productMeasurementType => 'نوع القياس';
+
+  @override
+  String get productMeasurementTypes => 'أنواع القياس';
+
+  @override
+  String get brand => 'العلامة التجارية';
+
+  @override
+  String get activeBrand => 'علامة تجارية نشطة';
+
+  @override
+  String get inactiveBrand => 'علامة تجارية غير نشطة';
 
   @override
   String get notificationsWelcomeTitle => 'مرحباً بك في Kalivra';

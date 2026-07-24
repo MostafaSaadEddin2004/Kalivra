@@ -6,10 +6,7 @@ import 'package:kalivra/model/checkout/checkout_summary_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 
 class PaymentStep extends StatefulWidget {
-  const PaymentStep({
-    super.key,
-    required this.methods,
-  });
+  const PaymentStep({super.key, required this.methods});
 
   final List<CheckoutPaymentMethodModel> methods;
 
@@ -43,7 +40,9 @@ class PaymentStepState extends State<PaymentStep> {
 
   bool get _requiresWalletDetails {
     final code = selectedPaymentMethodCode.toLowerCase();
-    return code != 'cashondelivery' && code != 'cash_on_delivery' && code != 'cod';
+    return code != 'cashondelivery' &&
+        code != 'cash_on_delivery' &&
+        code != 'cod';
   }
 
   @override
@@ -178,17 +177,17 @@ class PaymentStepState extends State<PaymentStep> {
                   Text(
                     method.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: textColor,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   if (method.description?.isNotEmpty == true) ...[
                     SizedBox(height: 4.h),
                     Text(
                       method.description!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.taupe,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: AppColors.taupe),
                     ),
                   ],
                 ],

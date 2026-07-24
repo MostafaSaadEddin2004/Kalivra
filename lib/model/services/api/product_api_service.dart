@@ -34,7 +34,7 @@ class ProductApiService {
   }) async {
     await _client.post(
       'product/$productId/review',
-      data: { 'comment': comment, 'rating': rating},
+      data: {'comment': comment, 'rating': rating},
     );
   }
 

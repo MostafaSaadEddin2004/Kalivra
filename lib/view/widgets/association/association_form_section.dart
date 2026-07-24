@@ -25,9 +25,7 @@ class AssociationFormSection extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.only(bottom: 16.h),
-      color: isDark
-          ? AppColors.burgundy.withValues(alpha: 0.08)
-          : Colors.white,
+      color: isDark ? AppColors.burgundy.withValues(alpha: 0.08) : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
         side: BorderSide(color: borderColor),

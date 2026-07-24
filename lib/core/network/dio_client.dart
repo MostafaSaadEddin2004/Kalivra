@@ -57,9 +57,9 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      if(e.response!.requestOptions.connectTimeout != null) {
+      if (e.response!.requestOptions.connectTimeout != null) {
         throw 'Connection timeout';
-      }else{
+      } else {
         throw e.response!.data['message'] ?? 'Something wrong';
       }
     }
@@ -70,9 +70,9 @@ class DioClient {
       final response = await _dio.post(path, data: data);
       return response;
     } on DioException catch (e) {
-     if(e.response!.requestOptions.connectTimeout != null) {
+      if (e.response!.requestOptions.connectTimeout != null) {
         throw 'Connection timeout';
-      }else{
+      } else {
         throw e.response!.data['message'] ?? 'Something wrong';
       }
     }
@@ -95,9 +95,34 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-       if(e.response!.requestOptions.connectTimeout != null) {
+      if (e.response!.requestOptions.connectTimeout != null) {
         throw 'Connection timeout';
-      }else{
+      } else {
+        throw e.response!.data['message'] ?? 'Something wrong';
+      }
+    }
+  }
+
+  Future<Response> patch(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.patch(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
+      return response;
+    } on DioException catch (e) {
+      if (e.response!.requestOptions.connectTimeout != null) {
+        throw 'Connection timeout';
+      } else {
         throw e.response!.data['message'] ?? 'Something wrong';
       }
     }
@@ -120,9 +145,9 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      if(e.response!.requestOptions.connectTimeout != null) {
+      if (e.response!.requestOptions.connectTimeout != null) {
         throw 'Connection timeout';
-      }else{
+      } else {
         throw e.response!.data['message'] ?? 'Something wrong';
       }
     }

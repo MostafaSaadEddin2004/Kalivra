@@ -8,7 +8,9 @@ class ConfigApiService {
   Future<ConfigurationApiModel?> getConfigurations() async {
     final res = await _client.get('configurations');
     if (res.data['data'] != null) {
-      return ConfigurationApiModel.fromJson(res.data['data'] as Map<String, dynamic>);
+      return ConfigurationApiModel.fromJson(
+        res.data['data'] as Map<String, dynamic>,
+      );
     }
     return ConfigurationApiModel.fromJson(res.data);
   }

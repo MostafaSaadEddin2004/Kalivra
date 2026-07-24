@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             break;
           case AuthSuccessed():
             isLoading = false;
-             case AuthFailed():
+          case AuthFailed():
             isLoading = false;
           default:
             isLoading = false;
@@ -90,48 +90,50 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     SizedBox(height: 40.h),
-                   Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  textDirection: TextDirection.ltr,
-                  children: [
-                    SizedBox(
-                      width: 75.w,
-                      child: AppTextField(
-                        textDirection: TextDirection.ltr,
-                        enabled: false,
-                        controller: _countryCodeController,
-                        keyboardType: TextInputType.phone,
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: AppTextField(
-                        textDirection: TextDirection.ltr,
-                        controller: _whatsappController,
-                        label: AppLocalizations.of(
-                          context,
-                        )!.signUpWhatsAppLabel,
-                        hint: AppLocalizations.of(context)!.signUpWhatsAppHint,
-                        keyboardType: TextInputType.phone,
-                        maxLength: 9,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return AppLocalizations.of(
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      textDirection: TextDirection.ltr,
+                      children: [
+                        SizedBox(
+                          width: 75.w,
+                          child: AppTextField(
+                            textDirection: TextDirection.ltr,
+                            enabled: false,
+                            controller: _countryCodeController,
+                            keyboardType: TextInputType.phone,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: AppTextField(
+                            textDirection: TextDirection.ltr,
+                            controller: _whatsappController,
+                            label: AppLocalizations.of(
                               context,
-                            )!.enterWhatsAppNumber;
-                          }
-                          if (v.trim().length < 8) {
-                            return AppLocalizations.of(
+                            )!.signUpWhatsAppLabel,
+                            hint: AppLocalizations.of(
                               context,
-                            )!.invalidWhatsAppShort;
-                          }
-                          return null;
-                        },
-                      ),
+                            )!.signUpWhatsAppHint,
+                            keyboardType: TextInputType.phone,
+                            maxLength: 9,
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return AppLocalizations.of(
+                                  context,
+                                )!.enterWhatsAppNumber;
+                              }
+                              if (v.trim().length < 8) {
+                                return AppLocalizations.of(
+                                  context,
+                                )!.invalidWhatsAppShort;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                   SizedBox(height: 20.h),
+                    SizedBox(height: 20.h),
                     AppTextField(
                       controller: _passwordController,
                       label: AppLocalizations.of(context)!.passwordLabel,
@@ -188,8 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: FilledButton(
                         onPressed: () {
-                          if (_formKey.currentState?.validate() != true) {
-                          }
+                          if (_formKey.currentState?.validate() != true) {}
                           context.read<AuthCubit>().login(
                             context: context,
                             phone:

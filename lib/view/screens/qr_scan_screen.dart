@@ -59,10 +59,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-          ),
+          MobileScanner(controller: _controller, onDetect: _onDetect),
           Center(
             child: Container(
               width: 260.w,

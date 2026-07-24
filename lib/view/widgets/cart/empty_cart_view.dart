@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
@@ -23,7 +25,9 @@ class EmptyCartView extends StatelessWidget {
               Icon(
                 Icons.shopping_cart_outlined,
                 size: 72.r,
-                color: isDark ? AppColors.taupe : AppColors.burgundy.withValues(alpha: 0.6),
+                color: isDark
+                    ? AppColors.taupe
+                    : AppColors.burgundy.withValues(alpha: 0.6),
               ),
               SizedBox(height: 24.h),
               Text(
@@ -41,7 +45,7 @@ class EmptyCartView extends StatelessWidget {
               ),
               SizedBox(height: 32.h),
               FilledButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.read<NavCubit>().goTo(0),
                 icon: Icon(Icons.storefront_rounded, size: 22.r),
                 label: Text(l10n.shopNow),
                 style: FilledButton.styleFrom(

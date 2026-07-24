@@ -40,9 +40,11 @@ class CheckoutSummaryModel {
 
     return methods
         .whereType<Map>()
-        .map((e) => CheckoutShippingMethodModel.fromJson(
-              Map<String, dynamic>.from(e),
-            ))
+        .map(
+          (e) => CheckoutShippingMethodModel.fromJson(
+            Map<String, dynamic>.from(e),
+          ),
+        )
         .toList();
   }
 
@@ -54,9 +56,10 @@ class CheckoutSummaryModel {
 
     return methods
         .whereType<Map>()
-        .map((e) => CheckoutPaymentMethodModel.fromJson(
-              Map<String, dynamic>.from(e),
-            ))
+        .map(
+          (e) =>
+              CheckoutPaymentMethodModel.fromJson(Map<String, dynamic>.from(e)),
+        )
         .toList();
   }
 }
@@ -79,17 +82,21 @@ class CheckoutShippingMethodModel {
   factory CheckoutShippingMethodModel.fromJson(Map<String, dynamic> json) {
     return CheckoutShippingMethodModel(
       method: (json['method'] ?? json['code'] ?? '').toString(),
-      title: (json['method_title'] ??
-              json['title'] ??
-              json['method'] ??
-              json['code'] ??
-              '')
-          .toString(),
-      description: json['method_description']?.toString() ??
+      title:
+          (json['method_title'] ??
+                  json['title'] ??
+                  json['method'] ??
+                  json['code'] ??
+                  '')
+              .toString(),
+      description:
+          json['method_description']?.toString() ??
           json['description']?.toString(),
-      formattedPrice: json['formatted_price']?.toString() ??
+      formattedPrice:
+          json['formatted_price']?.toString() ??
           json['base_formatted_price']?.toString(),
-      price: (json['price'] as num?)?.toDouble() ??
+      price:
+          (json['price'] as num?)?.toDouble() ??
           (json['base_price'] as num?)?.toDouble(),
     );
   }
@@ -109,13 +116,15 @@ class CheckoutPaymentMethodModel {
   factory CheckoutPaymentMethodModel.fromJson(Map<String, dynamic> json) {
     return CheckoutPaymentMethodModel(
       method: (json['method'] ?? json['code'] ?? '').toString(),
-      title: (json['method_title'] ??
-              json['title'] ??
-              json['method'] ??
-              json['code'] ??
-              '')
-          .toString(),
-      description: json['method_description']?.toString() ??
+      title:
+          (json['method_title'] ??
+                  json['title'] ??
+                  json['method'] ??
+                  json['code'] ??
+                  '')
+              .toString(),
+      description:
+          json['method_description']?.toString() ??
           json['description']?.toString(),
     );
   }

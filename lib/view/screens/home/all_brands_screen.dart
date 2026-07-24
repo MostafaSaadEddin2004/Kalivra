@@ -29,7 +29,7 @@ class AllBrandsScreen extends StatelessWidget {
                     crossAxisCount: 3,
                     mainAxisSpacing: 8.h,
                     crossAxisSpacing: 8.w,
-                    childAspectRatio: 90/100,
+                    childAspectRatio: 90 / 100,
                   ),
                   itemBuilder: (context, index) {
                     return Skeletonizer(
@@ -45,7 +45,7 @@ class AllBrandsScreen extends StatelessWidget {
                     crossAxisCount: 3,
                     mainAxisSpacing: 8.h,
                     crossAxisSpacing: 8.w,
-                    childAspectRatio: 90/100,
+                    childAspectRatio: 90 / 100,
                   ),
                   itemBuilder: (context, index) {
                     return BrandCard(brand: data[index]);

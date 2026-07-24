@@ -57,27 +57,27 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
                     switch (state) {
                       case AuthLoading():
                         return ConfirmDialog(
-                          isLoading: true ,
-                      title: AppLocalizations.of(context)!.signOut,
-                      message: AppLocalizations.of(
-                        context,
-                      )!.signOutConfirmation,
-                      onConfirm: () {
-                        context.read<AuthCubit>().logout(context: context);
-                      },
-                    );
-                      default:return ConfirmDialog(
-                        isLoading: false,
-                      title: AppLocalizations.of(context)!.signOut,
-                      message: AppLocalizations.of(
-                        context,
-                      )!.signOutConfirmation,
-                      onConfirm: () {
-                        context.read<AuthCubit>().logout(context: context);
-                      },
-                    );
+                          isLoading: true,
+                          title: AppLocalizations.of(context)!.signOut,
+                          message: AppLocalizations.of(
+                            context,
+                          )!.signOutConfirmation,
+                          onConfirm: () {
+                            context.read<AuthCubit>().logout(context: context);
+                          },
+                        );
+                      default:
+                        return ConfirmDialog(
+                          isLoading: false,
+                          title: AppLocalizations.of(context)!.signOut,
+                          message: AppLocalizations.of(
+                            context,
+                          )!.signOutConfirmation,
+                          onConfirm: () {
+                            context.read<AuthCubit>().logout(context: context);
+                          },
+                        );
                     }
-                    
                   },
                 );
               },

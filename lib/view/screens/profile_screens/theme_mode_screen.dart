@@ -66,10 +66,14 @@ class ThemeModeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ScreenAppBar(title: AppLocalizations.of(context)!.appearanceTitle),
+      appBar: ScreenAppBar(
+        title: AppLocalizations.of(context)!.appearanceTitle,
+      ),
       body: BlocBuilder<ThemeBloc, ThemeBlocState>(
         builder: (context, state) {
-          final currentMode = state is ThemeFetched ? state.mode : ThemeMode.system;
+          final currentMode = state is ThemeFetched
+              ? state.mode
+              : ThemeMode.system;
           final currentValue = _modeToValue(currentMode);
           final themeModes = _themeModes(context);
           return ListView(

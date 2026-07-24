@@ -23,7 +23,9 @@ class AttributeApiModel {
       name: json['name'] as String?,
       type: json['type'] as String?,
       options: (json['options'] as List<dynamic>?)
-          ?.map((e) => AttributeOptionApiModel.fromJson(e as Map<String, dynamic>))
+          ?.map(
+            (e) => AttributeOptionApiModel.fromJson(e as Map<String, dynamic>),
+          )
           .toList(),
       swatchType: json['swatch_type'] as String?,
     );

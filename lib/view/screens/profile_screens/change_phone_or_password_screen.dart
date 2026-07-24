@@ -90,7 +90,11 @@ class _ChangePhoneOrPasswordScreenState
                           ? 'رقم الجوال الجديد'
                           : 'رقم الجوال',
                       hint: '+966 5XX XXX XXXX',
-                      prefixIcon: Icon(Icons.phone_android_rounded, size: 22.r, color: labelColor),
+                      prefixIcon: Icon(
+                        Icons.phone_android_rounded,
+                        size: 22.r,
+                        color: labelColor,
+                      ),
                       keyboardType: TextInputType.phone,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
@@ -108,7 +112,11 @@ class _ChangePhoneOrPasswordScreenState
                         label: 'كلمة المرور الجديدة',
                         hint: '********',
                         obscureText: _obscureNew,
-                        prefixIcon: Icon(Icons.lock_outline_rounded, size: 22.r, color: labelColor),
+                        prefixIcon: Icon(
+                          Icons.lock_outline_rounded,
+                          size: 22.r,
+                          color: labelColor,
+                        ),
                         suffixIcon: CustomIconButton(
                           icon: _obscureNew
                               ? Icons.visibility_off_rounded
@@ -119,8 +127,9 @@ class _ChangePhoneOrPasswordScreenState
                               setState(() => _obscureNew = !_obscureNew),
                         ),
                         validator: (v) {
-                          if (v == null || v.length < 6)
-                          {  return 'كلمة المرور 6 أحرف على الأقل';}
+                          if (v == null || v.length < 6) {
+                            return 'كلمة المرور 6 أحرف على الأقل';
+                          }
                           return null;
                         },
                       ),
@@ -130,7 +139,11 @@ class _ChangePhoneOrPasswordScreenState
                         label: 'تأكيد كلمة المرور',
                         hint: '********',
                         obscureText: _obscureConfirm,
-                        prefixIcon: Icon(Icons.lock_rounded, size: 22.r, color: labelColor),
+                        prefixIcon: Icon(
+                          Icons.lock_rounded,
+                          size: 22.r,
+                          color: labelColor,
+                        ),
                         suffixIcon: CustomIconButton(
                           icon: _obscureConfirm
                               ? Icons.visibility_off_rounded
@@ -142,8 +155,9 @@ class _ChangePhoneOrPasswordScreenState
                           ),
                         ),
                         validator: (v) {
-                          if (v != _newPasswordController.text)
-                            {return 'غير متطابقة مع كلمة المرور الجديدة';}
+                          if (v != _newPasswordController.text) {
+                            return 'غير متطابقة مع كلمة المرور الجديدة';
+                          }
                           return null;
                         },
                       ),

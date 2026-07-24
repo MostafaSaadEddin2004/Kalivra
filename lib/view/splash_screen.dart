@@ -29,14 +29,15 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return PopScopeExitApp(
       child: Scaffold(
-      backgroundColor: AppColors.black,
-      body: Center(
-        child: Image.asset(
-          'assets/images/light_logo.png',
-          fit: BoxFit.contain,
-          width: 220.w,
+        backgroundColor: AppColors.black,
+        body: Center(
+          child: Image.asset(
+            'assets/images/light_logo.png',
+            fit: BoxFit.contain,
+            width: 220.w,
+          ),
         ),
       ),
-    ),
     );
-  }}
+  }
+}

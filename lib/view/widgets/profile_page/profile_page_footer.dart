@@ -15,7 +15,9 @@ class ProfilePageFooter extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Image.asset(
-            isDark ? 'assets/images/light_logo.png' : 'assets/images/coloured_logo.png',
+            isDark
+                ? 'assets/images/light_logo.png'
+                : 'assets/images/coloured_logo.png',
             height: 16.h,
             fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) => Icon(
@@ -24,7 +26,10 @@ class ProfilePageFooter extends StatelessWidget {
               color: theme.colorScheme.onSecondaryFixed,
             ),
           ),
-          Text(AppLocalizations.of(context)!.version, style: theme.textTheme.bodySmall),
+          Text(
+            AppLocalizations.of(context)!.version,
+            style: theme.textTheme.bodySmall,
+          ),
         ],
       ),
     );

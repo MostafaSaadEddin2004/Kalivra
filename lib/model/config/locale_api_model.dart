@@ -1,10 +1,6 @@
 /// GET /api/shop/v1/locales – supported locales.
 class LocaleApiModel {
-  const LocaleApiModel({
-    required this.id,
-    required this.code,
-    this.name,
-  });
+  const LocaleApiModel({required this.id, required this.code, this.name});
 
   final int id;
   final String code;

@@ -15,10 +15,7 @@ class CartDetailsRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: textTheme.bodyMedium
-        ),
+        Text(label, style: textTheme.bodyMedium),
         Text(
           '$value ${l10n.currencySYP}',
           style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),

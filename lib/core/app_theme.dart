@@ -16,7 +16,7 @@ class AppColors {
 class AppTheme {
   AppTheme._();
 
-static ThemeData get light => ThemeData(
+  static ThemeData get light => ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.light(
       primary: AppColors.burgundy,

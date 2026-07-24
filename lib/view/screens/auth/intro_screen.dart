@@ -47,7 +47,7 @@ class _IntroScreenState extends State<IntroScreen> {
     super.dispose();
   }
 
-  void _onNext() async{
+  void _onNext() async {
     if (_currentPage < _pages(context).length - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 350),
@@ -68,84 +68,84 @@ class _IntroScreenState extends State<IntroScreen> {
     final pages = _pages(context);
     return PopScopeExitApp(
       child: Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: pages.length,
-                itemBuilder: (context, index) {
-                  final page = pages[index];
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 28.w),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 140.w,
-                          height: 140.w,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSecondaryFixed,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.secondary.withValues(
-                                  alpha: 0.2,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _pageController,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: pages.length,
+                  itemBuilder: (context, index) {
+                    final page = pages[index];
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 28.w),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 140.w,
+                            height: 140.w,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.onSecondaryFixed,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.colorScheme.secondary.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  blurRadius: 24.r,
+                                  offset: Offset(0, 8.h),
                                 ),
-                                blurRadius: 24.r,
-                                offset: Offset(0, 8.h),
-                              ),
-                            ],
+                              ],
+                            ),
+                            child: Icon(
+                              page.icon,
+                              size: 64.r,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
-                          child: Icon(
-                            page.icon,
-                            size: 64.r,
-                            color: theme.colorScheme.primary,
+                          SizedBox(height: 40.h),
+                          Text(
+                            page.title,
+                            style: theme.textTheme.headlineMedium,
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        SizedBox(height: 40.h),
-                        Text(
-                          page.title,
-                          style: theme.textTheme.headlineMedium,
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          page.description,
-                          style: theme.textTheme.bodyLarge,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                          SizedBox(height: 16.h),
+                          Text(
+                            page.description,
+                            style: theme.textTheme.bodyLarge,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 16.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CustomIndicator(
+                      itemCount: pages.length,
+                      currentPage: _currentPage,
                     ),
-                  );
-                },
+                    CustomIconButton(
+                      onPressed: _onNext,
+                      icon: Icons.arrow_forward_rounded,
+                      backgroundColor: theme.colorScheme.onTertiaryFixed,
+                      color: theme.colorScheme.secondaryFixed,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 24.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.w,vertical: 16.h),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CustomIndicator(
-                    itemCount: pages.length,
-                    currentPage: _currentPage,
-                  ),
-                  CustomIconButton(
-                    onPressed: _onNext,
-                    icon: Icons.arrow_forward_rounded,
-                    backgroundColor: theme.colorScheme.onTertiaryFixed,
-                    color: theme.colorScheme.secondaryFixed,
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
     );
   }
 }

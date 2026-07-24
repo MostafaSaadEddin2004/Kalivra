@@ -28,7 +28,7 @@ class AuthInterceptor extends Interceptor {
     options.headers.addAll({
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-       'Locale': locale,
+      'Locale': locale,
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     });
     super.onRequest(options, handler);

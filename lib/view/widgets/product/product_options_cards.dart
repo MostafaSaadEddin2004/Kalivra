@@ -146,9 +146,7 @@ class ProductSizeSelectorCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
-        side: BorderSide(
-          color: primary.withValues(alpha: 0.2),
-        ),
+        side: BorderSide(color: primary.withValues(alpha: 0.2)),
       ),
       child: Padding(
         padding: EdgeInsets.all(16.w),
@@ -157,11 +155,7 @@ class ProductSizeSelectorCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.straighten_outlined,
-                  size: 22.r,
-                  color: primary,
-                ),
+                Icon(Icons.straighten_outlined, size: 22.r, color: primary),
                 SizedBox(width: 8.w),
                 Text(
                   'المقاس',
@@ -192,8 +186,8 @@ class ProductSizeSelectorCard extends StatelessWidget {
                       color: isSelected
                           ? primary.withValues(alpha: 0.15)
                           : (isDark
-                              ? AppColors.burgundy.withValues(alpha: 0.12)
-                              : AppColors.burgundy.withValues(alpha: 0.06)),
+                                ? AppColors.burgundy.withValues(alpha: 0.12)
+                                : AppColors.burgundy.withValues(alpha: 0.06)),
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
                         color: isSelected
@@ -208,8 +202,9 @@ class ProductSizeSelectorCard extends StatelessWidget {
                         color: isSelected
                             ? primary
                             : (isDark ? AppColors.offWhite : AppColors.black),
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                       ),
                     ),
                   ),

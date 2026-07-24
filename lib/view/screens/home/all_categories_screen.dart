@@ -128,9 +128,7 @@ class _CategoryGridCard extends StatelessWidget {
           children: [
             Expanded(
               child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle),
                 child: ClipOval(
                   child: CustomNetworkImage(
                     imageUrl: _categoryImageUrl(category),

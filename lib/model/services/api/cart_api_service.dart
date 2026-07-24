@@ -6,13 +6,11 @@ class CartApiService {
 
   final DioClient _client = DioClient();
 
-  Future<CartApiModel?> getCart() async {
+  Future<CartApiModel> getCart() async {
     final res = await _client.get('checkout/cart');
-    final data = res.data['data'];
-    if (data is Map<String, dynamic>) {
-      return CartApiModel.fromJson(data);
-    }
-    return null;
+    final json = res.data['data'];
+    final data = CartApiModel.fromJson(json);
+    return data;
   }
 
   Future<CartApiModel?> addToCart({
@@ -31,11 +29,35 @@ class CartApiService {
         'size': size,
       },
     );
-    final data = res.data['data'];
-    if (data is Map<String, dynamic>) {
-      return CartApiModel.fromJson(data);
-    }
-    return null;
+    return CartApiResponseModel.fromJson(
+      Map<String, dynamic>.from(res.data as Map),
+    ).cart;
+  }
+
+  Future<void> updateItemQuantity(int itemId, int quantity) async {
+    await _client.put(
+      'checkout/cart',
+      data: {
+        "qty": {itemId: quantity},
+      },
+    );
+  }
+
+  Future<void> updateItemDetials(
+    int itemId,
+    int quantity,
+    String colorId,
+    String sizeId,
+  ) async {
+    await _client.patch(
+      'checkout/cart/items',
+      data: {
+        "cart_item_id": itemId,
+        "quantity": quantity,
+        "color": colorId,
+        "size": sizeId,
+      },
+    );
   }
 
   Future<void> removeCartItem(int cartItemId) async {
@@ -47,5 +69,5 @@ class CartApiService {
 
   Future<void> clearCart() async {
     await _client.delete('checkout/cart/all');
-   }
+  }
 }

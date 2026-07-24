@@ -19,9 +19,7 @@ final class CheckoutInitial extends CheckoutState {
 }
 
 final class CheckoutLoading extends CheckoutState {
-  const CheckoutLoading({
-    this.previous,
-  });
+  const CheckoutLoading({this.previous});
 
   final CheckoutSummaryModel? previous;
 

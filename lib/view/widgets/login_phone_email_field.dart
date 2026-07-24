@@ -25,8 +25,9 @@ class LoginPhoneEmailField extends StatelessWidget {
 
     final label = isEmailMode ? l10n.email : l10n.phoneLabel;
     final hint = isEmailMode ? l10n.emailHint : '+963 9XX XXX XXX';
-    final keyboardType =
-        isEmailMode ? TextInputType.emailAddress : TextInputType.phone;
+    final keyboardType = isEmailMode
+        ? TextInputType.emailAddress
+        : TextInputType.phone;
     final prefixIcon = Icon(
       isEmailMode ? Icons.email_outlined : Icons.phone_android_rounded,
       size: 22.r,
@@ -54,8 +55,9 @@ class LoginPhoneEmailField extends StatelessWidget {
           return isEmailMode ? l10n.enterEmailShort : l10n.enterPhone;
         }
         if (isEmailMode) {
-          final emailValid =
-              RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v.trim());
+          final emailValid = RegExp(
+            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+          ).hasMatch(v.trim());
           if (!emailValid) return l10n.invalidEmail;
         } else if (v.trim().length < 8) {
           return l10n.invalidPhoneShort;

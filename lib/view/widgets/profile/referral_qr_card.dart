@@ -34,7 +34,9 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
         });
       },
       child: AnimatedCrossFade(
-        crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+        crossFadeState: isExpanded
+            ? CrossFadeState.showSecond
+            : CrossFadeState.showFirst,
         duration: Duration(milliseconds: 400),
         secondCurve: Curves.linear,
         firstCurve: Curves.linear,

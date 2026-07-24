@@ -15,6 +15,7 @@ import 'package:kalivra/view/screens/home/product_details_screen.dart';
 import 'package:kalivra/view/widgets/buttons/cart_button.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
+import 'package:kalivra/view/widgets/cart/cart_item_edit_dialog.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 
 class ProductCard extends StatefulWidget {
@@ -115,6 +116,29 @@ class _ProductCardState extends State<ProductCard> {
     } else if (wishlistCubit.state is WishlistFailed) {
       CustomSnackBar.show(context, l10n.removeFromWishlistFailed);
     }
+  }
+
+  Future<void> _showAddToCartDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+    final cartCubit = context.read<CartCubit>();
+    var dialogProduct = widget.product;
+
+    try {
+      dialogProduct = await cartCubit.loadProduct(widget.product.id);
+    } catch (_) {}
+
+    if (!mounted) return;
+    final added = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => BlocProvider.value(
+        value: cartCubit,
+        child: CartItemEditDialog.add(product: dialogProduct),
+      ),
+    );
+
+    if (!mounted || added != true) return;
+    CustomSnackBar.show(context, l10n.addToCartSuccess(dialogProduct.name));
   }
 
   @override
@@ -249,9 +273,9 @@ class _ProductCardState extends State<ProductCard> {
                       children: [
                         _PriceBlock(product: product, isDark: isDark),
                         CardButton(
-                          onTap: () => context.read<CartCubit>().addItem(
-                            product.id.toString(),
-                          ),
+                          onTap: product.isSaleable
+                              ? _showAddToCartDialog
+                              : null,
                         ),
                       ],
                     ),

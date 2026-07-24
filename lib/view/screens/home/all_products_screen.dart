@@ -47,7 +47,9 @@ class _AllProductsScreenState extends State<AllProductsScreen> {
                               urlKey: '',
                               images: [],
                               isNew: true,
-                              prices: ProductPrices(regular: PriceDetail(price: '')),
+                              prices: ProductPrices(
+                                regular: PriceDetail(price: ''),
+                              ),
                               isFeatured: true,
                               onSale: true,
                               isSaleable: true,

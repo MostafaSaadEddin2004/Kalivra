@@ -6,11 +6,10 @@ abstract class _ReferralKeys {
 }
 
 class ReferralRepository {
-  ReferralRepository([SharedPreferences? prefs])
-      : _prefs = prefs;
+  ReferralRepository([SharedPreferences? prefs]) : _prefs = prefs;
 
   SharedPreferences? _prefs;
-  static const String _mockCode = 'KLV-AHM-2024'; 
+  static const String _mockCode = 'KLV-AHM-2024';
 
   Future<SharedPreferences> get _storage async {
     _prefs ??= await SharedPreferences.getInstance();
@@ -24,14 +23,14 @@ class ReferralRepository {
     return _mockCode;
   }
 
-Future<void> submitReferralCode(String code) async {
+  Future<void> submitReferralCode(String code) async {
     final trimmed = code.trim();
     if (trimmed.isEmpty) return;
     final storage = await _storage;
     await storage.setString(_ReferralKeys.pendingReferralSubmission, trimmed);
   }
 
-Future<void> setMyReferralCodeFromApi(String code) async {
+  Future<void> setMyReferralCodeFromApi(String code) async {
     final storage = await _storage;
     await storage.setString(_ReferralKeys.myReferralCode, code.trim());
   }

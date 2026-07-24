@@ -20,7 +20,9 @@ class ProfilePageItem extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r),),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
           child: Row(
