@@ -15,13 +15,40 @@ class CheckoutApiService {
     return const CheckoutSummaryModel();
   }
 
-  Future<CheckoutSummaryModel> saveAddresses({
-    required Map<String, dynamic> billing,
-    required Map<String, dynamic> shipping,
+  Future<CheckoutSummaryModel> storeAddresses({
+    required String firstName,
+    required String lasttName,
+    required String email,
+    required String address,
+    required String country,
+    required String state,
+    required String city,
+    required String phone,
   }) async {
     final res = await _client.post(
       'checkout/onepage/addresses',
-      data: {'billing': billing, 'shipping': shipping},
+      data: {
+        'billing': {
+          'first_name': firstName,
+          'last_name': lasttName,
+          'email': email,
+          'address': address,
+          'country': country,
+          'state': state,
+          'city': city,
+          'phone': phone,
+        },
+        'shipping': {
+          'first_name': firstName,
+          'last_name': lasttName,
+          'email': email,
+          'address': address,
+          'country': country,
+          'state': state,
+          'city': city,
+          'phone': phone,
+        },
+      },
     );
     final data = res.data;
     if (data is Map<String, dynamic>) {
@@ -30,7 +57,9 @@ class CheckoutApiService {
     return getSummary();
   }
 
-  Future<CheckoutSummaryModel> saveShippingMethod(String shippingMethod) async {
+  Future<CheckoutSummaryModel> storeShippingMethod(
+    String shippingMethod,
+  ) async {
     final res = await _client.post(
       'checkout/onepage/shipping-methods',
       data: {'shipping_method': shippingMethod},
@@ -42,10 +71,12 @@ class CheckoutApiService {
     return getSummary();
   }
 
-  Future<CheckoutSummaryModel> savePaymentMethod(String paymentMethod) async {
+  Future<CheckoutSummaryModel> storePaymentMethod(String paymentMethod) async {
     final res = await _client.post(
       'checkout/onepage/payment-methods',
-      data: {'payment': paymentMethod},
+      data: {
+        'payment': {'method': paymentMethod},
+      },
     );
     final data = res.data;
     if (data is Map<String, dynamic>) {

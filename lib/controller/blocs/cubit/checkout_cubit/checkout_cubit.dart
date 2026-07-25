@@ -63,14 +63,26 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   }
 
   Future<bool> saveAddresses({
-    required Map<String, dynamic> billing,
-    required Map<String, dynamic> shipping,
+    required String firstName,
+    required String lasttName,
+    required String email,
+    required String address,
+    required String country,
+    required String state,
+    required String city,
+    required String phone,
   }) async {
     emit(CheckoutLoading(previous: _currentSummary));
     try {
-      final summary = await _checkoutService.saveAddresses(
-        billing: billing,
-        shipping: shipping,
+      final summary = await _checkoutService.storeAddresses(
+        firstName: firstName,
+        lasttName: lasttName,
+        email: email,
+        address: address,
+        country: country,
+        state: state,
+        city: city,
+        phone: phone,
       );
       emit(
         CheckoutLoaded(
@@ -95,7 +107,9 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   Future<bool> saveShippingMethod(String shippingMethod) async {
     emit(CheckoutLoading(previous: _currentSummary));
     try {
-      final summary = await _checkoutService.saveShippingMethod(shippingMethod);
+      final summary = await _checkoutService.storeShippingMethod(
+        shippingMethod,
+      );
       emit(
         CheckoutLoaded(
           summary: summary,
@@ -119,7 +133,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   Future<bool> savePaymentMethod(String paymentMethod) async {
     emit(CheckoutLoading(previous: _currentSummary));
     try {
-      final summary = await _checkoutService.savePaymentMethod(paymentMethod);
+      final summary = await _checkoutService.storePaymentMethod(paymentMethod);
       emit(
         CheckoutLoaded(
           summary: summary,

@@ -51,17 +51,15 @@ class AddressStepState extends State<AddressStep> {
 
   Map<String, dynamic> buildAddressesBody() {
     final billing = {
-      'use_for_shipping': true,
       'first_name': _firstNameController.text.trim(),
       'last_name': _lastNameController.text.trim(),
       'email': _emailController.text.trim(),
       'address': [_streetController.text.trim()],
-      'city': _cityController.text.trim(),
       'country': 'SY',
       'state': _stateController.text.trim(),
+      'city': _cityController.text.trim(),
       'postcode': _zipController.text.trim(),
       'phone': _phoneController.text.trim(),
-      'vat_id': _companyController.text.trim(),
     };
 
     return {
@@ -71,9 +69,9 @@ class AddressStepState extends State<AddressStep> {
         'last_name': billing['last_name'],
         'email': billing['email'],
         'address': billing['address'],
-        'city': billing['city'],
         'country': billing['country'],
         'state': billing['state'],
+        'city': billing['city'],
         'postcode': billing['postcode'],
         'phone': billing['phone'],
       },

@@ -19,18 +19,11 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CartCubit>().getCart();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     return BlocBuilder<CartCubit, CartState>(
+      bloc: CartCubit()..getCart(),
       builder: (context, state) {
         switch (state) {
           case CartLoginRequired():

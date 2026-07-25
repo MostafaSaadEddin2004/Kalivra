@@ -53,12 +53,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         _showStepError(l10n.completeStepData);
         return;
       }
-      final payload = _addressStepKey.currentState!.buildAddressesBody();
-      final ok = await checkoutCubit.saveAddresses(
-        billing: payload['billing'] as Map<String, dynamic>,
-        shipping: payload['shipping'] as Map<String, dynamic>,
-      );
-      if (!ok || !mounted) return;
     } else if (_currentIndex == 1) {
       final method = _shippingStepKey.currentState?.selectedMethodCode;
       if (method == null || method.isEmpty) {
@@ -133,7 +127,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         final isPlacing = checkoutState.isLoading;
         final shippingMethods = checkoutState.shippingMethods;
         final paymentMethods = checkoutState.paymentMethods;
-    
+
         return Stack(
           children: [
             Scaffold(
@@ -190,9 +184,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: Container(
                   color: Colors.black26,
                   child: Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.offWhite,
-                    ),
+                    child: CircularProgressIndicator(color: AppColors.offWhite),
                   ),
                 ),
               ),
