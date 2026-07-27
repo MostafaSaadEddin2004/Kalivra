@@ -36,10 +36,7 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final data = err.response?.data;
-    debugPrint('❌ Dio error: ${err.response?.statusCode} → ${err.message}');
-    debugPrint('📨 Error body: $data');
-    super.onError(err, handler);
+    handler.next(err);
   }
 
   @override
@@ -47,10 +44,7 @@ class AuthInterceptor extends Interceptor {
     Response<dynamic> response,
     ResponseInterceptorHandler handler,
   ) {
-    debugPrint(
-      '✅ Response [${response.statusCode}] → ${response.requestOptions.path}',
-    );
-    super.onResponse(response, handler);
+    handler.next(response);
   }
 }
 
@@ -62,37 +56,16 @@ class LoggingInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    if (!enabled) {
-      handler.next(options);
-      return;
-    }
-    debugPrint('→ API ${options.method} ${options.uri}');
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    if (!enabled) {
-      handler.next(response);
-      return;
-    }
-    final uri = response.requestOptions.uri.toString();
-    debugPrint('← API $uri → ${response.statusCode}');
-    if (logResponseBody && response.data != null) {
-      debugPrint('  DATA: $uri');
-      debugPrint('  ${response.data}');
-    }
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    if (enabled) {
-      debugPrint('✗ API ${err.requestOptions.uri} ${err.message}');
-      if (err.response?.data != null) {
-        debugPrint('  ERROR DATA: ${err.response!.data}');
-      }
-    }
     handler.next(err);
   }
 }
@@ -100,7 +73,8 @@ class LoggingInterceptor extends Interceptor {
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final message = err.response!.data['message'] ?? '';
+    final data = err.response?.data;
+    final message = data is Map ? data['message']?.toString() ?? '' : '';
     handler.reject(
       DioException(
         requestOptions: err.requestOptions,

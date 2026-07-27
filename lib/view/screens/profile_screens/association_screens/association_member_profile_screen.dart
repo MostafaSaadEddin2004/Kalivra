@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
@@ -81,7 +82,7 @@ class _AssociationMemberProfileScreenState
                           break;
                         case _AccosiciationMemberProfileMenuActions
                             .associationContactUs:
-                          context.push(AppRoutes.associationContactUs);
+                          context.push(AppRoutes.associationChat);
                           break;
                         case _AccosiciationMemberProfileMenuActions
                             .frequentlyAskedQuestion:
@@ -194,78 +195,125 @@ class _AssociationMemberProfileScreenState
       ),
       body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
         builder: (context, state) {
-          if (state is AssociationLinkLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is AssociationLinkFailure) {
-            return _MessageState(
-              icon: Icons.error_outline_rounded,
-              message: l10n.associationMemberLoadFailed,
-              actionLabel: l10n.retry,
-              onAction: _reload,
-            );
-          }
-          if (state is! AssociationProfileFetched) {
-            return _MessageState(
-              icon: Icons.link_off_rounded,
-              message: l10n.associationMemberProfileEmpty,
-              actionLabel: l10n.associationMemberProfileLinkRequest,
-              onAction: () =>
-                  context.push(AppRoutes.associationRequestsAndServices),
-            );
-          }
-
-          final profile = state.memberInfo;
-          if (!profile.isAssociationMember) {
-            return _MessageState(
-              icon: Icons.link_off_rounded,
-              message: l10n.associationMemberProfileEmpty,
-              actionLabel: l10n.associationRequestsAndServices,
-              onAction: () =>
-                  context.push(AppRoutes.associationRequestsAndServices),
-            );
-          }
-
-          final memberships = profile.memberships;
-          final selectedIndex = memberships.isEmpty
-              ? 0
-              : _selectedMembershipIndex
-                    .clamp(0, memberships.length - 1)
-                    .toInt();
-          final selectedMembership = memberships.isEmpty
-              ? null
-              : memberships[selectedIndex];
-
-          return RefreshIndicator(
-            onRefresh: _reload,
-            child: ListView(
-              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
-              children: [
-                _ProfileHeaderCard(profile: profile, isDark: isDark),
-                SizedBox(height: 16.h),
-                _AssociationNewsFeedSlider(news: state.news),
-                SizedBox(height: 16.h),
-                if (memberships.isEmpty)
-                  _AcceptedLinkEmptyMemberships(profile: profile)
-                else ...[
-                  _MembershipTabs(
-                    memberships: memberships,
-                    selectedIndex: selectedIndex,
-                    onSelected: (index) {
-                      setState(() => _selectedMembershipIndex = index);
-                    },
+          switch (state) {
+            case AssociationLinkLoading():
+              return Center(
+                child: SpinKitFadingCircle(
+                  color: theme.colorScheme.onTertiary,
+                  size: 40.r,
+                  itemCount: 12,
+                ),
+              );
+            case AssociationLinkFailure():
+              return _MessageState(
+                icon: Icons.error_outline_rounded,
+                message: l10n.associationMemberLoadFailed,
+                actionLabel: l10n.retry,
+                onAction: _reload,
+              );
+            case AssociationProfileFetched():
+              final profile = state.memberInfo;
+              if (!profile.isAssociationMember && profile.isLinkedPerson) {
+                return _MessageState(
+                  icon: Icons.person_pin_circle_outlined,
+                  title: _localizedText(
+                    context,
+                    arabic: 'تم ربطك كشخص',
+                    english: 'You are linked as a person',
                   ),
-                  SizedBox(height: 16.h),
-                  _MemberContactSection(profile: profile),
-                  if (selectedMembership != null)
-                    _MembershipDetailsSection(
-                      profile: profile,
-                      membership: selectedMembership,
-                    ),
-                ],
-              ],
-            ),
-          );
+                  message: _localizedText(
+                    context,
+                    arabic:
+                        'تم إنشاء ملف شخصي لك لدى الجمعية. ستقوم الجمعية قريباً بإنشاء عضوية لك، وبعدها ستظهر تفاصيل العضوية والمعلومات المالية هنا.',
+                    english:
+                        'Your person profile is now linked with the association. The association will create a membership for you soon, then your membership and financial details will appear here.',
+                  ),
+                  actionLabel: l10n.retry,
+                  onAction: _reload,
+                );
+              }
+              if (!profile.isAssociationMember &&
+                  !profile.canSubmitAssociationRequest) {
+                return _MessageState(
+                  icon: Icons.hourglass_top_rounded,
+                  title: _localizedText(
+                    context,
+                    arabic: 'طلب الربط قيد المراجعة',
+                    english: 'Association link request under review',
+                  ),
+                  message: _localizedText(
+                    context,
+                    arabic:
+                        'طلب ربطك بالجمعية قيد المراجعة حالياً. سنعرض تفاصيل العضوية فور اعتماد الطلب من قبل الجمعية.',
+                    english:
+                        'Your association link request is currently under review. Membership details will appear as soon as the association approves it.',
+                  ),
+                  actionLabel: l10n.retry,
+                  onAction: _reload,
+                );
+              }
+              if (!profile.isAssociationMember) {
+                return _MessageState(
+                  icon: Icons.info_outline_rounded,
+                  title: _localizedText(
+                    context,
+                    arabic: 'لا توجد عضوية بعد',
+                    english: 'No membership yet',
+                  ),
+                  message: _localizedText(
+                    context,
+                    arabic: 'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.',
+                    english:
+                        'There is no active association membership for this account yet.',
+                  ),
+                  actionLabel: l10n.retry,
+                  onAction: _reload,
+                );
+              }
+
+              final memberships = profile.memberships;
+              final selectedIndex = memberships.isEmpty
+                  ? 0
+                  : _selectedMembershipIndex
+                        .clamp(0, memberships.length - 1)
+                        .toInt();
+              final selectedMembership = memberships.isEmpty
+                  ? null
+                  : memberships[selectedIndex];
+
+              return RefreshIndicator(
+                onRefresh: _reload,
+                child: ListView(
+                  padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+                  children: [
+                    _ProfileHeaderCard(profile: profile, isDark: isDark),
+                    SizedBox(height: 16.h),
+                    _AssociationNewsFeedSlider(news: state.news),
+                    SizedBox(height: 16.h),
+                    if (memberships.isEmpty)
+                      _AcceptedLinkEmptyMemberships(profile: profile)
+                    else ...[
+                      _MembershipTabs(
+                        memberships: memberships,
+                        selectedIndex: selectedIndex,
+                        onSelected: (index) {
+                          setState(() => _selectedMembershipIndex = index);
+                        },
+                      ),
+                      SizedBox(height: 16.h),
+                      _MemberContactSection(profile: profile),
+                      if (selectedMembership != null)
+                        _MembershipDetailsSection(
+                          profile: profile,
+                          membership: selectedMembership,
+                        ),
+                    ],
+                  ],
+                ),
+              );
+            default:
+              return Center(child: Text('Something happened'));
+          }
         },
       ),
     );
@@ -620,8 +668,8 @@ class _MembershipDetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final project = membership.project;
-    final building = membership.building ?? membership.unit?.building;
-    final unit = membership.unit;
+    final unit = membership.unit ?? membership.allocatedUnit;
+    final building = membership.building ?? unit?.building;
     final lifecycle = profile.membershipLifecycle;
 
     return Column(
@@ -630,6 +678,14 @@ class _MembershipDetailsSection extends StatelessWidget {
         _MembershipSummaryCard(membership: membership),
         SizedBox(height: 16.h),
         _FinancialOverviewCard(membership: membership),
+        SizedBox(height: 16.h),
+        _FinancialInformationSection(membership: membership),
+        SizedBox(height: 16.h),
+        _PaymentsSection(payments: membership.payments),
+        SizedBox(height: 16.h),
+        _FinancialObligationsSection(
+          obligations: membership.financialObligations,
+        ),
         SizedBox(height: 16.h),
         AssociationFormSection(
           title: l10n.associationLinkMembershipSection,
@@ -767,12 +823,23 @@ class _FinancialOverviewCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final total = membership.unit?.price ?? membership.project?.price;
-    final paid = membership.totalPaymentsMade;
-    final remaining = total != null && paid != null ? total - paid : null;
-    final progress = total == null || total == 0 || paid == null
+    final financial = membership.financialInformation;
+    final total =
+        financial?.totalObligations ??
+        membership.unit?.price ??
+        membership.project?.price;
+    final paid =
+        financial?.totalPaid ??
+        financial?.totalPayments ??
+        membership.totalPaymentsMade;
+    final remaining =
+        financial?.remainingAmount ??
+        financial?.pendingObligations ??
+        (total != null && paid != null ? total - paid : null);
+    final covered = financial?.coveredObligations ?? paid;
+    final progress = total == null || total == 0 || covered == null
         ? null
-        : (paid / total).clamp(0, 1).toDouble();
+        : (covered / total).clamp(0, 1).toDouble();
 
     return Container(
       padding: EdgeInsets.all(16.w),
@@ -847,8 +914,28 @@ class _FinancialOverviewCard extends StatelessWidget {
               ),
               _FinanceMetric(
                 label: l10n.associationMemberPaymentCommitment,
-                value: membership.displayFinancialStatus,
+                value: financial?.memberFinancialStatusLabel.isNotEmpty == true
+                    ? financial?.memberFinancialStatusLabel ?? ''
+                    : membership.displayFinancialStatus,
                 icon: Icons.verified_outlined,
+              ),
+              _FinanceMetric(
+                label: _localizedText(
+                  context,
+                  arabic: 'الرصيد المتاح',
+                  english: 'Available Balance',
+                ),
+                value: _formatNullableNumber(financial?.availableBalance),
+                icon: Icons.savings_outlined,
+              ),
+              _FinanceMetric(
+                label: _localizedText(
+                  context,
+                  arabic: 'الالتزامات المفتوحة',
+                  english: 'Open Obligations',
+                ),
+                value: _formatNullableNumber(financial?.openObligationsCount),
+                icon: Icons.assignment_late_outlined,
               ),
             ],
           ),
@@ -907,6 +994,385 @@ class _FinanceMetric extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodySmall,
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinancialInformationSection extends StatelessWidget {
+  const _FinancialInformationSection({required this.membership});
+
+  final AssociationMembership membership;
+
+  @override
+  Widget build(BuildContext context) {
+    final financial = membership.financialInformation;
+    if (financial == null) return const SizedBox.shrink();
+
+    return AssociationFormSection(
+      title: _localizedText(
+        context,
+        arabic: 'المعلومات المالية',
+        english: 'Financial Information',
+      ),
+      icon: Icons.account_balance_wallet_outlined,
+      children: [
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'إجمالي المدفوعات',
+            english: 'Total Payments',
+          ),
+          value: _formatNullableNumber(financial.totalPayments),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'إجمالي الالتزامات',
+            english: 'Total Obligations',
+          ),
+          value: _formatNullableNumber(financial.totalObligations),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الالتزامات المغطاة',
+            english: 'Covered Obligations',
+          ),
+          value: _formatNullableNumber(financial.coveredObligations),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الالتزامات غير المغطاة',
+            english: 'Uncovered Obligations',
+          ),
+          value: _formatNullableNumber(financial.uncoveredObligations),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'عدد الالتزامات المفتوحة',
+            english: 'Open Obligations Count',
+          ),
+          value: _formatNullableNumber(financial.openObligationsCount),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'عدد الالتزامات المتأخرة',
+            english: 'Overdue Obligations Count',
+          ),
+          value: _formatNullableNumber(financial.overdueObligationsCount),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'قيمة الالتزامات المتأخرة',
+            english: 'Overdue Obligations Amount',
+          ),
+          value: _formatNullableNumber(financial.overdueObligationsAmount),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الرصيد المتاح',
+            english: 'Available Balance',
+          ),
+          value: _formatNullableNumber(financial.availableBalance),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الرصيد الحالي',
+            english: 'Current Balance',
+          ),
+          value: _formatNullableNumber(financial.currentBalance),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الحالة المالية',
+            english: 'Financial Status',
+          ),
+          value: financial.memberFinancialStatusLabel.isNotEmpty
+              ? financial.memberFinancialStatusLabel
+              : financial.memberFinancialStatus,
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'إجمالي المدفوع',
+            english: 'Total Paid',
+          ),
+          value: _formatNullableNumber(financial.totalPaid),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'المبلغ المتبقي',
+            english: 'Remaining Amount',
+          ),
+          value: _formatNullableNumber(financial.remainingAmount),
+        ),
+        _InfoRow(
+          label: _localizedText(
+            context,
+            arabic: 'الالتزامات المعلقة',
+            english: 'Pending Obligations',
+          ),
+          value: _formatNullableNumber(financial.pendingObligations),
+        ),
+      ],
+    );
+  }
+}
+
+class _PaymentsSection extends StatelessWidget {
+  const _PaymentsSection({required this.payments});
+
+  final List<AssociationPayment> payments;
+
+  @override
+  Widget build(BuildContext context) {
+    return AssociationFormSection(
+      title: _localizedText(context, arabic: 'المدفوعات', english: 'Payments'),
+      icon: Icons.payments_outlined,
+      children: payments.isEmpty
+          ? [
+              _EmptyInlineState(
+                icon: Icons.receipt_long_outlined,
+                text: _localizedText(
+                  context,
+                  arabic: 'لا توجد مدفوعات مسجلة حالياً.',
+                  english: 'There are no recorded payments yet.',
+                ),
+              ),
+            ]
+          : payments.map((payment) => _PaymentTile(payment: payment)).toList(),
+    );
+  }
+}
+
+class _PaymentTile extends StatelessWidget {
+  const _PaymentTile({required this.payment});
+
+  final AssociationPayment payment;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.taupe.withValues(alpha: 0.1)
+            : AppColors.burgundy.withValues(alpha: 0.045),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 20.r,
+            backgroundColor: AppColors.goldDark.withValues(alpha: 0.14),
+            child: Icon(
+              Icons.receipt_long_outlined,
+              color: AppColors.goldDark,
+              size: 20.r,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _formatNullableNumber(payment.amount),
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    _StatusPill(
+                      label: payment.approvalStatusLabel.isNotEmpty
+                          ? payment.approvalStatusLabel
+                          : payment.approvalStatus,
+                      color: _statusColor(payment.approvalStatus),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  _joinValues([
+                    payment.paymentDate,
+                    payment.paymentMethodLabel.isNotEmpty
+                        ? payment.paymentMethodLabel
+                        : payment.paymentMethod,
+                    payment.voucherNumber.isNotEmpty
+                        ? '${_localizedText(context, arabic: 'إيصال', english: 'Voucher')} ${payment.voucherNumber}'
+                        : '',
+                  ]),
+                  style: theme.textTheme.bodySmall,
+                ),
+                if (payment.notes.isNotEmpty) ...[
+                  SizedBox(height: 4.h),
+                  Text(payment.notes, style: theme.textTheme.bodySmall),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FinancialObligationsSection extends StatelessWidget {
+  const _FinancialObligationsSection({required this.obligations});
+
+  final List<AssociationFinancialObligation> obligations;
+
+  @override
+  Widget build(BuildContext context) {
+    return AssociationFormSection(
+      title: _localizedText(
+        context,
+        arabic: 'الالتزامات المالية',
+        english: 'Financial Obligations',
+      ),
+      icon: Icons.assignment_outlined,
+      children: obligations.isEmpty
+          ? [
+              _EmptyInlineState(
+                icon: Icons.task_alt_rounded,
+                text: _localizedText(
+                  context,
+                  arabic: 'لا توجد التزامات مالية مسجلة حالياً.',
+                  english: 'There are no financial obligations recorded yet.',
+                ),
+              ),
+            ]
+          : obligations
+                .map((obligation) => _ObligationTile(obligation: obligation))
+                .toList(),
+    );
+  }
+}
+
+class _ObligationTile extends StatelessWidget {
+  const _ObligationTile({required this.obligation});
+
+  final AssociationFinancialObligation obligation;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final statusText = obligation.statusLabel.isNotEmpty
+        ? obligation.statusLabel
+        : obligation.status;
+    final statusColor = obligation.isCovered
+        ? Colors.green
+        : _statusColor(obligation.status);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 10.h),
+      padding: EdgeInsets.all(12.w),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.taupe.withValues(alpha: 0.1)
+            : AppColors.burgundy.withValues(alpha: 0.045),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 20.r,
+            backgroundColor: statusColor.withValues(alpha: 0.12),
+            child: Icon(
+              obligation.isCovered
+                  ? Icons.check_circle_outline_rounded
+                  : Icons.pending_actions_outlined,
+              color: statusColor,
+              size: 20.r,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        obligation.name.isEmpty ? '-' : obligation.name,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                    _StatusPill(label: statusText, color: statusColor),
+                  ],
+                ),
+                SizedBox(height: 6.h),
+                Text(
+                  _formatNullableNumber(obligation.amount),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                Text(
+                  _joinValues([
+                    obligation.dueDate.isNotEmpty
+                        ? '${_localizedText(context, arabic: 'الاستحقاق', english: 'Due')} ${obligation.dueDate}'
+                        : '',
+                    obligation.paymentDeadline.isNotEmpty
+                        ? '${_localizedText(context, arabic: 'آخر موعد', english: 'Deadline')} ${obligation.paymentDeadline}'
+                        : '',
+                  ]),
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyInlineState extends StatelessWidget {
+  const _EmptyInlineState({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.tertiaryFixed.withValues(alpha: 0.45),
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: theme.colorScheme.primary, size: 22.r),
+          SizedBox(width: 10.w),
+          Expanded(child: Text(text, style: theme.textTheme.bodyMedium)),
         ],
       ),
     );
@@ -1088,6 +1554,8 @@ class _ProjectLocationButton extends StatelessWidget {
     if (!_hasValidCoordinates(latitude, longitude)) {
       return const SizedBox.shrink();
     }
+    final displayLatitude = latitude ?? 0;
+    final displayLongitude = longitude ?? 0;
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -1138,7 +1606,7 @@ class _ProjectLocationButton extends StatelessWidget {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  '${_formatCoordinate(latitude!)}, ${_formatCoordinate(longitude!)}',
+                  '${_formatCoordinate(displayLatitude)}, ${_formatCoordinate(displayLongitude)}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -1633,7 +2101,7 @@ class _ProgressBlock extends StatelessWidget {
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final progress = (value! / 100).clamp(0, 1).toDouble();
+    final progress = ((value ?? 0) / 100).clamp(0, 1).toDouble();
 
     return Padding(
       padding: EdgeInsets.only(bottom: 16.h),
@@ -2105,12 +2573,14 @@ class _InfoRow extends StatelessWidget {
 class _MessageState extends StatelessWidget {
   const _MessageState({
     required this.icon,
+    this.title = '',
     required this.message,
     required this.actionLabel,
     required this.onAction,
   });
 
   final IconData icon;
+  final String title;
   final String message;
   final String actionLabel;
   final VoidCallback onAction;
@@ -2126,6 +2596,16 @@ class _MessageState extends StatelessWidget {
           children: [
             Icon(icon, size: 56.r, color: theme.colorScheme.primary),
             SizedBox(height: 16.h),
+            if (title.trim().isNotEmpty) ...[
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(height: 8.h),
+            ],
             Text(
               message,
               textAlign: TextAlign.center,
@@ -2161,6 +2641,25 @@ IconData _membershipIcon(String type) {
   if (normalized.contains('residential')) return Icons.home_work_outlined;
   if (normalized.contains('tourism')) return Icons.luggage_outlined;
   return Icons.badge_outlined;
+}
+
+Color _statusColor(String status) {
+  final normalized = status.toLowerCase();
+  if (normalized.contains('approved') ||
+      normalized.contains('paid') ||
+      normalized.contains('success') ||
+      normalized.contains('covered')) {
+    return Colors.green;
+  }
+  if (normalized.contains('pending') || normalized.contains('due')) {
+    return AppColors.goldDark;
+  }
+  if (normalized.contains('rejected') ||
+      normalized.contains('failed') ||
+      normalized.contains('overdue')) {
+    return AppColors.red;
+  }
+  return AppColors.burgundy;
 }
 
 String _formatNullableNumber(num? value) {

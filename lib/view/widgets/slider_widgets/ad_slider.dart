@@ -110,7 +110,6 @@ class AdSliderState extends State<AdSlider> {
       builder: (context, state) {
         switch (state) {
           case AdsFailed():
-            debugPrint(state.errorMessage);
             return Center(child: Text(state.errorMessage));
           case AdsFetched():
             final entries = _flattenSlides(state.ads);

@@ -19,6 +19,23 @@ abstract class LocalStore {
     return;
   }
 
+  static Future<String?> getUserId() async {
+    final sp = await SharedPreferences.getInstance();
+    return sp.getString(PrefKeys.userIdKey);
+  }
+
+  static Future<void> setUserId(String value) async {
+    final sp = await SharedPreferences.getInstance();
+    await sp.setString(PrefKeys.userIdKey, value);
+    return;
+  }
+
+  static Future<void> removeUserId() async {
+    final sp = await SharedPreferences.getInstance();
+    await sp.remove(PrefKeys.userIdKey);
+    return;
+  }
+
   static Future<String?> getFCMToken() async {
     final sp = await SharedPreferences.getInstance();
     return sp.getString(PrefKeys.fcmTokenKey);

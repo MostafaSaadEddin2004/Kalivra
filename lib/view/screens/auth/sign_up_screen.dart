@@ -234,17 +234,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       color: isDark ? AppColors.taupe : AppColors.burgundy,
                     ),
                     children: [
-                      const TextSpan(text: 'Read our '),
                       TextSpan(
-                        text: 'privacy policy',
+                        text: AppLocalizations.of(context)!.signUpReadOur,
+                      ),
+                      TextSpan(
+                        text: AppLocalizations.of(context)!.drawerPrivacyPolicy,
                         style: const TextStyle(
                           decoration: TextDecoration.underline,
                         ),
                         recognizer: _privacyPolicyRecognizer,
                       ),
-                      const TextSpan(text: ' and the '),
                       TextSpan(
-                        text: 'terms and conditions',
+                        text: AppLocalizations.of(context)!.signUpAndThe,
+                      ),
+                      TextSpan(
+                        text: AppLocalizations.of(
+                          context,
+                        )!.drawerTermsConditions,
                         style: const TextStyle(
                           decoration: TextDecoration.underline,
                         ),

@@ -121,24 +121,25 @@ class _BrandDetailsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final description = htmlToPlainText(brand.description);
     final contactEntries = <_BrandInfoEntry>[
       if (_hasItems(brand.phoneNumbers))
         _BrandInfoEntry(
           icon: Icons.phone_outlined,
-          label: 'Phone numbers',
+          label: l10n.phoneNumbers,
           value: brand.phoneNumbers.join('\n'),
         ),
       if (_hasText(brand.email))
         _BrandInfoEntry(
           icon: Icons.email_outlined,
-          label: 'Email',
+          label: l10n.email,
           value: brand.email!.trim(),
         ),
       if (_hasText(brand.workingHours))
         _BrandInfoEntry(
           icon: Icons.schedule_outlined,
-          label: 'Working hours',
+          label: l10n.workingHours,
           value: brand.workingHours!.trim(),
         ),
     ];
@@ -146,19 +147,19 @@ class _BrandDetailsContent extends StatelessWidget {
       if (_hasText(brand.country))
         _BrandInfoEntry(
           icon: Icons.public_outlined,
-          label: 'Country',
+          label: l10n.country,
           value: brand.country!.trim(),
         ),
       if (_hasText(brand.city))
         _BrandInfoEntry(
           icon: Icons.location_city_outlined,
-          label: 'City',
+          label: l10n.city,
           value: brand.city!.trim(),
         ),
       if (_hasText(brand.address))
         _BrandInfoEntry(
           icon: Icons.place_outlined,
-          label: 'Address',
+          label: l10n.address,
           value: brand.address!.trim(),
         ),
     ];
@@ -166,14 +167,16 @@ class _BrandDetailsContent extends StatelessWidget {
       if (_hasText(brand.website))
         _BrandInfoEntry(
           icon: Icons.language_outlined,
-          label: 'Website',
+          label: l10n.website,
           value: brand.website!.trim(),
         ),
       for (final link in brand.socialLinks)
         if (_hasText(link.url))
           _BrandInfoEntry(
             icon: Icons.alternate_email_rounded,
-            label: _hasText(link.platform) ? link.platform!.trim() : 'Social',
+            label: _hasText(link.platform)
+                ? link.platform!.trim()
+                : l10n.social,
             value: link.url.trim(),
           ),
     ];
@@ -183,13 +186,13 @@ class _BrandDetailsContent extends StatelessWidget {
           icon: brand.isActive!
               ? Icons.check_circle_outline_rounded
               : Icons.pause_circle_outline_rounded,
-          label: 'Status',
-          value: brand.isActive! ? 'Active' : 'Inactive',
+          label: l10n.status,
+          value: brand.isActive! ? l10n.active : l10n.inactive,
         ),
       if (brand.sortOrder != null)
         _BrandInfoEntry(
           icon: Icons.sort_rounded,
-          label: 'Sort order',
+          label: l10n.sortOrder,
           value: brand.sortOrder.toString(),
         ),
     ];
@@ -207,7 +210,7 @@ class _BrandDetailsContent extends StatelessWidget {
           SizedBox(height: 16.h),
           _BrandSectionCard(
             isDark: isDark,
-            title: 'About',
+            title: l10n.about,
             icon: Icons.notes_rounded,
             child: Padding(
               padding: EdgeInsets.all(14.w),
@@ -224,7 +227,7 @@ class _BrandDetailsContent extends StatelessWidget {
         if (contactEntries.isNotEmpty) ...[
           SizedBox(height: 16.h),
           _BrandInfoSection(
-            title: 'Contact',
+            title: l10n.contact,
             icon: Icons.contact_phone_outlined,
             entries: contactEntries,
             isDark: isDark,
@@ -233,7 +236,7 @@ class _BrandDetailsContent extends StatelessWidget {
         if (locationEntries.isNotEmpty) ...[
           SizedBox(height: 16.h),
           _BrandInfoSection(
-            title: 'Location',
+            title: l10n.location,
             icon: Icons.map_outlined,
             entries: locationEntries,
             isDark: isDark,
@@ -242,7 +245,7 @@ class _BrandDetailsContent extends StatelessWidget {
         if (onlineEntries.isNotEmpty) ...[
           SizedBox(height: 16.h),
           _BrandInfoSection(
-            title: 'Online presence',
+            title: l10n.onlinePresence,
             icon: Icons.hub_outlined,
             entries: onlineEntries,
             isDark: isDark,
@@ -251,7 +254,7 @@ class _BrandDetailsContent extends StatelessWidget {
         if (detailEntries.isNotEmpty) ...[
           SizedBox(height: 16.h),
           _BrandInfoSection(
-            title: 'Brand details',
+            title: l10n.brandDetailsTitle,
             icon: Icons.info_outline_rounded,
             entries: detailEntries,
             isDark: isDark,
@@ -570,7 +573,7 @@ class _BrandGalleryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _BrandSectionCard(
       isDark: isDark,
-      title: 'Gallery',
+      title: AppLocalizations.of(context)!.gallery,
       icon: Icons.photo_library_outlined,
       child: SizedBox(
         height: 116.h,

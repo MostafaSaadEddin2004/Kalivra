@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(milliseconds: 2500), _goToNext);
   }
 
-  void _goToNext() {
+  Future<void> _goToNext() async {
     if (!mounted) return;
     context.go(AppRoutes.home);
   }

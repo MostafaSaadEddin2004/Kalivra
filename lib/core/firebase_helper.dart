@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/firebase_options.dart';
 
 typedef FirebaseNotificationTapCallback =
@@ -126,6 +127,14 @@ class FirebaseHelper {
 
     await initialize();
     return _messaging.getToken();
+  }
+
+  static Future<String?> createFcmToken() async {
+    final token = await getFcmToken();
+    if (token != null && token.isNotEmpty) {
+      await LocalStore.setFCMToken(token);
+    }
+    return token;
   }
 
   static Stream<String> get tokenRefreshStream {

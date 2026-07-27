@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 
 class ProductColorSelectorCard extends StatelessWidget {
   const ProductColorSelectorCard({
@@ -17,6 +18,7 @@ class ProductColorSelectorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
@@ -40,7 +42,7 @@ class ProductColorSelectorCard extends StatelessWidget {
                 ),
                 SizedBox(width: 8.w),
                 Text(
-                  'اللون',
+                  l10n.color,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: isDark ? AppColors.offWhite : AppColors.black,
                     fontWeight: FontWeight.w700,
@@ -139,6 +141,7 @@ class ProductSizeSelectorCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isDark = theme.brightness == Brightness.dark;
     final primary = theme.colorScheme.primary;
 
@@ -158,7 +161,7 @@ class ProductSizeSelectorCard extends StatelessWidget {
                 Icon(Icons.straighten_outlined, size: 22.r, color: primary),
                 SizedBox(width: 8.w),
                 Text(
-                  'المقاس',
+                  l10n.size,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: isDark ? AppColors.offWhite : AppColors.black,
                     fontWeight: FontWeight.w700,

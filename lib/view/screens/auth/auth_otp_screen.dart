@@ -18,12 +18,18 @@ class AuthOtpArgs {
     this.email,
     this.phone,
     this.token,
-    this.purpose = 'login',
+    this.name,
+    this.password,
+    this.referralCode,
+    required this.purpose,
   });
 
   final String? email;
   final String? phone;
   final String? token;
+  final String? name;
+  final String? password;
+  final String? referralCode;
   final String purpose;
 }
 
@@ -123,8 +129,8 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
       if (!mounted) return;
       _resendCount++;
       _startCooldown(_nextCooldownSeconds());
+      CustomSnackBar.show(context, l10n.authOtpResendSuccess);
     } catch (_) {
-      // Error snackbar is shown in AuthCubit.
     } finally {
       if (mounted) {
         setState(() => _isResending = false);
@@ -208,52 +214,55 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 40.h),
-                    PinCodeTextField(
-                      appContext: context,
-                      controller: _otpController,
-                      autoDisposeControllers: false,
-                      length: 6,
-                      keyboardType: TextInputType.number,
-                      animationType: AnimationType.fade,
-                      textStyle: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.offWhite : AppColors.black,
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: PinCodeTextField(
+                        appContext: context,
+                        controller: _otpController,
+                        autoDisposeControllers: false,
+                        length: 6,
+                        keyboardType: TextInputType.number,
+                        animationType: AnimationType.fade,
+                        textStyle: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? AppColors.offWhite : AppColors.black,
+                        ),
+                        cursorColor: labelColor,
+                        enableActiveFill: true,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
+                          borderRadius: BorderRadius.circular(12.r),
+                          fieldHeight: 52.r,
+                          fieldWidth: 44.w,
+                          activeColor: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          selectedColor: isDark
+                              ? AppColors.goldLight
+                              : AppColors.burgundy,
+                          inactiveColor: isDark
+                              ? AppColors.taupe.withValues(alpha: 0.5)
+                              : AppColors.burgundy.withValues(alpha: 0.35),
+                          activeFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.12)
+                              : AppColors.offWhite,
+                          selectedFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.18)
+                              : AppColors.offWhite,
+                          inactiveFillColor: isDark
+                              ? AppColors.burgundy.withValues(alpha: 0.08)
+                              : AppColors.offWhite,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return l10n.errorMissingData;
+                          }
+                          if (value.length != 6) {
+                            return l10n.authOtpCodeLength;
+                          }
+                          return null;
+                        },
                       ),
-                      cursorColor: labelColor,
-                      enableActiveFill: true,
-                      pinTheme: PinTheme(
-                        shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(12.r),
-                        fieldHeight: 52.r,
-                        fieldWidth: 44.w,
-                        activeColor: isDark
-                            ? AppColors.goldLight
-                            : AppColors.burgundy,
-                        selectedColor: isDark
-                            ? AppColors.goldLight
-                            : AppColors.burgundy,
-                        inactiveColor: isDark
-                            ? AppColors.taupe.withValues(alpha: 0.5)
-                            : AppColors.burgundy.withValues(alpha: 0.35),
-                        activeFillColor: isDark
-                            ? AppColors.burgundy.withValues(alpha: 0.12)
-                            : AppColors.offWhite,
-                        selectedFillColor: isDark
-                            ? AppColors.burgundy.withValues(alpha: 0.18)
-                            : AppColors.offWhite,
-                        inactiveFillColor: isDark
-                            ? AppColors.burgundy.withValues(alpha: 0.08)
-                            : AppColors.offWhite,
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.errorMissingData;
-                        }
-                        if (value.length != 6) {
-                          return l10n.authOtpCodeLength;
-                        }
-                        return null;
-                      },
                     ),
                     SizedBox(height: 12.h),
                     _buildResendSection(context, theme, isDark, l10n),
@@ -278,6 +287,10 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                               whatsappNumber: widget.args.phone?.trim() ?? '',
                               email: widget.args.email?.trim(),
                               token: widget.args.token ?? '',
+                              purpose: widget.args.purpose,
+                              name: widget.args.name,
+                              password: widget.args.password,
+                              referralCode: widget.args.referralCode,
                             );
                           }
                         },

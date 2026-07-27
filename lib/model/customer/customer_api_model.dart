@@ -25,6 +25,9 @@ class CustomerApiModel {
     this.personalInformation,
     this.contactInformation,
     this.addressInformation,
+    this.isAssociationMember,
+    this.canSubmitAssociationRequest,
+    this.isLinkedPerson,
   });
 
   final int id;
@@ -52,6 +55,9 @@ class CustomerApiModel {
   final CustomerPersonalInformation? personalInformation;
   final CustomerContactInformation? contactInformation;
   final CustomerAddressInformation? addressInformation;
+  final bool? isAssociationMember;
+  final bool? canSubmitAssociationRequest;
+  final bool? isLinkedPerson;
 
   String? get address =>
       addressInformation?.permanent?.formatted ??
@@ -114,6 +120,9 @@ class CustomerApiModel {
       personalInformation: personal,
       contactInformation: contact,
       addressInformation: addressInfo,
+      isAssociationMember: json['is_association_member'] as bool?,
+      canSubmitAssociationRequest: json['can_submit_association_request'] as bool?,
+      isLinkedPerson: json['is_linked_person'] as bool?,
     );
   }
 
@@ -197,17 +206,32 @@ class CustomerContactInformation {
     this.email,
     this.phone,
     this.whatsappNumber,
+    this.emailVerified,
+    this.emailVerificationStatus,
+    this.emailVerificationStatusLabel,
+    this.emailVerifiedAt,
+    this.emailVerificationNotice,
   });
 
   final String? email;
   final String? phone;
   final String? whatsappNumber;
+  final bool? emailVerified;
+  final String? emailVerificationStatus;
+  final String? emailVerificationStatusLabel;
+  final String? emailVerifiedAt;
+  final String? emailVerificationNotice;
 
   factory CustomerContactInformation.fromJson(Map<String, dynamic> json) {
     return CustomerContactInformation(
       email: CustomerApiModel._nullableString(json['email']),
       phone: CustomerApiModel._nullableString(json['phone']),
       whatsappNumber: CustomerApiModel._nullableString(json['whatsapp_number']),
+      emailVerified: json['email_verified'] as bool?,
+      emailVerificationStatus: CustomerApiModel._nullableString(json['email_verification_status']),
+      emailVerificationStatusLabel: CustomerApiModel._nullableString(json['email_verification_status_label']),
+      emailVerifiedAt: CustomerApiModel._nullableString(json['email_verified_at']),
+      emailVerificationNotice: CustomerApiModel._nullableString(json['email_verification_notice']),
     );
   }
 }

@@ -185,6 +185,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
       );
       if (!mounted) return;
       _startCooldown(_resendCooldownSeconds);
+      CustomSnackBar.show(context, l10n.authOtpResendSuccess);
     } catch (_) {
       if (mounted) {
         CustomSnackBar.show(context, l10n.authOtpResendFailed);

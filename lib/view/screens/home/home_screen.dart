@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
+import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/network/api_exception.dart';
 import 'package:kalivra/core/pop_scope_exit_app.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
 import 'package:kalivra/model/nav/nav_item_model.dart';
+import 'package:kalivra/model/services/api/customer_api_service.dart';
 import 'package:kalivra/view/screens/home/cart_page.dart';
 import 'package:kalivra/view/screens/home/categories_page.dart';
 import 'package:kalivra/view/screens/home/home_page.dart';
@@ -24,6 +27,68 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final CustomerApiService _customerApiService = CustomerApiService();
+  bool _didCheckAuthSession = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAuthSession();
+    });
+  }
+
+  Future<void> _checkAuthSession() async {
+    if (_didCheckAuthSession || !mounted) return;
+    _didCheckAuthSession = true;
+
+    final token = await LocalStore.getToken();
+    if (!mounted || token == null || token.isEmpty) return;
+
+    try {
+      await _customerApiService.getProfile();
+    } catch (e) {
+      if (!mounted) return;
+      final apiError = e is ApiException ? e : null;
+      if (apiError == null || !apiError.requiresForcedLogin) {
+        return;
+      }
+
+      await LocalStore.removeToken();
+      await LocalStore.removeUserId();
+      if (!mounted) return;
+      await _showForcedLoginDialog(apiError.message);
+    }
+  }
+
+  Future<void> _showForcedLoginDialog(String message) {
+    final l10n = AppLocalizations.of(context)!;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: Text(l10n.loginRequiredTitle),
+            content: Text(message),
+            actions: [
+              FilledButton(
+                onPressed: () {
+                  Navigator.of(dialogContext, rootNavigator: true).pop();
+                  if (mounted) {
+                    context.go(AppRoutes.login);
+                  }
+                },
+                child: Text(l10n.login),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;

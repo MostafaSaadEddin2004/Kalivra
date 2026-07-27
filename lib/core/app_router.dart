@@ -4,7 +4,7 @@ import 'package:kalivra/model/association/association_announcement_model.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcement_details_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcements_screen.dart';
-import 'package:kalivra/view/screens/profile_screens/association_screens/association_contact_us_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_chat_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_faq_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_requests_and_services_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_submitted_requests_screen.dart';
@@ -97,7 +97,7 @@ abstract class AppRoutes {
   static const String associationSubmittedRequests =
       '/association-submitted-requests';
   static const String associationFaq = '/association-faq';
-  static const String associationContactUs = '/association-contact-us';
+  static const String associationChat = '/association-chat';
   static const String associationRequestsAndServices =
       '/association-requests-and-services';
   static const String associationAnnouncements = '/association-announcements';
@@ -149,7 +149,7 @@ abstract class AppRoutesName {
   static const String associationSubmittedRequests =
       'association-submitted-requests';
   static const String associationFaq = 'association-faq';
-  static const String associationContactUs = 'association-contact-us';
+  static const String associationChat = 'association-chat';
   static const String associationRequestsAndServices =
       'association-requests-and-services';
   static const String associationAnnouncements = 'association-announcements';
@@ -351,8 +351,12 @@ abstract class AppRouter {
             builder: (context, state) {
               final product = state.extra as ProductModel?;
               if (product == null) {
-                return const Scaffold(
-                  body: Center(child: Text('المنتج غير متوفر')),
+                return Scaffold(
+                  body: Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.productUnavailable,
+                    ),
+                  ),
                 );
               }
               return ProductDetailsScreen(product: product);
@@ -364,8 +368,10 @@ abstract class AppRouter {
             builder: (context, state) {
               final brand = state.extra as BrandModel?;
               if (brand == null) {
-                return const Scaffold(
-                  body: Center(child: Text('العلامة غير متوفرة')),
+                return Scaffold(
+                  body: Center(
+                    child: Text(AppLocalizations.of(context)!.brandUnavailable),
+                  ),
                 );
               }
               return BrandDetailsScreen(brand: brand);
@@ -412,8 +418,10 @@ abstract class AppRouter {
             builder: (context, state) {
               final ad = state.extra as AdvertisementModel?;
               if (ad == null) {
-                return const Scaffold(
-                  body: Center(child: Text('الإعلان غير متوفر')),
+                return Scaffold(
+                  body: Center(
+                    child: Text(AppLocalizations.of(context)!.adUnavailable),
+                  ),
                 );
               }
               return AdDetailsScreen(ad: ad);
@@ -455,9 +463,9 @@ abstract class AppRouter {
             builder: (context, state) => const AssociationFaqScreen(),
           ),
           GoRoute(
-            path: AppRoutes.associationContactUs,
-            name: AppRoutesName.associationContactUs,
-            builder: (context, state) => const AssociationContactUsScreen(),
+            path: AppRoutes.associationChat,
+            name: AppRoutesName.associationChat,
+            builder: (context, state) => const AssociationChatScreen(),
           ),
           GoRoute(
             path: AppRoutes.associationRequestsAndServices,

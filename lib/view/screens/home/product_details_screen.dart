@@ -579,6 +579,7 @@ class ProductVariantsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
     final sizes = variantState.product.variants!.variantsBySize;
     final selectedSize = variantState.selectedSize;
@@ -587,7 +588,7 @@ class ProductVariantsSection extends StatelessWidget {
 
     return ProductSectionCardShell(
       isDark: isDark,
-      title: 'المقاس واللون',
+      title: l10n.sizeAndColor,
       icon: Icons.style_outlined,
       child: Padding(
         padding: EdgeInsets.all(14.w),
@@ -596,7 +597,7 @@ class ProductVariantsSection extends StatelessWidget {
           children: [
             // ── Size label ──────────────────────────────────────────────
             Text(
-              'المقاس',
+              l10n.size,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: isDark ? AppColors.taupe : AppColors.burgundy,
                 fontWeight: FontWeight.w600,
@@ -650,8 +651,8 @@ class ProductVariantsSection extends StatelessWidget {
               SizedBox(height: 16.h),
               Text(
                 selectedColor != null
-                    ? 'اللون: ${selectedColor.colorName}'
-                    : 'اللون',
+                    ? l10n.selectedColor(selectedColor.colorName)
+                    : l10n.color,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: isDark ? AppColors.taupe : AppColors.burgundy,
                   fontWeight: FontWeight.w600,
@@ -742,7 +743,7 @@ class ProductVariantsSection extends StatelessWidget {
                   ),
                   SizedBox(width: 6.w),
                   Text(
-                    'المخزون: ${selectedColor.stockQty} قطعة',
+                    l10n.stockPieces(selectedColor.stockQty),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: isDark ? AppColors.taupe : AppColors.burgundy,
                       fontWeight: FontWeight.w500,

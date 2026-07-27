@@ -909,7 +909,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get haveAccount => 'لديك حساب؟ ';
 
   @override
-  String get unexpectedError => 'حدث خطأ غير متوقع';
+  String get unexpectedError => 'خطأ غير متوقع';
 
   @override
   String get inviteCodeQuestion => 'لديك كود دعوة من صديق؟';
@@ -1048,10 +1048,23 @@ class AppLocalizationsAr extends AppLocalizations {
   String get changePhoneTitle => 'تغيير رقم الجوال';
 
   @override
-  String get sendCodeViaWhatsApp => 'إرسال الرمز عبر واتساب';
+  String get changePhoneIntro => 'أدخل رقم الجوال الجديد';
+
+  @override
+  String get changePasswordWithPhoneIntro =>
+      'أدخل رقم الجوال للتحقق ثم كلمة المرور الجديدة';
+
+  @override
+  String get newPhoneNumber => 'رقم الجوال الجديد';
+
+  @override
+  String get enterNewPhoneNumber => 'أدخل رقم الجوال الجديد';
 
   @override
   String get enterPhoneNumber => 'أدخل رقم الجوال';
+
+  @override
+  String get sendCodeViaWhatsApp => 'إرسال الرمز عبر واتساب';
 
   @override
   String get enterCode4To6 => 'أدخل الرمز المكون من 4-6 أرقام';
@@ -1870,4 +1883,134 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get associationRequestMessageHint => 'أدخل رسالتك';
+
+  @override
+  String get chatHistory => 'قائمة المحادثات';
+
+  @override
+  String get newChat => 'محادثة جديدة';
+
+  @override
+  String get associationChats => 'محادثات الجمعية';
+
+  @override
+  String get associationChatsSubtitle =>
+      'ابدأ جلسة جديدة أو تابع محادثة سابقة.';
+
+  @override
+  String get associationChatsTooltip => 'المحادثات';
+
+  @override
+  String get noChatsYet => 'لا توجد محادثات بعد';
+
+  @override
+  String chatTitle(int id) {
+    return 'محادثة $id';
+  }
+
+  @override
+  String chatSessionTitle(String id) {
+    return 'جلسة $id';
+  }
+
+  @override
+  String get askAssociation => 'اسأل الجمعية';
+
+  @override
+  String get chooseChatOrAskQuestion =>
+      'اختر محادثة من السجل أو أرسل سؤالاً جديداً.';
+
+  @override
+  String get chatWaitingPreparing => 'يتم تحضير الرد';
+
+  @override
+  String get chatWaitingLongTime => 'نعتذر عن التأخير';
+
+  @override
+  String get chatWaitingChecking => 'نتحقق من أفضل إجابة';
+
+  @override
+  String get chatWaitingAlmostDone => 'شارفنا على الانتهاء، شكراً لانتظارك';
+
+  @override
+  String get signUpReadOur => 'اقرأ ';
+
+  @override
+  String get signUpAndThe => ' و ';
+
+  @override
+  String get phoneNumbers => 'أرقام الهاتف';
+
+  @override
+  String get workingHours => 'ساعات العمل';
+
+  @override
+  String get country => 'الدولة';
+
+  @override
+  String get city => 'المدينة';
+
+  @override
+  String get social => 'تواصل اجتماعي';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get active => 'نشط';
+
+  @override
+  String get inactive => 'غير نشط';
+
+  @override
+  String get sortOrder => 'ترتيب العرض';
+
+  @override
+  String get about => 'حول';
+
+  @override
+  String get contact => 'التواصل';
+
+  @override
+  String get location => 'الموقع';
+
+  @override
+  String get onlinePresence => 'الحضور الإلكتروني';
+
+  @override
+  String get brandDetailsTitle => 'تفاصيل العلامة التجارية';
+
+  @override
+  String get gallery => 'المعرض';
+
+  @override
+  String get companyDetails => 'تفاصيل الشركة';
+
+  @override
+  String get whatCompanyOffers => 'ما تقدمه الشركة';
+
+  @override
+  String get additionalDescription => 'وصف إضافي';
+
+  @override
+  String get noAdditionalAdDetails => 'لا توجد تفاصيل إضافية لهذا الإعلان';
+
+  @override
+  String get sizeAndColor => 'المقاس واللون';
+
+  @override
+  String selectedColor(String color) {
+    return 'اللون: $color';
+  }
+
+  @override
+  String stockPieces(int count) {
+    return 'المخزون: $count قطعة';
+  }
+
+  @override
+  String get nothingToShow => 'لا يوجد محتوى للعرض.';
+
+  @override
+  String get userBalance => 'رصيد المستخدم';
 }

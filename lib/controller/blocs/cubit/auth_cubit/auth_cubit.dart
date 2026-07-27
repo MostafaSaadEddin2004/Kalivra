@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/firebase_helper.dart';
+import 'package:kalivra/core/network/api_exception.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
 import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
@@ -26,15 +28,45 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     final l10n = AppLocalizations.of(context)!;
     try {
-      await _customerApiService.login(phone: phone, password: password);
+      final fcmToken = await FirebaseHelper.createFcmToken();
+      await _customerApiService.login(
+        phone: phone,
+        password: password,
+        fcmToken: fcmToken,
+      );
+      if (!context.mounted) return;
       emit(AuthSuccessed(message: l10n.loginSuccess));
       context.go(AppRoutes.home);
     } catch (e) {
-      if (e == 'INVALID_CREDENTIALS') {
-        emit(AuthFailed(message: l10n.invalidLoginCredentials));
-        CustomSnackBar.show(context, l10n.invalidLoginCredentials);
-      } else if (e == 'EMAIL_NOT_VERIFIED') {
+      final apiError = e is ApiException ? e : null;
+      final errorCode = apiError?.code ?? e.toString();
+      final errorMessage = apiError?.message ?? e.toString();
+
+      if (errorCode == 'ACCOUNT_NOT_VERIFIED') {
+        final token =
+            apiError?.data?['token']?.toString() ?? await LocalStore.getToken();
+        if (!context.mounted) return;
+        context.goNamed(
+          AppRoutesName.authOtp,
+          extra: AuthOtpArgs(
+            email: phone,
+            phone: phone,
+            token: token,
+            purpose: 'login',
+          ),
+        );
+        emit(AuthFailed(message: errorMessage));
+        return;
+      }
+
+      if (!context.mounted) return;
+      if (errorCode == 'INVALID_CREDENTIALS') {
+        emit(AuthFailed(message: errorMessage));
+        CustomSnackBar.show(context, errorMessage);
+        return;
+      } else if (errorCode == 'EMAIL_NOT_VERIFIED') {
         final token = await LocalStore.getToken();
+        if (!context.mounted) return;
         context.goNamed(
           AppRoutesName.authOtp,
           extra: AuthOtpArgs(
@@ -45,15 +77,18 @@ class AuthCubit extends Cubit<AuthState> {
           ),
         );
         emit(AuthFailed(message: 'Email is not verfied.'));
-      } else if (e == 'INCORRECT_PASSWORD') {
-        emit(AuthFailed(message: l10n.incorrectPassword));
-        CustomSnackBar.show(context, l10n.incorrectPassword);
-      } else if (e == 'ACCOUNT_NOT_FOUND') {
-        emit(AuthFailed(message: l10n.accountNotFound));
-        CustomSnackBar.show(context, l10n.accountNotFound);
+        return;
+      } else if (errorCode == 'INCORRECT_PASSWORD') {
+        emit(AuthFailed(message: errorMessage));
+        CustomSnackBar.show(context, errorMessage);
+        return;
+      } else if (errorCode == 'ACCOUNT_NOT_FOUND') {
+        emit(AuthFailed(message: errorMessage));
+        CustomSnackBar.show(context, errorMessage);
+        return;
       }
-      emit(AuthFailed(message: e.toString()));
-      CustomSnackBar.show(context, e.toString());
+      emit(AuthFailed(message: errorMessage));
+      CustomSnackBar.show(context, errorMessage);
     }
   }
 
@@ -64,7 +99,6 @@ class AuthCubit extends Cubit<AuthState> {
     String? token,
     String purpose = 'login',
   }) async {
-    final l10n = AppLocalizations.of(context)!;
     try {
       final storedToken = token ?? await LocalStore.getToken();
       await _customerApiService.resendOtp(
@@ -73,9 +107,6 @@ class AuthCubit extends Cubit<AuthState> {
         token: storedToken,
         purpose: purpose,
       );
-      if (context.mounted) {
-        CustomSnackBar.show(context, l10n.authOtpResendSuccess);
-      }
     } catch (e) {
       rethrow;
     }
@@ -87,6 +118,10 @@ class AuthCubit extends Cubit<AuthState> {
     required String whatsappNumber,
     String? email,
     required String token,
+    String purpose = 'login',
+    String? name,
+    String? password,
+    String? referralCode,
   }) async {
     emit(AuthLoading());
     final l10n = AppLocalizations.of(context)!;
@@ -99,9 +134,28 @@ class AuthCubit extends Cubit<AuthState> {
       );
       if (!context.mounted) return;
       emit(VerifySuccessed(message: l10n.authOtpVerifySuccess));
+      if (purpose == 'register') {
+        context.go(
+          AppRoutes.completeProfile,
+          extra: OtpOnboardingArgs(
+            mode: OtpScreenMode.signUp,
+            whatsappNumber: whatsappNumber,
+            email: email,
+            token: token,
+            name: name,
+            password: password,
+            referralCode: referralCode,
+          ),
+        );
+        return;
+      }
       context.go(AppRoutes.home);
     } catch (e) {
-      emit(AuthFailed(message: e.toString()));
+      final message = e is ApiException ? e.message : e.toString();
+      emit(AuthFailed(message: message));
+      if (context.mounted) {
+        CustomSnackBar.show(context, message);
+      }
     }
   }
 
@@ -117,6 +171,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(AuthLoading());
     try {
+      final fcmToken = await FirebaseHelper.createFcmToken();
       final data = await _customerApiService.register(
         firstName: firstName,
         lastName: lastName,
@@ -124,33 +179,35 @@ class AuthCubit extends Cubit<AuthState> {
         whatsappNumber: whatsappNumber,
         password: password,
         passwordConfirmation: passwordConfirmation,
+        fcmToken: fcmToken,
       );
       final token = data?['token']?.toString() ?? await LocalStore.getToken();
-      if (!context.mounted) return;
-      context.go(
-        AppRoutes.completeProfile,
-        extra: OtpOnboardingArgs(
-          mode: OtpScreenMode.signUp,
-          whatsappNumber: whatsappNumber,
+      emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
+      context.goNamed(
+        AppRoutesName.authOtp,
+        extra: AuthOtpArgs(
           email: email,
+          phone: whatsappNumber,
           token: token,
           name: '$firstName $lastName'.trim(),
           password: password,
           referralCode: referralCode,
+          purpose: 'register',
         ),
       );
-      emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
     } catch (e) {
-      if (e == 'EMAIL_EXISTS') {
-        emit(AuthFailed(message: 'البريد الإلكتروني مستخدم بالفعل.'));
-        CustomSnackBar.show(context, 'البريد الإلكتروني مستخدم بالفعل.');
-      }
-      if (e == 'NUMBER_EXISTS') {
-        emit(AuthFailed(message: 'رقم الهاتف مستخدم بالفعل.'));
-        CustomSnackBar.show(context, 'رقم الهاتف مستخدم بالفعل.');
+      final apiError = e is ApiException ? e : null;
+      final errorCode = apiError?.code ?? e.toString();
+      final errorMessage = apiError?.message ?? e.toString();
+      if (errorCode == 'EMAIL_EXISTS') {
+        emit(AuthFailed(message: errorMessage));
+      } else if (errorCode == 'NUMBER_EXISTS') {
+        emit(AuthFailed(message: errorMessage));
       } else {
-        emit(AuthFailed(message: e.toString()));
-        CustomSnackBar.show(context, e.toString());
+        emit(AuthFailed(message: errorMessage));
+      }
+      if (context.mounted) {
+        CustomSnackBar.show(context, errorMessage);
       }
     }
   }

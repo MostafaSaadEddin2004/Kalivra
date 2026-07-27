@@ -47,7 +47,6 @@ class _ProductsSectionState extends State<ProductsSection> {
           builder: (context, state) {
             switch (state) {
               case ProductsFailed():
-                debugPrint(state.message);
                 return SliverToBoxAdapter(
                   child: Center(child: Text(state.message)),
                 );

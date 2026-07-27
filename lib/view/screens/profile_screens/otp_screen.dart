@@ -141,6 +141,7 @@ class _OtpScreenState extends State<OtpScreen> {
       );
       if (!mounted) return;
       _startCooldown(_resendCooldownSeconds);
+      CustomSnackBar.show(context, l10n.authOtpResendSuccess);
     } catch (_) {
       if (mounted) {
         CustomSnackBar.show(context, l10n.authOtpResendFailed);
@@ -306,42 +307,47 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       SizedBox(height: 12.h),
-                      PinCodeTextField(
-                        appContext: context,
-                        controller: _otpController,
-                        autoDisposeControllers: false,
-                        length: 6,
-                        keyboardType: TextInputType.number,
-                        animationType: AnimationType.fade,
-                        textStyle: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: isDark ? AppColors.offWhite : AppColors.black,
-                        ),
-                        cursorColor: labelColor,
-                        enableActiveFill: true,
-                        pinTheme: PinTheme(
-                          shape: PinCodeFieldShape.box,
-                          borderRadius: BorderRadius.circular(12.r),
-                          fieldHeight: 52.r,
-                          fieldWidth: 44.w,
-                          activeColor: isDark
-                              ? AppColors.goldLight
-                              : AppColors.burgundy,
-                          selectedColor: isDark
-                              ? AppColors.goldLight
-                              : AppColors.burgundy,
-                          inactiveColor: isDark
-                              ? AppColors.taupe.withValues(alpha: 0.5)
-                              : AppColors.burgundy.withValues(alpha: 0.35),
-                          activeFillColor: isDark
-                              ? AppColors.burgundy.withValues(alpha: 0.12)
-                              : AppColors.offWhite,
-                          selectedFillColor: isDark
-                              ? AppColors.burgundy.withValues(alpha: 0.18)
-                              : AppColors.offWhite,
-                          inactiveFillColor: isDark
-                              ? AppColors.burgundy.withValues(alpha: 0.08)
-                              : AppColors.offWhite,
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: PinCodeTextField(
+                          appContext: context,
+                          controller: _otpController,
+                          autoDisposeControllers: false,
+                          length: 6,
+                          keyboardType: TextInputType.number,
+                          animationType: AnimationType.fade,
+                          textStyle: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: isDark
+                                ? AppColors.offWhite
+                                : AppColors.black,
+                          ),
+                          cursorColor: labelColor,
+                          enableActiveFill: true,
+                          pinTheme: PinTheme(
+                            shape: PinCodeFieldShape.box,
+                            borderRadius: BorderRadius.circular(12.r),
+                            fieldHeight: 52.r,
+                            fieldWidth: 44.w,
+                            activeColor: isDark
+                                ? AppColors.goldLight
+                                : AppColors.burgundy,
+                            selectedColor: isDark
+                                ? AppColors.goldLight
+                                : AppColors.burgundy,
+                            inactiveColor: isDark
+                                ? AppColors.taupe.withValues(alpha: 0.5)
+                                : AppColors.burgundy.withValues(alpha: 0.35),
+                            activeFillColor: isDark
+                                ? AppColors.burgundy.withValues(alpha: 0.12)
+                                : AppColors.offWhite,
+                            selectedFillColor: isDark
+                                ? AppColors.burgundy.withValues(alpha: 0.18)
+                                : AppColors.offWhite,
+                            inactiveFillColor: isDark
+                                ? AppColors.burgundy.withValues(alpha: 0.08)
+                                : AppColors.offWhite,
+                          ),
                         ),
                       ),
                       SizedBox(height: 12.h),

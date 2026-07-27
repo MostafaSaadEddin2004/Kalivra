@@ -1823,7 +1823,7 @@ abstract class AppLocalizations {
   /// No description provided for @unexpectedError.
   ///
   /// In en, this message translates to:
-  /// **'An unexpected error occurred'**
+  /// **'unexpected error'**
   String get unexpectedError;
 
   /// No description provided for @inviteCodeQuestion.
@@ -2084,17 +2084,41 @@ abstract class AppLocalizations {
   /// **'Change Phone Number'**
   String get changePhoneTitle;
 
-  /// No description provided for @sendCodeViaWhatsApp.
+  /// No description provided for @changePhoneIntro.
   ///
   /// In en, this message translates to:
-  /// **'Send code via WhatsApp'**
-  String get sendCodeViaWhatsApp;
+  /// **'Enter the new phone number'**
+  String get changePhoneIntro;
+
+  /// No description provided for @changePasswordWithPhoneIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your phone number for verification, then the new password'**
+  String get changePasswordWithPhoneIntro;
+
+  /// No description provided for @newPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'New phone number'**
+  String get newPhoneNumber;
+
+  /// No description provided for @enterNewPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the new phone number'**
+  String get enterNewPhoneNumber;
 
   /// No description provided for @enterPhoneNumber.
   ///
   /// In en, this message translates to:
   /// **'Enter phone number'**
   String get enterPhoneNumber;
+
+  /// No description provided for @sendCodeViaWhatsApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Send code via WhatsApp'**
+  String get sendCodeViaWhatsApp;
 
   /// No description provided for @enterCode4To6.
   ///
@@ -3655,6 +3679,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter message'**
   String get associationRequestMessageHint;
+
+  /// No description provided for @chatHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat history'**
+  String get chatHistory;
+
+  /// No description provided for @newChat.
+  ///
+  /// In en, this message translates to:
+  /// **'New chat'**
+  String get newChat;
+
+  /// No description provided for @associationChats.
+  ///
+  /// In en, this message translates to:
+  /// **'Association chats'**
+  String get associationChats;
+
+  /// No description provided for @associationChatsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new session or continue a previous chat.'**
+  String get associationChatsSubtitle;
+
+  /// No description provided for @associationChatsTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Chats'**
+  String get associationChatsTooltip;
+
+  /// No description provided for @noChatsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No chats yet'**
+  String get noChatsYet;
+
+  /// No description provided for @chatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat {id}'**
+  String chatTitle(int id);
+
+  /// No description provided for @chatSessionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Session {id}'**
+  String chatSessionTitle(String id);
+
+  /// No description provided for @askAssociation.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the association'**
+  String get askAssociation;
+
+  /// No description provided for @chooseChatOrAskQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a chat from history or send a new question.'**
+  String get chooseChatOrAskQuestion;
+
+  /// No description provided for @chatWaitingPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Response is preparing'**
+  String get chatWaitingPreparing;
+
+  /// No description provided for @chatWaitingLongTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorry for taking a long time'**
+  String get chatWaitingLongTime;
+
+  /// No description provided for @chatWaitingChecking.
+  ///
+  /// In en, this message translates to:
+  /// **'We are checking the best answer'**
+  String get chatWaitingChecking;
+
+  /// No description provided for @chatWaitingAlmostDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Almost done, thank you for waiting'**
+  String get chatWaitingAlmostDone;
+
+  /// No description provided for @signUpReadOur.
+  ///
+  /// In en, this message translates to:
+  /// **'Read our '**
+  String get signUpReadOur;
+
+  /// No description provided for @signUpAndThe.
+  ///
+  /// In en, this message translates to:
+  /// **' and the '**
+  String get signUpAndThe;
+
+  /// No description provided for @phoneNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone numbers'**
+  String get phoneNumbers;
+
+  /// No description provided for @workingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Working hours'**
+  String get workingHours;
+
+  /// No description provided for @country.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get country;
+
+  /// No description provided for @city.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get city;
+
+  /// No description provided for @social.
+  ///
+  /// In en, this message translates to:
+  /// **'Social'**
+  String get social;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// No description provided for @sortOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort order'**
+  String get sortOrder;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact'**
+  String get contact;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @onlinePresence.
+  ///
+  /// In en, this message translates to:
+  /// **'Online presence'**
+  String get onlinePresence;
+
+  /// No description provided for @brandDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Brand details'**
+  String get brandDetailsTitle;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @companyDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Company details'**
+  String get companyDetails;
+
+  /// No description provided for @whatCompanyOffers.
+  ///
+  /// In en, this message translates to:
+  /// **'What the company offers'**
+  String get whatCompanyOffers;
+
+  /// No description provided for @additionalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional description'**
+  String get additionalDescription;
+
+  /// No description provided for @noAdditionalAdDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'No additional details for this ad'**
+  String get noAdditionalAdDetails;
+
+  /// No description provided for @sizeAndColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Size and color'**
+  String get sizeAndColor;
+
+  /// No description provided for @selectedColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Color: {color}'**
+  String selectedColor(String color);
+
+  /// No description provided for @stockPieces.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock: {count} pieces'**
+  String stockPieces(int count);
+
+  /// No description provided for @nothingToShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to show.'**
+  String get nothingToShow;
+
+  /// No description provided for @userBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'User Balance'**
+  String get userBalance;
 }
 
 class _AppLocalizationsDelegate

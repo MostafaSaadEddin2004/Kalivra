@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/ad/advertisement_model.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
@@ -12,6 +13,7 @@ class AdDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
 
@@ -40,53 +42,43 @@ class AdDetailsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(14.r),
-                        decoration: BoxDecoration(
-                          color: (isDark ? AppColors.offWhite : Colors.white)
-                              .withValues(alpha: 0.25),
-                          borderRadius: BorderRadius.circular(14.r),
+                  Container(
+                    padding: EdgeInsets.all(14.r),
+                    decoration: BoxDecoration(
+                      color: (isDark ? AppColors.offWhite : Colors.white)
+                          .withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    child: Icon(
+                      Icons.campaign_rounded,
+                      size: 40.r,
+                      color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                    ),
+                  ),
+                  SizedBox(width: 20.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ad.title,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: isDark ? AppColors.offWhite : Colors.white,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.campaign_rounded,
-                          size: 40.r,
-                          color: isDark
-                              ? AppColors.goldLight
-                              : AppColors.burgundy,
+                        SizedBox(height: 8.h),
+                        Text(
+                          ad.subtitle,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: (isDark ? AppColors.offWhite : Colors.white)
+                                .withValues(alpha: 0.95),
+                          ),
                         ),
-                      ),
-                      SizedBox(width: 20.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              ad.title,
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                color: isDark
-                                    ? AppColors.offWhite
-                                    : Colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            Text(
-                              ad.subtitle,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                color:
-                                    (isDark ? AppColors.offWhite : Colors.white)
-                                        .withValues(alpha: 0.95),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -103,7 +95,7 @@ class AdDetailsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'تفاصيل الشركة',
+                      l10n.companyDetails,
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: isDark
                             ? AppColors.goldLight
@@ -115,7 +107,7 @@ class AdDetailsScreen extends StatelessWidget {
                     if (ad.companyName != null) ...[
                       _DetailRow(
                         icon: Icons.business_rounded,
-                        label: 'اسم الشركة',
+                        label: l10n.companyName,
                         value: ad.companyName!,
                         isDark: isDark,
                       ),
@@ -124,7 +116,7 @@ class AdDetailsScreen extends StatelessWidget {
                     if (ad.whatTheySell != null) ...[
                       _DetailRow(
                         icon: Icons.shopping_bag_outlined,
-                        label: 'ما تقدمه الشركة',
+                        label: l10n.whatCompanyOffers,
                         value: ad.whatTheySell!,
                         isDark: isDark,
                         maxLines: 3,
@@ -134,7 +126,7 @@ class AdDetailsScreen extends StatelessWidget {
                     if (ad.location != null) ...[
                       _DetailRow(
                         icon: Icons.location_on_outlined,
-                        label: 'الموقع',
+                        label: l10n.location,
                         value: ad.location!,
                         isDark: isDark,
                         maxLines: 3,
@@ -144,7 +136,7 @@ class AdDetailsScreen extends StatelessWidget {
                     if (ad.phone != null) ...[
                       _DetailRow(
                         icon: Icons.phone_outlined,
-                        label: 'رقم الهاتف',
+                        label: l10n.phoneLabel,
                         value: ad.phone!,
                         isDark: isDark,
                       ),
@@ -153,7 +145,7 @@ class AdDetailsScreen extends StatelessWidget {
                     if (ad.website != null) ...[
                       _DetailRow(
                         icon: Icons.language_outlined,
-                        label: 'الموقع الإلكتروني',
+                        label: l10n.website,
                         value: ad.website!,
                         isDark: isDark,
                       ),
@@ -162,7 +154,7 @@ class AdDetailsScreen extends StatelessWidget {
                     if (ad.description != null) ...[
                       _DetailRow(
                         icon: Icons.info_outline_rounded,
-                        label: 'وصف إضافي',
+                        label: l10n.additionalDescription,
                         value: ad.description!,
                         isDark: isDark,
                         maxLines: 4,
@@ -177,7 +169,7 @@ class AdDetailsScreen extends StatelessWidget {
                       Padding(
                         padding: EdgeInsets.symmetric(vertical: 8.h),
                         child: Text(
-                          'لا توجد تفاصيل إضافية لهذا الإعلان',
+                          l10n.noAdditionalAdDetails,
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: isDark
                                 ? AppColors.taupe

@@ -67,9 +67,9 @@ class PaymentStepState extends State<PaymentStep> {
     final methods = widget.methods.isNotEmpty
         ? widget.methods
         : [
-            const CheckoutPaymentMethodModel(
+            CheckoutPaymentMethodModel(
               method: 'cashondelivery',
-              title: 'Cash On Delivery',
+              title: l10n.cashOnDelivery,
             ),
           ];
 

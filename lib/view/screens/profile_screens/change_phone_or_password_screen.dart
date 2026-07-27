@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
@@ -36,29 +37,33 @@ class _ChangePhoneOrPasswordScreenState
     super.dispose();
   }
 
-  String get _title => widget.mode == ChangePhoneOrPasswordMode.phone
-      ? 'تغيير رقم الجوال'
-      : 'تغيير كلمة المرور';
+  bool get _isPhoneMode => widget.mode == ChangePhoneOrPasswordMode.phone;
+
+  String _title(AppLocalizations l10n) {
+    return _isPhoneMode ? l10n.changePhoneTitle : l10n.changePasswordTitle;
+  }
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final l10n = AppLocalizations.of(context)!;
     CustomSnackBar.show(
       context,
-      widget.mode == ChangePhoneOrPasswordMode.phone
-          ? 'تم إرسال رمز التحقق إلى ${_phoneController.text}'
-          : 'تم تحديث كلمة المرور',
+      _isPhoneMode
+          ? l10n.otpSentToPhone(_phoneController.text)
+          : l10n.passwordUpdatedSuccess,
     );
     context.pop();
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
 
     return Scaffold(
-      appBar: ScreenAppBar(title: _title),
+      appBar: ScreenAppBar(title: _title(l10n)),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -75,9 +80,9 @@ class _ChangePhoneOrPasswordScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.mode == ChangePhoneOrPasswordMode.phone
-                          ? 'أدخل رقم الجوال الجديد'
-                          : 'رقم الجوال للتحقق ثم كلمة المرور الجديدة',
+                      _isPhoneMode
+                          ? l10n.changePhoneIntro
+                          : l10n.changePasswordWithPhoneIntro,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                         height: 1.4,
@@ -86,9 +91,9 @@ class _ChangePhoneOrPasswordScreenState
                     SizedBox(height: 24.h),
                     AppTextField(
                       controller: _phoneController,
-                      label: widget.mode == ChangePhoneOrPasswordMode.phone
-                          ? 'رقم الجوال الجديد'
-                          : 'رقم الجوال',
+                      label: _isPhoneMode
+                          ? l10n.newPhoneNumber
+                          : l10n.mobileNumber,
                       hint: '+966 5XX XXX XXXX',
                       prefixIcon: Icon(
                         Icons.phone_android_rounded,
@@ -98,18 +103,18 @@ class _ChangePhoneOrPasswordScreenState
                       keyboardType: TextInputType.phone,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return widget.mode == ChangePhoneOrPasswordMode.phone
-                              ? 'أدخل رقم الجوال الجديد'
-                              : 'أدخل رقم الجوال';
+                          return _isPhoneMode
+                              ? l10n.enterNewPhoneNumber
+                              : l10n.enterPhoneNumber;
                         }
                         return null;
                       },
                     ),
-                    if (widget.mode == ChangePhoneOrPasswordMode.password) ...[
+                    if (!_isPhoneMode) ...[
                       SizedBox(height: 20.h),
                       AppTextField(
                         controller: _newPasswordController,
-                        label: 'كلمة المرور الجديدة',
+                        label: l10n.newPassword,
                         hint: '********',
                         obscureText: _obscureNew,
                         prefixIcon: Icon(
@@ -128,7 +133,7 @@ class _ChangePhoneOrPasswordScreenState
                         ),
                         validator: (v) {
                           if (v == null || v.length < 6) {
-                            return 'كلمة المرور 6 أحرف على الأقل';
+                            return l10n.passwordMinLength;
                           }
                           return null;
                         },
@@ -136,7 +141,7 @@ class _ChangePhoneOrPasswordScreenState
                       SizedBox(height: 20.h),
                       AppTextField(
                         controller: _confirmPasswordController,
-                        label: 'تأكيد كلمة المرور',
+                        label: l10n.newPasswordConfirm,
                         hint: '********',
                         obscureText: _obscureConfirm,
                         prefixIcon: Icon(
@@ -156,7 +161,7 @@ class _ChangePhoneOrPasswordScreenState
                         ),
                         validator: (v) {
                           if (v != _newPasswordController.text) {
-                            return 'غير متطابقة مع كلمة المرور الجديدة';
+                            return l10n.confirmPasswordMismatch;
                           }
                           return null;
                         },
@@ -171,9 +176,9 @@ class _ChangePhoneOrPasswordScreenState
               onPressed: _submit,
               icon: Icon(Icons.check_rounded, size: 22.r),
               label: Text(
-                widget.mode == ChangePhoneOrPasswordMode.phone
-                    ? 'إرسال رمز التحقق'
-                    : 'تحديث كلمة المرور',
+                _isPhoneMode
+                    ? l10n.sendCodeViaWhatsApp
+                    : l10n.updatePasswordButton,
                 style: theme.textTheme.titleMedium?.copyWith(
                   color: AppColors.offWhite,
                   fontWeight: FontWeight.w700,

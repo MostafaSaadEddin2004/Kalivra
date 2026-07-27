@@ -84,7 +84,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   ),
                 );
               default:
-                return Center(child: Text('Nothing to show.'));
+                return Center(child: Text(l10n.nothingToShow));
             }
           },
         ),

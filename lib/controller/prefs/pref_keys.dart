@@ -13,4 +13,5 @@ abstract class PrefKeys {
   static const String systemLocaleKey = 'system';
   static const String associationLinkSubmittedKey =
       'association_link_submitted';
+  static const String userIdKey = 'user_id';
 }

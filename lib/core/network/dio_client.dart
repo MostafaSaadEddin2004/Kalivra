@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:kalivra/core/network/api_exception.dart';
 import 'package:kalivra/core/network/app_interceptor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
@@ -57,24 +58,28 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      if (e.response!.requestOptions.connectTimeout != null) {
-        throw 'Connection timeout';
-      } else {
-        throw e.response!.data['message'] ?? 'Something wrong';
-      }
+      throw _parseDioException(e);
     }
   }
 
-  Future<Response> post(String path, {dynamic data}) async {
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
     try {
-      final response = await _dio.post(path, data: data);
+      final response = await _dio.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+        cancelToken: cancelToken,
+      );
       return response;
     } on DioException catch (e) {
-      if (e.response!.requestOptions.connectTimeout != null) {
-        throw 'Connection timeout';
-      } else {
-        throw e.response!.data['message'] ?? 'Something wrong';
-      }
+      throw _parseDioException(e);
     }
   }
 
@@ -95,11 +100,7 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      if (e.response!.requestOptions.connectTimeout != null) {
-        throw 'Connection timeout';
-      } else {
-        throw e.response!.data['message'] ?? 'Something wrong';
-      }
+      throw _parseDioException(e);
     }
   }
 
@@ -120,11 +121,7 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      if (e.response!.requestOptions.connectTimeout != null) {
-        throw 'Connection timeout';
-      } else {
-        throw e.response!.data['message'] ?? 'Something wrong';
-      }
+      throw _parseDioException(e);
     }
   }
 
@@ -145,11 +142,25 @@ class DioClient {
       );
       return response;
     } on DioException catch (e) {
-      if (e.response!.requestOptions.connectTimeout != null) {
-        throw 'Connection timeout';
-      } else {
-        throw e.response!.data['message'] ?? 'Something wrong';
-      }
+      throw _parseDioException(e);
     }
+  }
+
+  ApiException _parseDioException(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return const ApiException(message: 'Connection timeout');
+    }
+
+    final response = e.response;
+    if (response == null) {
+      return ApiException(message: e.message ?? 'Something wrong');
+    }
+
+    return ApiException.fromResponseData(
+      response.data,
+      fallbackStatus: response.statusCode,
+    );
   }
 }

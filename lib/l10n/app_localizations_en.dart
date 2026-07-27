@@ -915,7 +915,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get haveAccount => 'Already have an account? ';
 
   @override
-  String get unexpectedError => 'An unexpected error occurred';
+  String get unexpectedError => 'unexpected error';
 
   @override
   String get inviteCodeQuestion => 'Have an invite code from a friend?';
@@ -1053,10 +1053,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get changePhoneTitle => 'Change Phone Number';
 
   @override
-  String get sendCodeViaWhatsApp => 'Send code via WhatsApp';
+  String get changePhoneIntro => 'Enter the new phone number';
+
+  @override
+  String get changePasswordWithPhoneIntro =>
+      'Enter your phone number for verification, then the new password';
+
+  @override
+  String get newPhoneNumber => 'New phone number';
+
+  @override
+  String get enterNewPhoneNumber => 'Enter the new phone number';
 
   @override
   String get enterPhoneNumber => 'Enter phone number';
+
+  @override
+  String get sendCodeViaWhatsApp => 'Send code via WhatsApp';
 
   @override
   String get enterCode4To6 => 'Enter the 4-6 digit code';
@@ -1886,4 +1899,134 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get associationRequestMessageHint => 'Enter message';
+
+  @override
+  String get chatHistory => 'Chat history';
+
+  @override
+  String get newChat => 'New chat';
+
+  @override
+  String get associationChats => 'Association chats';
+
+  @override
+  String get associationChatsSubtitle =>
+      'Start a new session or continue a previous chat.';
+
+  @override
+  String get associationChatsTooltip => 'Chats';
+
+  @override
+  String get noChatsYet => 'No chats yet';
+
+  @override
+  String chatTitle(int id) {
+    return 'Chat $id';
+  }
+
+  @override
+  String chatSessionTitle(String id) {
+    return 'Session $id';
+  }
+
+  @override
+  String get askAssociation => 'Ask the association';
+
+  @override
+  String get chooseChatOrAskQuestion =>
+      'Choose a chat from history or send a new question.';
+
+  @override
+  String get chatWaitingPreparing => 'Response is preparing';
+
+  @override
+  String get chatWaitingLongTime => 'Sorry for taking a long time';
+
+  @override
+  String get chatWaitingChecking => 'We are checking the best answer';
+
+  @override
+  String get chatWaitingAlmostDone => 'Almost done, thank you for waiting';
+
+  @override
+  String get signUpReadOur => 'Read our ';
+
+  @override
+  String get signUpAndThe => ' and the ';
+
+  @override
+  String get phoneNumbers => 'Phone numbers';
+
+  @override
+  String get workingHours => 'Working hours';
+
+  @override
+  String get country => 'Country';
+
+  @override
+  String get city => 'City';
+
+  @override
+  String get social => 'Social';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get sortOrder => 'Sort order';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get contact => 'Contact';
+
+  @override
+  String get location => 'Location';
+
+  @override
+  String get onlinePresence => 'Online presence';
+
+  @override
+  String get brandDetailsTitle => 'Brand details';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get companyDetails => 'Company details';
+
+  @override
+  String get whatCompanyOffers => 'What the company offers';
+
+  @override
+  String get additionalDescription => 'Additional description';
+
+  @override
+  String get noAdditionalAdDetails => 'No additional details for this ad';
+
+  @override
+  String get sizeAndColor => 'Size and color';
+
+  @override
+  String selectedColor(String color) {
+    return 'Color: $color';
+  }
+
+  @override
+  String stockPieces(int count) {
+    return 'Stock: $count pieces';
+  }
+
+  @override
+  String get nothingToShow => 'Nothing to show.';
+
+  @override
+  String get userBalance => 'User Balance';
 }

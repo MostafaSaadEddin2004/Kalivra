@@ -1,5 +1,13 @@
 class AssociationMemberProfileModel {
   const AssociationMemberProfileModel({
+    this.associationRequestStatus = '',
+    this.lifecycleStage = '',
+    this.associationMemberStatus = '',
+    this.canRequestMembershipInfoEdit = false,
+    this.hasPendingProfileEditRequest = false,
+    this.documents = const [],
+    this.addresses,
+    this.associationInformation,
     required this.isLinkedPerson,
     required this.isAssociationMember,
     required this.hasPendingAssociationMembershipRequest,
@@ -16,6 +24,14 @@ class AssociationMemberProfileModel {
     this.membershipLifecycle,
   });
 
+  final String associationRequestStatus;
+  final String lifecycleStage;
+  final String associationMemberStatus;
+  final bool canRequestMembershipInfoEdit;
+  final bool hasPendingProfileEditRequest;
+  final List<AssociationMembershipDocument> documents;
+  final AssociationProfileAddresses? addresses;
+  final AssociationInformation? associationInformation;
   final bool isLinkedPerson;
   final bool isAssociationMember;
   final bool hasPendingAssociationMembershipRequest;
@@ -31,37 +47,77 @@ class AssociationMemberProfileModel {
   final Object? latestAssociationMembershipRequest;
   final MembershipLifecycle? membershipLifecycle;
 
+  bool get canSubmitAssociationRequest =>
+      membershipLifecycle?.canSubmitRequest ?? false;
+
   factory AssociationMemberProfileModel.fromJson(Map<String, dynamic> json) {
+    final association = _mapValue(json['association']) ?? json;
+    final topLevelMemberships = _listOf(
+      json['memberships'],
+      AssociationMembership.fromJson,
+    );
+    final associationMemberships = _listOf(
+      association['memberships'],
+      AssociationMembership.fromJson,
+    );
+
     return AssociationMemberProfileModel(
-      isLinkedPerson: _boolValue(json['is_linked_person']),
-      isAssociationMember: _boolValue(json['is_association_member']),
-      hasPendingAssociationMembershipRequest: _boolValue(
-        json['has_pending_association_membership_request'],
+      associationRequestStatus: _stringValue(
+        json['association_request_status'],
       ),
-      isAssignedToProjects: _boolValue(json['is_assigned_to_projects']),
-      isAssignedToUnits: _boolValue(json['is_assigned_to_units']),
-      hasActiveMemberships: _boolValue(json['has_active_memberships']),
+      lifecycleStage: _stringValue(json['lifecycle_stage']),
+      associationMemberStatus: _stringValue(json['association_member_status']),
+      canRequestMembershipInfoEdit: _boolValue(
+        json['can_request_membership_info_edit'],
+      ),
+      hasPendingProfileEditRequest: _boolValue(
+        json['has_pending_profile_edit_request'],
+      ),
+      documents: _listOf(
+        json['documents'],
+        AssociationMembershipDocument.fromJson,
+      ),
+      addresses: _mapOrNull(
+        json['addresses'],
+        AssociationProfileAddresses.fromJson,
+      ),
+      associationInformation: _mapOrNull(
+        json['association_information'],
+        AssociationInformation.fromJson,
+      ),
+      isLinkedPerson:
+          _boolValue(association['is_linked_person']) ||
+          _mapValue(association['person']) != null,
+      isAssociationMember: _boolValue(association['is_association_member']),
+      hasPendingAssociationMembershipRequest: _boolValue(
+        association['has_pending_association_membership_request'],
+      ),
+      isAssignedToProjects: _boolValue(association['is_assigned_to_projects']),
+      isAssignedToUnits: _boolValue(association['is_assigned_to_units']),
+      hasActiveMemberships: _boolValue(association['has_active_memberships']),
       registrationProfile: _mapOrNull(
-        json['registration_profile'],
+        association['registration_profile'],
         ProfileCompletion.fromJson,
       ),
       bindingProfile: _mapOrNull(
-        json['binding_profile'],
+        association['binding_profile'],
         BindingProfile.fromJson,
       ),
       person:
-          _mapOrNull(json['person'], AssociationPerson.fromJson) ??
+          _mapOrNull(association['person'], AssociationPerson.fromJson) ??
           const AssociationPerson(),
       associationMember: _mapOrNull(
-        json['association_member'],
+        association['association_member'],
         AssociationCoreMember.fromJson,
       ),
-      memberships: _listOf(json['memberships'], AssociationMembership.fromJson),
-      projects: _listOf(json['projects'], AssociationProject.fromJson),
+      memberships: topLevelMemberships.isNotEmpty
+          ? topLevelMemberships
+          : associationMemberships,
+      projects: _listOf(association['projects'], AssociationProject.fromJson),
       latestAssociationMembershipRequest:
-          json['latest_association_membership_request'],
+          association['latest_association_membership_request'],
       membershipLifecycle: _mapOrNull(
-        json['membership_lifecycle'],
+        association['membership_lifecycle'],
         MembershipLifecycle.fromJson,
       ),
     );
@@ -69,6 +125,14 @@ class AssociationMemberProfileModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'association_request_status': associationRequestStatus,
+      'lifecycle_stage': lifecycleStage,
+      'association_member_status': associationMemberStatus,
+      'can_request_membership_info_edit': canRequestMembershipInfoEdit,
+      'has_pending_profile_edit_request': hasPendingProfileEditRequest,
+      'documents': documents.map((item) => item.toJson()).toList(),
+      'addresses': addresses?.toJson(),
+      'association_information': associationInformation?.toJson(),
       'is_linked_person': isLinkedPerson,
       'is_association_member': isAssociationMember,
       'has_pending_association_membership_request':
@@ -85,6 +149,82 @@ class AssociationMemberProfileModel {
       'latest_association_membership_request':
           latestAssociationMembershipRequest,
       'membership_lifecycle': membershipLifecycle?.toJson(),
+    };
+  }
+}
+
+class AssociationProfileAddresses {
+  const AssociationProfileAddresses({
+    this.permanent,
+    this.current,
+    this.additional = const [],
+  });
+
+  final Map<String, dynamic>? permanent;
+  final Map<String, dynamic>? current;
+  final List<Map<String, dynamic>> additional;
+
+  factory AssociationProfileAddresses.fromJson(Map<String, dynamic> json) {
+    return AssociationProfileAddresses(
+      permanent: _mapValue(json['permanent']),
+      current: _mapValue(json['current']),
+      additional: _mapList(json['additional']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'permanent': permanent,
+      'current': current,
+      'additional': additional,
+    };
+  }
+}
+
+class AssociationInformation {
+  const AssociationInformation({
+    this.membershipNumber = '',
+    this.priorityNumber,
+    this.associationJoinDate = '',
+    this.membershipType = '',
+    this.membershipTypeLabel = '',
+    this.currentAssociationStatus = '',
+    this.currentAssociationStatusLabel = '',
+  });
+
+  final String membershipNumber;
+  final int? priorityNumber;
+  final String associationJoinDate;
+  final String membershipType;
+  final String membershipTypeLabel;
+  final String currentAssociationStatus;
+  final String currentAssociationStatusLabel;
+
+  factory AssociationInformation.fromJson(Map<String, dynamic> json) {
+    return AssociationInformation(
+      membershipNumber: _stringValue(json['membership_number']),
+      priorityNumber: _intValue(json['priority_number']),
+      associationJoinDate: _stringValue(json['association_join_date']),
+      membershipType: _stringValue(json['membership_type']),
+      membershipTypeLabel: _stringValue(json['membership_type_label']),
+      currentAssociationStatus: _stringValue(
+        json['current_association_status'],
+      ),
+      currentAssociationStatusLabel: _stringValue(
+        json['current_association_status_label'],
+      ),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'membership_number': membershipNumber,
+      'priority_number': priorityNumber,
+      'association_join_date': associationJoinDate,
+      'membership_type': membershipType,
+      'membership_type_label': membershipTypeLabel,
+      'current_association_status': currentAssociationStatus,
+      'current_association_status_label': currentAssociationStatusLabel,
     };
   }
 }
@@ -280,6 +420,7 @@ class AssociationMembership {
     this.membershipTypeLabel = '',
     this.membershipStatus = '',
     this.status = '',
+    this.statusLabel = '',
     this.membershipStatusLabel = '',
     this.isActive = false,
     this.isAssignedToProject = false,
@@ -292,10 +433,16 @@ class AssociationMembership {
     this.priorityNumber,
     this.priorityStatus = '',
     this.priorityStatusLabel = '',
+    this.allocatedUnit,
     this.membershipDecision = '',
     this.joinDocuments = '',
     this.closedAt = '',
     this.project,
+    this.financialInformation,
+    this.payments = const [],
+    this.financialObligations = const [],
+    this.holderHistory = const [],
+    this.documents = const [],
     this.building,
     this.unit,
     this.totalPaymentsMade,
@@ -307,6 +454,7 @@ class AssociationMembership {
   final String membershipTypeLabel;
   final String membershipStatus;
   final String status;
+  final String statusLabel;
   final String membershipStatusLabel;
   final bool isActive;
   final bool isAssignedToProject;
@@ -319,10 +467,16 @@ class AssociationMembership {
   final int? priorityNumber;
   final String priorityStatus;
   final String priorityStatusLabel;
+  final AssociationUnit? allocatedUnit;
   final String membershipDecision;
   final String joinDocuments;
   final String closedAt;
   final AssociationProject? project;
+  final AssociationFinancialInformation? financialInformation;
+  final List<AssociationPayment> payments;
+  final List<AssociationFinancialObligation> financialObligations;
+  final List<AssociationHolderHistory> holderHistory;
+  final List<AssociationMembershipDocument> documents;
   final AssociationBuilding? building;
   final AssociationUnit? unit;
   final num? totalPaymentsMade;
@@ -334,6 +488,7 @@ class AssociationMembership {
 
   String get displayStatus {
     if (membershipStatusLabel.isNotEmpty) return membershipStatusLabel;
+    if (statusLabel.isNotEmpty) return statusLabel;
     return membershipStatus.isNotEmpty ? membershipStatus : status;
   }
 
@@ -355,6 +510,7 @@ class AssociationMembership {
       membershipTypeLabel: _stringValue(json['membership_type_label']),
       membershipStatus: _stringValue(json['membership_status']),
       status: _stringValue(json['status']),
+      statusLabel: _stringValue(json['status_label']),
       membershipStatusLabel: _stringValue(json['membership_status_label']),
       isActive: _boolValue(json['is_active']),
       isAssignedToProject: _boolValue(json['is_assigned_to_project']),
@@ -369,13 +525,40 @@ class AssociationMembership {
       priorityNumber: _intValue(json['priority_number']),
       priorityStatus: _stringValue(json['priority_status']),
       priorityStatusLabel: _stringValue(json['priority_status_label']),
+      allocatedUnit: _mapOrNull(
+        json['allocated_unit'],
+        AssociationUnit.fromJson,
+      ),
       membershipDecision: _stringValue(json['membership_decision']),
       joinDocuments: _stringValue(json['join_documents']),
       closedAt: _stringValue(json['closed_at']),
       project: _mapOrNull(json['project'], AssociationProject.fromJson),
+      financialInformation: _mapOrNull(
+        json['financial_information'],
+        AssociationFinancialInformation.fromJson,
+      ),
+      payments: _listOf(json['payments'], AssociationPayment.fromJson),
+      financialObligations: _listOf(
+        json['financial_obligations'],
+        AssociationFinancialObligation.fromJson,
+      ),
+      holderHistory: _listOf(
+        json['holder_history'],
+        AssociationHolderHistory.fromJson,
+      ),
+      documents: _listOf(
+        json['documents'],
+        AssociationMembershipDocument.fromJson,
+      ),
       building: _mapOrNull(json['building'], AssociationBuilding.fromJson),
       unit: _mapOrNull(json['unit'], AssociationUnit.fromJson),
-      totalPaymentsMade: _numValue(json['total_payments_made']),
+      totalPaymentsMade:
+          _numValue(json['total_payments_made']) ??
+          _numValue(
+            json['financial_information'] is Map
+                ? (json['financial_information'] as Map)['total_payments']
+                : null,
+          ),
     );
   }
 
@@ -387,6 +570,7 @@ class AssociationMembership {
       'membership_type_label': membershipTypeLabel,
       'membership_status': membershipStatus,
       'status': status,
+      'status_label': statusLabel,
       'membership_status_label': membershipStatusLabel,
       'is_active': isActive,
       'is_assigned_to_project': isAssignedToProject,
@@ -399,13 +583,283 @@ class AssociationMembership {
       'priority_number': priorityNumber,
       'priority_status': priorityStatus,
       'priority_status_label': priorityStatusLabel,
+      'allocated_unit': allocatedUnit?.toJson(),
       'membership_decision': membershipDecision,
       'join_documents': joinDocuments,
       'closed_at': closedAt,
       'project': project?.toJson(),
+      'financial_information': financialInformation?.toJson(),
+      'payments': payments.map((item) => item.toJson()).toList(),
+      'financial_obligations': financialObligations
+          .map((item) => item.toJson())
+          .toList(),
+      'holder_history': holderHistory.map((item) => item.toJson()).toList(),
+      'documents': documents.map((item) => item.toJson()).toList(),
       'building': building?.toJson(),
       'unit': unit?.toJson(),
       'total_payments_made': totalPaymentsMade,
+    };
+  }
+}
+
+class AssociationFinancialInformation {
+  const AssociationFinancialInformation({
+    this.totalPayments,
+    this.totalObligations,
+    this.coveredObligations,
+    this.uncoveredObligations,
+    this.openObligationsCount,
+    this.overdueObligationsCount,
+    this.overdueObligationsAmount,
+    this.availableBalance,
+    this.currentBalance,
+    this.memberFinancialStatus = '',
+    this.memberFinancialStatusLabel = '',
+    this.totalPaid,
+    this.remainingAmount,
+    this.pendingObligations,
+  });
+
+  final num? totalPayments;
+  final num? totalObligations;
+  final num? coveredObligations;
+  final num? uncoveredObligations;
+  final int? openObligationsCount;
+  final int? overdueObligationsCount;
+  final num? overdueObligationsAmount;
+  final num? availableBalance;
+  final num? currentBalance;
+  final String memberFinancialStatus;
+  final String memberFinancialStatusLabel;
+  final num? totalPaid;
+  final num? remainingAmount;
+  final num? pendingObligations;
+
+  factory AssociationFinancialInformation.fromJson(Map<String, dynamic> json) {
+    return AssociationFinancialInformation(
+      totalPayments: _numValue(json['total_payments']),
+      totalObligations: _numValue(json['total_obligations']),
+      coveredObligations: _numValue(json['covered_obligations']),
+      uncoveredObligations: _numValue(json['uncovered_obligations']),
+      openObligationsCount: _intValue(json['open_obligations_count']),
+      overdueObligationsCount: _intValue(json['overdue_obligations_count']),
+      overdueObligationsAmount: _numValue(json['overdue_obligations_amount']),
+      availableBalance: _numValue(json['available_balance']),
+      currentBalance: _numValue(json['current_balance']),
+      memberFinancialStatus: _stringValue(json['member_financial_status']),
+      memberFinancialStatusLabel: _stringValue(
+        json['member_financial_status_label'],
+      ),
+      totalPaid: _numValue(json['total_paid']),
+      remainingAmount: _numValue(json['remaining_amount']),
+      pendingObligations: _numValue(json['pending_obligations']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'total_payments': totalPayments,
+      'total_obligations': totalObligations,
+      'covered_obligations': coveredObligations,
+      'uncovered_obligations': uncoveredObligations,
+      'open_obligations_count': openObligationsCount,
+      'overdue_obligations_count': overdueObligationsCount,
+      'overdue_obligations_amount': overdueObligationsAmount,
+      'available_balance': availableBalance,
+      'current_balance': currentBalance,
+      'member_financial_status': memberFinancialStatus,
+      'member_financial_status_label': memberFinancialStatusLabel,
+      'total_paid': totalPaid,
+      'remaining_amount': remainingAmount,
+      'pending_obligations': pendingObligations,
+    };
+  }
+}
+
+class AssociationPayment {
+  const AssociationPayment({
+    this.id,
+    this.paymentDate = '',
+    this.amount,
+    this.paymentMethod = '',
+    this.paymentMethodLabel = '',
+    this.voucherNumber = '',
+    this.approvalStatus = '',
+    this.approvalStatusLabel = '',
+    this.notes = '',
+  });
+
+  final int? id;
+  final String paymentDate;
+  final num? amount;
+  final String paymentMethod;
+  final String paymentMethodLabel;
+  final String voucherNumber;
+  final String approvalStatus;
+  final String approvalStatusLabel;
+  final String notes;
+
+  factory AssociationPayment.fromJson(Map<String, dynamic> json) {
+    return AssociationPayment(
+      id: _intValue(json['id']),
+      paymentDate: _stringValue(json['payment_date']),
+      amount: _numValue(json['amount']),
+      paymentMethod: _stringValue(json['payment_method']),
+      paymentMethodLabel: _stringValue(json['payment_method_label']),
+      voucherNumber: _stringValue(json['voucher_number']),
+      approvalStatus: _stringValue(json['approval_status']),
+      approvalStatusLabel: _stringValue(json['approval_status_label']),
+      notes: _stringValue(json['notes']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'payment_date': paymentDate,
+      'amount': amount,
+      'payment_method': paymentMethod,
+      'payment_method_label': paymentMethodLabel,
+      'voucher_number': voucherNumber,
+      'approval_status': approvalStatus,
+      'approval_status_label': approvalStatusLabel,
+      'notes': notes,
+    };
+  }
+}
+
+class AssociationFinancialObligation {
+  const AssociationFinancialObligation({
+    this.id,
+    this.name = '',
+    this.amount,
+    this.dueDate = '',
+    this.paymentDeadline = '',
+    this.status = '',
+    this.statusLabel = '',
+    this.isCovered = false,
+  });
+
+  final int? id;
+  final String name;
+  final num? amount;
+  final String dueDate;
+  final String paymentDeadline;
+  final String status;
+  final String statusLabel;
+  final bool isCovered;
+
+  factory AssociationFinancialObligation.fromJson(Map<String, dynamic> json) {
+    return AssociationFinancialObligation(
+      id: _intValue(json['id']),
+      name: _stringValue(json['name']),
+      amount: _numValue(json['amount']),
+      dueDate: _stringValue(json['due_date']),
+      paymentDeadline: _stringValue(json['payment_deadline']),
+      status: _stringValue(json['status']),
+      statusLabel: _stringValue(json['status_label']),
+      isCovered: _boolValue(json['is_covered']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'amount': amount,
+      'due_date': dueDate,
+      'payment_deadline': paymentDeadline,
+      'status': status,
+      'status_label': statusLabel,
+      'is_covered': isCovered,
+    };
+  }
+}
+
+class AssociationHolderHistory {
+  const AssociationHolderHistory({
+    this.holderName = '',
+    this.holderStartDate = '',
+    this.holderEndDate = '',
+    this.reason = '',
+    this.reasonLabel = '',
+    this.referenceDecision = '',
+    this.notes = '',
+    this.isCurrent = false,
+  });
+
+  final String holderName;
+  final String holderStartDate;
+  final String holderEndDate;
+  final String reason;
+  final String reasonLabel;
+  final String referenceDecision;
+  final String notes;
+  final bool isCurrent;
+
+  factory AssociationHolderHistory.fromJson(Map<String, dynamic> json) {
+    return AssociationHolderHistory(
+      holderName: _stringValue(json['holder_name']),
+      holderStartDate: _stringValue(json['holder_start_date']),
+      holderEndDate: _stringValue(json['holder_end_date']),
+      reason: _stringValue(json['reason']),
+      reasonLabel: _stringValue(json['reason_label']),
+      referenceDecision: _stringValue(json['reference_decision']),
+      notes: _stringValue(json['notes']),
+      isCurrent: _boolValue(json['is_current']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'holder_name': holderName,
+      'holder_start_date': holderStartDate,
+      'holder_end_date': holderEndDate,
+      'reason': reason,
+      'reason_label': reasonLabel,
+      'reference_decision': referenceDecision,
+      'notes': notes,
+      'is_current': isCurrent,
+    };
+  }
+}
+
+class AssociationMembershipDocument {
+  const AssociationMembershipDocument({
+    this.documentType = '',
+    this.documentTypeLabel = '',
+    this.status = '',
+    this.uploadDate = '',
+    this.previewUrl = '',
+    this.downloadUrl = '',
+  });
+
+  final String documentType;
+  final String documentTypeLabel;
+  final String status;
+  final String uploadDate;
+  final String previewUrl;
+  final String downloadUrl;
+
+  factory AssociationMembershipDocument.fromJson(Map<String, dynamic> json) {
+    return AssociationMembershipDocument(
+      documentType: _stringValue(json['document_type']),
+      documentTypeLabel: _stringValue(json['document_type_label']),
+      status: _stringValue(json['status']),
+      uploadDate: _stringValue(json['upload_date']),
+      previewUrl: _stringValue(json['preview_url']),
+      downloadUrl: _stringValue(json['download_url']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'document_type': documentType,
+      'document_type_label': documentTypeLabel,
+      'status': status,
+      'upload_date': uploadDate,
+      'preview_url': previewUrl,
+      'download_url': downloadUrl,
     };
   }
 }
@@ -996,6 +1450,12 @@ class LifecycleMembership {
 T? _mapOrNull<T>(Object? raw, T Function(Map<String, dynamic>) fromJson) {
   if (raw is Map<String, dynamic>) return fromJson(raw);
   if (raw is Map) return fromJson(Map<String, dynamic>.from(raw));
+  return null;
+}
+
+Map<String, dynamic>? _mapValue(Object? raw) {
+  if (raw is Map<String, dynamic>) return raw;
+  if (raw is Map) return Map<String, dynamic>.from(raw);
   return null;
 }
 

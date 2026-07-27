@@ -4,14 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_cubit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
-import 'package:kalivra/model/location/syrian_location_catalog.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
-import 'package:kalivra/view/screens/auth/auth_otp_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
@@ -31,13 +30,15 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _countryCodeController = TextEditingController(text: '+963');
   final _phoneController = TextEditingController();
-  final _countryController = TextEditingController();
   final _dobController = TextEditingController();
   final _streetController = TextEditingController();
+  final _streetNumberController = TextEditingController();
   final _buildingController = TextEditingController();
-  final _permanentAddressController = TextEditingController();
   final _villageController = TextEditingController();
+  final _currentAddress = _ProfileAddressInput();
+  final List<_ProfileAddressInput> _additionalAddresses = [];
 
   String? _gender;
   String? _selectedGovernorate;
@@ -45,18 +46,39 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   String? _selectedTown;
   File? _pickedAvatarFile;
   String? _networkAvatarUrl;
+  bool _hasCurrentAddress = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final args = widget.args;
+    if (args != null) {
+      final nameParts = (args.name ?? '').trim().split(RegExp(r'\s+'));
+      _firstNameController.text = nameParts.isNotEmpty ? nameParts.first : '';
+      _lastNameController.text = nameParts.length > 1
+          ? nameParts.sublist(1).join(' ')
+          : '';
+      final phoneParts = _splitPhoneNumber(args.whatsappNumber);
+      _countryCodeController.text = phoneParts.countryCode;
+      _phoneController.text = phoneParts.number;
+    }
+  }
 
   @override
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _countryCodeController.dispose();
     _phoneController.dispose();
-    _countryController.dispose();
     _dobController.dispose();
     _streetController.dispose();
+    _streetNumberController.dispose();
     _buildingController.dispose();
-    _permanentAddressController.dispose();
     _villageController.dispose();
+    _currentAddress.dispose();
+    for (final address in _additionalAddresses) {
+      address.dispose();
+    }
     super.dispose();
   }
 
@@ -79,6 +101,110 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     setState(() {
       _selectedTown = value;
     });
+  }
+
+  void _addAddress() {
+    setState(() {
+      if (_hasCurrentAddress) {
+        _additionalAddresses.add(_ProfileAddressInput());
+      } else {
+        _hasCurrentAddress = true;
+      }
+    });
+  }
+
+  void _removeCurrentAddress() {
+    setState(() {
+      _hasCurrentAddress = false;
+      _currentAddress.clear();
+    });
+  }
+
+  void _removeAdditionalAddress(int index) {
+    setState(() {
+      _additionalAddresses.removeAt(index).dispose();
+    });
+  }
+
+  Widget _fieldSpacer() {
+    return SizedBox(height: 14.h);
+  }
+
+  static _PhoneParts _splitPhoneNumber(String value) {
+    final normalized = value.trim().replaceAll(RegExp(r'\s+'), '');
+    if (normalized.startsWith('+963')) {
+      return _PhoneParts(countryCode: '+963', number: normalized.substring(4));
+    }
+    if (normalized.startsWith('963')) {
+      return _PhoneParts(countryCode: '+963', number: normalized.substring(3));
+    }
+    return _PhoneParts(
+      countryCode: '+963',
+      number: normalized.replaceFirst(RegExp(r'^0+'), ''),
+    );
+  }
+
+  static String _formatDate(DateTime date) {
+    final month = date.month.toString().padLeft(2, '0');
+    final day = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$month-$day';
+  }
+
+  Future<void> _pickDateOfBirth() async {
+    final now = DateTime.now();
+    final currentValue = DateTime.tryParse(_dobController.text.trim());
+    final initialDate = currentValue != null && !currentValue.isAfter(now)
+        ? currentValue
+        : DateTime(now.year - 18, now.month, now.day);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: now,
+      helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: isDark ? AppColors.taupe : AppColors.burgundy,
+              onPrimary: AppColors.offWhite,
+              surface: isDark ? AppColors.black : Colors.white,
+              onSurface: isDark ? AppColors.offWhite : AppColors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (pickedDate == null || !mounted) return;
+    setState(() {
+      _dobController.text = _formatDate(pickedDate);
+    });
+  }
+
+  Map<String, dynamic> _permanentAddressMap() {
+    return _ProfileAddressInput.toCleanMap(
+      capitalId: _selectedGovernorate,
+      cityId: _selectedCity,
+      townId: _selectedTown,
+      village: _villageController.text.trim(),
+      streetName: _streetController.text.trim(),
+      streetNumber: _streetNumberController.text.trim(),
+      building: _buildingController.text.trim(),
+    );
+  }
+
+  Map<String, dynamic> _addressesMap() {
+    return {
+      'permanent': _permanentAddressMap(),
+      'current': _hasCurrentAddress
+          ? _currentAddress.toMap()
+          : _permanentAddressMap(),
+      'additional': _additionalAddresses
+          .map((address) => address.toMap(includeDetails: true))
+          .toList(),
+    };
   }
 
   Future<void> _pickAvatar() async {
@@ -119,30 +245,23 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     try {
       await context.read<AuthCubit>().updateProfile(
         context: context,
+        countryCode: _countryCodeController.text.trim(),
         phone: _phoneController.text.trim(),
+        whatsappNumber: _phoneController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         gender: _gender,
         dateOfBirth: _dobController.text.trim().isEmpty
             ? null
             : _dobController.text.trim(),
-        officialGovernorate: _selectedGovernorate,
-        officialCity: _selectedCity,
-        officialTown: _selectedTown,
-        officialMunicipalityVillage: _villageController.text,
-        officialStreet: _streetController.text.trim().isEmpty
-            ? null
-            : _streetController.text.trim(),
-        officialBuilding: _buildingController.text.trim().isEmpty
-            ? null
-            : _buildingController.text.trim(),
-        permanentAddress: _permanentAddressController.text.trim().isEmpty
-            ? null
-            : _permanentAddressController.text.trim(),
+        addresses: _addressesMap(),
         imageFile: f,
       );
-      context.pop();
+      if (!mounted) return;
+      CustomSnackBar.show(context, l10n.profileSaved);
+      context.go(AppRoutes.home);
     } catch (_) {
+      if (!mounted) return;
       final msg = context.read<AuthCubit>().state;
       if (msg is AuthFailed) {
         CustomSnackBar.show(context, msg.message);
@@ -150,32 +269,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     }
   }
 
-  void _skipToOtp() {
-    final args = widget.args;
-    final phone = args?.whatsappNumber.trim();
-    final token = args?.token?.trim();
-
-    if (args == null ||
-        phone == null ||
-        phone.isEmpty ||
-        token == null ||
-        token.isEmpty) {
-      CustomSnackBar.show(
-        context,
-        AppLocalizations.of(context)!.errorMissingData,
-      );
-      return;
-    }
-
-    context.goNamed(
-      AppRoutesName.authOtp,
-      extra: AuthOtpArgs(
-        email: args.email,
-        phone: phone,
-        token: token,
-        purpose: 'register',
-      ),
-    );
+  void _skipToHome() {
+    context.go(AppRoutes.home);
   }
 
   bool isLoading = false;
@@ -197,7 +292,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: ScreenAppBar(title: l10n.editProfileTitle),
+          appBar: ScreenAppBar(title: l10n.completeProfileTitle),
           body: Form(
             key: _formKey,
             child: ListView(
@@ -321,6 +416,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         color: isDark ? AppColors.taupe : AppColors.burgundy,
                       ),
                       keyboardType: TextInputType.datetime,
+                      readOnly: true,
+                      onTap: _pickDateOfBirth,
                     ),
                   ],
                 ),
@@ -329,19 +426,52 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   title: l10n.contactInfo,
                   icon: Icons.contact_phone_outlined,
                   children: [
-                    AppTextField(
-                      controller: _phoneController,
-                      label: l10n.mobileNumber,
-                      hint: '+963 9XX XXX XXX',
-                      prefixIcon: Icon(
-                        Icons.phone_android_rounded,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      keyboardType: TextInputType.phone,
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? l10n.enterPhone
-                          : null,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      textDirection: TextDirection.ltr,
+                      children: [
+                        SizedBox(
+                          width: 82.w,
+                          child: AppTextField(
+                            textDirection: TextDirection.ltr,
+                            enabled: false,
+                            controller: _countryCodeController,
+                            keyboardType: TextInputType.phone,
+                            borderRadius: 22.r,
+                            fillColor: isDark
+                                ? AppColors.burgundy.withValues(alpha: 0.08)
+                                : AppColors.offWhite,
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: AppTextField(
+                            textDirection: TextDirection.ltr,
+                            controller: _phoneController,
+                            label: l10n.mobileNumber,
+                            hint: '9XX XXX XXX',
+                            prefixIcon: Icon(
+                              Icons.phone_android_rounded,
+                              size: 22.r,
+                              color: isDark
+                                  ? AppColors.taupe
+                                  : AppColors.burgundy,
+                            ),
+                            keyboardType: TextInputType.phone,
+                            maxLength: 9,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+                              if (value.isEmpty) {
+                                return l10n.enterPhoneNumber;
+                              }
+                              if (value.length < 8) {
+                                return l10n.invalidPhone;
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -350,78 +480,25 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   title: l10n.userLocationInfo,
                   icon: Icons.location_on_outlined,
                   children: [
-                    AssociationDropdownField(
-                      label: l10n.associationLinkGovernorate,
-                      value: _selectedGovernorate,
-                      items: SyrianLocationCatalog.withSavedValue(
-                        SyrianLocationCatalog.governorates(),
-                        _selectedGovernorate,
-                      ),
+                    _ProfileAddressesSection(
+                      selectedGovernorate: _selectedGovernorate,
+                      selectedCity: _selectedCity,
+                      selectedTown: _selectedTown,
+                      villageController: _villageController,
+                      streetController: _streetController,
+                      streetNumberController: _streetNumberController,
+                      buildingController: _buildingController,
+                      hasCurrentAddress: _hasCurrentAddress,
+                      currentAddress: _currentAddress,
+                      additionalAddresses: _additionalAddresses,
                       enabled: !isLoading,
-                      onChanged: _onGovernorateChanged,
-                    ),
-                    SizedBox(height: 16.h),
-
-                    AssociationDropdownField(
-                      label: l10n.associationLinkCity,
-                      value: _selectedCity,
-                      items: SyrianLocationCatalog.withSavedValue(
-                        SyrianLocationCatalog.cities(_selectedGovernorate),
-                        _selectedCity,
-                      ),
-                      enabled: !isLoading && _selectedGovernorate != null,
-                      onChanged: _onCityChanged,
-                    ),
-                    SizedBox(height: 16.h),
-                    AssociationDropdownField(
-                      label: l10n.associationLinkTown,
-                      value: _selectedTown,
-                      items: SyrianLocationCatalog.withSavedValue(
-                        SyrianLocationCatalog.towns(
-                          _selectedGovernorate,
-                          _selectedCity,
-                        ),
-                        _selectedTown,
-                      ),
-                      enabled: !isLoading && _selectedCity != null,
-                      onChanged: _onTownChanged,
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _villageController,
-                      label: l10n.associationLinkVillage,
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _streetController,
-                      label: l10n.associationLinkStreet,
-                      prefixIcon: Icon(
-                        Icons.signpost_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _buildingController,
-                      label: l10n.associationLinkBuilding,
-                      prefixIcon: Icon(
-                        Icons.apartment_rounded,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    AppTextField(
-                      controller: _permanentAddressController,
-                      label: l10n.associationLinkPermanentAddress,
-                      hint: l10n.cityAreaStreet,
-                      prefixIcon: Icon(
-                        Icons.place_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
-                      maxLines: 2,
+                      fieldSpacer: _fieldSpacer,
+                      onGovernorateChanged: _onGovernorateChanged,
+                      onCityChanged: _onCityChanged,
+                      onTownChanged: _onTownChanged,
+                      onAddAddress: _addAddress,
+                      onRemoveAddress: _removeAdditionalAddress,
+                      onRemoveCurrentAddress: _removeCurrentAddress,
                     ),
                   ],
                 ),
@@ -450,7 +527,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 ),
                 SizedBox(height: 12.h),
                 TextButton(
-                  onPressed: isLoading ? null : _skipToOtp,
+                  onPressed: isLoading ? null : _skipToHome,
                   child: Text(
                     l10n.skipForNow,
                     style: theme.textTheme.titleMedium?.copyWith(
@@ -464,6 +541,536 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _PhoneParts {
+  const _PhoneParts({required this.countryCode, required this.number});
+
+  final String countryCode;
+  final String number;
+}
+
+class _ProfileAddressInput {
+  _ProfileAddressInput();
+
+  String? selectedGovernorate;
+  String? selectedCity;
+  String? selectedTown;
+  final labelController = TextEditingController();
+  final typeController = TextEditingController();
+  final villageController = TextEditingController();
+  final streetController = TextEditingController();
+  final streetNumberController = TextEditingController();
+  final buildingController = TextEditingController();
+
+  static int? _addressId(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return int.tryParse(value);
+  }
+
+  static Map<String, dynamic> toCleanMap({
+    required String? capitalId,
+    required String? cityId,
+    required String? townId,
+    required String village,
+    required String streetName,
+    required String streetNumber,
+    required String building,
+    String label = '',
+    String type = '',
+  }) {
+    final map = <String, dynamic>{
+      'label': label,
+      'type': type,
+      'capital_id': _addressId(capitalId),
+      'city_id': _addressId(cityId),
+      'town_id': _addressId(townId),
+      'village': village,
+      'street_name': streetName,
+      'street_number': streetNumber,
+      'building': building,
+    };
+
+    map.removeWhere(
+      (_, value) => value == null || (value is String && value.isEmpty),
+    );
+    return map;
+  }
+
+  void clear() {
+    selectedGovernorate = null;
+    selectedCity = null;
+    selectedTown = null;
+    labelController.clear();
+    typeController.clear();
+    villageController.clear();
+    streetController.clear();
+    streetNumberController.clear();
+    buildingController.clear();
+  }
+
+  Map<String, dynamic> toMap({bool includeDetails = false}) {
+    return toCleanMap(
+      capitalId: selectedGovernorate,
+      cityId: selectedCity,
+      townId: selectedTown,
+      village: villageController.text.trim(),
+      streetName: streetController.text.trim(),
+      streetNumber: streetNumberController.text.trim(),
+      building: buildingController.text.trim(),
+      label: includeDetails ? labelController.text.trim() : '',
+      type: includeDetails ? typeController.text.trim() : '',
+    );
+  }
+
+  void dispose() {
+    labelController.dispose();
+    typeController.dispose();
+    villageController.dispose();
+    streetController.dispose();
+    streetNumberController.dispose();
+    buildingController.dispose();
+  }
+}
+
+class _ProfileAddressesSection extends StatelessWidget {
+  const _ProfileAddressesSection({
+    required this.selectedGovernorate,
+    required this.selectedCity,
+    required this.selectedTown,
+    required this.villageController,
+    required this.streetController,
+    required this.streetNumberController,
+    required this.buildingController,
+    required this.hasCurrentAddress,
+    required this.currentAddress,
+    required this.additionalAddresses,
+    required this.enabled,
+    required this.fieldSpacer,
+    required this.onGovernorateChanged,
+    required this.onCityChanged,
+    required this.onTownChanged,
+    required this.onAddAddress,
+    required this.onRemoveAddress,
+    required this.onRemoveCurrentAddress,
+  });
+
+  final String? selectedGovernorate;
+  final String? selectedCity;
+  final String? selectedTown;
+  final TextEditingController villageController;
+  final TextEditingController streetController;
+  final TextEditingController streetNumberController;
+  final TextEditingController buildingController;
+  final bool hasCurrentAddress;
+  final _ProfileAddressInput currentAddress;
+  final List<_ProfileAddressInput> additionalAddresses;
+  final bool enabled;
+  final Widget Function() fieldSpacer;
+  final ValueChanged<String?> onGovernorateChanged;
+  final ValueChanged<String?> onCityChanged;
+  final ValueChanged<String?> onTownChanged;
+  final VoidCallback onAddAddress;
+  final ValueChanged<int> onRemoveAddress;
+  final VoidCallback onRemoveCurrentAddress;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _ProfileAddressFormFields(
+          title: l10n.associationLinkPermanentAddress,
+          selectedGovernorate: selectedGovernorate,
+          selectedCity: selectedCity,
+          selectedTown: selectedTown,
+          villageController: villageController,
+          streetController: streetController,
+          streetNumberController: streetNumberController,
+          buildingController: buildingController,
+          enabled: enabled,
+          fieldSpacer: fieldSpacer,
+          onGovernorateChanged: onGovernorateChanged,
+          onCityChanged: onCityChanged,
+          onTownChanged: onTownChanged,
+        ),
+        if (hasCurrentAddress) ...[
+          SizedBox(height: 18.h),
+          _ProfileAddressFormFields(
+            title: l10n.associationMemberCurrentAddress,
+            selectedGovernorate: currentAddress.selectedGovernorate,
+            selectedCity: currentAddress.selectedCity,
+            selectedTown: currentAddress.selectedTown,
+            villageController: currentAddress.villageController,
+            streetController: currentAddress.streetController,
+            streetNumberController: currentAddress.streetNumberController,
+            buildingController: currentAddress.buildingController,
+            enabled: enabled,
+            fieldSpacer: fieldSpacer,
+            onRemove: onRemoveCurrentAddress,
+            onGovernorateChanged: (value) {
+              currentAddress.selectedGovernorate = value;
+              currentAddress.selectedCity = null;
+              currentAddress.selectedTown = null;
+            },
+            onCityChanged: (value) {
+              currentAddress.selectedCity = value;
+              currentAddress.selectedTown = null;
+            },
+            onTownChanged: (value) {
+              currentAddress.selectedTown = value;
+            },
+          ),
+        ],
+        for (var index = 0; index < additionalAddresses.length; index++) ...[
+          SizedBox(height: 18.h),
+          _ProfileAddressFormFields(
+            title: '${l10n.associationAdditionalAddress} ${index + 1}',
+            selectedGovernorate: additionalAddresses[index].selectedGovernorate,
+            selectedCity: additionalAddresses[index].selectedCity,
+            selectedTown: additionalAddresses[index].selectedTown,
+            villageController: additionalAddresses[index].villageController,
+            streetController: additionalAddresses[index].streetController,
+            streetNumberController:
+                additionalAddresses[index].streetNumberController,
+            buildingController: additionalAddresses[index].buildingController,
+            labelController: additionalAddresses[index].labelController,
+            typeController: additionalAddresses[index].typeController,
+            enabled: enabled,
+            fieldSpacer: fieldSpacer,
+            onRemove: () => onRemoveAddress(index),
+            onGovernorateChanged: (value) {
+              additionalAddresses[index].selectedGovernorate = value;
+              additionalAddresses[index].selectedCity = null;
+              additionalAddresses[index].selectedTown = null;
+            },
+            onCityChanged: (value) {
+              additionalAddresses[index].selectedCity = value;
+              additionalAddresses[index].selectedTown = null;
+            },
+            onTownChanged: (value) {
+              additionalAddresses[index].selectedTown = value;
+            },
+          ),
+        ],
+        if (enabled) ...[
+          SizedBox(height: 14.h),
+          OutlinedButton.icon(
+            onPressed: onAddAddress,
+            icon: const Icon(Icons.add_rounded),
+            label: Text(
+              hasCurrentAddress
+                  ? l10n.associationAdditionalAddress
+                  : l10n.associationAddCurrentAddress,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _ProfileAddressFormFields extends StatefulWidget {
+  const _ProfileAddressFormFields({
+    required this.title,
+    required this.selectedGovernorate,
+    required this.selectedCity,
+    required this.selectedTown,
+    required this.villageController,
+    required this.streetController,
+    required this.streetNumberController,
+    required this.buildingController,
+    required this.enabled,
+    required this.fieldSpacer,
+    required this.onGovernorateChanged,
+    required this.onCityChanged,
+    required this.onTownChanged,
+    this.labelController,
+    this.typeController,
+    this.onRemove,
+  });
+
+  final String title;
+  final String? selectedGovernorate;
+  final String? selectedCity;
+  final String? selectedTown;
+  final TextEditingController villageController;
+  final TextEditingController streetController;
+  final TextEditingController streetNumberController;
+  final TextEditingController buildingController;
+  final TextEditingController? labelController;
+  final TextEditingController? typeController;
+  final bool enabled;
+  final Widget Function() fieldSpacer;
+  final ValueChanged<String?> onGovernorateChanged;
+  final ValueChanged<String?> onCityChanged;
+  final ValueChanged<String?> onTownChanged;
+  final VoidCallback? onRemove;
+
+  @override
+  State<_ProfileAddressFormFields> createState() =>
+      _ProfileAddressFormFieldsState();
+}
+
+class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
+  late final AddressInfoCubit _addressInfoCubit;
+  late String? _selectedGovernorate;
+  late String? _selectedCity;
+  late String? _selectedTown;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedGovernorate = widget.selectedGovernorate;
+    _selectedCity = widget.selectedCity;
+    _selectedTown = widget.selectedTown;
+    _addressInfoCubit = AddressInfoCubit()..fetchCapitals();
+    if (_selectedGovernorate != null) {
+      _addressInfoCubit.fetchCities(capitalId: _selectedGovernorate!);
+    }
+    if (_selectedCity != null) {
+      _addressInfoCubit.fetchTowns(cityId: _selectedCity!);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _ProfileAddressFormFields oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedGovernorate != widget.selectedGovernorate) {
+      _selectedGovernorate = widget.selectedGovernorate;
+    }
+    if (oldWidget.selectedCity != widget.selectedCity) {
+      _selectedCity = widget.selectedCity;
+    }
+    if (oldWidget.selectedTown != widget.selectedTown) {
+      _selectedTown = widget.selectedTown;
+    }
+  }
+
+  @override
+  void dispose() {
+    _addressInfoCubit.close();
+    super.dispose();
+  }
+
+  void _onGovernorateChanged(String? value) {
+    widget.onGovernorateChanged(value);
+    setState(() {
+      _selectedGovernorate = value;
+      _selectedCity = null;
+      _selectedTown = null;
+    });
+    if (value != null) {
+      _addressInfoCubit.fetchCities(capitalId: value);
+    }
+  }
+
+  void _onCityChanged(String? value) {
+    widget.onCityChanged(value);
+    setState(() {
+      _selectedCity = value;
+      _selectedTown = null;
+    });
+    if (value != null) {
+      _addressInfoCubit.fetchTowns(cityId: value);
+    }
+  }
+
+  void _onTownChanged(String? value) {
+    widget.onTownChanged(value);
+    setState(() {
+      _selectedTown = value;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final labelController = widget.labelController;
+    final typeController = widget.typeController;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                widget.title,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ),
+            if (widget.enabled && widget.onRemove != null)
+              IconButton(
+                onPressed: widget.onRemove,
+                tooltip: l10n.associationDeleteAddress,
+                icon: const Icon(Icons.delete_outline_rounded),
+              ),
+          ],
+        ),
+        SizedBox(height: 12.h),
+        if (labelController != null && typeController != null) ...[
+          AppTextField(
+            controller: labelController,
+            label: l10n.associationAddressLabel,
+            enabled: widget.enabled,
+          ),
+          widget.fieldSpacer(),
+          AppTextField(
+            controller: typeController,
+            label: l10n.associationAddressType,
+            enabled: widget.enabled,
+          ),
+          widget.fieldSpacer(),
+        ],
+        BlocBuilder<AddressInfoCubit, AddressInfoState>(
+          bloc: _addressInfoCubit,
+          builder: (context, addressState) {
+            final capitalLabels = {
+              for (final capital in addressState.capitals)
+                capital.id: capital.name,
+            };
+            final cityLabels = {
+              for (final city in addressState.cities) city.id: city.name,
+            };
+            final townLabels = {
+              for (final town in addressState.towns) town.id: town.name,
+            };
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AssociationDropdownField(
+                  label: l10n.associationLinkGovernorate,
+                  hintText: addressState.isLoadingCapitals
+                      ? l10n.associationAddressLoadingCapitals
+                      : l10n.associationAddressSelectCapital,
+                  value: _selectedGovernorate,
+                  items: addressState.capitals
+                      .map((capital) => capital.id)
+                      .toList(),
+                  itemLabelBuilder: (id) => capitalLabels[id] ?? id,
+                  enabled:
+                      widget.enabled &&
+                      !addressState.isLoadingCapitals &&
+                      !addressState.capitalsFailed,
+                  trailing: addressState.capitalsFailed
+                      ? _AddressReloadButton(
+                          onPressed: widget.enabled
+                              ? _addressInfoCubit.fetchCapitals
+                              : null,
+                        )
+                      : null,
+                  onChanged: _onGovernorateChanged,
+                ),
+                SizedBox(height: 16.h),
+                AssociationDropdownField(
+                  label: l10n.associationLinkCity,
+                  hintText: addressState.isLoadingCities
+                      ? l10n.associationAddressLoadingCities
+                      : l10n.associationAddressSelectCity,
+                  value: _selectedCity,
+                  items: addressState.cities.map((city) => city.id).toList(),
+                  itemLabelBuilder: (id) => cityLabels[id] ?? id,
+                  enabled:
+                      widget.enabled &&
+                      _selectedGovernorate != null &&
+                      !addressState.isLoadingCities &&
+                      !addressState.citiesFailed,
+                  trailing:
+                      addressState.citiesFailed && _selectedGovernorate != null
+                      ? _AddressReloadButton(
+                          onPressed: widget.enabled
+                              ? () => _addressInfoCubit.fetchCities(
+                                  capitalId: _selectedGovernorate!,
+                                )
+                              : null,
+                        )
+                      : null,
+                  onChanged: _onCityChanged,
+                ),
+                SizedBox(height: 16.h),
+                AssociationDropdownField(
+                  label: l10n.associationLinkTown,
+                  hintText: addressState.isLoadingTowns
+                      ? l10n.associationAddressLoadingTowns
+                      : l10n.associationAddressSelectTown,
+                  value: _selectedTown,
+                  items: addressState.towns.map((town) => town.id).toList(),
+                  itemLabelBuilder: (id) => townLabels[id] ?? id,
+                  enabled:
+                      widget.enabled &&
+                      _selectedCity != null &&
+                      !addressState.isLoadingTowns &&
+                      !addressState.townsFailed,
+                  trailing: addressState.townsFailed && _selectedCity != null
+                      ? _AddressReloadButton(
+                          onPressed: widget.enabled
+                              ? () => _addressInfoCubit.fetchTowns(
+                                  cityId: _selectedCity!,
+                                )
+                              : null,
+                        )
+                      : null,
+                  onChanged: _onTownChanged,
+                ),
+              ],
+            );
+          },
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.villageController,
+          label: l10n.associationLinkVillage,
+          enabled: widget.enabled,
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.streetController,
+          label: l10n.associationLinkStreet,
+          enabled: widget.enabled,
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.streetNumberController,
+          label: l10n.associationStreetNumber,
+          enabled: widget.enabled,
+        ),
+        widget.fieldSpacer(),
+        AppTextField(
+          controller: widget.buildingController,
+          label: l10n.associationLinkBuilding,
+          enabled: widget.enabled,
+        ),
+      ],
+    );
+  }
+}
+
+class _AddressReloadButton extends StatelessWidget {
+  const _AddressReloadButton({required this.onPressed});
+
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsetsDirectional.only(end: 4.w),
+      child: TextButton.icon(
+        onPressed: onPressed,
+        icon: Icon(Icons.refresh_rounded, size: 18.r),
+        label: Text(AppLocalizations.of(context)!.associationAddressLoadAgain),
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          minimumSize: Size(0, 36.h),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
     );
   }
 }

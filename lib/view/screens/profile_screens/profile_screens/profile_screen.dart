@@ -323,7 +323,7 @@ class _ProfileState extends State<Profile> {
                         icon: Icons.person_outline_rounded,
                       ),
                       _InfoRow(
-                        label: 'User Balance',
+                        label: l10n.userBalance,
                         value: _formatBalance(customer.userBalance),
                         icon: Icons.account_balance_wallet_outlined,
                       ),

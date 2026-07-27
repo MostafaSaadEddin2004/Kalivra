@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/network/dio_client.dart';
@@ -23,39 +21,34 @@ class CustomerApiService {
   Future<CustomerApiModel> getProfile() async {
     final res = await _client.get('customer/profile');
     final json = res.data['data'];
-    debugPrint("Here is the json: $json");
     return CustomerApiModel.fromJson(json);
   }
 
-  Future<void> login({required String phone, required String password}) async {
+  Future<void> login({
+    required String phone,
+    required String password,
+    String? fcmToken,
+  }) async {
     final res = await _client.post(
       'customer/login',
-      data: {'whatsapp_number': phone, 'password': password},
+      data: {
+        'whatsapp_number': phone,
+        'password': password,
+        if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
+      },
     );
 
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
-      final token = res.data[PrefKeys.tokenKey];
+      final token = res.data[PrefKeys.tokenKey]?.toString();
+      if (token == null || token.isEmpty) {
+        throw 'حدث خطأ غير متوقع';
+      }
       await LocalStore.setToken(token);
-      return res.data;
+      await _storeUserIdFromResponse(res.data);
+      return;
     }
-    if (res.statusCode! == 422 && res.data['message'].contains('credential')) {
-      throw 'INVALID_CREDENTIALS';
-    }
-
-    if (res.statusCode! == 403 && res.data['message'].contains('verified')) {
-      throw 'EMAIL_NOT_VERIFIED';
-    }
-
-    if (res.statusCode! == 422 && res.data['message'].contains('incorrect')) {
-      throw 'INCORRECT_PASSWORD';
-    }
-
-    if (res.statusCode! == 422 && res.data['message'].contains('registered')) {
-      throw 'ACCOUNT_NOT_FOUND';
-    }
-    throw res.data['message'].isNotEmpty
-        ? res.data['message']
-        : 'حدث خطأ غير متوقع';
+    final message = res.data is Map ? res.data['message']?.toString() : null;
+    throw message?.isNotEmpty == true ? message! : 'حدث خطأ غير متوقع';
   }
 
   Future<Map<String, dynamic>?> register({
@@ -66,6 +59,7 @@ class CustomerApiService {
     required String password,
     required String passwordConfirmation,
     String? referralCode,
+    String? fcmToken,
   }) async {
     final Map<String, dynamic> body = {
       'first_name': firstName,
@@ -74,30 +68,19 @@ class CustomerApiService {
       'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,
+      if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
       // 'referral_code_input': referralCode ?? '',
     };
 
     final res = await _client.post('customer/register', data: body);
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
-      final token = res.data['token'];
-      debugPrint("Here is the token: $token");
+      final token = res.data['token'].toString();
       await LocalStore.setToken(token);
+      await _storeUserIdFromResponse(res.data);
       return res.data;
-    } else if (res.statusCode! == 422 &&
-        res.data['message'].toLowerCase().contains(
-          'The email has already been taken',
-        )) {
-      throw 'EMAIL_EXISTS';
-    } else if (res.statusCode! == 422 &&
-        res.data['message'].toLowerCase().contains(
-          'The phone has already been taken',
-        )) {
-      throw 'NUMBER_EXISTS';
     }
-
-    throw res.data['message'].isNotEmpty
-        ? res.data['message']
-        : 'حدث خطأ غير متوقع';
+    final message = res.data is Map ? res.data['message']?.toString() : null;
+    throw message?.isNotEmpty == true ? message! : 'حدث خطأ غير متوقع';
   }
 
   Future<void> logout() async {
@@ -105,6 +88,7 @@ class CustomerApiService {
 
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
       await LocalStore.removeToken();
+      await LocalStore.removeUserId();
     } else if (res.statusCode! >= 400 && res.statusCode! < 500) {
       final message = res.data['message'];
       throw message;
@@ -135,9 +119,10 @@ class CustomerApiService {
       if (res.statusCode! >= 200 && res.statusCode! < 300) {
         final newToken = res.data['token'];
         await LocalStore.setToken(newToken);
+        await _storeUserIdFromResponse(res.data);
       }
     } on DioException catch (e) {
-      throw '';
+      throw e.message.toString();
     }
   }
 
@@ -330,5 +315,39 @@ class CustomerApiService {
       await _client.put('customer/profile', data: fields);
     }
     return true;
+  }
+
+  Future<void> _storeUserIdFromResponse(dynamic data) async {
+    final userId = _extractUserId(data);
+    if (userId != null && userId.isNotEmpty) {
+      await LocalStore.setUserId(userId);
+      return;
+    }
+
+    try {
+      final profile = await getProfile();
+      if (profile.id > 0) {
+        await LocalStore.setUserId(profile.id.toString());
+      }
+    } catch (_) {
+      return;
+    }
+  }
+
+  String? _extractUserId(dynamic data) {
+    if (data is! Map) return null;
+
+    for (final key in const ['user_id', 'customer_id', 'id']) {
+      final value = data[key];
+      final text = value?.toString().trim();
+      if (text != null && text.isNotEmpty) return text;
+    }
+
+    for (final key in const ['user', 'customer', 'data']) {
+      final nested = _extractUserId(data[key]);
+      if (nested != null) return nested;
+    }
+
+    return null;
   }
 }

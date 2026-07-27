@@ -37,8 +37,6 @@ class AddressStepState extends State<AddressStep> {
     super.dispose();
   }
 
-  static const String _required = 'مطلوب';
-
   void _saveAddress() {
     if (_formKey.currentState?.validate() ?? false) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,6 +79,7 @@ class AddressStepState extends State<AddressStep> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 24.h),
@@ -91,84 +90,84 @@ class AddressStepState extends State<AddressStep> {
           children: [
             AppTextField(
               controller: _firstNameController,
-              label: 'الاسم الأول*',
-              hint: 'الاسم الأول',
+              label: l10n.firstNameRequired,
+              hint: l10n.firstName,
               textCapitalization: TextCapitalization.words,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _lastNameController,
-              label: 'الاسم الأخير*',
-              hint: 'الاسم الأخير',
+              label: l10n.lastNameRequired,
+              hint: l10n.lastName,
               textCapitalization: TextCapitalization.words,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _emailController,
-              label: 'البريد الإلكتروني*',
-              hint: 'example@email.com',
+              label: l10n.emailRequired,
+              hint: l10n.emailHint,
               keyboardType: TextInputType.emailAddress,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return _required;
-                if (!v.contains('@')) return 'أدخل بريداً إلكترونياً صالحاً';
+                if (v == null || v.trim().isEmpty) return l10n.required;
+                if (!v.contains('@')) return l10n.invalidEmail;
                 return null;
               },
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _companyController,
-              label: 'اسم الشركة',
-              hint: 'اسم الشركة',
+              label: l10n.companyName,
+              hint: l10n.companyName,
               textCapitalization: TextCapitalization.words,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _phoneController,
-              label: 'الهاتف*',
-              hint: 'الهاتف',
+              label: l10n.phoneRequired,
+              hint: l10n.phoneLabel,
               keyboardType: TextInputType.phone,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _streetController,
-              label: 'الشارع*',
-              hint: 'عنوان الشارع',
+              label: l10n.streetRequired,
+              hint: l10n.streetHint,
               textCapitalization: TextCapitalization.words,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _zipController,
-              label: 'الرمز البريدي*',
-              hint: 'الرمز البريدي',
+              label: l10n.postalCodeRequired,
+              hint: l10n.postalCode,
               keyboardType: TextInputType.streetAddress,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _stateController,
-              label: 'المحافظة*',
-              hint: 'المحافظة',
+              label: l10n.stateRequired,
+              hint: l10n.stateRequired,
               textCapitalization: TextCapitalization.words,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 16.h),
             AppTextField(
               controller: _cityController,
-              label: 'المدينة*',
-              hint: 'المدينة',
+              label: l10n.cityRequired,
+              hint: l10n.city,
               textCapitalization: TextCapitalization.words,
               validator: (v) =>
-                  (v == null || v.trim().isEmpty) ? _required : null,
+                  (v == null || v.trim().isEmpty) ? l10n.required : null,
             ),
             SizedBox(height: 24.h),
             SizedBox(
@@ -184,7 +183,7 @@ class AddressStepState extends State<AddressStep> {
                   ),
                 ),
                 child: Text(
-                  'حفظ العنوان',
+                  l10n.saveAddress,
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: AppColors.burgundy,
                     fontWeight: FontWeight.w700,

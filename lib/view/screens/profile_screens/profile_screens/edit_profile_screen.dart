@@ -101,7 +101,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.text = phoneParts.number;
     _dobController.text = _formatDateForField(c.dateOfBirth);
     _selectedGovernorate =
-        addressInfo?.permanentCapitalId?.toString() ??
+        addressInfo?. permanentCapitalId?.toString() ??
         addressInfo?.officialGovernorate;
     _selectedCity =
         addressInfo?.permanentCityId?.toString() ?? addressInfo?.officialCity;
