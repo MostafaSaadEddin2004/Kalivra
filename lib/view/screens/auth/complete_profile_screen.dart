@@ -160,7 +160,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime(1900),
+      firstDate: DateTime(1950),
       lastDate: now,
       helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
       builder: (context, child) {
@@ -170,7 +170,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
               primary: isDark ? AppColors.taupe : AppColors.burgundy,
               onPrimary: AppColors.offWhite,
               surface: isDark ? AppColors.black : Colors.white,
-              onSurface: isDark ? AppColors.offWhite : AppColors.black,
+              onSurface: isDark ? AppColors.black : AppColors.offWhite,
             ),
           ),
           child: child!,
@@ -760,7 +760,7 @@ class _ProfileAddressesSection extends StatelessWidget {
           SizedBox(height: 14.h),
           OutlinedButton.icon(
             onPressed: onAddAddress,
-            icon: const Icon(Icons.add_rounded),
+            icon: const Icon(Icons.add_rounded,),
             label: Text(
               hasCurrentAddress
                   ? l10n.associationAdditionalAddress

@@ -61,6 +61,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  String _normalizedWhatsAppNumber() {
+    final countryCode = _countryCodeController.text.trim();
+    final nationalNumber = _whatsappNumberController.text.replaceAll(
+      RegExp(r'\D'),
+      '',
+    );
+    final normalizedNational = nationalNumber.startsWith('0')
+        ? nationalNumber.substring(1)
+        : nationalNumber;
+    return '$countryCode$normalizedNational';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -266,6 +278,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     switch (state) {
                       case AuthLoading():
                         isLoading = true;
+                      case AuthSuccessed():
+                        isLoading = false;
                       default:
                         isLoading = false;
                     }
@@ -273,21 +287,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   builder: (context, state) {
                     return FilledButton(
                       onPressed: () {
-                        if (!(_formKey.currentState?.validate() ?? false)) {
-                          return;
+                        if (_formKey.currentState!.validate()) {
+                          context.read<AuthCubit>().register(
+                            context: context,
+                            firstName: _firstNameController.text.trim(),
+                            lastName: _lastNameController.text.trim(),
+                            email: _emailController.text.trim(),
+                            whatsappNumber: _normalizedWhatsAppNumber(),
+                            password: _passwordController.text,
+                            passwordConfirmation:
+                                _confirmPasswordController.text,
+                            referralCode: _referralCodeController.text.trim(),
+                          );
                         }
-                        context.read<AuthCubit>().register(
-                          context: context,
-                          firstName: _firstNameController.text.trim(),
-                          lastName: _lastNameController.text.trim(),
-                          email: _emailController.text.trim(),
-                          whatsappNumber:
-                              _countryCodeController.text +
-                              _whatsappNumberController.text,
-                          password: _passwordController.text,
-                          passwordConfirmation: _confirmPasswordController.text,
-                          referralCode: _referralCodeController.text.trim(),
-                        );
                       },
                       style: FilledButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 16.h),

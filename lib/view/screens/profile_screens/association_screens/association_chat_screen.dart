@@ -47,7 +47,11 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
     if (text.isEmpty) return;
     _messageController.clear();
     FocusScope.of(context).unfocus();
-    _chatCubit.sendMessage(message: text);
+    if (retryText == null) {
+      _chatCubit.sendMessage(message: text);
+    } else {
+      _chatCubit.retryMessage(message: text);
+    }
   }
 
   void _startNewChat() {
@@ -69,7 +73,7 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   void _startWaitingMessages() {
     _waitingTimer?.cancel();
     setState(() => _waitingMessageCount = 1);
-    _waitingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _waitingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (!mounted) return;
       if (_waitingMessageCount >= _waitingMessageIcons.length) {
         timer.cancel();

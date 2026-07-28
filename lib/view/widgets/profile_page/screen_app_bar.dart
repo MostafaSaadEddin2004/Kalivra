@@ -6,10 +6,16 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 
 class ScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const ScreenAppBar({super.key, required this.title, this.actions});
+  const ScreenAppBar({
+    super.key,
+    required this.title,
+    this.actions,
+    this.noBackArrow = false,
+  });
 
   final String title;
   final List<Widget>? actions;
+  final bool noBackArrow;
 
   @override
   Size get preferredSize => Size.fromHeight(56.h);
@@ -23,13 +29,15 @@ class ScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       elevation: 0,
       centerTitle: true,
-      leading: CustomIconButton(
-        icon: Icons.arrow_back_rounded,
-        color: fgColor,
-        iconSize: 20.r,
-        onPressed: () => context.pop(),
-        tooltip: AppLocalizations.of(context)!.back,
-      ),
+      leading: noBackArrow == false
+          ? SizedBox.shrink()
+          : CustomIconButton(
+              icon: Icons.arrow_back_rounded,
+              color: fgColor,
+              iconSize: 20.r,
+              onPressed: () => context.pop(),
+              tooltip: AppLocalizations.of(context)!.back,
+            ),
       title: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(

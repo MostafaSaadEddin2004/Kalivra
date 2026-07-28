@@ -5,9 +5,9 @@ import 'package:kalivra/model/chat/chat_api_model.dart';
 class ChatApiService {
   ChatApiService()
     : _client = DioClient(
-        connectTimeout: const Duration(seconds: 120),
-        receiveTimeout: const Duration(seconds: 120),
-        sendTimeout: const Duration(seconds: 120),
+        connectTimeout: const Duration(seconds: 3),
+        receiveTimeout: const Duration(seconds: 3),
+        sendTimeout: const Duration(seconds: 3),
       );
 
   final DioClient _client;

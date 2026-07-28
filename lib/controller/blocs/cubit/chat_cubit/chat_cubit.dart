@@ -12,21 +12,33 @@ class ChatCubit extends Cubit<ChatState> {
 
   final ChatApiService _chatService = ChatApiService();
 
-  Future<void> sendMessage({required String message}) async {
+  Future<void> sendMessage({required String message}) {
+    return _sendMessage(message: message, appendUserMessage: true);
+  }
+
+  Future<void> retryMessage({required String message}) {
+    return _sendMessage(message: message, appendUserMessage: false);
+  }
+
+  Future<void> _sendMessage({
+    required String message,
+    required bool appendUserMessage,
+  }) async {
     final trimmed = message.trim();
-    if (trimmed.isEmpty || state.isSending) return;
 
     final sessionId = state.sessionId ?? await _buildSessionId();
-    final userMessage = ChatUiMessage.user(
-      text: trimmed,
-      createdAt: DateTime.now(),
-    );
+    final messages = appendUserMessage
+        ? [
+            ...state.messages,
+            ChatUiMessage.user(text: trimmed, createdAt: DateTime.now()),
+          ]
+        : _messagesWithoutRetryError(trimmed);
 
     emit(
       state.copyWith(
         status: ChatStatus.sending,
         sessionId: sessionId,
-        messages: [...state.messages, userMessage],
+        messages: messages,
         errorMessage: '',
       ),
     );
@@ -71,6 +83,18 @@ class ChatCubit extends Cubit<ChatState> {
         ),
       );
     }
+  }
+
+  List<ChatUiMessage> _messagesWithoutRetryError(String retryText) {
+    final messages = List<ChatUiMessage>.of(state.messages);
+    final errorIndex = messages.lastIndexWhere(
+      (message) =>
+          message.isError && message.retryText?.trim() == retryText.trim(),
+    );
+    if (errorIndex != -1) {
+      messages.removeAt(errorIndex);
+    }
+    return messages;
   }
 
   Future<void> getChatHistory({bool keepCurrentMessages = false}) async {

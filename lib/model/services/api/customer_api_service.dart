@@ -64,18 +64,21 @@ class CustomerApiService {
     final Map<String, dynamic> body = {
       'first_name': firstName,
       'last_name': lastName,
-      'email': email,
+      // 'email': email,
       'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,
-      if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
-      // 'referral_code_input': referralCode ?? '',
+      // if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
+      // if (referralCode != null && referralCode.trim().isNotEmpty)
+      //   'referral_code_input': referralCode.trim(),
     };
 
     final res = await _client.post('customer/register', data: body);
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
-      final token = res.data['token'].toString();
-      await LocalStore.setToken(token);
+      final token = _extractToken(res.data);
+      if (token != null && token.isNotEmpty) {
+        await LocalStore.setToken(token);
+      }
       await _storeUserIdFromResponse(res.data);
       return res.data;
     }
@@ -110,15 +113,17 @@ class CustomerApiService {
         'customer/verify',
         data: {
           'email': email ?? '',
-          'token': token,
+          if (token.trim().isNotEmpty) 'token': token,
           'otp': otp,
           'whatsapp_number': whatsappNumber,
         },
       );
 
       if (res.statusCode! >= 200 && res.statusCode! < 300) {
-        final newToken = res.data['token'];
-        await LocalStore.setToken(newToken);
+        final newToken = _extractToken(res.data);
+        if (newToken != null && newToken.isNotEmpty) {
+          await LocalStore.setToken(newToken);
+        }
         await _storeUserIdFromResponse(res.data);
       }
     } on DioException catch (e) {
@@ -345,6 +350,23 @@ class CustomerApiService {
 
     for (final key in const ['user', 'customer', 'data']) {
       final nested = _extractUserId(data[key]);
+      if (nested != null) return nested;
+    }
+
+    return null;
+  }
+
+  String? _extractToken(dynamic data) {
+    if (data is! Map) return null;
+
+    for (final key in const ['token', 'access_token', 'bearer_token']) {
+      final value = data[key];
+      final text = value?.toString().trim();
+      if (text != null && text.isNotEmpty && text != 'null') return text;
+    }
+
+    for (final key in const ['user', 'customer', 'data']) {
+      final nested = _extractToken(data[key]);
       if (nested != null) return nested;
     }
 

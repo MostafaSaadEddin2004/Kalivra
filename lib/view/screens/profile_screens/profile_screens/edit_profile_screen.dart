@@ -233,12 +233,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
+         data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
               primary: isDark ? AppColors.taupe : AppColors.burgundy,
               onPrimary: AppColors.offWhite,
               surface: isDark ? AppColors.black : Colors.white,
-              onSurface: isDark ? AppColors.offWhite : AppColors.black,
+              onSurface: isDark ? AppColors.black : AppColors.offWhite,
             ),
           ),
           child: child!,

@@ -179,11 +179,12 @@ class AuthCubit extends Cubit<AuthState> {
         whatsappNumber: whatsappNumber,
         password: password,
         passwordConfirmation: passwordConfirmation,
+        referralCode: referralCode,
         fcmToken: fcmToken,
       );
       final token = data?['token']?.toString() ?? await LocalStore.getToken();
       emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));
-      context.goNamed(
+      context.go(
         AppRoutesName.authOtp,
         extra: AuthOtpArgs(
           email: email,
