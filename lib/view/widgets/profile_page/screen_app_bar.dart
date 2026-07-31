@@ -10,7 +10,7 @@ class ScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.title,
     this.actions,
-    this.noBackArrow = false,
+    this.noBackArrow = true,
   });
 
   final String title;

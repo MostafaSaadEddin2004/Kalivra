@@ -693,5 +693,6 @@
   "@stockPieces": {"placeholders": {"count": {"type": "int"}}},
   "nothingToShow": "لا يوجد محتوى للعرض.",
   "userBalance": "رصيد المستخدم",
-  "unexpectedError": "خطأ غير متوقع"
+  "unexpectedError": "خطأ غير متوقع",
+  "associaitionSendLinkRequest": "إرسال طلب ربط"
 }

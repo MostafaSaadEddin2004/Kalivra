@@ -45,7 +45,6 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   void _sendMessage({String? retryText}) {
     final text = (retryText ?? _messageController.text).trim();
     if (text.isEmpty) return;
-    _messageController.clear();
     FocusScope.of(context).unfocus();
     if (retryText == null) {
       _chatCubit.sendMessage(message: text);
@@ -440,22 +439,12 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   Widget _buildMessageInput(BuildContext context, ChatState state) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return SafeArea(
       top: false,
-      child: Container(
+      maintainBottomViewPadding: true,
+      child: Padding(
         padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 12.h),
-        decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
-              blurRadius: 18,
-              offset: const Offset(0, -6),
-            ),
-          ],
-        ),
         child: Row(
           children: [
             Expanded(
@@ -463,16 +452,28 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
                 controller: _messageController,
                 enabled: !state.isSending && !state.isLoadingChat,
                 minLines: 1,
-                maxLines: 4,
+                maxLines: 5,
                 textInputAction: TextInputAction.newline,
+                cursorColor: theme.colorScheme.onSurfaceVariant,
+                cursorHeight: 16.h,
+                cursorWidth: 0.5.w,
+                style: theme.textTheme.bodyMedium!.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
                 decoration: InputDecoration(
-                  hintText: l10n.associationChatMessageHint,
+                  hint: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: Text(
+                      l10n.associationChatMessageHint,
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
                   filled: true,
-                  fillColor: isDark
-                      ? AppColors.burgundy.withValues(alpha: 0.1)
-                      : AppColors.offWhite,
+                  fillColor: theme.colorScheme.onTertiary,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(18.r),
+                    borderRadius: BorderRadius.circular(40.r),
                     borderSide: BorderSide.none,
                   ),
                   contentPadding: EdgeInsets.symmetric(

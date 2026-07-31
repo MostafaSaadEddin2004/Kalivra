@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/middleware_cubit/middleware_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
@@ -31,70 +32,72 @@ class ProfilePage extends StatelessWidget {
             switch (state) {
               case UnAuthinticated():
                 return const SizedBox.shrink();
-              default:
+              case AuthFetchedData():
                 return Column(
                   children: [
                     ProfilePageItem(
                       icon: Icons.person_outline_rounded,
                       label: AppLocalizations.of(context)!.drawerMyAccount,
-                      onTap: () => AppRouter.openScreenWithPop(
-                        context,
-                        AppRoutes.account,
-                      ),
+                      onTap: () => context.push(AppRoutes.account),
                     ),
+                    state.customer.isLinkedPerson != null ||
+                            state.customer.isLinkedPerson == true
+                        ? ProfilePageItem(
+                            icon: Icons.groups_rounded,
+                            label: AppLocalizations.of(
+                              context,
+                            )!.associationPersonalProfileButton,
+                            onTap: () => context.push(
+                              AppRoutes.associationMemberProfile,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                     ProfilePageItem(
                       icon: Icons.receipt_long_outlined,
                       label: AppLocalizations.of(context)!.drawerMyOrders,
-                      onTap: () => AppRouter.openScreenWithPop(
-                        context,
-                        AppRoutes.orders,
-                      ),
+                      onTap: () => context.push(AppRoutes.orders),
                     ),
                     ProfilePageItem(
                       icon: Icons.favorite_border_rounded,
                       label: AppLocalizations.of(context)!.drawerFavorites,
-                      onTap: () => AppRouter.openScreenWithPop(
-                        context,
-                        AppRoutes.favorites,
-                      ),
+                      onTap: () => context.push(AppRoutes.favorites),
                     ),
                   ],
                 );
+              default:
+                return const SizedBox.shrink();
             }
           },
         ),
         ProfilePageItem(
           icon: Icons.settings_outlined,
           label: AppLocalizations.of(context)!.drawerSettings,
-          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.settings),
+          onTap: () => context.push(AppRoutes.settings),
         ),
         ProfilePageItem(
           icon: Icons.phone_outlined,
           label: AppLocalizations.of(context)!.drawerContactUs,
-          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.contact),
+          onTap: () => context.push(AppRoutes.contact),
         ),
         ProfilePageItem(
           icon: Icons.info_outline_rounded,
           label: AppLocalizations.of(context)!.drawerAboutApp,
-          onTap: () => AppRouter.openScreenWithPop(context, AppRoutes.about),
+          onTap: () => context.push(AppRoutes.about),
         ),
         ProfilePageItem(
           icon: Icons.privacy_tip_outlined,
           label: AppLocalizations.of(context)!.drawerPrivacyPolicy,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.privacyPolicy),
+          onTap: () => context.push(AppRoutes.privacyPolicy),
         ),
         ProfilePageItem(
           icon: Icons.quiz_outlined,
           label: AppLocalizations.of(context)!.drawerTermsConditions,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.termsConditions),
+          onTap: () => context.push(AppRoutes.termsConditions),
         ),
         ProfilePageItem(
           icon: Icons.help_outline_rounded,
           label: AppLocalizations.of(context)!.frequentlyAskedQuestion,
-          onTap: () =>
-              AppRouter.openScreenWithPop(context, AppRoutes.kalivraFaq),
+          onTap: () => context.push(AppRoutes.kalivraFaq),
         ),
         ProfilePageItem(
           icon: Icons.share_rounded,
@@ -111,8 +114,7 @@ class ProfilePage extends StatelessWidget {
                 return ProfilePageItem(
                   icon: Icons.star_rounded,
                   label: AppLocalizations.of(context)!.rateTitle,
-                  onTap: () =>
-                      AppRouter.openScreenWithPop(context, AppRoutes.rate),
+                  onTap: () => context.push(AppRoutes.rate),
                 );
             }
           },

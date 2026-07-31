@@ -698,5 +698,6 @@
   "@stockPieces": {"placeholders": {"count": {"type": "int"}}},
   "nothingToShow": "Nothing to show.",
   "userBalance": "User Balance",
-  "unexpectedError": "unexpected error"
+  "unexpectedError": "unexpected error",
+  "associaitionSendLinkRequest": "ٍSend link request"
 }

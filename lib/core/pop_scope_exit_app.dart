@@ -22,7 +22,6 @@ class PopScopeExitApp extends StatelessWidget {
               title: l10n.exitAppTitle,
               message: l10n.exitAppConfirmation,
               onConfirm: () {
-                Navigator.pop(context, true);
                 SystemNavigator.pop();
               },
             ),

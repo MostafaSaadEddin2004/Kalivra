@@ -3919,6 +3919,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User Balance'**
   String get userBalance;
+
+  /// No description provided for @associaitionSendLinkRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'ٍSend link request'**
+  String get associaitionSendLinkRequest;
 }
 
 class _AppLocalizationsDelegate

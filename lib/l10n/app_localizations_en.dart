@@ -2029,4 +2029,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get userBalance => 'User Balance';
+
+  @override
+  String get associaitionSendLinkRequest => 'ٍSend link request';
 }

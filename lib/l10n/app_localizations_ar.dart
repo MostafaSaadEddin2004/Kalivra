@@ -2013,4 +2013,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get userBalance => 'رصيد المستخدم';
+
+  @override
+  String get associaitionSendLinkRequest => 'إرسال طلب ربط';
 }

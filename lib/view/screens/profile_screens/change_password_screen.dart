@@ -6,7 +6,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
-import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
@@ -31,15 +30,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     _newController.dispose();
     _confirmController.dispose();
     super.dispose();
-  }
-
-  void _update() {
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    CustomSnackBar.show(
-      context,
-      AppLocalizations.of(context)!.passwordUpdatedSuccess,
-    );
-    context.pop();
   }
 
   void _forgotPassword() {
@@ -159,7 +149,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             ),
             SizedBox(height: 20.h),
             FilledButton.icon(
-              onPressed: _update,
+              onPressed: () {
+                
+              },
               icon: Icon(Icons.check_rounded, size: 22.r),
               label: Text(
                 l10n.updatePasswordButton,

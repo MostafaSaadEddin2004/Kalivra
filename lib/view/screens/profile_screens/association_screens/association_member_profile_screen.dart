@@ -218,8 +218,8 @@ class _AssociationMemberProfileScreenState
                   icon: Icons.person_pin_circle_outlined,
                   title: _localizedText(
                     context,
-                    arabic: 'تم ربطك كشخص',
-                    english: 'You are linked as a person',
+                    arabic: 'تم قبول طلبك',
+                    english: 'Your request is accepted',
                   ),
                   message: _localizedText(
                     context,
@@ -232,42 +232,44 @@ class _AssociationMemberProfileScreenState
                   onAction: _reload,
                 );
               }
-              if (!profile.isAssociationMember &&
-                  !profile.canSubmitAssociationRequest) {
-                return _MessageState(
-                  icon: Icons.hourglass_top_rounded,
-                  title: _localizedText(
-                    context,
-                    arabic: 'طلب الربط قيد المراجعة',
-                    english: 'Association link request under review',
-                  ),
-                  message: _localizedText(
-                    context,
-                    arabic:
-                        'طلب ربطك بالجمعية قيد المراجعة حالياً. سنعرض تفاصيل العضوية فور اعتماد الطلب من قبل الجمعية.',
-                    english:
-                        'Your association link request is currently under review. Membership details will appear as soon as the association approves it.',
-                  ),
-                  actionLabel: l10n.retry,
-                  onAction: _reload,
-                );
-              }
               if (!profile.isAssociationMember) {
-                return _MessageState(
-                  icon: Icons.info_outline_rounded,
-                  title: _localizedText(
-                    context,
-                    arabic: 'لا توجد عضوية بعد',
-                    english: 'No membership yet',
-                  ),
-                  message: _localizedText(
-                    context,
-                    arabic: 'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.',
-                    english:
-                        'There is no active association membership for this account yet.',
-                  ),
-                  actionLabel: l10n.retry,
-                  onAction: _reload,
+                return Column(spacing: 16.h,
+                  children: [
+                    _MessageState(
+                      icon: Icons.info_outline_rounded,
+                      title: _localizedText(
+                        context,
+                        arabic: 'لا توجد عضوية بعد',
+                        english: 'No membership yet',
+                      ),
+                      message: _localizedText(
+                        context,
+                        arabic: 'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.',
+                        english:
+                            'There is no active association membership for this account yet.',
+                      ),
+                      actionLabel: l10n.retry,
+                      onAction: _reload,
+                    ),
+                     FilledButton(
+                          onPressed: () =>
+                              context.push(AppRoutes.associationRequestsAndServices),
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            l10n.associaitionSendLinkRequest,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                  ],
                 );
               }
 

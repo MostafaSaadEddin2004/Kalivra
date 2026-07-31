@@ -137,9 +137,6 @@ class _ProfileState extends State<Profile> {
                             );
                           }
                           break;
-                        case _ProfileMenuAction.associationMemberProfile:
-                          context.push(AppRoutes.associationMemberProfile);
-                          break;
                       }
                     },
                     itemBuilder: (context) => [
@@ -154,23 +151,6 @@ class _ProfileState extends State<Profile> {
                             ),
                             const SizedBox(width: 12),
                             Text(l10n.editProfile, style: textTheme.bodyMedium),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: _ProfileMenuAction.associationMemberProfile,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.groups_rounded,
-                              size: 20.r,
-                              color: theme.colorScheme.onTertiaryFixed,
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              l10n.associationPersonalProfileButton,
-                              style: textTheme.bodyMedium,
-                            ),
                           ],
                         ),
                       ),
@@ -279,58 +259,100 @@ class _ProfileState extends State<Profile> {
               return ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
-                  Center(
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 48.r,
-                          backgroundColor: isDark
-                              ? AppColors.burgundy.withValues(alpha: 0.3)
-                              : AppColors.burgundy.withValues(alpha: 0.15),
-                          backgroundImage: avatarUrl != null
-                              ? NetworkImage(avatarUrl)
-                              : null,
-                          child: avatarUrl == null
-                              ? Icon(
-                                  Icons.person_rounded,
-                                  size: 56.r,
-                                  color: isDark
-                                      ? AppColors.goldLight
-                                      : AppColors.burgundy,
-                                )
-                              : null,
-                        ),
-                        SizedBox(height: 12.h),
-                      ],
-                    ),
+                  Column(
+                    children: [
+                      Row(
+                        spacing: 16.w,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 48.r,
+                            backgroundColor: isDark
+                                ? AppColors.burgundy.withValues(alpha: 0.3)
+                                : AppColors.burgundy.withValues(alpha: 0.15),
+                            backgroundImage: avatarUrl != null
+                                ? NetworkImage(avatarUrl)
+                                : null,
+                            child: avatarUrl == null
+                                ? Icon(
+                                    Icons.person_rounded,
+                                    size: 56.r,
+                                    color: isDark
+                                        ? AppColors.goldLight
+                                        : AppColors.burgundy,
+                                  )
+                                : null,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  fullName,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                state.customer.email != null
+                                    ? Text(
+                                        state.customer.email!,
+                                        style: theme.textTheme.bodyLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      )
+                                    : const SizedBox.shrink(),
+                                customer.gender != null
+                                    ? Text(
+                                        customer.gender!,
+                                        style: theme.textTheme.bodyLarge
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
                   ),
+                  customer.isLinkedPerson == false
+                      ? FilledButton(
+                          onPressed: () => context.push(
+                            AppRoutes.associationRequestsAndServices,
+                          ),
+                          style: FilledButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14.r),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            l10n.associaitionSendLinkRequest,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                   if (referralCode != null && referralCode.isNotEmpty)
                     ReferralQrCard(referralCode: referralCode),
                   SizedBox(height: 16.h),
                   _SectionCard(
                     title: l10n.accountInfo,
                     children: [
-                      firstName.isEmpty && lastName.isEmpty
-                          ? _InfoRow(
-                              label: l10n.name,
-                              value: customer.name ?? '---',
-                              icon: Icons.person_outline_rounded,
-                            )
-                          : SizedBox(),
-                      _InfoRow(
-                        label: l10n.fullName,
-                        value: fullName.isEmpty ? '---' : fullName,
-                        icon: Icons.person_outline_rounded,
-                      ),
                       _InfoRow(
                         label: l10n.userBalance,
                         value: _formatBalance(customer.userBalance),
                         icon: Icons.account_balance_wallet_outlined,
-                      ),
-                      _InfoRow(
-                        label: l10n.genderLabel,
-                        value: customer.gender ?? '---',
-                        icon: Icons.person_pin_outlined,
                       ),
                       _InfoRow(
                         label: l10n.dateOfBirthLabel,
@@ -674,4 +696,4 @@ class _AddressDetailGrid extends StatelessWidget {
   }
 }
 
-enum _ProfileMenuAction { editProfile, associationMemberProfile }
+enum _ProfileMenuAction { editProfile }
