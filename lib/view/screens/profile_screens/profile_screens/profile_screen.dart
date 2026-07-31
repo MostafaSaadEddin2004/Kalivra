@@ -146,11 +146,10 @@ class _ProfileState extends State<Profile> {
                           children: [
                             Icon(
                               Icons.edit_rounded,
-                              size: 20.r,
-                              color: theme.colorScheme.onTertiaryFixed,
+                              size: 20.r,color: AppColors.burgundy
                             ),
                             const SizedBox(width: 12),
-                            Text(l10n.editProfile, style: textTheme.bodyMedium),
+                            Text(l10n.editProfile, style: textTheme.bodyMedium!.copyWith(color: AppColors.burgundy)),
                           ],
                         ),
                       ),

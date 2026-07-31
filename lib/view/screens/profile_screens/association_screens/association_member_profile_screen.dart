@@ -100,12 +100,14 @@ class _AssociationMemberProfileScreenState
                               Icon(
                                 Icons.link_rounded,
                                 size: 20.r,
-                                color: theme.colorScheme.onTertiaryFixed,
+                                color: AppColors.burgundy,
                               ),
                               const SizedBox(width: 12),
                               Text(
                                 l10n.associationRequestsAndServices,
-                                style: theme.textTheme.bodyMedium,
+                                style: theme.textTheme.bodyMedium!.copyWith(
+                                  color: AppColors.burgundy,
+                                ),
                               ),
                             ],
                           ),
@@ -119,12 +121,14 @@ class _AssociationMemberProfileScreenState
                               Icon(
                                 Icons.campaign_rounded,
                                 size: 20.r,
-                                color: theme.colorScheme.onTertiaryFixed,
+                                color: AppColors.burgundy,
                               ),
                               const SizedBox(width: 12),
                               Text(
                                 l10n.associationAnnouncementsTitle,
-                                style: theme.textTheme.bodyMedium,
+                                style: theme.textTheme.bodyMedium!.copyWith(
+                                  color: AppColors.burgundy,
+                                ),
                               ),
                             ],
                           ),
@@ -136,13 +140,12 @@ class _AssociationMemberProfileScreenState
                           children: [
                             Icon(
                               Icons.upload_file_rounded,
-                              size: 20.r,
-                              color: theme.colorScheme.onTertiaryFixed,
+                              size: 20.r,color: AppColors.burgundy
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.linkRequestsScreen,
-                              style: theme.textTheme.bodyMedium,
+                              style: theme.textTheme.bodyMedium!.copyWith(color: AppColors.burgundy),
                             ),
                           ],
                         ),
@@ -155,13 +158,12 @@ class _AssociationMemberProfileScreenState
                           children: [
                             Icon(
                               Icons.question_answer_outlined,
-                              size: 20.r,
-                              color: theme.colorScheme.onTertiaryFixed,
+                              size: 20.r,color: AppColors.burgundy
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.associationContactUs,
-                              style: theme.textTheme.bodyMedium,
+                              style: theme.textTheme.bodyMedium!.copyWith(color: AppColors.burgundy),
                             ),
                           ],
                         ),
@@ -173,13 +175,12 @@ class _AssociationMemberProfileScreenState
                           children: [
                             Icon(
                               Icons.help_rounded,
-                              size: 20.r,
-                              color: theme.colorScheme.onTertiaryFixed,
+                              size: 20.r,color: AppColors.burgundy
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.frequentlyAskedQuestion,
-                              style: theme.textTheme.bodyMedium,
+                              style: theme.textTheme.bodyMedium!.copyWith(color: AppColors.burgundy),
                             ),
                           ],
                         ),
@@ -233,7 +234,8 @@ class _AssociationMemberProfileScreenState
                 );
               }
               if (!profile.isAssociationMember) {
-                return Column(spacing: 16.h,
+                return Column(
+                  spacing: 16.h,
                   children: [
                     _MessageState(
                       icon: Icons.info_outline_rounded,
@@ -244,31 +246,33 @@ class _AssociationMemberProfileScreenState
                       ),
                       message: _localizedText(
                         context,
-                        arabic: 'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.',
+                        arabic:
+                            'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.',
                         english:
                             'There is no active association membership for this account yet.',
                       ),
                       actionLabel: l10n.retry,
                       onAction: _reload,
                     ),
-                     FilledButton(
-                          onPressed: () =>
-                              context.push(AppRoutes.associationRequestsAndServices),
-                          style: FilledButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 8.h),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14.r),
-                            ),
-                            elevation: 0,
-                          ),
-                          child: Text(
-                            l10n.associaitionSendLinkRequest,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: AppColors.offWhite,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                    FilledButton(
+                      onPressed: () => context.push(
+                        AppRoutes.associationRequestsAndServices,
+                      ),
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.r),
                         ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        l10n.associaitionSendLinkRequest,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: AppColors.offWhite,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ],
                 );
               }

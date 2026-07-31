@@ -177,6 +177,8 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Drawer(
+      backgroundColor: theme.colorScheme.secondaryFixed,
+
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -310,7 +312,7 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   Widget _buildMessagesList(ThemeData theme, ChatState state) {
     final l10n = AppLocalizations.of(context)!;
 
-    if (state.messages.isEmpty && !state.isSending) {
+    if (state.messages.isEmpty) {
       return Center(
         child: Padding(
           padding: EdgeInsets.all(28.w),
@@ -454,7 +456,7 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
                 minLines: 1,
                 maxLines: 5,
                 textInputAction: TextInputAction.newline,
-                cursorColor: theme.colorScheme.onSurfaceVariant,
+                cursorColor: theme.colorScheme.secondaryFixed,
                 cursorHeight: 16.h,
                 cursorWidth: 0.5.w,
                 style: theme.textTheme.bodyMedium!.copyWith(
@@ -466,12 +468,12 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
                     child: Text(
                       l10n.associationChatMessageHint,
                       style: theme.textTheme.bodyMedium!.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.secondaryFixed,
                       ),
                     ),
                   ),
                   filled: true,
-                  fillColor: theme.colorScheme.onTertiary,
+                  fillColor: theme.colorScheme.onTertiaryFixed,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(40.r),
                     borderSide: BorderSide.none,
@@ -491,8 +493,8 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
               icon: const Icon(Icons.send_rounded),
               tooltip: l10n.send,
               style: IconButton.styleFrom(
-                backgroundColor: AppColors.burgundy,
-                foregroundColor: AppColors.offWhite,
+                backgroundColor: theme.colorScheme.onTertiaryFixed,
+                foregroundColor: theme.colorScheme.secondaryFixed,
                 disabledBackgroundColor: AppColors.burgundy.withValues(
                   alpha: 0.45,
                 ),

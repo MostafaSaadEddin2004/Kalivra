@@ -26,7 +26,9 @@ class ConfirmDialog extends StatelessWidget {
 
     return AlertDialog(
       title: Text(title, style: theme.textTheme.titleLarge),
-      content: Text(message, style: theme.textTheme.bodyMedium),
+      content: Text(message, style: theme.textTheme.bodyMedium!.copyWith(
+        color: AppColors.black
+      )),
       actions: [
         TextButton(onPressed: () => context.pop(), child: Text(l10n.no)),
         Container(

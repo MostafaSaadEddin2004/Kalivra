@@ -120,7 +120,7 @@ class _CategoriesPageBody extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: 102.h,
+                          height: 110.h,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -185,7 +185,7 @@ class _CategoriesPageBody extends StatelessWidget {
 
                   default:
                     return SizedBox(
-                      height: 92.h,
+                      height: 110.h,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(horizontal: 20.w),
