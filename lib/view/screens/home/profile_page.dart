@@ -133,7 +133,7 @@ class ProfilePage extends StatelessWidget {
           },
         ),
         const ProfilePageFooter(),
-        SizedBox(height: 72.h),
+        SizedBox(height: 80.h),
       ],
     );
   }

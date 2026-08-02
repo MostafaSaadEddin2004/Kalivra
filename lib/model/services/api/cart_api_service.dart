@@ -8,9 +8,10 @@ class CartApiService {
 
   Future<CartApiModel> getCart() async {
     final res = await _client.get('checkout/cart');
-    final json = res.data['data'];
-    final data = CartApiModel.fromJson(json);
-    return data;
+    final data = CartApiResponseModel.fromJson(
+      Map<String, dynamic>.from(res.data as Map),
+    );
+    return data.cart ?? const CartApiModel();
   }
 
   Future<CartApiModel?> addToCart({
@@ -69,5 +70,13 @@ class CartApiService {
 
   Future<void> clearCart() async {
     await _client.delete('checkout/cart/all');
+  }
+
+  Future<void> postCoupon({required String code}) async {
+    await _client.post('checkout/cart/coupon', data: {'code': code});
+  }
+
+  Future<void> removeCoupon() async {
+    await _client.delete('checkout/cart/coupon');
   }
 }

@@ -404,6 +404,18 @@ abstract class AppLocalizations {
   /// **'Price Details'**
   String get priceDetails;
 
+  /// No description provided for @cartItemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get cartItemsCount;
+
+  /// No description provided for @cartItemsQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Total quantity'**
+  String get cartItemsQuantity;
+
   /// No description provided for @subtotal.
   ///
   /// In en, this message translates to:
@@ -529,6 +541,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cart cleared successfully'**
   String get cartClearedSuccessfully;
+
+  /// No description provided for @coupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon'**
+  String get coupon;
+
+  /// No description provided for @couponCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon code'**
+  String get couponCode;
+
+  /// No description provided for @applyCoupon.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get applyCoupon;
+
+  /// No description provided for @applyCouponTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply coupon'**
+  String get applyCouponTitle;
+
+  /// No description provided for @couponAppliedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon applied successfully'**
+  String get couponAppliedSuccessfully;
+
+  /// No description provided for @couponRemovedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Coupon removed successfully'**
+  String get couponRemovedSuccessfully;
 
   /// No description provided for @noChangesDetected.
   ///
@@ -3925,6 +3973,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'ٍSend link request'**
   String get associaitionSendLinkRequest;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'search'**
+  String get search;
 }
 
 class _AppLocalizationsDelegate

@@ -131,8 +131,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 onNotificationsTap: () => context.push(AppRoutes.notifications),
               ),
               body: IndexedStack(
-                sizing: StackFit.passthrough,
-                clipBehavior: Clip.none,
                 index: index,
                 children: [
                   const HomePage(),

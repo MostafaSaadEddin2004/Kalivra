@@ -233,7 +233,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     VariantBySize? initialSize,
     ColorVariant? initialColor,
   }) async {
-    final l10n = AppLocalizations.of(context)!;
     final cartCubit = context.read<CartCubit>();
     var dialogProduct = product;
 
@@ -244,7 +243,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
 
     if (!mounted) return;
-    final added = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => BlocProvider.value(
@@ -256,9 +255,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
       ),
     );
-
-    if (!mounted || added != true) return;
-    CustomSnackBar.show(context, l10n.addToCartSuccess(dialogProduct.name));
   }
 
   @override

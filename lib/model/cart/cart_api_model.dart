@@ -1,4 +1,4 @@
-﻿/// GET /api/shop/v1/cart response wrapper and cart data.
+/// GET /api/shop/v1/cart response wrapper and cart data.
 class CartApiResponseModel {
   const CartApiResponseModel({required this.success, this.cart});
 
@@ -20,6 +20,7 @@ class CartApiModel {
   const CartApiModel({
     this.success,
     this.id,
+    this.isGuest,
     this.customerId,
     this.guestCheckout,
     this.items = const [],
@@ -51,6 +52,7 @@ class CartApiModel {
 
   final bool? success;
   final int? id;
+  final int? isGuest;
   final int? customerId;
   final bool? guestCheckout;
   final List<CartItemApiModel> items;
@@ -83,6 +85,7 @@ class CartApiModel {
     return CartApiModel(
       success: _asBool(success),
       id: _asInt(json['id']),
+      isGuest: _asInt(json['is_guest']),
       customerId: _asInt(json['customer_id']),
       guestCheckout:
           _asBool(json['guest_checkout']) ?? _asBool(json['is_guest']),

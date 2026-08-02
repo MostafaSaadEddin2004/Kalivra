@@ -3,10 +3,13 @@ import 'package:kalivra/model/cart/cart_api_model.dart';
 enum CartOperation {
   none,
   refreshing,
+  addingItem,
   updatingQuantity,
   updatingDetails,
   removingItem,
   clearingCart,
+  applyingCoupon,
+  removingCoupon,
 }
 
 abstract class CartState {
@@ -86,4 +89,14 @@ final class CartFailure extends CartState {
   final CartApiModel? cart;
   final CartOperation operation;
   final int? activeItemId;
+}
+
+final class CouponSent extends CartState {
+  final String message;
+  const CouponSent({required this.message});
+}
+
+final class CouponRemoved extends CartState {
+  final String message;
+  const CouponRemoved({required this.message});
 }

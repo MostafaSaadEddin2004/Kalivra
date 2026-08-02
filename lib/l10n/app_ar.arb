@@ -60,6 +60,8 @@
   "continueShopping": "متابعة التسوق",
   "emptyCart": "تفريغ السلة",
   "priceDetails": "تفاصيل السعر",
+  "cartItemsCount": "العناصر",
+  "cartItemsQuantity": "إجمالي الكمية",
   "subtotal": "المجموع الفرعي",
   "discount": "الخصم",
   "tax": "الضريبة",
@@ -82,6 +84,12 @@
   "itemUpdatedSuccessfully": "تم تحديث المنتج في السلة بنجاح",
   "itemDeletedSuccessfully": "تم حذف المنتج من السلة بنجاح",
   "cartClearedSuccessfully": "تم إفراغ السلة بنجاح",
+  "coupon": "القسيمة",
+  "couponCode": "رمز القسيمة",
+  "applyCoupon": "إضافة",
+  "applyCouponTitle": "إضافة قسيمة",
+  "couponAppliedSuccessfully": "تم تطبيق القسيمة بنجاح",
+  "couponRemovedSuccessfully": "تم حذف القسيمة بنجاح",
   "noChangesDetected": "لا توجد تغييرات",
   "invalidQuantity": "أدخل كمية صالحة",
   "selectRequiredOptions": "اختر الخيارات المطلوبة",
@@ -102,7 +110,7 @@
   "invalidProductId": "معرّف المنتج غير صالح",
   "addToWishlistSuccess": "تمت إضافة \"{productName}\" إلى المفضلة بنجاح",
   "addToWishlistFailed": "فشل إضافة المنتج إلى المفضلة",
-  "unit": "الوحدة",
+  "unit": "عدد",
   "maxOrderLimit": "الحد الأقصى للطلب",
   "productOrderInfo": "معلومات الطلب",
   "unitPiece": "قطعة",
@@ -694,5 +702,6 @@
   "nothingToShow": "لا يوجد محتوى للعرض.",
   "userBalance": "رصيد المستخدم",
   "unexpectedError": "خطأ غير متوقع",
-  "associaitionSendLinkRequest": "إرسال طلب ربط"
+  "associaitionSendLinkRequest": "إرسال طلب ربط",
+  "search": "ابحث"
 }

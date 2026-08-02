@@ -1,11 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_api_model.dart';
 import 'package:kalivra/model/cart/cart_item_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/model/services/api/cart_api_service.dart';
 import 'package:kalivra/model/services/api/product_api_service.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/login_dialog.dart';
 
 export 'cart_state.dart';
@@ -40,6 +43,12 @@ class CartCubit extends Cubit<CartState> {
   int? get activeItemId => _activeItemId;
 
   bool get isClearingCart => _operation == CartOperation.clearingCart;
+
+  bool get isAddingItem => _operation == CartOperation.addingItem;
+
+  bool get isApplyingCoupon => _operation == CartOperation.applyingCoupon;
+
+  bool get isRemovingCoupon => _operation == CartOperation.removingCoupon;
 
   bool isRemovingItem(int itemId) =>
       _operation == CartOperation.removingItem && _activeItemId == itemId;
@@ -108,10 +117,12 @@ class CartCubit extends Cubit<CartState> {
   }
 
   Future<bool> addItem(
+    BuildContext context,
     String productId, {
     int quantity = 1,
     String color = '',
     String size = '',
+    String productName = '',
   }) async {
     if (quantity < 1) return false;
 
@@ -122,7 +133,8 @@ class CartCubit extends Cubit<CartState> {
       return false;
     }
 
-    emit(const CartLoading());
+    final l10n = AppLocalizations.of(context)!;
+    _emitLoading(operation: CartOperation.addingItem);
     try {
       final cart = await _cartService.addToCart(
         productId: int.parse(productId),
@@ -131,17 +143,29 @@ class CartCubit extends Cubit<CartState> {
         size: size,
       );
       _cart = cart ?? await _cartService.getCart();
-      emit(AddToCartSuccessed(message: 'added', cart: _cart!));
+      final message = l10n.addToCartSuccess(productName);
+      emit(AddToCartSuccessed(message: message, cart: _cart!));
       _emitLoaded();
+      CustomSnackBar.show(context, message);
       return true;
     } catch (e) {
-      emit(CartFailure(message: e.toString(), cart: _cart));
+      final message = e.toString();
+      emit(
+        CartFailure(
+          message: message,
+          cart: _cart,
+          operation: CartOperation.addingItem,
+        ),
+      );
+      if (_cart != null) _emitLoaded();
+      CustomSnackBar.show(context, message);
       return false;
     }
   }
 
-  Future<bool> removeCartItem(int cartItemId) async {
+  Future<bool> removeCartItem(BuildContext context, int cartItemId) async {
     if (isRemovingItem(cartItemId)) return false;
+    final l10n = AppLocalizations.of(context)!;
     _emitLoaded(
       operation: CartOperation.removingItem,
       activeItemId: cartItemId,
@@ -150,48 +174,64 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.removeCartItem(cartItemId);
       _cart = await _cartService.getCart();
-      emit(RemoveFromCartSuccessed(message: 'removed', cart: _cart!));
+      final message = l10n.itemDeletedSuccessfully;
+      emit(RemoveFromCartSuccessed(message: message, cart: _cart!));
       _emitLoaded();
+      CustomSnackBar.show(context, message);
+      getCart();
       return true;
     } catch (e) {
+      final message = e.toString();
       emit(
         CartFailure(
-          message: e.toString(),
+          message: message,
           cart: _cart,
           operation: CartOperation.removingItem,
           activeItemId: cartItemId,
         ),
       );
       _emitLoaded();
+      CustomSnackBar.show(context, message);
       return false;
     }
   }
 
-  Future<bool> clearCart() async {
+  Future<bool> clearCart(BuildContext context) async {
     if ((_cart?.items.isEmpty ?? true) || isClearingCart) return false;
+    final l10n = AppLocalizations.of(context)!;
     _emitLoaded(operation: CartOperation.clearingCart);
 
     try {
       await _cartService.clearCart();
       _cart = const CartApiModel();
-      emit(const DeleteCartSuccessed(message: 'cleared'));
+      final message = l10n.cartClearedSuccessfully;
+      emit(DeleteCartSuccessed(message: message));
       _emitLoaded();
+      CustomSnackBar.show(context, message);
+      getCart();
       return true;
     } catch (e) {
+      final message = e.toString();
       emit(
         CartFailure(
-          message: e.toString(),
+          message: message,
           cart: _cart,
           operation: CartOperation.clearingCart,
         ),
       );
       _emitLoaded();
+      CustomSnackBar.show(context, message);
       return false;
     }
   }
 
-  Future<bool> updateItemQuantity(int itemId, int quantity) async {
+  Future<bool> updateItemQuantity(
+    BuildContext context,
+    int itemId,
+    int quantity,
+  ) async {
     if (quantity < 1 || isUpdatingItem(itemId)) return false;
+    final l10n = AppLocalizations.of(context)!;
     _emitLoaded(
       operation: CartOperation.updatingQuantity,
       activeItemId: itemId,
@@ -200,66 +240,86 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.updateItemQuantity(itemId, quantity);
       _cart = await _cartService.getCart();
-      emit(UpdateItemQuantitySuccessed(message: 'updated', cart: _cart!));
+      final message = l10n.itemUpdatedSuccessfully;
+      emit(UpdateItemQuantitySuccessed(message: message, cart: _cart!));
       _emitLoaded();
+      CustomSnackBar.show(context, message);
+      getCart();
       return true;
     } catch (e) {
+      final message = e.toString();
       emit(
         CartFailure(
-          message: e.toString(),
+          message: message,
           cart: _cart,
           operation: CartOperation.updatingQuantity,
           activeItemId: itemId,
         ),
       );
       _emitLoaded();
+      CustomSnackBar.show(context, message);
       return false;
     }
   }
 
   Future<bool> updateItemDetials(
+    BuildContext context,
     int itemId,
     int quantity,
     String colorId,
     String sizeId,
   ) async {
     if (quantity < 1 || isUpdatingItem(itemId)) return false;
+    final l10n = AppLocalizations.of(context)!;
     _emitLoaded(operation: CartOperation.updatingDetails, activeItemId: itemId);
 
     try {
       await _cartService.updateItemDetials(itemId, quantity, colorId, sizeId);
       _cart = await _cartService.getCart();
-      emit(UpdateItemDetialsSuccessed(message: 'updated', cart: _cart!));
+      final message = l10n.itemUpdatedSuccessfully;
+      emit(UpdateItemDetialsSuccessed(message: message, cart: _cart!));
       _emitLoaded();
+      CustomSnackBar.show(context, message);
+      getCart();
       return true;
     } catch (e) {
+      final message = e.toString();
       emit(
         CartFailure(
-          message: e.toString(),
+          message: message,
           cart: _cart,
           operation: CartOperation.updatingDetails,
           activeItemId: itemId,
         ),
       );
       _emitLoaded();
+      CustomSnackBar.show(context, message);
       return false;
     }
   }
 
-  Future<bool> updateItemDetails(
-    int itemId,
+  Future<void> changeQuantity(
+    BuildContext context,
+    String productId,
     int quantity,
-    String colorId,
-    String sizeId,
-  ) {
-    return updateItemDetials(itemId, quantity, colorId, sizeId);
-  }
-
-  Future<void> changeQuantity(String productId, int quantity) async {
+  ) async {
     if (quantity < 1) return;
     final itemId = int.tryParse(productId);
     if (itemId == null) return;
-    await updateItemQuantity(itemId, quantity);
+    await updateItemQuantity(context, itemId, quantity);
+  }
+
+  void _emitLoading({
+    CartOperation operation = CartOperation.none,
+    int? activeItemId,
+  }) {
+    if (_cart == null) {
+      _operation = operation;
+      _activeItemId = activeItemId;
+      emit(const CartLoading());
+      return;
+    }
+    _emitLoaded(operation: operation, activeItemId: activeItemId);
   }
 
   void _emitLoaded({
@@ -275,5 +335,53 @@ class CartCubit extends Cubit<CartState> {
         activeItemId: activeItemId,
       ),
     );
+  }
+
+  Future<void> sendCoupon(BuildContext context, String code) async {
+    final l10n = AppLocalizations.of(context)!;
+    _emitLoading(operation: CartOperation.applyingCoupon);
+    try {
+      await _cartService.postCoupon(code: code);
+      _cart = await _cartService.getCart();
+      final message = l10n.couponAppliedSuccessfully;
+      emit(CouponSent(message: message));
+      _emitLoaded();
+      CustomSnackBar.show(context, message);
+    } catch (e) {
+      final message = e.toString();
+      emit(
+        CartFailure(
+          message: message,
+          cart: _cart,
+          operation: CartOperation.applyingCoupon,
+        ),
+      );
+      if (_cart != null) _emitLoaded();
+      CustomSnackBar.show(context, message);
+    }
+  }
+
+  Future<void> removeCoupon(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    _emitLoading(operation: CartOperation.removingCoupon);
+    try {
+      await _cartService.removeCoupon();
+      _cart = await _cartService.getCart();
+      final message = l10n.couponRemovedSuccessfully;
+      emit(CouponRemoved(message: message));
+      _emitLoaded();
+      CustomSnackBar.show(context, message);
+    } catch (e) {
+      final message = e.toString();
+      emit(
+        CartFailure(
+          message: message,
+          cart: _cart,
+          operation: CartOperation.removingCoupon,
+        ),
+      );
+      if (_cart != null) _emitLoaded();
+      CustomSnackBar.show(context, message);
+    }
   }
 }

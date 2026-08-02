@@ -14,6 +14,10 @@ This is a Flutter project.
 - Do not remove existing features.
 - Do not add packages unless necessary.
 - Do just what I exactly ask and nothing else.
+- Do not change any color or theme I used.
+- Always use the AppTheme for colors and text style.
+- Don't use isDark method and it's enough to use the AppTheme.
+- Check if the text color match the theme and if it's not make sure to use ".copyWith".
 
 ## Commands to check work
 Run these after meaningful changes:

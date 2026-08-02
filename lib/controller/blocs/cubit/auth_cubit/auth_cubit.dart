@@ -384,6 +384,7 @@ class AuthCubit extends Cubit<AuthState> {
     Map<String, dynamic>? addresses,
     File? imageFile,
   }) async {
+    final l10n = AppLocalizations.of(context)!;
     emit(AuthLoading());
     try {
       await _customerApiService.updateProfile(
@@ -407,10 +408,13 @@ class AuthCubit extends Cubit<AuthState> {
         addresses: addresses,
         imageFile: imageFile,
       );
-      emit(AuthSuccessed(message: 'تم تحديث البيانات بنجاح'));
+      emit(AuthSuccessed(message: l10n.profileSaved));
+      CustomSnackBar.show(context, l10n.profileSaved);
+      context.pop();
       await loadProfile(context);
     } catch (e) {
       emit(AuthFailed(message: e.toString()));
+       CustomSnackBar.show(context, e.toString());
       throw Exception(e);
     }
   }

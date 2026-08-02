@@ -36,6 +36,7 @@ class AppTheme {
       inversePrimary: AppColors.burgundy,
       onSurfaceVariant: AppColors.offWhite,
       onPrimaryFixedVariant: AppColors.black,
+      onTertiaryFixedVariant: AppColors.burgundy,
       onError: AppColors.red,
       brightness: Brightness.light,
     ),
@@ -67,6 +68,32 @@ class AppTheme {
         foregroundColor: WidgetStatePropertyAll(AppColors.offWhite),
         iconSize: WidgetStatePropertyAll(20.r),
       ),
+    ), datePickerTheme: DatePickerThemeData(
+      backgroundColor: AppColors.offWhite,
+      headerForegroundColor: AppColors.burgundy,
+      dividerColor: AppColors.burgundy,
+      cancelButtonStyle: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+          TextStyle(
+            color: AppColors.burgundy,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      confirmButtonStyle: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+          TextStyle(
+            color: AppColors.burgundy,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      dayStyle: TextStyle(color: AppColors.burgundy, fontSize: 16.sp),
+      yearStyle: TextStyle(color: AppColors.burgundy, fontSize: 16.sp),
+      weekdayStyle: TextStyle(color: AppColors.burgundy, fontSize: 16.sp),
+      toggleButtonTextStyle: TextStyle(color: AppColors.burgundy, fontSize: 16.sp),
     ),
   );
 
@@ -90,6 +117,7 @@ class AppTheme {
       inversePrimary: AppColors.goldLight,
       onSurfaceVariant: AppColors.burgundy,
       onPrimaryFixedVariant: AppColors.offWhite,
+      onTertiaryFixedVariant: AppColors.black,
       onError: AppColors.red,
       brightness: Brightness.dark,
     ),
@@ -121,6 +149,33 @@ class AppTheme {
         foregroundColor: WidgetStatePropertyAll(AppColors.black),
         iconSize: WidgetStatePropertyAll(20.r),
       ),
+    ),
+    datePickerTheme: DatePickerThemeData(
+      backgroundColor: AppColors.offWhite,
+      headerForegroundColor: AppColors.black,
+      dividerColor: AppColors.black,
+      cancelButtonStyle: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+          TextStyle(
+            color: AppColors.black,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      confirmButtonStyle: ButtonStyle(
+        textStyle: WidgetStatePropertyAll(
+          TextStyle(
+            color: AppColors.black,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      dayStyle: TextStyle(color: AppColors.black, fontSize: 16.sp),
+      yearStyle: TextStyle(color: AppColors.black, fontSize: 16.sp),
+      weekdayStyle: TextStyle(color: AppColors.black, fontSize: 16.sp),
+      toggleButtonTextStyle: TextStyle(color: AppColors.black, fontSize: 16.sp),
     ),
   );
 

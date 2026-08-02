@@ -21,11 +21,6 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primary = theme.colorScheme.primary;
-    final surfaceColor = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.2)
-        : AppColors.burgundy.withValues(alpha: 0.06);
 
     return GestureDetector(
       onTap: () {
@@ -41,13 +36,9 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
         secondCurve: Curves.linear,
         firstCurve: Curves.linear,
         firstChild: Card(
-          elevation: 0,
+          elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadiusGeometry.circular(20.r),
-            side: BorderSide(
-              color: primary.withValues(alpha: 0.25),
-              width: 1.5,
-            ),
           ),
           child: Padding(
             padding: EdgeInsetsGeometry.all(16.w),
@@ -63,14 +54,12 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                           Icon(
                             Icons.qr_code_2_rounded,
                             size: 24.r,
-                            color: primary,
+                            color: theme.colorScheme.onTertiaryFixed,
                           ),
                           Text(
                             AppLocalizations.of(context)!.referralCode,
                             style: theme.textTheme.titleLarge?.copyWith(
-                              color: isDark
-                                  ? AppColors.offWhite
-                                  : AppColors.black,
+                              color: theme.colorScheme.onTertiaryFixed,
                               fontWeight: FontWeight.w800,
                             ),
                             softWrap: true,
@@ -80,7 +69,7 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                       Text(
                         AppLocalizations.of(context)!.referralCodeHint,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDark ? AppColors.taupe : AppColors.burgundy,
+                          color: theme.colorScheme.primaryFixed,
                           height: 1.35,
                         ),
                         maxLines: 2,
@@ -89,19 +78,15 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                     ],
                   ),
                 ),
-                Icon(Icons.expand_more_rounded, size: 28.r, color: primary),
+                Icon(Icons.expand_more_rounded, size: 28.r, color: theme.colorScheme.primaryFixed),
               ],
             ),
           ),
         ),
         secondChild: Card(
-          elevation: 0,
+          elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.r),
-            side: BorderSide(
-              color: primary.withValues(alpha: 0.25),
-              width: 1.5,
-            ),
+            borderRadius: BorderRadius.circular(20.r),        
           ),
           child: Padding(
             padding: EdgeInsets.all(16.w),
@@ -119,14 +104,12 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                               Icon(
                                 Icons.qr_code_2_rounded,
                                 size: 24.r,
-                                color: primary,
+                                color: theme.colorScheme.onTertiaryFixed,
                               ),
                               Text(
                                 AppLocalizations.of(context)!.referralCode,
                                 style: theme.textTheme.titleLarge?.copyWith(
-                                  color: isDark
-                                      ? AppColors.offWhite
-                                      : AppColors.black,
+                                  color: theme.colorScheme.onTertiaryFixed,
                                   fontWeight: FontWeight.w800,
                                 ),
                                 softWrap: true,
@@ -136,9 +119,7 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                           Text(
                             AppLocalizations.of(context)!.referralCodeHint,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: isDark
-                                  ? AppColors.taupe
-                                  : AppColors.burgundy,
+                              color: theme.colorScheme.primaryFixed,
                               height: 1.35,
                             ),
                             maxLines: 2,
@@ -147,7 +128,7 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                         ],
                       ),
                     ),
-                    Icon(Icons.expand_less_rounded, size: 28.r, color: primary),
+                    Icon(Icons.expand_less_rounded, size: 28.r, color: theme.colorScheme.primaryFixed),
                   ],
                 ),
                 SizedBox(height: 24.h),
@@ -159,8 +140,13 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 12.r,
-                        offset: Offset(0, 4.h),
+                        blurRadius: 10.r,
+                        offset: Offset(0, 8.h),
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius:102.r,
+                        offset: Offset(8.w, 0),
                       ),
                     ],
                   ),
@@ -185,19 +171,13 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                     horizontal: 16.w,
                     vertical: 12.h,
                   ),
-                  decoration: BoxDecoration(
-                    color: surfaceColor,
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         widget.referralCode,
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: isDark
-                              ? AppColors.goldLight
-                              : AppColors.burgundy,
+                          color: theme.colorScheme.primaryFixed,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.2,
                         ),
@@ -220,7 +200,7 @@ class _ReferralQrCardState extends State<ReferralQrCard> {
                           child: Icon(
                             Icons.copy_rounded,
                             size: 22.r,
-                            color: primary,
+                            color: theme.colorScheme.primaryFixed,
                           ),
                         ),
                       ),

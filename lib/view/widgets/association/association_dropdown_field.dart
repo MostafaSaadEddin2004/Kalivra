@@ -31,60 +31,13 @@ class AssociationDropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final border = isDark
-        ? AppColors.taupe.withValues(alpha: 0.5)
-        : AppColors.burgundy.withValues(alpha: 0.4);
-    final fill = isDark
-        ? AppColors.black.withValues(alpha: 0.08)
-        : AppColors.offWhite;
-    final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
-    final activeColor = isDark ? AppColors.goldLight : AppColors.burgundy;
-    final disabledIconColor = AppColors.lightGray;
+    final l10n = AppLocalizations.of(context)!;
     final radius = 14.r;
     final canSelect = enabled && items.isNotEmpty;
     final selectedValue =
         value != null && value!.isNotEmpty && items.contains(value)
         ? value
         : null;
-    final searchHint = AppLocalizations.of(context)?.navSearch ?? 'Search';
-
-    InputDecoration dropdownDecoration({String? hint}) {
-      return InputDecoration(
-        isDense: true,
-        filled: true,
-        fillColor: fill,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: activeColor),
-        ),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border.withValues(alpha: 0.35)),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: theme.colorScheme.error),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: theme.colorScheme.error),
-        ),
-        labelStyle: TextStyle(color: labelColor),
-        hintText: hint,
-        hintStyle: TextStyle(color: activeColor.withValues(alpha: 0.72)),
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-      );
-    }
-
     return AdaptiveDropdownSearch<String>(
       context: context,
       key: ValueKey('$label-$value-${items.join('|')}'),
@@ -95,13 +48,17 @@ class AssociationDropdownField extends StatelessWidget {
       onSelected: onChanged,
       validator: validator,
       textProps: TextProps(
-        style: theme.textTheme.bodyMedium?.copyWith(color: activeColor),
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.primaryFixed,
+        ),
       ),
       suffixProps: DropdownSuffixProps(
         dropdownButtonProps: DropdownButtonProps(
           iconClosed: Icon(Icons.arrow_drop_down_rounded, size: 24.r),
-          color: canSelect ? activeColor : disabledIconColor,
-          disabledColor: disabledIconColor,
+          color: canSelect
+              ? theme.colorScheme.onTertiaryFixed
+              : AppColors.lightGray,
+          disabledColor: AppColors.lightGray,
         ),
       ),
       popupProps: AdaptivePopupProps(
@@ -110,10 +67,63 @@ class AssociationDropdownField extends StatelessWidget {
           showSearchBox: true,
           fit: FlexFit.loose,
           searchFieldProps: TextFieldProps(
-            cursorColor: activeColor,
-            style: theme.textTheme.bodyMedium?.copyWith(color: activeColor),
-            decoration: dropdownDecoration(hint: searchHint).copyWith(
-              prefixIcon: Icon(Icons.search_rounded, color: activeColor),
+            cursorColor: theme.colorScheme.onTertiaryFixedVariant,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onTertiaryFixedVariant,
+            ),
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: theme.colorScheme.secondaryFixed.withValues(
+                alpha: 0.05,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.onTertiaryFixedVariant.withValues(
+                    alpha: 0.6,
+                  ),
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.onTertiaryFixedVariant.withValues(
+                    alpha: 0.6,
+                  ),
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.onTertiaryFixedVariant.withValues(
+                    alpha: 0.6,
+                  ),
+                ),
+              ),
+              disabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(
+                  color: theme.colorScheme.onTertiaryFixedVariant.withValues(
+                    alpha: 0.3,
+                  ),
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(color: theme.colorScheme.onError),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(radius),
+                borderSide: BorderSide(color: theme.colorScheme.onError),
+              ),
+              hintText: l10n.search,
+              hintStyle: theme.textTheme.bodyMedium!.copyWith(
+                color: theme.colorScheme.onTertiaryFixedVariant.withValues(alpha: 0.7),
+              ),
+              labelStyle: theme.textTheme.bodyMedium!.copyWith(
+                color: theme.colorScheme.onTertiaryFixedVariant.withValues(alpha: 0.7),
+              ),
               prefixIconConstraints: BoxConstraints(
                 minWidth: 40.w,
                 minHeight: 40.h,
@@ -121,6 +131,10 @@ class AssociationDropdownField extends StatelessWidget {
               contentPadding: EdgeInsets.symmetric(
                 horizontal: 10.w,
                 vertical: 8.h,
+              ),
+              prefixIcon: Icon(
+                Icons.search_rounded,
+                color: theme.colorScheme.onTertiaryFixedVariant,
               ),
             ),
           ),
@@ -130,7 +144,7 @@ class AssociationDropdownField extends StatelessWidget {
               child: Text(
                 itemLabelBuilder?.call(item) ?? item,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: activeColor,
+                  color: theme.colorScheme.onTertiaryFixedVariant,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
@@ -139,13 +153,58 @@ class AssociationDropdownField extends StatelessWidget {
         ),
       ),
       decoratorProps: DropDownDecoratorProps(
-        baseStyle: theme.textTheme.bodyMedium?.copyWith(color: activeColor),
-        decoration: dropdownDecoration(hint: hintText).copyWith(
-          labelText: label,
-          suffixIcon: trailing,
-          suffixIconConstraints: trailing == null
-              ? null
-              : BoxConstraints(minWidth: 48.w, minHeight: 48.h),
+        baseStyle: theme.textTheme.bodyMedium?.copyWith(
+          color: theme.colorScheme.onTertiaryFixed,
+        ),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: true,
+          fillColor: theme.colorScheme.secondaryFixed.withValues(alpha: 0.05),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
+            ),
+          ),
+          disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.3),
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: theme.colorScheme.onError),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(radius),
+            borderSide: BorderSide(color: theme.colorScheme.onError),
+          ),
+          hintText: label,
+          hintStyle: theme.textTheme.bodyMedium!.copyWith(
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
+          ),
+          labelStyle: theme.textTheme.bodyMedium!.copyWith(
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
+          ),
+          prefixIcon: trailing,
+          prefixIconConstraints: BoxConstraints(
+            minWidth: 40.w,
+            minHeight: 40.h,
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
         ),
       ),
     );

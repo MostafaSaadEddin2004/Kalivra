@@ -253,10 +253,12 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
     if (product == null) return false;
 
     return cartCubit.addItem(
+      context,
       (_selectedColor?.variantId ?? product.id).toString(),
       quantity: _quantity,
       color: _selectedColor?.colorName ?? '',
       size: _selectedSize?.sizeName ?? '',
+      productName: product.name,
     );
   }
 
@@ -269,6 +271,7 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
       final sizeId = _selectedSizeOptionId;
       if (colorId == null || sizeId == null) return false;
       return cartCubit.updateItemDetials(
+        context,
         item.id,
         _quantity,
         colorId.toString(),
@@ -276,7 +279,7 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
       );
     }
 
-    return cartCubit.updateItemQuantity(item.id, _quantity);
+    return cartCubit.updateItemQuantity(context, item.id, _quantity);
   }
 
   @override

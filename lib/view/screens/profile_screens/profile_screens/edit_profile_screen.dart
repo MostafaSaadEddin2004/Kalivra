@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
@@ -101,7 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.text = phoneParts.number;
     _dobController.text = _formatDateForField(c.dateOfBirth);
     _selectedGovernorate =
-        addressInfo?. permanentCapitalId?.toString() ??
+        addressInfo?.permanentCapitalId?.toString() ??
         addressInfo?.officialGovernorate;
     _selectedCity =
         addressInfo?.permanentCityId?.toString() ?? addressInfo?.officialCity;
@@ -224,7 +223,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final initialDate = currentValue != null && !currentValue.isAfter(now)
         ? currentValue
         : DateTime(now.year - 18, now.month, now.day);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final pickedDate = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -232,17 +230,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       lastDate: now,
       helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
       builder: (context, child) {
-        return Theme(
-         data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: isDark ? AppColors.taupe : AppColors.burgundy,
-              onPrimary: AppColors.offWhite,
-              surface: isDark ? AppColors.black : Colors.white,
-              onSurface: isDark ? AppColors.black : AppColors.offWhite,
-            ),
-          ),
-          child: child!,
-        );
+        return child!;
       },
     );
     if (pickedDate == null || !mounted) return;
@@ -308,9 +296,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         CustomSnackBar.show(context, l10n.profileImageTooLarge);
         return;
       }
-    }
-
-    try {
+    } else {
       await context.read<AuthCubit>().updateProfile(
         context: context,
         countryCode: _countryCodeController.text.trim(),
@@ -325,15 +311,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         addresses: _addressesMap(),
         imageFile: f,
       );
-      if (!mounted) return;
-      CustomSnackBar.show(context, l10n.profileSaved);
-      context.pop();
-    } catch (_) {
-      if (!mounted) return;
-      final msg = context.read<AuthCubit>().state;
-      if (msg is AuthFailed) {
-        CustomSnackBar.show(context, msg.message);
-      }
     }
   }
 
@@ -344,7 +321,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-    final labelColor = isDark ? AppColors.taupe : AppColors.burgundy;
     return BlocConsumer<AuthCubit, AuthState>(
       listenWhen: (prev, curr) => curr is AuthFetchedData && !didApplyCustomer,
       listener: (context, state) {
@@ -383,9 +359,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ? Icon(
                                   Icons.person_rounded,
                                   size: 56.r,
-                                  color: isDark
-                                      ? AppColors.goldLight
-                                      : AppColors.burgundy,
+                                  color: theme.colorScheme.onTertiaryFixed,
                                 )
                               : null,
                         ),
@@ -395,9 +369,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: Container(
                             padding: EdgeInsets.all(8.r),
                             decoration: BoxDecoration(
-                              color: isDark
-                                  ? AppColors.burgundy
-                                  : AppColors.burgundy.withValues(alpha: 0.9),
+                              color: theme.colorScheme.onTertiaryFixed,
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -410,19 +382,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             child: Icon(
                               Icons.camera_alt_rounded,
                               size: 20.r,
-                              color: AppColors.offWhite,
+                              color: theme.colorScheme.secondaryFixed,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                ),
-                SizedBox(height: 8.h),
-                Text(
-                  l10n.changePhoto,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(color: labelColor),
                 ),
                 SizedBox(height: 28.h),
                 _SectionCard(
@@ -433,11 +399,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       controller: _firstNameController,
                       label: l10n.firstName,
                       hint: l10n.firstName,
-                      prefixIcon: Icon(
-                        Icons.badge_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? l10n.enterFirstName
                           : null,
@@ -447,11 +408,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       controller: _lastNameController,
                       label: l10n.lastName,
                       hint: l10n.lastName,
-                      prefixIcon: Icon(
-                        Icons.badge_outlined,
-                        size: 22.r,
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                      ),
                       validator: (v) => (v == null || v.trim().isEmpty)
                           ? l10n.enterLastName
                           : null,
@@ -512,13 +468,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             controller: _phoneController,
                             label: l10n.mobileNumber,
                             hint: '9XX XXX XXX',
-                            prefixIcon: Icon(
-                              Icons.phone_android_rounded,
-                              size: 22.r,
-                              color: isDark
-                                  ? AppColors.taupe
-                                  : AppColors.burgundy,
-                            ),
                             keyboardType: TextInputType.phone,
                             maxLength: 9,
                             validator: (v) {
@@ -564,7 +513,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 32.h),
+                SizedBox(height: 16.h),
                 BlocListener<AuthCubit, AuthState>(
                   listener: (context, state) {
                     switch (state) {
@@ -577,21 +526,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   child: FilledButton(
                     onPressed: _save,
                     style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      padding: EdgeInsets.symmetric(vertical: 8.h),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14.r),
                       ),
                       elevation: 0,
+                      backgroundColor: theme.colorScheme.onTertiaryFixed,
                     ),
                     child: isLoading
                         ? SpinKitFadingCircle(
-                            color: AppColors.offWhite,
+                            color: theme.colorScheme.secondaryFixed,
                             size: 20.r,
                           )
                         : Text(
                             l10n.saveChanges,
                             style: theme.textTheme.titleMedium?.copyWith(
-                              color: AppColors.offWhite,
+                              color: theme.colorScheme.secondaryFixed,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -757,6 +707,7 @@ class _ProfileAddressesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -838,11 +789,14 @@ class _ProfileAddressesSection extends StatelessWidget {
           SizedBox(height: 14.h),
           OutlinedButton.icon(
             onPressed: onAddAddress,
-            icon: const Icon(Icons.add_rounded),
+            icon: Icon(Icons.add_rounded, color: theme.colorScheme.onTertiary),
             label: Text(
               hasCurrentAddress
                   ? l10n.associationAdditionalAddress
                   : l10n.associationAddCurrentAddress,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: theme.colorScheme.onTertiary,
+              ),
             ),
           ),
         ],
@@ -969,6 +923,7 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
     final l10n = AppLocalizations.of(context)!;
     final labelController = widget.labelController;
     final typeController = widget.typeController;
+    final theme = Theme.of(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -987,7 +942,7 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
               IconButton(
                 onPressed: widget.onRemove,
                 tooltip: l10n.associationDeleteAddress,
-                icon: const Icon(Icons.delete_outline_rounded),
+                icon:  Icon(Icons.delete_outline_rounded,color: theme.colorScheme.onTertiaryFixed,),
               ),
           ],
         ),
@@ -1167,8 +1122,6 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
@@ -1179,16 +1132,12 @@ class _SectionCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  size: 24.r,
-                  color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                ),
+                Icon(icon, size: 24.r, color: theme.colorScheme.onTertiary),
                 SizedBox(width: 10.w),
                 Text(
                   title,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                    color: theme.colorScheme.onTertiary,
                     fontWeight: FontWeight.w700,
                   ),
                 ),

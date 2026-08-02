@@ -119,7 +119,6 @@ class _ProductCardState extends State<ProductCard> {
   }
 
   Future<void> _showAddToCartDialog() async {
-    final l10n = AppLocalizations.of(context)!;
     final cartCubit = context.read<CartCubit>();
     var dialogProduct = widget.product;
 
@@ -128,7 +127,7 @@ class _ProductCardState extends State<ProductCard> {
     } catch (_) {}
 
     if (!mounted) return;
-    final added = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => BlocProvider.value(
@@ -136,9 +135,6 @@ class _ProductCardState extends State<ProductCard> {
         child: CartItemEditDialog.add(product: dialogProduct),
       ),
     );
-
-    if (!mounted || added != true) return;
-    CustomSnackBar.show(context, l10n.addToCartSuccess(dialogProduct.name));
   }
 
   @override

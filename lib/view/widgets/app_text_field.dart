@@ -53,18 +53,6 @@ class AppTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final border =
-        borderColor ??
-        (isDark
-            ? AppColors.taupe.withValues(alpha: 0.5)
-            : AppColors.burgundy.withValues(alpha: 0.4));
-    final fill =
-        fillColor ??
-        (isDark
-            ? AppColors.burgundy.withValues(alpha: 0.08)
-            : AppColors.offWhite);
-    final label = labelColor ?? (isDark ? AppColors.taupe : AppColors.burgundy);
     final radius = borderRadius ?? 14.r;
 
     return TextFormField(
@@ -85,25 +73,25 @@ class AppTextField extends StatelessWidget {
       cursorColor: Theme.of(context).colorScheme.inversePrimary,
       cursorWidth: .5.w,
       decoration: InputDecoration(
-        labelText: this.label,
+        labelText: label,
         hintText: hint,
         counterText: maxLength != null ? '' : null,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: fill,
+        fillColor: theme.colorScheme.secondaryFixed.withValues(alpha: 0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: border),
+          borderSide: BorderSide(color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
           borderSide: BorderSide(
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
           ),
         ),
         errorBorder: OutlineInputBorder(
@@ -115,8 +103,13 @@ class AppTextField extends StatelessWidget {
           borderSide: const BorderSide(color: AppColors.red),
         ),
         errorStyle: const TextStyle(color: AppColors.red),
-        labelStyle: TextStyle(color: label),
-        hintStyle: TextStyle(color: label.withValues(alpha: 0.6)),
+        labelStyle:  theme.textTheme.bodyMedium!.copyWith(
+                        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
+                      ),
+        hintStyle: theme.textTheme.bodyMedium!.copyWith(
+                        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
+                      ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       ),
     );
   }

@@ -3,14 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_api_model.dart';
 import 'package:kalivra/view/widgets/cart/cart_item_card.dart';
 import 'package:kalivra/view/widgets/cart/cart_item_edit_dialog.dart';
 import 'package:kalivra/view/widgets/confirm_dialog.dart';
-import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 
 class CartItemsView extends StatelessWidget {
   const CartItemsView({super.key, required this.cart});
@@ -21,53 +20,57 @@ class CartItemsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cartCubit = context.watch<CartCubit>();
     final items = cart.items;
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-            padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 120.h),
+    final theme = Theme.of(context);
+
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          sliver: SliverList.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
-                final item = items[index];
-                return CartItemCard(
-                  item: item,
-                  isLoading:
-                      cartCubit.isRemovingItem(item.id) ||
-                      cartCubit.isUpdatingItem(item.id),
-                  onEdit: () => _showEditDialog(context, item),
-                  onDelete: () => _confirmRemoveItem(context, item),
-                );
+              final item = items[index];
+              return CartItemCard(
+                item: item,
+                isLoading:
+                    cartCubit.isRemovingItem(item.id) ||
+                    cartCubit.isUpdatingItem(item.id),
+                onEdit: () => _showEditDialog(context, item),
+                onDelete: () => _confirmRemoveItem(context, item),
+              );
             },
           ),
         ),
-        _ClearCartButton(
-          isLoading: cartCubit.isClearingCart,
-          onPressed: items.isEmpty ? null : () => _confirmClearCart(context),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 16.h),
-          child: _CartSummary(cart: cart),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 12.h),
-          child: SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: () => context.pop(),
-              icon: Icon(Icons.arrow_forward_rounded, size: 22.r),
-              label: Text(AppLocalizations.of(context)!.continueShopping),
-              style: FilledButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 14.h),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.r),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              children: [
+                SizedBox(height: 8.h),
+                Divider(height: 1.h, color: theme.colorScheme.primaryFixed),
+                SizedBox(height: 8.h),
+                _CartActionsBar(
+                  isLoading: cartCubit.isClearingCart,
+                  onClearPressed: items.isEmpty
+                      ? null
+                      : () => _confirmClearCart(context),
                 ),
-              ),
+                SizedBox(height: 16.h),
+                _CouponSection(cart: cart),
+                SizedBox(height: 16.h),
+                _PriceBreak(cart: cart),
+                SizedBox(height: 16.h),
+                CartBottomBar(
+                  amount:
+                      cart.formattedGrandTotal ??
+                      cart.grandTotal?.toString() ??
+                      '',
+                  onProceed: () => context.push(AppRoutes.checkout),
+                ),
+                SizedBox(height: 80.h),
+              ],
             ),
           ),
-        ),
-        CartBottomBar(
-          amount: cart.formattedGrandTotal ?? cart.grandTotal?.toString() ?? '',
-          onProceed: () => context.push(AppRoutes.checkout),
         ),
       ],
     );
@@ -77,8 +80,7 @@ class CartItemsView extends StatelessWidget {
     BuildContext context,
     CartItemApiModel item,
   ) async {
-    final l10n = AppLocalizations.of(context)!;
-    final updated = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => BlocProvider.value(
@@ -86,8 +88,6 @@ class CartItemsView extends StatelessWidget {
         child: CartItemEditDialog(item: item),
       ),
     );
-    if (!context.mounted || updated != true) return;
-    CustomSnackBar.show(context, l10n.itemUpdatedSuccessfully);
   }
 
   Future<void> _confirmRemoveItem(
@@ -95,21 +95,14 @@ class CartItemsView extends StatelessWidget {
     CartItemApiModel item,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+     await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ConfirmDialog(
         title: l10n.deleteItem,
         message: l10n.removeItemConfirmation(item.name ?? ''),
-        onConfirm: () => Navigator.of(dialogContext).pop(true),
+        onConfirm: () =>
+            context.read<CartCubit>().removeCartItem(context, item.id),
       ),
-    );
-    if (!context.mounted || confirmed != true) return;
-
-    final removed = await context.read<CartCubit>().removeCartItem(item.id);
-    if (!context.mounted) return;
-    CustomSnackBar.show(
-      context,
-      removed ? l10n.itemDeletedSuccessfully : l10n.unableToDeleteItem,
     );
   }
 
@@ -125,49 +118,86 @@ class CartItemsView extends StatelessWidget {
     );
     if (!context.mounted || confirmed != true) return;
 
-    final cleared = await context.read<CartCubit>().clearCart();
-    if (!context.mounted) return;
-    CustomSnackBar.show(
-      context,
-      cleared ? l10n.cartClearedSuccessfully : l10n.unableToClearCart,
-    );
+    await context.read<CartCubit>().clearCart(context);
   }
 }
 
-class _ClearCartButton extends StatelessWidget {
-  const _ClearCartButton({required this.onPressed, required this.isLoading});
+class _CartActionsBar extends StatelessWidget {
+  const _CartActionsBar({
+    required this.onClearPressed,
+    required this.isLoading,
+  });
 
-  final VoidCallback? onPressed;
+  final VoidCallback? onClearPressed;
   final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton.icon(
-        onPressed: isLoading ? null : onPressed,
-        icon: isLoading
-            ? SizedBox(
-                width: 18.r,
-                height: 18.r,
-                child: const CircularProgressIndicator(strokeWidth: 2),
-              )
-            : Icon(Icons.delete_outline_rounded, size: 20.r),
-        label: Text(l10n.clearCart),
-        style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 14.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final foreground = colorScheme.primaryFixed;
+
+    return Card(
+      elevation: 1,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextButton.icon(
+              onPressed: () => context.read<NavCubit>().goTo(0),
+              icon: Icon(Icons.arrow_forward_rounded, size: 28.r),
+              label: Text(
+                l10n.continueShopping,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: foreground,
+                textStyle: theme.textTheme.bodyLarge,
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+              ),
+            ),
           ),
-        ),
+          SizedBox(
+            height: 34.h,
+            child: VerticalDivider(
+              width: 1.w,
+              color: colorScheme.primary.withValues(alpha: 0.12),
+            ),
+          ),
+          Expanded(
+            child: TextButton.icon(
+              onPressed: isLoading ? null : onClearPressed,
+              icon: isLoading
+                  ? SizedBox(
+                      width: 20.r,
+                      height: 20.r,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: foreground,
+                      ),
+                    )
+                  : Icon(Icons.delete_outline_rounded, size: 28.r),
+              label: Text(
+                l10n.emptyCart,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: foreground,
+                textStyle: theme.textTheme.bodyLarge,
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _CartSummary extends StatelessWidget {
-  const _CartSummary({required this.cart});
+class _PriceBreak extends StatelessWidget {
+  const _PriceBreak({required this.cart});
 
   final CartApiModel cart;
 
@@ -175,55 +205,191 @@ class _CartSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final rows = <_SummaryRowData>[
-      _SummaryRowData(l10n.subtotal, cart.formattedSubTotal, alwaysShow: true),
+      _SummaryRowData(l10n.subtotal, cart.formattedSubTotal),
       _SummaryRowData(l10n.discount, cart.formattedDiscountAmount),
-      _SummaryRowData(l10n.tax, cart.formattedTaxTotal, alwaysShow: true),
-      _SummaryRowData(
-        l10n.shipping,
-        cart.formattedShippingAmount,
-        alwaysShow: true,
-      ),
+      _SummaryRowData(l10n.deliveryCost, cart.formattedShippingAmount),
+      _SummaryRowData(l10n.tax, cart.formattedTaxTotal),
     ];
 
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: theme.cardTheme.color ?? colorScheme.surface,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.2)),
+    return Card(
+      elevation: 1,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.priceDetails, style: theme.textTheme.headlineSmall),
+            SizedBox(height: 26.h),
+            ...rows.map(
+              (row) => Padding(
+                padding: EdgeInsets.only(bottom: 13.h),
+                child: _SummaryLine(label: row.label, value: row.value ?? ''),
+              ),
+            ),
+            _SummaryLine(
+              label: l10n.total,
+              value:
+                  cart.formattedGrandTotal ?? cart.grandTotal?.toString() ?? '',
+              bold: true,
+            ),
+          ],
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(l10n.priceDetails, style: theme.textTheme.titleMedium),
-              Text(
-                '${cart.itemQuantity ?? cart.items.length}',
-                style: theme.textTheme.titleMedium,
+    );
+  }
+}
+
+class _CouponSection extends StatefulWidget {
+  const _CouponSection({required this.cart});
+
+  final CartApiModel cart;
+
+  @override
+  State<_CouponSection> createState() => _CouponSectionState();
+}
+
+class _CouponSectionState extends State<_CouponSection> {
+  late final TextEditingController _couponController;
+
+  @override
+  void initState() {
+    super.initState();
+    _couponController = TextEditingController();
+    _couponController.addListener(_onCouponChanged);
+  }
+
+  @override
+  void dispose() {
+    _couponController
+      ..removeListener(_onCouponChanged)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onCouponChanged() => setState(() {});
+
+  Future<void> _applyCoupon() async {
+    final code = _couponController.text.trim();
+    final cartCubit = context.read<CartCubit>();
+    if (code.isEmpty || cartCubit.isApplyingCoupon) return;
+
+    FocusScope.of(context).unfocus();
+    await cartCubit.sendCoupon(context, code);
+  }
+
+  Future<void> _removeCoupon() async {
+    final cartCubit = context.read<CartCubit>();
+    if (cartCubit.isRemovingCoupon) return;
+
+    FocusScope.of(context).unfocus();
+    await cartCubit.removeCoupon(context);
+    if (mounted) _couponController.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final cartCubit = context.watch<CartCubit>();
+    final couponCode = widget.cart.couponCode?.trim();
+    final hasCoupon = couponCode != null && couponCode.isNotEmpty;
+    final isApplying = cartCubit.isApplyingCoupon;
+    final isRemoving = cartCubit.isRemovingCoupon;
+    final canApply = _couponController.text.trim().isNotEmpty && !isApplying;
+
+    return Card(
+      elevation: 1,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.applyCouponTitle, style: theme.textTheme.headlineSmall),
+            SizedBox(height: 20.h),
+            if (hasCoupon)
+              Row(
+                children: [
+                  Expanded(
+                    child: _SummaryLine(label: l10n.coupon, value: couponCode),
+                  ),
+                  SizedBox(width: 12.w),
+                  OutlinedButton.icon(
+                    onPressed: isRemoving ? null : _removeCoupon,
+                    icon: isRemoving
+                        ? SizedBox(
+                            width: 16.r,
+                            height: 16.r,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Icon(Icons.close_rounded, size: 18.r),
+                    label: Text(l10n.remove),
+                  ),
+                ],
+              )
+            else
+              Row(
+                spacing: 8.w,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _couponController,
+                      enabled: !isApplying,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) {
+                        if (canApply) _applyCoupon();
+                      },
+                      style: theme.textTheme.bodyMedium,
+                      decoration: InputDecoration(
+                        labelText: l10n.couponCode,
+                        labelStyle: theme.textTheme.bodySmall?.copyWith(
+                          color: colorScheme.primaryFixed,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 4.h,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                    ),
+                  ),
+                  FilledButton(
+                    onPressed: canApply ? _applyCoupon : null,
+                    style: FilledButton.styleFrom(
+                      backgroundColor: colorScheme.onTertiaryFixed,
+                      foregroundColor: colorScheme.secondaryFixed,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                    ),
+                    child: isApplying
+                        ? SizedBox(
+                            width: 18.r,
+                            height: 18.r,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: colorScheme.secondaryFixed,
+                            ),
+                          )
+                        : Text(
+                            l10n.applyCoupon,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: colorScheme.secondaryFixed,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          ...rows
-              .where((row) => row.alwaysShow || _hasNonZeroMoney(row.value))
-              .map(
-                (row) => Padding(
-                  padding: EdgeInsets.only(bottom: 8.h),
-                  child: _SummaryLine(label: row.label, value: row.value ?? ''),
-                ),
-              ),
-          Divider(height: 18.h),
-          _SummaryLine(
-            label: l10n.total,
-            value:
-                cart.formattedGrandTotal ?? cart.grandTotal?.toString() ?? '',
-            bold: true,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -243,9 +409,10 @@ class _SummaryLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final style = theme.textTheme.bodyMedium?.copyWith(
+    final colorScheme = theme.colorScheme;
+    final style = theme.textTheme.bodyLarge?.copyWith(
+      color: colorScheme.primaryFixed,
       fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
-      color: bold ? theme.colorScheme.primary : null,
     );
 
     return Row(
@@ -281,87 +448,64 @@ class CartBottomBar extends StatelessWidget {
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        16.w,
-        12.h,
-        16.w,
-        12.h + MediaQuery.paddingOf(context).bottom,
-      ),
-      decoration: BoxDecoration(
-        color: colorScheme.primary,
-        boxShadow: [
-          BoxShadow(
-            color: colorScheme.shadow.withValues(alpha: 0.2),
-            blurRadius: 12.r,
-            offset: Offset(0, -4.h),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              spacing: 4.h,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${AppLocalizations.of(context)!.amountDue}:',
+                  style: textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.primaryFixed,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  amount,
+                  style: textTheme.headlineSmall?.copyWith(
+                    color: colorScheme.primaryFixed,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: FilledButton(
+              onPressed: onProceed,
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.onTertiaryFixed,
+                foregroundColor: colorScheme.secondaryFixed,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28.r),
+                ),
+              ),
+              child: Text(
+                AppLocalizations.of(context)!.proceed,
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.secondaryFixed,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ),
         ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                spacing: 4.h,
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.amountDue,
-                    style: textTheme.displayLarge?.copyWith(
-                      color: AppColors.offWhite,
-                    ),
-                  ),
-                  Text(
-                    amount,
-                    style: textTheme.displayLarge?.copyWith(
-                      color: AppColors.offWhite,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 12.w),
-            SizedBox(
-              width: 140.w,
-              child: FilledButton(
-                onPressed: onProceed,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.offWhite,
-                  foregroundColor: AppColors.burgundy,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                ),
-                child: Text(
-                  AppLocalizations.of(context)!.proceed,
-                  style: textTheme.displayLarge?.copyWith(
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
 }
 
 class _SummaryRowData {
-  const _SummaryRowData(this.label, this.value, {this.alwaysShow = false});
+  const _SummaryRowData(this.label, this.value);
 
   final String label;
   final String? value;
-  final bool alwaysShow;
-}
-
-bool _hasNonZeroMoney(String? value) {
-  if (value == null || value.trim().isEmpty) return false;
-  return RegExp(r'[1-9١-٩]').hasMatch(value);
 }

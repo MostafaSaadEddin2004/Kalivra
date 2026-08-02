@@ -167,6 +167,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get priceDetails => 'Price Details';
 
   @override
+  String get cartItemsCount => 'Items';
+
+  @override
+  String get cartItemsQuantity => 'Total quantity';
+
+  @override
   String get subtotal => 'Subtotal';
 
   @override
@@ -231,6 +237,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get cartClearedSuccessfully => 'Cart cleared successfully';
+
+  @override
+  String get coupon => 'Coupon';
+
+  @override
+  String get couponCode => 'Coupon code';
+
+  @override
+  String get applyCoupon => 'Apply';
+
+  @override
+  String get applyCouponTitle => 'Apply coupon';
+
+  @override
+  String get couponAppliedSuccessfully => 'Coupon applied successfully';
+
+  @override
+  String get couponRemovedSuccessfully => 'Coupon removed successfully';
 
   @override
   String get noChangesDetected => 'No changes detected';
@@ -2032,4 +2056,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get associaitionSendLinkRequest => 'ٍSend link request';
+
+  @override
+  String get search => 'search';
 }

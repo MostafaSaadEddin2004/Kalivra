@@ -7,6 +7,7 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
+import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -146,10 +147,16 @@ class _ProfileState extends State<Profile> {
                           children: [
                             Icon(
                               Icons.edit_rounded,
-                              size: 20.r,color: AppColors.burgundy
+                              size: 20.r,
+                              color: AppColors.burgundy,
                             ),
                             const SizedBox(width: 12),
-                            Text(l10n.editProfile, style: textTheme.bodyMedium!.copyWith(color: AppColors.burgundy)),
+                            Text(
+                              l10n.editProfile,
+                              style: textTheme.bodyMedium!.copyWith(
+                                color: AppColors.burgundy,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -193,15 +200,60 @@ class _ProfileState extends State<Profile> {
                 child: ListView(
                   padding: EdgeInsets.all(20.w),
                   children: [
-                    Center(
-                      child: Column(
-                        children: [
-                          CircleAvatar(radius: 48.r),
-                          SizedBox(height: 12.h),
-                          Text('asascasdsad', style: textTheme.headlineSmall),
-                          SizedBox(height: 8.h),
-                        ],
-                      ),
+                    Column(
+                      children: [
+                        Row(
+                          spacing: 16.w,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: 96.r,
+                              height: 96.r,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: theme.colorScheme.onTertiaryFixed,
+                              ),
+                              child: ClipOval(
+                                child: CustomNetworkImage(
+                                  imageUrl: '',
+                                  defaultIcon: Icons.person_rounded,
+                                  defaultIconColor:
+                                      theme.colorScheme.onTertiaryFixed,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'fullName',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  Text(
+                                    'email',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    'gender',
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.h),
+                      ],
                     ),
                     _SectionCard(
                       title: l10n.accountInfo,
@@ -265,23 +317,21 @@ class _ProfileState extends State<Profile> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 48.r,
-                            backgroundColor: isDark
-                                ? AppColors.burgundy.withValues(alpha: 0.3)
-                                : AppColors.burgundy.withValues(alpha: 0.15),
-                            backgroundImage: avatarUrl != null
-                                ? NetworkImage(avatarUrl)
-                                : null,
-                            child: avatarUrl == null
-                                ? Icon(
-                                    Icons.person_rounded,
-                                    size: 56.r,
-                                    color: isDark
-                                        ? AppColors.goldLight
-                                        : AppColors.burgundy,
-                                  )
-                                : null,
+                          Container(
+                            width: 96.r,
+                            height: 96.r,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: theme.colorScheme.onTertiaryFixed,
+                            ),
+                            child: ClipOval(
+                              child: CustomNetworkImage(
+                                imageUrl: avatarUrl,
+                                defaultIcon: Icons.person_rounded,
+                                defaultIconColor:
+                                    theme.colorScheme.onTertiaryFixed,
+                              ),
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -332,12 +382,12 @@ class _ProfileState extends State<Profile> {
                               borderRadius: BorderRadius.circular(14.r),
                             ),
                             elevation: 0,
+                            backgroundColor: theme.colorScheme.onTertiaryFixed,
                           ),
                           child: Text(
                             l10n.associaitionSendLinkRequest,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: AppColors.offWhite,
-                              fontWeight: FontWeight.w700,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: theme.colorScheme.secondaryFixed,
                             ),
                           ),
                         )
@@ -409,8 +459,6 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
@@ -422,7 +470,7 @@ class _SectionCard extends StatelessWidget {
             Text(
               title,
               style: theme.textTheme.titleMedium?.copyWith(
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                color: theme.colorScheme.primaryFixed,
                 fontWeight: FontWeight.w700,
               ),
             ),

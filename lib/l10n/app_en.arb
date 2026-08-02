@@ -62,6 +62,8 @@
   "continueShopping": "Continue Shopping",
   "emptyCart": "Empty Cart",
   "priceDetails": "Price Details",
+  "cartItemsCount": "Items",
+  "cartItemsQuantity": "Total quantity",
   "subtotal": "Subtotal",
   "discount": "Discount",
   "tax": "Tax",
@@ -84,6 +86,12 @@
   "itemUpdatedSuccessfully": "Cart item updated successfully",
   "itemDeletedSuccessfully": "Cart item deleted successfully",
   "cartClearedSuccessfully": "Cart cleared successfully",
+  "coupon": "Coupon",
+  "couponCode": "Coupon code",
+  "applyCoupon": "Apply",
+  "applyCouponTitle": "Apply coupon",
+  "couponAppliedSuccessfully": "Coupon applied successfully",
+  "couponRemovedSuccessfully": "Coupon removed successfully",
   "noChangesDetected": "No changes detected",
   "invalidQuantity": "Enter a valid quantity",
   "selectRequiredOptions": "Select the required options",
@@ -699,5 +707,6 @@
   "nothingToShow": "Nothing to show.",
   "userBalance": "User Balance",
   "unexpectedError": "unexpected error",
-  "associaitionSendLinkRequest": "ٍSend link request"
+  "associaitionSendLinkRequest": "ٍSend link request",
+  "search": "search"
 }

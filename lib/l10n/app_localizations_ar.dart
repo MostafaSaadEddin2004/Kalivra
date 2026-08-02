@@ -167,6 +167,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get priceDetails => 'تفاصيل السعر';
 
   @override
+  String get cartItemsCount => 'العناصر';
+
+  @override
+  String get cartItemsQuantity => 'إجمالي الكمية';
+
+  @override
   String get subtotal => 'المجموع الفرعي';
 
   @override
@@ -233,6 +239,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartClearedSuccessfully => 'تم إفراغ السلة بنجاح';
 
   @override
+  String get coupon => 'القسيمة';
+
+  @override
+  String get couponCode => 'رمز القسيمة';
+
+  @override
+  String get applyCoupon => 'إضافة';
+
+  @override
+  String get applyCouponTitle => 'إضافة قسيمة';
+
+  @override
+  String get couponAppliedSuccessfully => 'تم تطبيق القسيمة بنجاح';
+
+  @override
+  String get couponRemovedSuccessfully => 'تم حذف القسيمة بنجاح';
+
+  @override
   String get noChangesDetected => 'لا توجد تغييرات';
 
   @override
@@ -290,7 +314,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addToWishlistFailed => 'فشل إضافة المنتج إلى المفضلة';
 
   @override
-  String get unit => 'الوحدة';
+  String get unit => 'عدد';
 
   @override
   String get maxOrderLimit => 'الحد الأقصى للطلب';
@@ -2016,4 +2040,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get associaitionSendLinkRequest => 'إرسال طلب ربط';
+
+  @override
+  String get search => 'ابحث';
 }
