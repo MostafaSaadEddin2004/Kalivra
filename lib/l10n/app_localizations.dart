@@ -686,6 +686,12 @@ abstract class AppLocalizations {
   /// **'Unit'**
   String get unit;
 
+  /// No description provided for @residentialUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Residetial Unit'**
+  String get residentialUnit;
+
   /// No description provided for @maxOrderLimit.
   ///
   /// In en, this message translates to:
@@ -2663,7 +2669,7 @@ abstract class AppLocalizations {
   /// No description provided for @associationLinkProjectName.
   ///
   /// In en, this message translates to:
-  /// **'Project Name'**
+  /// **'Project'**
   String get associationLinkProjectName;
 
   /// No description provided for @associationLinkHousingUnit.
@@ -4235,7 +4241,7 @@ abstract class AppLocalizations {
   /// No description provided for @associationMemberVoucher.
   ///
   /// In en, this message translates to:
-  /// **'Voucher'**
+  /// **'Voucher number'**
   String get associationMemberVoucher;
 
   /// No description provided for @associationMemberFinancialObligations.
@@ -4253,13 +4259,13 @@ abstract class AppLocalizations {
   /// No description provided for @associationMemberDue.
   ///
   /// In en, this message translates to:
-  /// **'Due'**
+  /// **'Due date'**
   String get associationMemberDue;
 
   /// No description provided for @associationMemberDeadline.
   ///
   /// In en, this message translates to:
-  /// **'Deadline'**
+  /// **'Last payment deadline'**
   String get associationMemberDeadline;
 
   /// No description provided for @associationMemberProjectGallery.

@@ -52,13 +52,9 @@ class AssociationMemberProfileModel {
 
   factory AssociationMemberProfileModel.fromJson(Map<String, dynamic> json) {
     final association = _mapValue(json['association']) ?? json;
-    final topLevelMemberships = _listOf(
+    final memberships = _membershipsWithAssociationFlags(
       json['memberships'],
-      AssociationMembership.fromJson,
-    );
-    final associationMemberships = _listOf(
       association['memberships'],
-      AssociationMembership.fromJson,
     );
 
     return AssociationMemberProfileModel(
@@ -110,9 +106,7 @@ class AssociationMemberProfileModel {
         association['association_member'],
         AssociationCoreMember.fromJson,
       ),
-      memberships: topLevelMemberships.isNotEmpty
-          ? topLevelMemberships
-          : associationMemberships,
+      memberships: memberships,
       projects: _listOf(association['projects'], AssociationProject.fromJson),
       latestAssociationMembershipRequest:
           association['latest_association_membership_request'],
@@ -600,6 +594,53 @@ class AssociationMembership {
       'total_payments_made': totalPaymentsMade,
     };
   }
+}
+
+List<AssociationMembership> _membershipsWithAssociationFlags(
+  Object? topLevelRaw,
+  Object? associationRaw,
+) {
+  final topLevelItems = _mapList(topLevelRaw);
+  final associationItems = _mapList(associationRaw);
+
+  if (topLevelItems.isEmpty) {
+    return associationItems.map(AssociationMembership.fromJson).toList();
+  }
+  if (associationItems.isEmpty) {
+    return topLevelItems.map(AssociationMembership.fromJson).toList();
+  }
+
+  final associationByKey = <String, Map<String, dynamic>>{};
+  for (final item in associationItems) {
+    final key = _membershipKey(item);
+    if (key.isNotEmpty) associationByKey[key] = item;
+  }
+
+  return topLevelItems.map((item) {
+    final associationItem = associationByKey[_membershipKey(item)];
+    if (associationItem == null) return AssociationMembership.fromJson(item);
+
+    final mergedItem = Map<String, dynamic>.from(item);
+    for (final key in const [
+      'is_active',
+      'is_assigned_to_project',
+      'is_assigned_to_unit',
+    ]) {
+      if (associationItem.containsKey(key)) {
+        mergedItem[key] = associationItem[key];
+      }
+    }
+
+    return AssociationMembership.fromJson(mergedItem);
+  }).toList();
+}
+
+String _membershipKey(Map<String, dynamic> item) {
+  final id = _stringValue(item['id']);
+  if (id.isNotEmpty) return 'id:$id';
+
+  final membershipNumber = _stringValue(item['membership_number']);
+  return membershipNumber.isEmpty ? '' : 'number:$membershipNumber';
 }
 
 class AssociationFinancialInformation {

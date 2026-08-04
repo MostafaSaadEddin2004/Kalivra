@@ -317,6 +317,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unit => 'Unit';
 
   @override
+  String get residentialUnit => 'Residetial Unit';
+
+  @override
   String get maxOrderLimit => 'Max order limit';
 
   @override
@@ -1348,7 +1351,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationLinkPriorityNumber => 'Priority Number';
 
   @override
-  String get associationLinkProjectName => 'Project Name';
+  String get associationLinkProjectName => 'Project';
 
   @override
   String get associationLinkHousingUnit => 'Assigned Housing Unit';
@@ -2198,7 +2201,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'There are no recorded payments yet.';
 
   @override
-  String get associationMemberVoucher => 'Voucher';
+  String get associationMemberVoucher => 'Voucher number';
 
   @override
   String get associationMemberFinancialObligations => 'Financial Obligations';
@@ -2208,10 +2211,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'There are no financial obligations recorded yet.';
 
   @override
-  String get associationMemberDue => 'Due';
+  String get associationMemberDue => 'Due date';
 
   @override
-  String get associationMemberDeadline => 'Deadline';
+  String get associationMemberDeadline => 'Last payment deadline';
 
   @override
   String get associationMemberProjectGallery => 'Project Gallery';

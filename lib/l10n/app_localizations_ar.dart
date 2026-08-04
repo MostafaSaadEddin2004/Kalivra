@@ -317,6 +317,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get unit => 'عدد';
 
   @override
+  String get residentialUnit => 'الوحدة السكنية';
+
+  @override
   String get maxOrderLimit => 'الحد الأقصى للطلب';
 
   @override
@@ -1342,7 +1345,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationLinkPriorityNumber => 'رقم الأفضلية';
 
   @override
-  String get associationLinkProjectName => 'اسم المشروع';
+  String get associationLinkProjectName => 'المشروع';
 
   @override
   String get associationLinkHousingUnit => 'الوحدة السكنية المخصصة';
@@ -2181,7 +2184,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد مدفوعات مسجلة حالياً.';
 
   @override
-  String get associationMemberVoucher => 'إيصال';
+  String get associationMemberVoucher => 'رقم الإيصال';
 
   @override
   String get associationMemberFinancialObligations => 'الالتزامات المالية';
@@ -2191,10 +2194,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد التزامات مالية مسجلة حالياً.';
 
   @override
-  String get associationMemberDue => 'الاستحقاق';
+  String get associationMemberDue => 'تاريخ الاستحقاق';
 
   @override
-  String get associationMemberDeadline => 'آخر موعد';
+  String get associationMemberDeadline => 'آخر مهلة للدفع';
 
   @override
   String get associationMemberProjectGallery => 'معرض المشروع';

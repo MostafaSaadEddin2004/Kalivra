@@ -665,14 +665,10 @@ class _MembershipDetailsSection extends StatelessWidget {
     final project = membership.project;
     final unit = membership.unit ?? membership.allocatedUnit;
     final building = membership.building ?? unit?.building;
-    final lifecycle = profile.membershipLifecycle;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _MembershipSummaryCard(membership: membership),
-        SizedBox(height: 16.h),
-        _FinancialOverviewCard(membership: membership),
         SizedBox(height: 16.h),
         _FinancialInformationSection(membership: membership),
         SizedBox(height: 16.h),
@@ -749,218 +745,10 @@ class _MembershipDetailsSection extends StatelessWidget {
             ),
           ],
         ),
-        if (lifecycle != null)
-          AssociationFormSection(
-            title: AppLocalizations.of(context)!.associationMemberProfileStatus,
-            icon: Icons.route_outlined,
-            children: [
-              InfoRow(
-                label: l10n.associationMemberStatus,
-                value: lifecycle.title,
-              ),
-              InfoRow(
-                label: AppLocalizations.of(context)!.associationMemberStage,
-                value: lifecycle.statusLabel.isNotEmpty
-                    ? lifecycle.statusLabel
-                    : lifecycle.stage,
-              ),
-              InfoRow(
-                label: AppLocalizations.of(context)!.associationMemberMessage,
-                value: lifecycle.message,
-              ),
-              InfoRow(
-                label: l10n.associationMemberNotes,
-                value: lifecycle.adminNotes,
-              ),
-            ],
-          ),
         if (project != null) _ProjectDetailsSection(project: project),
         if (building != null) _BuildingDetailsSection(building: building),
         if (unit != null) _UnitDetailsSection(unit: unit),
       ],
-    );
-  }
-}
-
-class _FinancialOverviewCard extends StatelessWidget {
-  const _FinancialOverviewCard({required this.membership});
-
-  final AssociationMembership membership;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final financial = membership.financialInformation;
-    final total =
-        financial?.totalObligations ??
-        membership.unit?.price ??
-        membership.project?.price;
-    final paid =
-        financial?.totalPaid ??
-        financial?.totalPayments ??
-        membership.totalPaymentsMade;
-    final remaining =
-        financial?.remainingAmount ??
-        financial?.pendingObligations ??
-        (total != null && paid != null ? total - paid : null);
-    final covered = financial?.coveredObligations ?? paid;
-    final progress = total == null || total == 0 || covered == null
-        ? null
-        : (covered / total).clamp(0, 1).toDouble();
-
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.burgundy.withValues(alpha: 0.12)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(
-          color: isDark
-              ? AppColors.taupe.withValues(alpha: 0.32)
-              : AppColors.burgundy.withValues(alpha: 0.12),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.account_balance_wallet_outlined,
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                size: 24.r,
-              ),
-              SizedBox(width: 10.w),
-              Expanded(
-                child: Text(
-                  l10n.associationMemberFinancialSummary,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark ? AppColors.offWhite : AppColors.burgundy,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          if (progress != null) ...[
-            SizedBox(height: 14.h),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: LinearProgressIndicator(
-                value: progress,
-                minHeight: 9.h,
-                backgroundColor: isDark
-                    ? AppColors.taupe.withValues(alpha: 0.22)
-                    : AppColors.burgundy.withValues(alpha: 0.08),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  isDark ? AppColors.goldLight : AppColors.goldDark,
-                ),
-              ),
-            ),
-          ],
-          SizedBox(height: 14.h),
-          Wrap(
-            spacing: 10.w,
-            runSpacing: 10.h,
-            children: [
-              _FinanceMetric(
-                label: l10n.associationMemberTotalAmount,
-                value: _formatNullableNumber(total),
-                icon: Icons.request_quote_outlined,
-              ),
-              _FinanceMetric(
-                label: l10n.associationMemberPaidAmount,
-                value: _formatNullableNumber(paid),
-                icon: Icons.check_circle_outline_rounded,
-              ),
-              _FinanceMetric(
-                label: l10n.associationMemberRemainingInstallments,
-                value: _formatNullableNumber(remaining),
-                icon: Icons.pending_actions_outlined,
-              ),
-              _FinanceMetric(
-                label: l10n.associationMemberPaymentCommitment,
-                value: financial?.memberFinancialStatusLabel.isNotEmpty == true
-                    ? financial?.memberFinancialStatusLabel ?? ''
-                    : membership.displayFinancialStatus,
-                icon: Icons.verified_outlined,
-              ),
-              _FinanceMetric(
-                label: AppLocalizations.of(
-                  context,
-                )!.associationMemberAvailableBalance,
-                value: _formatNullableNumber(financial?.availableBalance),
-                icon: Icons.savings_outlined,
-              ),
-              _FinanceMetric(
-                label: AppLocalizations.of(
-                  context,
-                )!.associationMemberOpenObligations,
-                value: _formatNullableNumber(financial?.openObligationsCount),
-                icon: Icons.assignment_late_outlined,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FinanceMetric extends StatelessWidget {
-  const _FinanceMetric({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      width: 145.w,
-      padding: EdgeInsets.all(12.w),
-      decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.taupe.withValues(alpha: 0.1)
-            : AppColors.burgundy.withValues(alpha: 0.045),
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            size: 20.r,
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            value.trim().isEmpty ? '-' : value,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 3.h),
-          Text(
-            label,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall,
-          ),
-        ],
-      ),
     );
   }
 }
@@ -1045,7 +833,13 @@ class _PaymentsSection extends StatelessWidget {
                 )!.associationMemberNoRecordedPayments,
               ),
             ]
-          : payments.map((payment) => _PaymentTile(payment: payment)).toList(),
+          : [
+              _PaginatedSectionList<AssociationPayment>(
+                items: payments,
+                pageHeight: 420.h,
+                itemBuilder: (payment) => _PaymentTile(payment: payment),
+              ),
+            ],
     );
   }
 }
@@ -1117,10 +911,6 @@ class _PaymentTile extends StatelessWidget {
                   ]),
                   style: theme.textTheme.bodySmall,
                 ),
-                if (payment.notes.isNotEmpty) ...[
-                  SizedBox(height: 4.h),
-                  Text(payment.notes, style: theme.textTheme.bodySmall),
-                ],
               ],
             ),
           ),
@@ -1151,9 +941,14 @@ class _FinancialObligationsSection extends StatelessWidget {
                 )!.associationMemberNoFinancialObligations,
               ),
             ]
-          : obligations
-                .map((obligation) => _ObligationTile(obligation: obligation))
-                .toList(),
+          : [
+              _PaginatedSectionList<AssociationFinancialObligation>(
+                items: obligations,
+                pageHeight: 460.h,
+                itemBuilder: (obligation) =>
+                    _ObligationTile(obligation: obligation),
+              ),
+            ],
     );
   }
 }
@@ -1239,6 +1034,140 @@ class _ObligationTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PaginatedSectionList<T> extends StatefulWidget {
+  const _PaginatedSectionList({
+    required this.items,
+    required this.itemBuilder,
+    required this.pageHeight,
+  });
+
+  static const int pageSize = 5;
+
+  final List<T> items;
+  final Widget Function(T item) itemBuilder;
+  final double pageHeight;
+
+  @override
+  State<_PaginatedSectionList<T>> createState() =>
+      _PaginatedSectionListState<T>();
+}
+
+class _PaginatedSectionListState<T> extends State<_PaginatedSectionList<T>> {
+  late final PageController _pageController;
+  int _currentPage = 0;
+
+  int get _pageCount =>
+      (widget.items.length / _PaginatedSectionList.pageSize).ceil();
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PaginatedSectionList<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.items.length == oldWidget.items.length) return;
+
+    final lastPage = _pageCount - 1;
+    if (_currentPage > lastPage) {
+      _currentPage = lastPage.clamp(0, lastPage);
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(_currentPage);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _animateToPage(int page) {
+    if (page < 0 || page >= _pageCount || page == _currentPage) return;
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.items.length <= _PaginatedSectionList.pageSize) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: widget.items.map(widget.itemBuilder).toList(),
+      );
+    }
+
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accentColor = isDark ? AppColors.goldLight : AppColors.burgundy;
+    final canGoBack = _currentPage > 0;
+    final canGoForward = _currentPage < _pageCount - 1;
+
+    return Column(
+      children: [
+        SizedBox(
+          height: widget.pageHeight,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: _pageCount,
+            onPageChanged: (page) => setState(() => _currentPage = page),
+            itemBuilder: (context, pageIndex) {
+              final start = pageIndex * _PaginatedSectionList.pageSize;
+              final pageItems = widget.items
+                  .skip(start)
+                  .take(_PaginatedSectionList.pageSize);
+
+              return SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: pageItems.map(widget.itemBuilder).toList(),
+                ),
+              );
+            },
+          ),
+        ),
+        SizedBox(height: 10.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton.filledTonal(
+              onPressed: canGoBack
+                  ? () => _animateToPage(_currentPage - 1)
+                  : null,
+              icon: const Icon(Icons.chevron_left_rounded),
+              color: accentColor,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14.w),
+              child: Text(
+                '${_currentPage + 1} / $_pageCount',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: accentColor,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            IconButton.filledTonal(
+              onPressed: canGoForward
+                  ? () => _animateToPage(_currentPage + 1)
+                  : null,
+              icon: const Icon(Icons.chevron_right_rounded),
+              color: accentColor,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -1562,7 +1491,7 @@ class _UnitDetailsSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AssociationFormSection(
-      title: l10n.unit,
+      title: l10n.residentialUnit,
       icon: Icons.home_work_outlined,
       children: [
         _MediaGallery(
@@ -1735,87 +1664,72 @@ class _MediaGalleryState extends State<_MediaGallery> {
         : const <String>[];
     if (visibleImages.isEmpty) return const SizedBox.shrink();
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
+    return Container(
+      margin: EdgeInsets.only(bottom: 16.h),
+      height: visibleImages.length == 1 ? 220.h : 290.h,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            widget.title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 10.h),
           SizedBox(
-            height: visibleImages.length == 1 ? 220.h : 290.h,
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 220.h,
-                  width: double.infinity,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: visibleImages.length,
-                    onPageChanged: (index) {
-                      setState(() => _currentIndex = index);
-                    },
-                    itemBuilder: (context, index) {
-                      final imageUrl = visibleImages[index];
-                      return _GalleryMainImage(
-                        title: widget.title,
-                        imageUrl: imageUrl,
-                        index: index,
-                        fallbackIcon: widget.fallbackIcon,
-                      );
-                    },
-                  ),
-                ),
-                if (visibleImages.length > 1) ...[
-                  SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 58.h,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: visibleImages.length,
-                      separatorBuilder: (context, index) =>
-                          SizedBox(width: 8.w),
-                      itemBuilder: (context, index) {
-                        final isSelected = index == _currentIndex;
-                        final imageUrl = visibleImages[index];
-                        return GestureDetector(
-                          onTap: () => _goToPage(index),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 180),
-                            curve: Curves.easeInOut,
-                            width: 58.w,
-                            height: 58.h,
-                            padding: EdgeInsets.all(isSelected ? 3.w : 0),
-                            decoration: BoxDecoration(
-                              border: isSelected
-                                  ? Border.all(
-                                      color: theme.colorScheme.primary,
-                                      width: 2.w,
-                                    )
-                                  : null,
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10.r),
-                              child: CustomNetworkImage(
-                                imageUrl: imageUrl,
-                                defaultIcon: widget.fallbackIcon,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ],
+            height: 220.h,
+            width: double.infinity,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: visibleImages.length,
+              onPageChanged: (index) {
+                setState(() => _currentIndex = index);
+              },
+              itemBuilder: (context, index) {
+                final imageUrl = visibleImages[index];
+                return _GalleryMainImage(
+                  title: widget.title,
+                  imageUrl: imageUrl,
+                  index: index,
+                  fallbackIcon: widget.fallbackIcon,
+                );
+              },
             ),
           ),
+          if (visibleImages.length > 1) ...[
+            SizedBox(height: 12.h),
+            SizedBox(
+              height: 58.h,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: visibleImages.length,
+                separatorBuilder: (context, index) => SizedBox(width: 8.w),
+                itemBuilder: (context, index) {
+                  final isSelected = index == _currentIndex;
+                  final imageUrl = visibleImages[index];
+                  return GestureDetector(
+                    onTap: () => _goToPage(index),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeInOut,
+                      width: 58.w,
+                      height: 58.h,
+                      padding: EdgeInsets.all(isSelected ? 3.w : 0),
+                      decoration: BoxDecoration(
+                        border: isSelected
+                            ? Border.all(
+                                color: theme.colorScheme.primary,
+                                width: 2.w,
+                              )
+                            : null,
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.r),
+                        child: CustomNetworkImage(
+                          imageUrl: imageUrl,
+                          defaultIcon: widget.fallbackIcon,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
