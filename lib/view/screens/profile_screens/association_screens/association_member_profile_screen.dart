@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -687,6 +686,10 @@ class _MembershipDetailsSection extends StatelessWidget {
               value: membership.membershipNumber,
             ),
             InfoRow(
+              label: l10n.associationLinkPriorityNumber,
+              value: _formatNullableNumber(membership.priorityNumber),
+            ),
+            InfoRow(
               label: l10n.associationMemberType,
               value: membership.displayType,
             ),
@@ -695,24 +698,8 @@ class _MembershipDetailsSection extends StatelessWidget {
               value: membership.displayStatus,
             ),
             InfoRow(
-              label: l10n.associationMemberFinancialSummary,
-              value: membership.displayFinancialStatus,
-            ),
-            InfoRow(
               label: l10n.associationMemberDate,
               value: membership.joinDate,
-            ),
-            InfoRow(
-              label: l10n.associationLinkPriorityNumber,
-              value: _formatNullableNumber(membership.priorityNumber),
-            ),
-            InfoRow(
-              label: AppLocalizations.of(
-                context,
-              )!.associationMemberPriorityStatus,
-              value: membership.priorityStatusLabel.isNotEmpty
-                  ? membership.priorityStatusLabel
-                  : membership.priorityStatus,
             ),
             InfoRow(
               label: AppLocalizations.of(
@@ -720,28 +707,9 @@ class _MembershipDetailsSection extends StatelessWidget {
               )!.associationMemberMembershipDecision,
               value: membership.membershipDecision,
             ),
-            _ProfileFilesSection(
-              title: AppLocalizations.of(
-                context,
-              )!.associationMemberJoinDocuments,
-              fileUrls: _fileUrlsFromValue(membership.joinDocuments),
-              fallbackName: AppLocalizations.of(
-                context,
-              )!.associationMemberJoinDocument,
-            ),
-            InfoRow(
-              label: AppLocalizations.of(
-                context,
-              )!.associationMemberJoinDocuments,
-              value: membership.joinDocuments,
-            ),
             InfoRow(
               label: AppLocalizations.of(context)!.associationMemberClosedAt,
               value: membership.closedAt,
-            ),
-            InfoRow(
-              label: l10n.associationMemberPaidAmount,
-              value: _formatNullableNumber(membership.totalPaymentsMade),
             ),
           ],
         ),
@@ -773,35 +741,38 @@ class _FinancialInformationSection extends StatelessWidget {
           label: AppLocalizations.of(
             context,
           )!.associationMemberTotalObligations,
-          value: _formatNullableNumber(financial.totalObligations),
+          value: _formatNullableMoney(context, financial.totalObligations),
         ),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberTotalPayments,
-          value: _formatNullableNumber(financial.totalPayments),
+          value: _formatNullableMoney(context, financial.totalPayments),
         ),
         InfoRow(
           label: AppLocalizations.of(
             context,
           )!.associationMemberCoveredObligations,
-          value: _formatNullableNumber(financial.coveredObligations),
+          value: _formatNullableMoney(context, financial.coveredObligations),
         ),
         InfoRow(
           label: AppLocalizations.of(
             context,
           )!.associationMemberUncoveredObligations,
-          value: _formatNullableNumber(financial.uncoveredObligations),
+          value: _formatNullableMoney(context, financial.uncoveredObligations),
           labelNumber: _formatNullableNumber(financial.openObligationsCount),
         ),
         InfoRow(
           label: AppLocalizations.of(
             context,
           )!.associationMemberOverdueObligationsAmount,
-          value: _formatNullableNumber(financial.overdueObligationsAmount),
+          value: _formatNullableMoney(
+            context,
+            financial.overdueObligationsAmount,
+          ),
           labelNumber: _formatNullableNumber(financial.overdueObligationsCount),
         ),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberCurrentBalance,
-          value: _formatNullableNumber(financial.currentBalance),
+          value: _formatNullableMoney(context, financial.currentBalance),
         ),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberFinancialStatus,
@@ -853,6 +824,7 @@ class _PaymentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l1on = AppLocalizations.of(context)!;
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
@@ -884,7 +856,7 @@ class _PaymentTile extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        _formatNullableNumber(payment.amount),
+                        _formatNullableMoney(context, payment.amount),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w800,
                         ),
@@ -901,12 +873,12 @@ class _PaymentTile extends StatelessWidget {
                 SizedBox(height: 6.h),
                 Text(
                   _joinValues([
-                    payment.paymentDate,
+                    '${l1on.payDate} ${payment.paymentDate}',
                     payment.paymentMethodLabel.isNotEmpty
                         ? payment.paymentMethodLabel
                         : payment.paymentMethod,
                     payment.voucherNumber.isNotEmpty
-                        ? '${AppLocalizations.of(context)!.associationMemberVoucher} ${payment.voucherNumber}'
+                        ? '${l1on.associationMemberVoucher} ${payment.voucherNumber}'
                         : '',
                   ]),
                   style: theme.textTheme.bodySmall,
@@ -1012,7 +984,7 @@ class _ObligationTile extends StatelessWidget {
                 ),
                 SizedBox(height: 6.h),
                 Text(
-                  _formatNullableNumber(obligation.amount),
+                  _formatNullableMoney(context, obligation.amount),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -1207,45 +1179,29 @@ class _ProjectDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
+    final theme = Theme.of(context);
     return AssociationFormSection(
       title: l10n.associationLinkProjectName,
       icon: Icons.apartment_rounded,
       children: [
+        Text(
+          project.name,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 12.h),
         _MediaGallery(
           title: AppLocalizations.of(context)!.associationMemberProjectGallery,
           imageUrl: project.imageUrl,
           galleryImages: [...project.images, ...project.galleryImages],
           fallbackIcon: Icons.apartment_rounded,
         ),
-        _ProgressBlock(
-          label: AppLocalizations.of(context)!.associationMemberCompletion,
-          value: project.completionPercentage,
-        ),
-        InfoRow(
-          label: AppLocalizations.of(
-            context,
-          )!.associationMemberCompletionPercentage,
-          value: _formatNullablePercent(project.completionPercentage),
-        ),
-        InfoRow(label: l10n.associationLinkProjectName, value: project.name),
         InfoRow(
           label: l10n.associationMemberType,
           value: project.typeLabel.isNotEmpty
               ? project.typeLabel
               : project.type,
-        ),
-        InfoRow(
-          label: AppLocalizations.of(context)!.associationMemberSubtitle,
-          value: project.subtitle,
-        ),
-        InfoRow(
-          label: l10n.associationMemberAmount,
-          value: _formatNullableNumber(project.price),
-        ),
-        InfoRow(
-          label: l10n.associationMemberStatus,
-          value: project.displayStatus,
         ),
         InfoRow(
           label: l10n.associationMemberLocation,
@@ -1295,7 +1251,7 @@ class _ProjectDetailsSection extends StatelessWidget {
         ),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberEstimatedCost,
-          value: _formatNullableNumber(project.estimatedCost),
+          value: _formatNullableMoney(context, project.estimatedCost),
         ),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberEngineer,
@@ -1420,10 +1376,6 @@ class _BuildingDetailsSection extends StatelessWidget {
           ],
           fallbackIcon: Icons.business_rounded,
         ),
-        _ProgressBlock(
-          label: AppLocalizations.of(context)!.associationMemberCompletion,
-          value: building.completionPercentage,
-        ),
         InfoRow(
           label: AppLocalizations.of(
             context,
@@ -1523,7 +1475,7 @@ class _UnitDetailsSection extends StatelessWidget {
         ),
         InfoRow(
           label: l10n.associationMemberAmount,
-          value: _formatNullableNumber(unit.price),
+          value: _formatNullableMoney(context, unit.price),
         ),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberSpecifications,
@@ -1772,63 +1724,6 @@ class _GalleryMainImage extends StatelessWidget {
   }
 }
 
-class _ProgressBlock extends StatelessWidget {
-  const _ProgressBlock({required this.label, required this.value});
-
-  final String label;
-  final num? value;
-
-  @override
-  Widget build(BuildContext context) {
-    if (value == null) return const SizedBox.shrink();
-
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final progress = ((value ?? 0) / 100).clamp(0, 1).toDouble();
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Text(
-                '${_formatNullableNumber(value)}%',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8.h,
-              backgroundColor: isDark
-                  ? AppColors.taupe.withValues(alpha: 0.2)
-                  : AppColors.burgundy.withValues(alpha: 0.08),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                isDark ? AppColors.goldLight : AppColors.goldDark,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _StagesTimeline extends StatelessWidget {
   const _StagesTimeline({required this.stages});
 
@@ -1995,12 +1890,6 @@ class _BuildingSummaryCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall,
-                ),
-                _ProgressBlock(
-                  label: AppLocalizations.of(
-                    context,
-                  )!.associationMemberProgress,
-                  value: building.completionPercentage,
                 ),
               ],
             ),
@@ -2339,6 +2228,12 @@ String _formatNullableNumber(num? value) {
     return asDouble.toInt().toString();
   }
   return asDouble.toStringAsFixed(2);
+}
+
+String _formatNullableMoney(BuildContext context, num? value) {
+  final formatted = _formatNullableNumber(value);
+  if (formatted.isEmpty) return '';
+  return '$formatted ${AppLocalizations.of(context)!.currencySYP}';
 }
 
 String _formatNullablePercent(num? value) {

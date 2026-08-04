@@ -2110,7 +2110,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationMemberPriorityStatus => 'حالة الدور';
 
   @override
-  String get associationMemberMembershipDecision => 'قرار العضوية';
+  String get associationMemberMembershipDecision => 'رقم قرار العضوية';
 
   @override
   String get associationMemberJoinDocuments => 'وثائق الانتساب';
@@ -2119,7 +2119,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationMemberJoinDocument => 'وثيقة انتساب';
 
   @override
-  String get associationMemberClosedAt => 'تاريخ الإغلاق';
+  String get associationMemberClosedAt => 'تاريخ الإغلاق العضوية';
 
   @override
   String get associationMemberProfileStatus => 'حالة الملف';
@@ -2195,6 +2195,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get associationMemberDue => 'تاريخ الاستحقاق';
+
+  @override
+  String get payDate => 'تاريخ الدفع';
 
   @override
   String get associationMemberDeadline => 'آخر مهلة للدفع';

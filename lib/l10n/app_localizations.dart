@@ -2333,7 +2333,7 @@ abstract class AppLocalizations {
   /// No description provided for @currencySYP.
   ///
   /// In en, this message translates to:
-  /// **'SYP'**
+  /// **'SY.P'**
   String get currencySYP;
 
   /// No description provided for @setNewPasswordTitle.
@@ -4097,7 +4097,7 @@ abstract class AppLocalizations {
   /// No description provided for @associationMemberMembershipDecision.
   ///
   /// In en, this message translates to:
-  /// **'Membership Decision'**
+  /// **'Membership Decision Number'**
   String get associationMemberMembershipDecision;
 
   /// No description provided for @associationMemberJoinDocuments.
@@ -4115,7 +4115,7 @@ abstract class AppLocalizations {
   /// No description provided for @associationMemberClosedAt.
   ///
   /// In en, this message translates to:
-  /// **'Closed At'**
+  /// **'Membership closed At'**
   String get associationMemberClosedAt;
 
   /// No description provided for @associationMemberProfileStatus.
@@ -4261,6 +4261,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Due date'**
   String get associationMemberDue;
+
+  /// No description provided for @payDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay date'**
+  String get payDate;
 
   /// No description provided for @associationMemberDeadline.
   ///

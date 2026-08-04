@@ -1178,7 +1178,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get colorPlaceholder => 'Color — —';
 
   @override
-  String get currencySYP => 'SYP';
+  String get currencySYP => 'SY.P';
 
   @override
   String get setNewPasswordTitle => 'New Password';
@@ -2127,7 +2127,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationMemberPriorityStatus => 'Priority Status';
 
   @override
-  String get associationMemberMembershipDecision => 'Membership Decision';
+  String get associationMemberMembershipDecision =>
+      'Membership Decision Number';
 
   @override
   String get associationMemberJoinDocuments => 'Join Documents';
@@ -2136,7 +2137,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationMemberJoinDocument => 'Join document';
 
   @override
-  String get associationMemberClosedAt => 'Closed At';
+  String get associationMemberClosedAt => 'Membership closed At';
 
   @override
   String get associationMemberProfileStatus => 'Profile Status';
@@ -2212,6 +2213,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get associationMemberDue => 'Due date';
+
+  @override
+  String get payDate => 'Pay date';
 
   @override
   String get associationMemberDeadline => 'Last payment deadline';
