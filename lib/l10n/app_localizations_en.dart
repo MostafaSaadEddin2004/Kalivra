@@ -2059,4 +2059,308 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search => 'search';
+
+  @override
+  String get fileActionCouldNotOpenFile => 'Could not open this file';
+
+  @override
+  String get fileActionDownloadFile => 'Download file';
+
+  @override
+  String get fileActionDownloadPrompt => 'Do you want to download this file?';
+
+  @override
+  String get fileActionOpenOnly => 'No, open only';
+
+  @override
+  String get fileActionDownloadConfirm => 'Yes, download';
+
+  @override
+  String get fileActionDownloading => 'Downloading file...';
+
+  @override
+  String get fileActionSaveFile => 'Save file';
+
+  @override
+  String get fileActionDownloadFailedOpenInstead =>
+      'Could not download the file. Opening it instead.';
+
+  @override
+  String get noCategoriesAvailable => 'No categories available';
+
+  @override
+  String get associationMemberRequestAcceptedTitle =>
+      'Your request is accepted';
+
+  @override
+  String get associationMemberRequestAcceptedMessage =>
+      'Your person profile is now linked with the association. The association will create a membership for you soon, then your membership and financial details will appear here.';
+
+  @override
+  String get associationMemberNoMembershipTitle => 'No membership yet';
+
+  @override
+  String get associationMemberNoMembershipMessage =>
+      'There is no active association membership for this account yet.';
+
+  @override
+  String get associationMemberFallbackPersonName => 'the member';
+
+  @override
+  String get associationMemberLinkingRequestAcceptedTitle =>
+      'Linking request accepted';
+
+  @override
+  String associationMemberLinkAcceptedMessage(String personName) {
+    return 'Your linking request for Mr. $personName has been accepted. Your membership information will appear once it is completed.';
+  }
+
+  @override
+  String associationMemberIndexedMembership(int number) {
+    return 'Membership $number';
+  }
+
+  @override
+  String get associationMemberPriorityStatus => 'Priority Status';
+
+  @override
+  String get associationMemberMembershipDecision => 'Membership Decision';
+
+  @override
+  String get associationMemberJoinDocuments => 'Join Documents';
+
+  @override
+  String get associationMemberJoinDocument => 'Join document';
+
+  @override
+  String get associationMemberClosedAt => 'Closed At';
+
+  @override
+  String get associationMemberProfileStatus => 'Profile Status';
+
+  @override
+  String get associationMemberStage => 'Stage';
+
+  @override
+  String get associationMemberMessage => 'Message';
+
+  @override
+  String get associationMemberAvailableBalance => 'Available Balance';
+
+  @override
+  String get associationMemberOpenObligations => 'Open Obligations';
+
+  @override
+  String get associationMemberFinancialInformation => 'Financial Information';
+
+  @override
+  String get associationMemberTotalPayments => 'Total Payments';
+
+  @override
+  String get associationMemberTotalObligations => 'Total Obligations';
+
+  @override
+  String get associationMemberCoveredObligations => 'Covered Obligations';
+
+  @override
+  String get associationMemberUncoveredObligations => 'Uncovered Obligations';
+
+  @override
+  String get associationMemberOpenObligationsCount => 'Open Obligations Count';
+
+  @override
+  String get associationMemberOverdueObligationsCount =>
+      'Overdue Obligations Count';
+
+  @override
+  String get associationMemberOverdueObligationsAmount => 'Overdue Obligations';
+
+  @override
+  String get associationMemberCurrentBalance => 'Current Balance';
+
+  @override
+  String get associationMemberFinancialStatus => 'Financial Status';
+
+  @override
+  String get associationMemberTotalPaid => 'Total Paid';
+
+  @override
+  String get associationMemberRemainingAmount => 'Remaining Amount';
+
+  @override
+  String get associationMemberPendingObligations => 'Pending Obligations';
+
+  @override
+  String get associationMemberPayments => 'Payments';
+
+  @override
+  String get associationMemberNoRecordedPayments =>
+      'There are no recorded payments yet.';
+
+  @override
+  String get associationMemberVoucher => 'Voucher';
+
+  @override
+  String get associationMemberFinancialObligations => 'Financial Obligations';
+
+  @override
+  String get associationMemberNoFinancialObligations =>
+      'There are no financial obligations recorded yet.';
+
+  @override
+  String get associationMemberDue => 'Due';
+
+  @override
+  String get associationMemberDeadline => 'Deadline';
+
+  @override
+  String get associationMemberProjectGallery => 'Project Gallery';
+
+  @override
+  String get associationMemberCompletion => 'Completion';
+
+  @override
+  String get associationMemberCompletionPercentage => 'Completion Percentage';
+
+  @override
+  String get associationMemberSubtitle => 'Subtitle';
+
+  @override
+  String get associationMemberProjectMasterPlan => 'Project Master Plan';
+
+  @override
+  String get associationMemberProjectMasterPlanFile => 'Project master plan';
+
+  @override
+  String get associationMemberBuildings => 'Buildings';
+
+  @override
+  String get associationMemberTotalUnits => 'Total Units';
+
+  @override
+  String get associationMemberAvailableUnits => 'Available Units';
+
+  @override
+  String get associationMemberAllocatedUnits => 'Allocated Units';
+
+  @override
+  String get associationMemberDeliveredUnits => 'Delivered Units';
+
+  @override
+  String get associationMemberRemainingUnits => 'Remaining Units';
+
+  @override
+  String get associationMemberEstimatedCost => 'Estimated Cost';
+
+  @override
+  String get associationMemberEngineer => 'Engineer';
+
+  @override
+  String get associationMemberLandArea => 'Land Area';
+
+  @override
+  String get associationMemberProjectLocation => 'Project Location';
+
+  @override
+  String get associationMemberOpenGoogleMaps => 'Open in Google Maps';
+
+  @override
+  String get associationMemberBuildingGallery => 'Building Gallery';
+
+  @override
+  String get associationMemberBuildingNumber => 'Building Number';
+
+  @override
+  String get associationMemberDescription => 'Description';
+
+  @override
+  String get associationMemberBuildingPlan => 'Building Plan';
+
+  @override
+  String get associationMemberBuildingPlanFile => 'Building plan';
+
+  @override
+  String get associationMemberFloors => 'Floors';
+
+  @override
+  String get associationMemberUnits => 'Units';
+
+  @override
+  String get associationMemberSpecifications => 'Specifications';
+
+  @override
+  String get associationMemberUnitGallery => 'Unit Gallery';
+
+  @override
+  String get associationMemberFloor => 'Floor';
+
+  @override
+  String get associationMemberOrientation => 'Orientation';
+
+  @override
+  String get associationMemberArea => 'Area';
+
+  @override
+  String get associationMemberGardenTerraceArea => 'Garden / Terrace Area';
+
+  @override
+  String get associationMemberUnitPlan => 'Unit Plan';
+
+  @override
+  String get associationMemberUnitPlanFile => 'Unit plan';
+
+  @override
+  String get associationMemberStages => 'Stages';
+
+  @override
+  String get associationMemberProjectBuildings => 'Project Buildings';
+
+  @override
+  String get associationMemberProgress => 'Progress';
+
+  @override
+  String get associationMemberAssignedToProject => 'Assigned to project';
+
+  @override
+  String get associationMemberNoProjectAssignment => 'No project assignment';
+
+  @override
+  String get associationMemberAssignedToUnit => 'Assigned to unit';
+
+  @override
+  String get associationMemberNoUnitAssignment => 'No unit assignment';
+
+  @override
+  String get associationMemberProjectLocationOpenFailed =>
+      'Could not open the project location';
+
+  @override
+  String get contactHelpTitle => 'How can we help?';
+
+  @override
+  String contactAvailableNumbers(int count) {
+    return '$count available numbers';
+  }
+
+  @override
+  String get contactWhatsAppTitle => 'WhatsApp';
+
+  @override
+  String get contactSocialMediaTitle => 'Social media';
+
+  @override
+  String contactAvailableLinks(int count) {
+    return '$count available links';
+  }
+
+  @override
+  String contactWorkingDays(int count) {
+    return '$count days';
+  }
+
+  @override
+  String get contactLoadingInfo => 'Loading contact info';
+
+  @override
+  String get contactOpenLinkFailed => 'Could not open this link';
 }

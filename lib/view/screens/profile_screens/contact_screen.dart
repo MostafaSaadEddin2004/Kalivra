@@ -88,11 +88,7 @@ class _ContactScreenState extends State<ContactScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _localizedText(
-                      context,
-                      arabic: 'كيف يمكننا مساعدتك؟',
-                      english: 'How can we help?',
-                    ),
+                    AppLocalizations.of(context)!.contactHelpTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: isDark ? AppColors.goldLight : AppColors.burgundy,
                       fontWeight: FontWeight.w700,
@@ -206,11 +202,9 @@ class _ContactInfoSection extends StatelessWidget {
         _AccordionContactCard(
           icon: Icons.phone_rounded,
           title: l10n.contactPhoneTitle,
-          collapsedSubtitle: _localizedText(
+          collapsedSubtitle: AppLocalizations.of(
             context,
-            arabic: '${contactInfo.phones.length} أرقام متاحة',
-            english: '${contactInfo.phones.length} available numbers',
-          ),
+          )!.contactAvailableNumbers(contactInfo.phones.length),
           children: [
             for (var i = 0; i < contactInfo.phones.length; i++)
               _ContactValueRow(
@@ -239,11 +233,7 @@ class _ContactInfoSection extends StatelessWidget {
       addCard(
         _ContactCard(
           icon: Icons.language_rounded,
-          title: _localizedText(
-            context,
-            arabic: 'الموقع الإلكتروني',
-            english: 'Website',
-          ),
+          title: AppLocalizations.of(context)!.website,
           value: contactInfo.website!,
           onTap: () => _launchWebLink(context, contactInfo.website!),
         ),
@@ -254,7 +244,7 @@ class _ContactInfoSection extends StatelessWidget {
       addCard(
         _ContactCard(
           icon: Icons.chat_rounded,
-          title: _localizedText(context, arabic: 'واتساب', english: 'WhatsApp'),
+          title: AppLocalizations.of(context)!.contactWhatsAppTitle,
           value: contactInfo.whatsapp!,
           onTap: () => _launchWhatsApp(context, contactInfo.whatsapp!),
         ),
@@ -265,7 +255,7 @@ class _ContactInfoSection extends StatelessWidget {
       addCard(
         _ContactCard(
           icon: Icons.location_on_rounded,
-          title: _localizedText(context, arabic: 'العنوان', english: 'Address'),
+          title: AppLocalizations.of(context)!.address,
           value: contactInfo.address!,
         ),
       );
@@ -275,16 +265,10 @@ class _ContactInfoSection extends StatelessWidget {
       addCard(
         _AccordionContactCard(
           icon: Icons.groups_rounded,
-          title: _localizedText(
+          title: AppLocalizations.of(context)!.contactSocialMediaTitle,
+          collapsedSubtitle: AppLocalizations.of(
             context,
-            arabic: 'وسائل التواصل',
-            english: 'Social media',
-          ),
-          collapsedSubtitle: _localizedText(
-            context,
-            arabic: '${contactInfo.socialLinks.length} روابط متاحة',
-            english: '${contactInfo.socialLinks.length} available links',
-          ),
+          )!.contactAvailableLinks(contactInfo.socialLinks.length),
           children: [
             for (final socialLink in contactInfo.socialLinks)
               _SocialValueRow(
@@ -301,11 +285,9 @@ class _ContactInfoSection extends StatelessWidget {
         _AccordionContactCard(
           icon: Icons.schedule_rounded,
           title: l10n.contactHoursTitle,
-          collapsedSubtitle: _localizedText(
+          collapsedSubtitle: AppLocalizations.of(
             context,
-            arabic: '${contactInfo.workingHours.length} أيام',
-            english: '${contactInfo.workingHours.length} days',
-          ),
+          )!.contactWorkingDays(contactInfo.workingHours.length),
           children: [
             for (final entry in contactInfo.workingHours.entries)
               _ContactValueRow(
@@ -347,11 +329,7 @@ class _ContactLoadingCard extends StatelessWidget {
             ),
             SizedBox(width: 12.w),
             Text(
-              _localizedText(
-                context,
-                arabic: 'جاري تحميل معلومات التواصل',
-                english: 'Loading contact info',
-              ),
+              AppLocalizations.of(context)!.contactLoadingInfo,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: isDark ? AppColors.offWhite : AppColors.black,
               ),
@@ -881,16 +859,6 @@ String _dayLabel(BuildContext context, String day) {
   };
 }
 
-String _localizedText(
-  BuildContext context, {
-  required String arabic,
-  required String english,
-}) {
-  return Localizations.localeOf(context).languageCode == 'ar'
-      ? arabic
-      : english;
-}
-
 String _capitalize(String value) {
   if (value.isEmpty) return value;
   return value[0].toUpperCase() + value.substring(1);
@@ -980,13 +948,7 @@ Future<void> _launchUri(BuildContext context, Uri uri) async {
 void _showLaunchError(BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(
-        _localizedText(
-          context,
-          arabic: 'تعذر فتح الرابط',
-          english: 'Could not open this link',
-        ),
-      ),
+      content: Text(AppLocalizations.of(context)!.contactOpenLinkFailed),
     ),
   );
 }

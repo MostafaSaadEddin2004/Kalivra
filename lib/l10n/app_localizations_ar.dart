@@ -2043,4 +2043,307 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get search => 'ابحث';
+
+  @override
+  String get fileActionCouldNotOpenFile => 'ØªØ¹Ø°Ø± ÙØªØ­ Ø§Ù„Ù…Ù„Ù';
+
+  @override
+  String get fileActionDownloadFile => 'تحميل الملف';
+
+  @override
+  String get fileActionDownloadPrompt => 'هل تريد تحميل الملف؟';
+
+  @override
+  String get fileActionOpenOnly => 'لا، فتح فقط';
+
+  @override
+  String get fileActionDownloadConfirm => 'نعم، تحميل';
+
+  @override
+  String get fileActionDownloading => 'جاري تحميل الملف...';
+
+  @override
+  String get fileActionSaveFile => 'حفظ الملف';
+
+  @override
+  String get fileActionDownloadFailedOpenInstead =>
+      'تعذر تحميل الملف، سيتم فتحه فقط';
+
+  @override
+  String get noCategoriesAvailable => 'لا توجد تصنيفات متاحة';
+
+  @override
+  String get associationMemberRequestAcceptedTitle => 'تم قبول طلبك';
+
+  @override
+  String get associationMemberRequestAcceptedMessage =>
+      'تم إنشاء ملف شخصي لك لدى الجمعية. ستقوم الجمعية قريباً بإنشاء عضوية لك، وبعدها ستظهر تفاصيل العضوية والمعلومات المالية هنا.';
+
+  @override
+  String get associationMemberNoMembershipTitle => 'لا توجد عضوية بعد';
+
+  @override
+  String get associationMemberNoMembershipMessage =>
+      'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.';
+
+  @override
+  String get associationMemberFallbackPersonName => 'العضو';
+
+  @override
+  String get associationMemberLinkingRequestAcceptedTitle =>
+      'تم قبول طلب الربط';
+
+  @override
+  String associationMemberLinkAcceptedMessage(String personName) {
+    return 'تم قبول طلب الربط من السيد $personName، وسيتم عرض المعلومات الخاصة بالعضويات الخاصة بك عند الانتهاء من استكمالها.';
+  }
+
+  @override
+  String associationMemberIndexedMembership(int number) {
+    return 'عضوية $number';
+  }
+
+  @override
+  String get associationMemberPriorityStatus => 'حالة الدور';
+
+  @override
+  String get associationMemberMembershipDecision => 'قرار العضوية';
+
+  @override
+  String get associationMemberJoinDocuments => 'وثائق الانتساب';
+
+  @override
+  String get associationMemberJoinDocument => 'وثيقة انتساب';
+
+  @override
+  String get associationMemberClosedAt => 'تاريخ الإغلاق';
+
+  @override
+  String get associationMemberProfileStatus => 'حالة الملف';
+
+  @override
+  String get associationMemberStage => 'المرحلة';
+
+  @override
+  String get associationMemberMessage => 'الرسالة';
+
+  @override
+  String get associationMemberAvailableBalance => 'الرصيد المتاح';
+
+  @override
+  String get associationMemberOpenObligations => 'الالتزامات المفتوحة';
+
+  @override
+  String get associationMemberFinancialInformation => 'المعلومات المالية';
+
+  @override
+  String get associationMemberTotalPayments => 'إجمالي المدفوعات';
+
+  @override
+  String get associationMemberTotalObligations => 'إجمالي الالتزامات';
+
+  @override
+  String get associationMemberCoveredObligations => 'الالتزامات المغطاة';
+
+  @override
+  String get associationMemberUncoveredObligations => 'الالتزامات غير المغطاة';
+
+  @override
+  String get associationMemberOpenObligationsCount => 'عدد الالتزامات المفتوحة';
+
+  @override
+  String get associationMemberOverdueObligationsCount =>
+      'عدد الالتزامات المتأخرة';
+
+  @override
+  String get associationMemberOverdueObligationsAmount => 'الالتزامات المتأخرة';
+
+  @override
+  String get associationMemberCurrentBalance => 'الرصيد الحالي';
+
+  @override
+  String get associationMemberFinancialStatus => 'الحالة المالية';
+
+  @override
+  String get associationMemberTotalPaid => 'إجمالي المدفوع';
+
+  @override
+  String get associationMemberRemainingAmount => 'المبلغ المتبقي';
+
+  @override
+  String get associationMemberPendingObligations => 'الالتزامات المعلقة';
+
+  @override
+  String get associationMemberPayments => 'المدفوعات';
+
+  @override
+  String get associationMemberNoRecordedPayments =>
+      'لا توجد مدفوعات مسجلة حالياً.';
+
+  @override
+  String get associationMemberVoucher => 'إيصال';
+
+  @override
+  String get associationMemberFinancialObligations => 'الالتزامات المالية';
+
+  @override
+  String get associationMemberNoFinancialObligations =>
+      'لا توجد التزامات مالية مسجلة حالياً.';
+
+  @override
+  String get associationMemberDue => 'الاستحقاق';
+
+  @override
+  String get associationMemberDeadline => 'آخر موعد';
+
+  @override
+  String get associationMemberProjectGallery => 'معرض المشروع';
+
+  @override
+  String get associationMemberCompletion => 'نسبة الإنجاز';
+
+  @override
+  String get associationMemberCompletionPercentage => 'نسبة الإنجاز';
+
+  @override
+  String get associationMemberSubtitle => 'الوصف';
+
+  @override
+  String get associationMemberProjectMasterPlan => 'مخطط المشروع';
+
+  @override
+  String get associationMemberProjectMasterPlanFile => 'مخطط المشروع';
+
+  @override
+  String get associationMemberBuildings => 'عدد الأبنية';
+
+  @override
+  String get associationMemberTotalUnits => 'إجمالي الوحدات';
+
+  @override
+  String get associationMemberAvailableUnits => 'الوحدات المتاحة';
+
+  @override
+  String get associationMemberAllocatedUnits => 'الوحدات المخصصة';
+
+  @override
+  String get associationMemberDeliveredUnits => 'الوحدات المسلمة';
+
+  @override
+  String get associationMemberRemainingUnits => 'الوحدات المتبقية';
+
+  @override
+  String get associationMemberEstimatedCost => 'الكلفة التقديرية';
+
+  @override
+  String get associationMemberEngineer => 'المهندس';
+
+  @override
+  String get associationMemberLandArea => 'مساحة الأرض';
+
+  @override
+  String get associationMemberProjectLocation => 'موقع المشروع';
+
+  @override
+  String get associationMemberOpenGoogleMaps => 'فتح في خرائط Google';
+
+  @override
+  String get associationMemberBuildingGallery => 'معرض البناء';
+
+  @override
+  String get associationMemberBuildingNumber => 'رقم البناء';
+
+  @override
+  String get associationMemberDescription => 'الوصف';
+
+  @override
+  String get associationMemberBuildingPlan => 'مخطط البناء';
+
+  @override
+  String get associationMemberBuildingPlanFile => 'مخطط البناء';
+
+  @override
+  String get associationMemberFloors => 'عدد الطوابق';
+
+  @override
+  String get associationMemberUnits => 'عدد الوحدات';
+
+  @override
+  String get associationMemberSpecifications => 'المواصفات';
+
+  @override
+  String get associationMemberUnitGallery => 'معرض الوحدة';
+
+  @override
+  String get associationMemberFloor => 'الطابق';
+
+  @override
+  String get associationMemberOrientation => 'الاتجاه';
+
+  @override
+  String get associationMemberArea => 'المساحة';
+
+  @override
+  String get associationMemberGardenTerraceArea => 'مساحة الحديقة / التراس';
+
+  @override
+  String get associationMemberUnitPlan => 'مخطط الوحدة';
+
+  @override
+  String get associationMemberUnitPlanFile => 'مخطط الوحدة';
+
+  @override
+  String get associationMemberStages => 'مراحل التنفيذ';
+
+  @override
+  String get associationMemberProjectBuildings => 'الأبنية ضمن المشروع';
+
+  @override
+  String get associationMemberProgress => 'الإنجاز';
+
+  @override
+  String get associationMemberAssignedToProject => 'مخصص لمشروع';
+
+  @override
+  String get associationMemberNoProjectAssignment => 'غير مخصص لمشروع';
+
+  @override
+  String get associationMemberAssignedToUnit => 'مخصص لوحدة';
+
+  @override
+  String get associationMemberNoUnitAssignment => 'غير مخصص لوحدة';
+
+  @override
+  String get associationMemberProjectLocationOpenFailed =>
+      'تعذر فتح موقع المشروع';
+
+  @override
+  String get contactHelpTitle => 'كيف يمكننا مساعدتك؟';
+
+  @override
+  String contactAvailableNumbers(int count) {
+    return '$count أرقام متاحة';
+  }
+
+  @override
+  String get contactWhatsAppTitle => 'واتساب';
+
+  @override
+  String get contactSocialMediaTitle => 'وسائل التواصل';
+
+  @override
+  String contactAvailableLinks(int count) {
+    return '$count روابط متاحة';
+  }
+
+  @override
+  String contactWorkingDays(int count) {
+    return '$count أيام';
+  }
+
+  @override
+  String get contactLoadingInfo => 'جاري تحميل معلومات التواصل';
+
+  @override
+  String get contactOpenLinkFailed => 'تعذر فتح الرابط';
 }

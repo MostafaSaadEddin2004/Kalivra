@@ -140,12 +140,15 @@ class _AssociationMemberProfileScreenState
                           children: [
                             Icon(
                               Icons.upload_file_rounded,
-                              size: 20.r,color: AppColors.burgundy
+                              size: 20.r,
+                              color: AppColors.burgundy,
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.linkRequestsScreen,
-                              style: theme.textTheme.bodyMedium!.copyWith(color: AppColors.burgundy),
+                              style: theme.textTheme.bodyMedium!.copyWith(
+                                color: AppColors.burgundy,
+                              ),
                             ),
                           ],
                         ),
@@ -158,12 +161,15 @@ class _AssociationMemberProfileScreenState
                           children: [
                             Icon(
                               Icons.question_answer_outlined,
-                              size: 20.r,color: AppColors.burgundy
+                              size: 20.r,
+                              color: AppColors.burgundy,
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.associationContactUs,
-                              style: theme.textTheme.bodyMedium!.copyWith(color: AppColors.burgundy),
+                              style: theme.textTheme.bodyMedium!.copyWith(
+                                color: AppColors.burgundy,
+                              ),
                             ),
                           ],
                         ),
@@ -175,12 +181,15 @@ class _AssociationMemberProfileScreenState
                           children: [
                             Icon(
                               Icons.help_rounded,
-                              size: 20.r,color: AppColors.burgundy
+                              size: 20.r,
+                              color: AppColors.burgundy,
                             ),
                             const SizedBox(width: 12),
                             Text(
                               l10n.frequentlyAskedQuestion,
-                              style: theme.textTheme.bodyMedium!.copyWith(color: AppColors.burgundy),
+                              style: theme.textTheme.bodyMedium!.copyWith(
+                                color: AppColors.burgundy,
+                              ),
                             ),
                           ],
                         ),
@@ -217,18 +226,12 @@ class _AssociationMemberProfileScreenState
               if (!profile.isAssociationMember && profile.isLinkedPerson) {
                 return _MessageState(
                   icon: Icons.person_pin_circle_outlined,
-                  title: _localizedText(
+                  title: AppLocalizations.of(
                     context,
-                    arabic: 'تم قبول طلبك',
-                    english: 'Your request is accepted',
-                  ),
-                  message: _localizedText(
+                  )!.associationMemberRequestAcceptedTitle,
+                  message: AppLocalizations.of(
                     context,
-                    arabic:
-                        'تم إنشاء ملف شخصي لك لدى الجمعية. ستقوم الجمعية قريباً بإنشاء عضوية لك، وبعدها ستظهر تفاصيل العضوية والمعلومات المالية هنا.',
-                    english:
-                        'Your person profile is now linked with the association. The association will create a membership for you soon, then your membership and financial details will appear here.',
-                  ),
+                  )!.associationMemberRequestAcceptedMessage,
                   actionLabel: l10n.retry,
                   onAction: _reload,
                 );
@@ -239,18 +242,12 @@ class _AssociationMemberProfileScreenState
                   children: [
                     _MessageState(
                       icon: Icons.info_outline_rounded,
-                      title: _localizedText(
+                      title: AppLocalizations.of(
                         context,
-                        arabic: 'لا توجد عضوية بعد',
-                        english: 'No membership yet',
-                      ),
-                      message: _localizedText(
+                      )!.associationMemberNoMembershipTitle,
+                      message: AppLocalizations.of(
                         context,
-                        arabic:
-                            'لا توجد عضوية جمعية مفعّلة لهذا الحساب حالياً.',
-                        english:
-                            'There is no active association membership for this account yet.',
-                      ),
+                      )!.associationMemberNoMembershipMessage,
                       actionLabel: l10n.retry,
                       onAction: _reload,
                     ),
@@ -453,7 +450,7 @@ class _AcceptedLinkEmptyMemberships extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final personName = profile.person.displayName.isEmpty
-        ? _localizedText(context, arabic: 'العضو', english: 'the member')
+        ? AppLocalizations.of(context)!.associationMemberFallbackPersonName
         : profile.person.displayName;
 
     return Container(
@@ -489,11 +486,9 @@ class _AcceptedLinkEmptyMemberships extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           Text(
-            _localizedText(
+            AppLocalizations.of(
               context,
-              arabic: 'تم قبول طلب الربط',
-              english: 'Linking request accepted',
-            ),
+            )!.associationMemberLinkingRequestAcceptedTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.titleMedium?.copyWith(
               color: isDark ? AppColors.offWhite : AppColors.burgundy,
@@ -502,13 +497,9 @@ class _AcceptedLinkEmptyMemberships extends StatelessWidget {
           ),
           SizedBox(height: 10.h),
           Text(
-            _localizedText(
+            AppLocalizations.of(
               context,
-              arabic:
-                  'تم قبول طلب الربط من السيد $personName، وسيتم عرض المعلومات الخاصة بالعضويات الخاصة بك عند الانتهاء من استكمالها.',
-              english:
-                  'Your linking request for Mr. $personName has been accepted. Your membership information will appear once it is completed.',
-            ),
+            )!.associationMemberLinkAcceptedMessage(personName),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(height: 1.45),
           ),
@@ -542,11 +533,9 @@ class _MembershipTabs extends StatelessWidget {
           final selected = index == selectedIndex;
           final color = isDark ? AppColors.goldLight : AppColors.burgundy;
           final label = membership.displayType.isEmpty
-              ? _localizedText(
+              ? AppLocalizations.of(
                   context,
-                  arabic: 'عضوية ${index + 1}',
-                  english: 'Membership ${index + 1}',
-                )
+                )!.associationMemberIndexedMembership(index + 1)
               : membership.displayType;
 
           return Padding(
@@ -626,33 +615,33 @@ class _MemberContactSection extends StatelessWidget {
       title: l10n.associationLinkContactSection,
       icon: Icons.contact_phone_outlined,
       children: [
-        _InfoRow(
+        InfoRow(
           label: l10n.associationLinkFirstName,
           value: person.displayName,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationLinkFatherName,
           value: person.fatherName,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationLinkMotherName,
           value: person.motherName,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationLinkNationalId,
           value: person.nationalId,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.genderLabel,
           value: _genderLabel(context, person.gender),
         ),
-        _InfoRow(label: l10n.associationLinkMobile, value: person.phone),
-        _InfoRow(
+        InfoRow(label: l10n.associationLinkMobile, value: person.phone),
+        InfoRow(
           label: l10n.associationLinkWhatsApp,
           value: person.whatsappNumber,
         ),
-        _InfoRow(label: l10n.associationLinkEmail, value: person.email),
-        _InfoRow(
+        InfoRow(label: l10n.associationLinkEmail, value: person.email),
+        InfoRow(
           label: l10n.associationMemberCurrentAddress,
           value: person.address,
         ),
@@ -697,78 +686,64 @@ class _MembershipDetailsSection extends StatelessWidget {
           title: l10n.associationLinkMembershipSection,
           icon: Icons.badge_outlined,
           children: [
-            _InfoRow(
+            InfoRow(
               label: l10n.associationLinkMembershipNumber,
               value: membership.membershipNumber,
             ),
-            _InfoRow(
+            InfoRow(
               label: l10n.associationMemberType,
               value: membership.displayType,
             ),
-            _InfoRow(
+            InfoRow(
               label: l10n.associationMemberStatus,
               value: membership.displayStatus,
             ),
-            _InfoRow(
+            InfoRow(
               label: l10n.associationMemberFinancialSummary,
               value: membership.displayFinancialStatus,
             ),
-            _InfoRow(
+            InfoRow(
               label: l10n.associationMemberDate,
               value: membership.joinDate,
             ),
-            _InfoRow(
+            InfoRow(
               label: l10n.associationLinkPriorityNumber,
               value: _formatNullableNumber(membership.priorityNumber),
             ),
-            _InfoRow(
-              label: _localizedText(
+            InfoRow(
+              label: AppLocalizations.of(
                 context,
-                arabic: 'حالة الدور',
-                english: 'Priority Status',
-              ),
+              )!.associationMemberPriorityStatus,
               value: membership.priorityStatusLabel.isNotEmpty
                   ? membership.priorityStatusLabel
                   : membership.priorityStatus,
             ),
-            _InfoRow(
-              label: _localizedText(
+            InfoRow(
+              label: AppLocalizations.of(
                 context,
-                arabic: 'قرار العضوية',
-                english: 'Membership Decision',
-              ),
+              )!.associationMemberMembershipDecision,
               value: membership.membershipDecision,
             ),
             _ProfileFilesSection(
-              title: _localizedText(
+              title: AppLocalizations.of(
                 context,
-                arabic: 'وثائق الانتساب',
-                english: 'Join Documents',
-              ),
+              )!.associationMemberJoinDocuments,
               fileUrls: _fileUrlsFromValue(membership.joinDocuments),
-              fallbackName: _localizedText(
+              fallbackName: AppLocalizations.of(
                 context,
-                arabic: 'وثيقة انتساب',
-                english: 'Join document',
-              ),
+              )!.associationMemberJoinDocument,
             ),
-            _InfoRow(
-              label: _localizedText(
+            InfoRow(
+              label: AppLocalizations.of(
                 context,
-                arabic: 'وثائق الانتساب',
-                english: 'Join Documents',
-              ),
+              )!.associationMemberJoinDocuments,
               value: membership.joinDocuments,
             ),
-            _InfoRow(
-              label: _localizedText(
-                context,
-                arabic: 'تاريخ الإغلاق',
-                english: 'Closed At',
-              ),
+            InfoRow(
+              label: AppLocalizations.of(context)!.associationMemberClosedAt,
               value: membership.closedAt,
             ),
-            _InfoRow(
+            InfoRow(
               label: l10n.associationMemberPaidAmount,
               value: _formatNullableNumber(membership.totalPaymentsMade),
             ),
@@ -776,36 +751,24 @@ class _MembershipDetailsSection extends StatelessWidget {
         ),
         if (lifecycle != null)
           AssociationFormSection(
-            title: _localizedText(
-              context,
-              arabic: 'حالة الملف',
-              english: 'Profile Status',
-            ),
+            title: AppLocalizations.of(context)!.associationMemberProfileStatus,
             icon: Icons.route_outlined,
             children: [
-              _InfoRow(
+              InfoRow(
                 label: l10n.associationMemberStatus,
                 value: lifecycle.title,
               ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'المرحلة',
-                  english: 'Stage',
-                ),
+              InfoRow(
+                label: AppLocalizations.of(context)!.associationMemberStage,
                 value: lifecycle.statusLabel.isNotEmpty
                     ? lifecycle.statusLabel
                     : lifecycle.stage,
               ),
-              _InfoRow(
-                label: _localizedText(
-                  context,
-                  arabic: 'الرسالة',
-                  english: 'Message',
-                ),
+              InfoRow(
+                label: AppLocalizations.of(context)!.associationMemberMessage,
                 value: lifecycle.message,
               ),
-              _InfoRow(
+              InfoRow(
                 label: l10n.associationMemberNotes,
                 value: lifecycle.adminNotes,
               ),
@@ -926,20 +889,16 @@ class _FinancialOverviewCard extends StatelessWidget {
                 icon: Icons.verified_outlined,
               ),
               _FinanceMetric(
-                label: _localizedText(
+                label: AppLocalizations.of(
                   context,
-                  arabic: 'الرصيد المتاح',
-                  english: 'Available Balance',
-                ),
+                )!.associationMemberAvailableBalance,
                 value: _formatNullableNumber(financial?.availableBalance),
                 icon: Icons.savings_outlined,
               ),
               _FinanceMetric(
-                label: _localizedText(
+                label: AppLocalizations.of(
                   context,
-                  arabic: 'الالتزامات المفتوحة',
-                  english: 'Open Obligations',
-                ),
+                )!.associationMemberOpenObligations,
                 value: _formatNullableNumber(financial?.openObligationsCount),
                 icon: Icons.assignment_late_outlined,
               ),
@@ -1017,118 +976,50 @@ class _FinancialInformationSection extends StatelessWidget {
     if (financial == null) return const SizedBox.shrink();
 
     return AssociationFormSection(
-      title: _localizedText(
+      title: AppLocalizations.of(
         context,
-        arabic: 'المعلومات المالية',
-        english: 'Financial Information',
-      ),
+      )!.associationMemberFinancialInformation,
       icon: Icons.account_balance_wallet_outlined,
       children: [
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'إجمالي المدفوعات',
-            english: 'Total Payments',
-          ),
-          value: _formatNullableNumber(financial.totalPayments),
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'إجمالي الالتزامات',
-            english: 'Total Obligations',
-          ),
+          )!.associationMemberTotalObligations,
           value: _formatNullableNumber(financial.totalObligations),
         ),
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberTotalPayments,
+          value: _formatNullableNumber(financial.totalPayments),
+        ),
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'الالتزامات المغطاة',
-            english: 'Covered Obligations',
-          ),
+          )!.associationMemberCoveredObligations,
           value: _formatNullableNumber(financial.coveredObligations),
         ),
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'الالتزامات غير المغطاة',
-            english: 'Uncovered Obligations',
-          ),
+          )!.associationMemberUncoveredObligations,
           value: _formatNullableNumber(financial.uncoveredObligations),
+          labelNumber: _formatNullableNumber(financial.openObligationsCount),
         ),
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'عدد الالتزامات المفتوحة',
-            english: 'Open Obligations Count',
-          ),
-          value: _formatNullableNumber(financial.openObligationsCount),
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'عدد الالتزامات المتأخرة',
-            english: 'Overdue Obligations Count',
-          ),
-          value: _formatNullableNumber(financial.overdueObligationsCount),
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'قيمة الالتزامات المتأخرة',
-            english: 'Overdue Obligations Amount',
-          ),
+          )!.associationMemberOverdueObligationsAmount,
           value: _formatNullableNumber(financial.overdueObligationsAmount),
+          labelNumber: _formatNullableNumber(financial.overdueObligationsCount),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الرصيد المتاح',
-            english: 'Available Balance',
-          ),
-          value: _formatNullableNumber(financial.availableBalance),
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الرصيد الحالي',
-            english: 'Current Balance',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberCurrentBalance,
           value: _formatNullableNumber(financial.currentBalance),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الحالة المالية',
-            english: 'Financial Status',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberFinancialStatus,
           value: financial.memberFinancialStatusLabel.isNotEmpty
               ? financial.memberFinancialStatusLabel
               : financial.memberFinancialStatus,
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'إجمالي المدفوع',
-            english: 'Total Paid',
-          ),
-          value: _formatNullableNumber(financial.totalPaid),
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'المبلغ المتبقي',
-            english: 'Remaining Amount',
-          ),
-          value: _formatNullableNumber(financial.remainingAmount),
-        ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الالتزامات المعلقة',
-            english: 'Pending Obligations',
-          ),
-          value: _formatNullableNumber(financial.pendingObligations),
         ),
       ],
     );
@@ -1143,17 +1034,15 @@ class _PaymentsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AssociationFormSection(
-      title: _localizedText(context, arabic: 'المدفوعات', english: 'Payments'),
+      title: AppLocalizations.of(context)!.associationMemberPayments,
       icon: Icons.payments_outlined,
       children: payments.isEmpty
           ? [
               _EmptyInlineState(
                 icon: Icons.receipt_long_outlined,
-                text: _localizedText(
+                text: AppLocalizations.of(
                   context,
-                  arabic: 'لا توجد مدفوعات مسجلة حالياً.',
-                  english: 'There are no recorded payments yet.',
-                ),
+                )!.associationMemberNoRecordedPayments,
               ),
             ]
           : payments.map((payment) => _PaymentTile(payment: payment)).toList(),
@@ -1223,7 +1112,7 @@ class _PaymentTile extends StatelessWidget {
                         ? payment.paymentMethodLabel
                         : payment.paymentMethod,
                     payment.voucherNumber.isNotEmpty
-                        ? '${_localizedText(context, arabic: 'إيصال', english: 'Voucher')} ${payment.voucherNumber}'
+                        ? '${AppLocalizations.of(context)!.associationMemberVoucher} ${payment.voucherNumber}'
                         : '',
                   ]),
                   style: theme.textTheme.bodySmall,
@@ -1249,21 +1138,17 @@ class _FinancialObligationsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AssociationFormSection(
-      title: _localizedText(
+      title: AppLocalizations.of(
         context,
-        arabic: 'الالتزامات المالية',
-        english: 'Financial Obligations',
-      ),
+      )!.associationMemberFinancialObligations,
       icon: Icons.assignment_outlined,
       children: obligations.isEmpty
           ? [
               _EmptyInlineState(
                 icon: Icons.task_alt_rounded,
-                text: _localizedText(
+                text: AppLocalizations.of(
                   context,
-                  arabic: 'لا توجد التزامات مالية مسجلة حالياً.',
-                  english: 'There are no financial obligations recorded yet.',
-                ),
+                )!.associationMemberNoFinancialObligations,
               ),
             ]
           : obligations
@@ -1341,10 +1226,10 @@ class _ObligationTile extends StatelessWidget {
                 Text(
                   _joinValues([
                     obligation.dueDate.isNotEmpty
-                        ? '${_localizedText(context, arabic: 'الاستحقاق', english: 'Due')} ${obligation.dueDate}'
+                        ? '${AppLocalizations.of(context)!.associationMemberDue} ${obligation.dueDate}'
                         : '',
                     obligation.paymentDeadline.isNotEmpty
-                        ? '${_localizedText(context, arabic: 'آخر موعد', english: 'Deadline')} ${obligation.paymentDeadline}'
+                        ? '${AppLocalizations.of(context)!.associationMemberDeadline} ${obligation.paymentDeadline}'
                         : '',
                   ]),
                   style: theme.textTheme.bodySmall,
@@ -1399,51 +1284,41 @@ class _ProjectDetailsSection extends StatelessWidget {
       icon: Icons.apartment_rounded,
       children: [
         _MediaGallery(
-          title: _localizedText(
-            context,
-            arabic: 'معرض المشروع',
-            english: 'Project Gallery',
-          ),
+          title: AppLocalizations.of(context)!.associationMemberProjectGallery,
           imageUrl: project.imageUrl,
           galleryImages: [...project.images, ...project.galleryImages],
           fallbackIcon: Icons.apartment_rounded,
         ),
         _ProgressBlock(
-          label: _localizedText(
-            context,
-            arabic: 'نسبة الإنجاز',
-            english: 'Completion',
-          ),
+          label: AppLocalizations.of(context)!.associationMemberCompletion,
           value: project.completionPercentage,
         ),
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'نسبة الإنجاز',
-            english: 'Completion Percentage',
-          ),
+          )!.associationMemberCompletionPercentage,
           value: _formatNullablePercent(project.completionPercentage),
         ),
-        _InfoRow(label: l10n.associationLinkProjectName, value: project.name),
-        _InfoRow(
+        InfoRow(label: l10n.associationLinkProjectName, value: project.name),
+        InfoRow(
           label: l10n.associationMemberType,
           value: project.typeLabel.isNotEmpty
               ? project.typeLabel
               : project.type,
         ),
-        _InfoRow(
-          label: _localizedText(context, arabic: 'الوصف', english: 'Subtitle'),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberSubtitle,
           value: project.subtitle,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationMemberAmount,
           value: _formatNullableNumber(project.price),
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationMemberStatus,
           value: project.displayStatus,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationMemberLocation,
           value: _joinValues([
             project.governorate,
@@ -1453,92 +1328,52 @@ class _ProjectDetailsSection extends StatelessWidget {
         ),
         _ProjectLocationButton(project: project),
         _ProfileFilesSection(
-          title: _localizedText(
+          title: AppLocalizations.of(
             context,
-            arabic: 'مخطط المشروع',
-            english: 'Project Master Plan',
-          ),
+          )!.associationMemberProjectMasterPlan,
           fileUrls: _fileUrlsFromValue(project.masterPlanUrl),
-          fallbackName: _localizedText(
+          fallbackName: AppLocalizations.of(
             context,
-            arabic: 'مخطط المشروع',
-            english: 'Project master plan',
-          ),
+          )!.associationMemberProjectMasterPlanFile,
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'عدد الأبنية',
-            english: 'Buildings',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberBuildings,
           value: _formatNullableNumber(
             project.numberOfBuildings ?? project.buildings.length,
           ),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'إجمالي الوحدات',
-            english: 'Total Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberTotalUnits,
           value: _formatNullableNumber(
             project.totalUnits ?? project.totalNumberOfUnits,
           ),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوحدات المتاحة',
-            english: 'Available Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberAvailableUnits,
           value: _formatNullableNumber(project.availableUnits),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوحدات المخصصة',
-            english: 'Allocated Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberAllocatedUnits,
           value: _formatNullableNumber(project.allocatedUnits),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوحدات المسلمة',
-            english: 'Delivered Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberDeliveredUnits,
           value: _formatNullableNumber(project.deliveredUnits),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوحدات المتبقية',
-            english: 'Remaining Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberRemainingUnits,
           value: _formatNullableNumber(project.remainingUnits),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الكلفة التقديرية',
-            english: 'Estimated Cost',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberEstimatedCost,
           value: _formatNullableNumber(project.estimatedCost),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'المهندس',
-            english: 'Engineer',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberEngineer,
           value: project.projectEngineer,
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'مساحة الأرض',
-            english: 'Land Area',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberLandArea,
           value: _formatNullableNumber(project.landArea),
         ),
         _StagesTimeline(stages: project.stages),
@@ -1601,11 +1436,9 @@ class _ProjectLocationButton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _localizedText(
+                  AppLocalizations.of(
                     context,
-                    arabic: 'موقع المشروع',
-                    english: 'Project Location',
-                  ),
+                  )!.associationMemberProjectLocation,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -1624,11 +1457,9 @@ class _ProjectLocationButton extends StatelessWidget {
           ),
           SizedBox(width: 8.w),
           IconButton.filledTonal(
-            tooltip: _localizedText(
+            tooltip: AppLocalizations.of(
               context,
-              arabic: 'فتح في خرائط Google',
-              english: 'Open in Google Maps',
-            ),
+            )!.associationMemberOpenGoogleMaps,
             onPressed: () => _openProjectLocation(context, project),
             icon: const Icon(Icons.map_rounded),
           ),
@@ -1652,11 +1483,7 @@ class _BuildingDetailsSection extends StatelessWidget {
       icon: Icons.business_rounded,
       children: [
         _MediaGallery(
-          title: _localizedText(
-            context,
-            arabic: 'معرض البناء',
-            english: 'Building Gallery',
-          ),
+          title: AppLocalizations.of(context)!.associationMemberBuildingGallery,
           imageUrl: building.buildingPlanUrl,
           galleryImages: [
             ...building.floorPlanImages,
@@ -1665,98 +1492,58 @@ class _BuildingDetailsSection extends StatelessWidget {
           fallbackIcon: Icons.business_rounded,
         ),
         _ProgressBlock(
-          label: _localizedText(
-            context,
-            arabic: 'نسبة الإنجاز',
-            english: 'Completion',
-          ),
+          label: AppLocalizations.of(context)!.associationMemberCompletion,
           value: building.completionPercentage,
         ),
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'نسبة الإنجاز',
-            english: 'Completion Percentage',
-          ),
+          )!.associationMemberCompletionPercentage,
           value: _formatNullablePercent(building.completionPercentage),
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationLinkBuilding,
           value: building.displayName,
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'رقم البناء',
-            english: 'Building Number',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberBuildingNumber,
           value: building.buildingNumber,
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوصف',
-            english: 'Description',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberDescription,
           value: building.description,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationMemberLocation,
           value: building.physicalAddress,
         ),
         _ProfileFilesSection(
-          title: _localizedText(
-            context,
-            arabic: 'مخطط البناء',
-            english: 'Building Plan',
-          ),
+          title: AppLocalizations.of(context)!.associationMemberBuildingPlan,
           fileUrls: _fileUrlsFromValue(building.buildingPlanUrl),
-          fallbackName: _localizedText(
+          fallbackName: AppLocalizations.of(
             context,
-            arabic: 'مخطط البناء',
-            english: 'Building plan',
-          ),
+          )!.associationMemberBuildingPlanFile,
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'عدد الطوابق',
-            english: 'Floors',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberFloors,
           value: _formatNullableNumber(building.numberOfFloors),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'عدد الوحدات',
-            english: 'Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberUnits,
           value: _formatNullableNumber(
             building.numberOfUnits ?? building.totalUnits,
           ),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوحدات المتاحة',
-            english: 'Available Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberAvailableUnits,
           value: _formatNullableNumber(building.availableUnits),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الوحدات المخصصة',
-            english: 'Allocated Units',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberAllocatedUnits,
           value: _formatNullableNumber(building.allocatedUnits),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'المواصفات',
-            english: 'Specifications',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberSpecifications,
           value: building.specifications,
         ),
         _StagesTimeline(stages: building.stages),
@@ -1779,77 +1566,53 @@ class _UnitDetailsSection extends StatelessWidget {
       icon: Icons.home_work_outlined,
       children: [
         _MediaGallery(
-          title: _localizedText(
-            context,
-            arabic: 'معرض الوحدة',
-            english: 'Unit Gallery',
-          ),
+          title: AppLocalizations.of(context)!.associationMemberUnitGallery,
           imageUrl: unit.unitPlanUrl,
           galleryImages: [...unit.images, ...unit.galleryImages],
           fallbackIcon: Icons.home_work_outlined,
         ),
-        _InfoRow(label: l10n.unit, value: unit.unitNumber),
-        _InfoRow(
-          label: _localizedText(context, arabic: 'الطابق', english: 'Floor'),
+        InfoRow(label: l10n.unit, value: unit.unitNumber),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberFloor,
           value: _formatNullableNumber(unit.floorNumber),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'الاتجاه',
-            english: 'Orientation',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberOrientation,
           value: unit.orientationLabel.isNotEmpty
               ? unit.orientationLabel
               : unit.orientation,
         ),
-        _InfoRow(
-          label: _localizedText(context, arabic: 'المساحة', english: 'Area'),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberArea,
           value: _formatNullableNumber(unit.area),
         ),
-        _InfoRow(
-          label: _localizedText(
+        InfoRow(
+          label: AppLocalizations.of(
             context,
-            arabic: 'مساحة الحديقة / التراس',
-            english: 'Garden / Terrace Area',
-          ),
+          )!.associationMemberGardenTerraceArea,
           value: _formatNullableNumber(unit.gardenTerraceArea),
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationMemberAmount,
           value: _formatNullableNumber(unit.price),
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'المواصفات',
-            english: 'Specifications',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberSpecifications,
           value: unit.specifications,
         ),
-        _InfoRow(
+        InfoRow(
           label: l10n.associationMemberStatus,
           value: unit.statusLabel.isNotEmpty ? unit.statusLabel : unit.status,
         ),
         _ProfileFilesSection(
-          title: _localizedText(
-            context,
-            arabic: 'مخطط الوحدة',
-            english: 'Unit Plan',
-          ),
+          title: AppLocalizations.of(context)!.associationMemberUnitPlan,
           fileUrls: _fileUrlsFromValue(unit.unitPlanUrl),
-          fallbackName: _localizedText(
+          fallbackName: AppLocalizations.of(
             context,
-            arabic: 'مخطط الوحدة',
-            english: 'Unit plan',
-          ),
+          )!.associationMemberUnitPlanFile,
         ),
-        _InfoRow(
-          label: _localizedText(
-            context,
-            arabic: 'مخطط الوحدة',
-            english: 'Unit Plan',
-          ),
+        InfoRow(
+          label: AppLocalizations.of(context)!.associationMemberUnitPlan,
           value: unit.unitPlanUrl,
         ),
       ],
@@ -2168,7 +1931,7 @@ class _StagesTimeline extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _localizedText(context, arabic: 'مراحل التنفيذ', english: 'Stages'),
+            AppLocalizations.of(context)!.associationMemberStages,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w800,
             ),
@@ -2246,11 +2009,7 @@ class _ProjectBuildingsGallery extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _localizedText(
-              context,
-              arabic: 'الأبنية ضمن المشروع',
-              english: 'Project Buildings',
-            ),
+            AppLocalizations.of(context)!.associationMemberProjectBuildings,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w800,
             ),
@@ -2324,11 +2083,9 @@ class _BuildingSummaryCard extends StatelessWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 _ProgressBlock(
-                  label: _localizedText(
+                  label: AppLocalizations.of(
                     context,
-                    arabic: 'الإنجاز',
-                    english: 'Progress',
-                  ),
+                  )!.associationMemberProgress,
                   value: building.completionPercentage,
                 ),
               ],
@@ -2354,9 +2111,7 @@ class _MembershipSummaryCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.burgundy.withValues(alpha: 0.1)
-            : AppColors.goldLight.withValues(alpha: 0.14),
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18.r),
         border: Border.all(color: accent.withValues(alpha: 0.18)),
       ),
@@ -2382,16 +2137,8 @@ class _MembershipSummaryCard extends StatelessWidget {
               ),
               _StatusPill(
                 label: membership.isActive
-                    ? _localizedText(
-                        context,
-                        arabic: 'فعالة',
-                        english: 'Active',
-                      )
-                    : _localizedText(
-                        context,
-                        arabic: 'غير فعالة',
-                        english: 'Inactive',
-                      ),
+                    ? AppLocalizations.of(context)!.active
+                    : AppLocalizations.of(context)!.inactive,
                 color: membership.isActive ? Colors.green : AppColors.red,
               ),
             ],
@@ -2408,30 +2155,22 @@ class _MembershipSummaryCard extends StatelessWidget {
               ),
               _StatusPill(
                 label: membership.isAssignedToProject
-                    ? _localizedText(
+                    ? AppLocalizations.of(
                         context,
-                        arabic: 'مخصص لمشروع',
-                        english: 'Assigned to project',
-                      )
-                    : _localizedText(
+                      )!.associationMemberAssignedToProject
+                    : AppLocalizations.of(
                         context,
-                        arabic: 'غير مخصص لمشروع',
-                        english: 'No project assignment',
-                      ),
+                      )!.associationMemberNoProjectAssignment,
                 color: membership.isAssignedToProject ? accent : AppColors.red,
               ),
               _StatusPill(
                 label: membership.isAssignedToUnit
-                    ? _localizedText(
+                    ? AppLocalizations.of(
                         context,
-                        arabic: 'مخصص لوحدة',
-                        english: 'Assigned to unit',
-                      )
-                    : _localizedText(
+                      )!.associationMemberAssignedToUnit
+                    : AppLocalizations.of(
                         context,
-                        arabic: 'غير مخصص لوحدة',
-                        english: 'No unit assignment',
-                      ),
+                      )!.associationMemberNoUnitAssignment,
                 color: membership.isAssignedToUnit ? accent : AppColors.red,
               ),
             ].where((item) => item.label.trim().isNotEmpty).toList(),
@@ -2537,11 +2276,17 @@ enum _AccosiciationMemberProfileMenuActions {
   announcements,
 }
 
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({required this.label, required this.value});
+class InfoRow extends StatelessWidget {
+  const InfoRow({
+    super.key,
+    required this.label,
+    required this.value,
+    this.labelNumber,
+  });
 
   final String label;
   final String value;
+  final String? labelNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -2557,11 +2302,25 @@ class _InfoRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: isDark ? AppColors.taupe : AppColors.burgundy,
-            ),
+          Row(
+            spacing: 16.w,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDark ? AppColors.taupe : AppColors.burgundy,
+                ),
+              ),
+              labelNumber != null
+                  ? Text(
+                      '(${labelNumber!})',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ],
           ),
           SizedBox(height: 4.h),
           Text(
@@ -2624,15 +2383,6 @@ class _MessageState extends StatelessWidget {
       ),
     );
   }
-}
-
-String _localizedText(
-  BuildContext context, {
-  required String arabic,
-  required String english,
-}) {
-  final locale = Localizations.localeOf(context).languageCode.toLowerCase();
-  return locale == 'ar' ? arabic : english;
 }
 
 String _genderLabel(BuildContext context, String gender) {
@@ -2787,11 +2537,9 @@ void _showProjectLocationError(BuildContext context) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(
-        _localizedText(
+        AppLocalizations.of(
           context,
-          arabic: 'تعذر فتح موقع المشروع',
-          english: 'Could not open the project location',
-        ),
+        )!.associationMemberProjectLocationOpenFailed,
       ),
     ),
   );

@@ -3979,6 +3979,576 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'search'**
   String get search;
+
+  /// No description provided for @fileActionCouldNotOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this file'**
+  String get fileActionCouldNotOpenFile;
+
+  /// No description provided for @fileActionDownloadFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Download file'**
+  String get fileActionDownloadFile;
+
+  /// No description provided for @fileActionDownloadPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to download this file?'**
+  String get fileActionDownloadPrompt;
+
+  /// No description provided for @fileActionOpenOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'No, open only'**
+  String get fileActionOpenOnly;
+
+  /// No description provided for @fileActionDownloadConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, download'**
+  String get fileActionDownloadConfirm;
+
+  /// No description provided for @fileActionDownloading.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading file...'**
+  String get fileActionDownloading;
+
+  /// No description provided for @fileActionSaveFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Save file'**
+  String get fileActionSaveFile;
+
+  /// No description provided for @fileActionDownloadFailedOpenInstead.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not download the file. Opening it instead.'**
+  String get fileActionDownloadFailedOpenInstead;
+
+  /// No description provided for @noCategoriesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories available'**
+  String get noCategoriesAvailable;
+
+  /// No description provided for @associationMemberRequestAcceptedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request is accepted'**
+  String get associationMemberRequestAcceptedTitle;
+
+  /// No description provided for @associationMemberRequestAcceptedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your person profile is now linked with the association. The association will create a membership for you soon, then your membership and financial details will appear here.'**
+  String get associationMemberRequestAcceptedMessage;
+
+  /// No description provided for @associationMemberNoMembershipTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No membership yet'**
+  String get associationMemberNoMembershipTitle;
+
+  /// No description provided for @associationMemberNoMembershipMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no active association membership for this account yet.'**
+  String get associationMemberNoMembershipMessage;
+
+  /// No description provided for @associationMemberFallbackPersonName.
+  ///
+  /// In en, this message translates to:
+  /// **'the member'**
+  String get associationMemberFallbackPersonName;
+
+  /// No description provided for @associationMemberLinkingRequestAcceptedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Linking request accepted'**
+  String get associationMemberLinkingRequestAcceptedTitle;
+
+  /// No description provided for @associationMemberLinkAcceptedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your linking request for Mr. {personName} has been accepted. Your membership information will appear once it is completed.'**
+  String associationMemberLinkAcceptedMessage(String personName);
+
+  /// No description provided for @associationMemberIndexedMembership.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership {number}'**
+  String associationMemberIndexedMembership(int number);
+
+  /// No description provided for @associationMemberPriorityStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Status'**
+  String get associationMemberPriorityStatus;
+
+  /// No description provided for @associationMemberMembershipDecision.
+  ///
+  /// In en, this message translates to:
+  /// **'Membership Decision'**
+  String get associationMemberMembershipDecision;
+
+  /// No description provided for @associationMemberJoinDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Documents'**
+  String get associationMemberJoinDocuments;
+
+  /// No description provided for @associationMemberJoinDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Join document'**
+  String get associationMemberJoinDocument;
+
+  /// No description provided for @associationMemberClosedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed At'**
+  String get associationMemberClosedAt;
+
+  /// No description provided for @associationMemberProfileStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Status'**
+  String get associationMemberProfileStatus;
+
+  /// No description provided for @associationMemberStage.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage'**
+  String get associationMemberStage;
+
+  /// No description provided for @associationMemberMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get associationMemberMessage;
+
+  /// No description provided for @associationMemberAvailableBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Balance'**
+  String get associationMemberAvailableBalance;
+
+  /// No description provided for @associationMemberOpenObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Obligations'**
+  String get associationMemberOpenObligations;
+
+  /// No description provided for @associationMemberFinancialInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Information'**
+  String get associationMemberFinancialInformation;
+
+  /// No description provided for @associationMemberTotalPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Payments'**
+  String get associationMemberTotalPayments;
+
+  /// No description provided for @associationMemberTotalObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Obligations'**
+  String get associationMemberTotalObligations;
+
+  /// No description provided for @associationMemberCoveredObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Covered Obligations'**
+  String get associationMemberCoveredObligations;
+
+  /// No description provided for @associationMemberUncoveredObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncovered Obligations'**
+  String get associationMemberUncoveredObligations;
+
+  /// No description provided for @associationMemberOpenObligationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Obligations Count'**
+  String get associationMemberOpenObligationsCount;
+
+  /// No description provided for @associationMemberOverdueObligationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue Obligations Count'**
+  String get associationMemberOverdueObligationsCount;
+
+  /// No description provided for @associationMemberOverdueObligationsAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue Obligations'**
+  String get associationMemberOverdueObligationsAmount;
+
+  /// No description provided for @associationMemberCurrentBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Balance'**
+  String get associationMemberCurrentBalance;
+
+  /// No description provided for @associationMemberFinancialStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Status'**
+  String get associationMemberFinancialStatus;
+
+  /// No description provided for @associationMemberTotalPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Paid'**
+  String get associationMemberTotalPaid;
+
+  /// No description provided for @associationMemberRemainingAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining Amount'**
+  String get associationMemberRemainingAmount;
+
+  /// No description provided for @associationMemberPendingObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Obligations'**
+  String get associationMemberPendingObligations;
+
+  /// No description provided for @associationMemberPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get associationMemberPayments;
+
+  /// No description provided for @associationMemberNoRecordedPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no recorded payments yet.'**
+  String get associationMemberNoRecordedPayments;
+
+  /// No description provided for @associationMemberVoucher.
+  ///
+  /// In en, this message translates to:
+  /// **'Voucher'**
+  String get associationMemberVoucher;
+
+  /// No description provided for @associationMemberFinancialObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Obligations'**
+  String get associationMemberFinancialObligations;
+
+  /// No description provided for @associationMemberNoFinancialObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no financial obligations recorded yet.'**
+  String get associationMemberNoFinancialObligations;
+
+  /// No description provided for @associationMemberDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get associationMemberDue;
+
+  /// No description provided for @associationMemberDeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get associationMemberDeadline;
+
+  /// No description provided for @associationMemberProjectGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Gallery'**
+  String get associationMemberProjectGallery;
+
+  /// No description provided for @associationMemberCompletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion'**
+  String get associationMemberCompletion;
+
+  /// No description provided for @associationMemberCompletionPercentage.
+  ///
+  /// In en, this message translates to:
+  /// **'Completion Percentage'**
+  String get associationMemberCompletionPercentage;
+
+  /// No description provided for @associationMemberSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtitle'**
+  String get associationMemberSubtitle;
+
+  /// No description provided for @associationMemberProjectMasterPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Master Plan'**
+  String get associationMemberProjectMasterPlan;
+
+  /// No description provided for @associationMemberProjectMasterPlanFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Project master plan'**
+  String get associationMemberProjectMasterPlanFile;
+
+  /// No description provided for @associationMemberBuildings.
+  ///
+  /// In en, this message translates to:
+  /// **'Buildings'**
+  String get associationMemberBuildings;
+
+  /// No description provided for @associationMemberTotalUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Units'**
+  String get associationMemberTotalUnits;
+
+  /// No description provided for @associationMemberAvailableUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Available Units'**
+  String get associationMemberAvailableUnits;
+
+  /// No description provided for @associationMemberAllocatedUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Allocated Units'**
+  String get associationMemberAllocatedUnits;
+
+  /// No description provided for @associationMemberDeliveredUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered Units'**
+  String get associationMemberDeliveredUnits;
+
+  /// No description provided for @associationMemberRemainingUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining Units'**
+  String get associationMemberRemainingUnits;
+
+  /// No description provided for @associationMemberEstimatedCost.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Cost'**
+  String get associationMemberEstimatedCost;
+
+  /// No description provided for @associationMemberEngineer.
+  ///
+  /// In en, this message translates to:
+  /// **'Engineer'**
+  String get associationMemberEngineer;
+
+  /// No description provided for @associationMemberLandArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Land Area'**
+  String get associationMemberLandArea;
+
+  /// No description provided for @associationMemberProjectLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Location'**
+  String get associationMemberProjectLocation;
+
+  /// No description provided for @associationMemberOpenGoogleMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Google Maps'**
+  String get associationMemberOpenGoogleMaps;
+
+  /// No description provided for @associationMemberBuildingGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Gallery'**
+  String get associationMemberBuildingGallery;
+
+  /// No description provided for @associationMemberBuildingNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Number'**
+  String get associationMemberBuildingNumber;
+
+  /// No description provided for @associationMemberDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get associationMemberDescription;
+
+  /// No description provided for @associationMemberBuildingPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Plan'**
+  String get associationMemberBuildingPlan;
+
+  /// No description provided for @associationMemberBuildingPlanFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Building plan'**
+  String get associationMemberBuildingPlanFile;
+
+  /// No description provided for @associationMemberFloors.
+  ///
+  /// In en, this message translates to:
+  /// **'Floors'**
+  String get associationMemberFloors;
+
+  /// No description provided for @associationMemberUnits.
+  ///
+  /// In en, this message translates to:
+  /// **'Units'**
+  String get associationMemberUnits;
+
+  /// No description provided for @associationMemberSpecifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Specifications'**
+  String get associationMemberSpecifications;
+
+  /// No description provided for @associationMemberUnitGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Gallery'**
+  String get associationMemberUnitGallery;
+
+  /// No description provided for @associationMemberFloor.
+  ///
+  /// In en, this message translates to:
+  /// **'Floor'**
+  String get associationMemberFloor;
+
+  /// No description provided for @associationMemberOrientation.
+  ///
+  /// In en, this message translates to:
+  /// **'Orientation'**
+  String get associationMemberOrientation;
+
+  /// No description provided for @associationMemberArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Area'**
+  String get associationMemberArea;
+
+  /// No description provided for @associationMemberGardenTerraceArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Garden / Terrace Area'**
+  String get associationMemberGardenTerraceArea;
+
+  /// No description provided for @associationMemberUnitPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit Plan'**
+  String get associationMemberUnitPlan;
+
+  /// No description provided for @associationMemberUnitPlanFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit plan'**
+  String get associationMemberUnitPlanFile;
+
+  /// No description provided for @associationMemberStages.
+  ///
+  /// In en, this message translates to:
+  /// **'Stages'**
+  String get associationMemberStages;
+
+  /// No description provided for @associationMemberProjectBuildings.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Buildings'**
+  String get associationMemberProjectBuildings;
+
+  /// No description provided for @associationMemberProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get associationMemberProgress;
+
+  /// No description provided for @associationMemberAssignedToProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to project'**
+  String get associationMemberAssignedToProject;
+
+  /// No description provided for @associationMemberNoProjectAssignment.
+  ///
+  /// In en, this message translates to:
+  /// **'No project assignment'**
+  String get associationMemberNoProjectAssignment;
+
+  /// No description provided for @associationMemberAssignedToUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned to unit'**
+  String get associationMemberAssignedToUnit;
+
+  /// No description provided for @associationMemberNoUnitAssignment.
+  ///
+  /// In en, this message translates to:
+  /// **'No unit assignment'**
+  String get associationMemberNoUnitAssignment;
+
+  /// No description provided for @associationMemberProjectLocationOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the project location'**
+  String get associationMemberProjectLocationOpenFailed;
+
+  /// No description provided for @contactHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How can we help?'**
+  String get contactHelpTitle;
+
+  /// No description provided for @contactAvailableNumbers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} available numbers'**
+  String contactAvailableNumbers(int count);
+
+  /// No description provided for @contactWhatsAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get contactWhatsAppTitle;
+
+  /// No description provided for @contactSocialMediaTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Social media'**
+  String get contactSocialMediaTitle;
+
+  /// No description provided for @contactAvailableLinks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} available links'**
+  String contactAvailableLinks(int count);
+
+  /// No description provided for @contactWorkingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days'**
+  String contactWorkingDays(int count);
+
+  /// No description provided for @contactLoadingInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading contact info'**
+  String get contactLoadingInfo;
+
+  /// No description provided for @contactOpenLinkFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this link'**
+  String get contactOpenLinkFailed;
 }
 
 class _AppLocalizationsDelegate

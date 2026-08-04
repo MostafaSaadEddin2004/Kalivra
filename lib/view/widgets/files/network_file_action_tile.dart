@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/dio_client.dart' as network;
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -113,8 +114,7 @@ Future<void> handleNetworkFileTap(
   if (uri == null) {
     _showFileSnackBar(
       context,
-      arabic: 'ØªØ¹Ø°Ø± ÙØªØ­ Ø§Ù„Ù…Ù„Ù',
-      english: 'Could not open this file',
+      AppLocalizations.of(context)!.fileActionCouldNotOpenFile,
     );
     return;
   }
@@ -150,8 +150,7 @@ Future<void> showNetworkFileActionDialog(
   if (uri == null) {
     _showFileSnackBar(
       context,
-      arabic: 'تعذر فتح الملف',
-      english: 'Could not open this file',
+      AppLocalizations.of(context)!.fileActionCouldNotOpenFile,
     );
     return;
   }
@@ -161,40 +160,20 @@ Future<void> showNetworkFileActionDialog(
     context: context,
     builder: (dialogContext) {
       return AlertDialog(
-        title: Text(
-          _localizedText(
-            dialogContext,
-            arabic: 'تحميل الملف',
-            english: 'Download file',
-          ),
-        ),
+        title: Text(AppLocalizations.of(dialogContext)!.fileActionDownloadFile),
         content: Text(
-          _localizedText(
-            dialogContext,
-            arabic: 'هل تريد تحميل الملف؟',
-            english: 'Do you want to download this file?',
-          ),
+          AppLocalizations.of(dialogContext)!.fileActionDownloadPrompt,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(
-              _localizedText(
-                dialogContext,
-                arabic: 'لا، فتح فقط',
-                english: 'No, open only',
-              ),
-            ),
+            child: Text(AppLocalizations.of(dialogContext)!.fileActionOpenOnly),
           ),
           FilledButton.icon(
             onPressed: () => Navigator.of(dialogContext).pop(true),
             icon: const Icon(Icons.download_rounded),
             label: Text(
-              _localizedText(
-                dialogContext,
-                arabic: 'نعم، تحميل',
-                english: 'Yes, download',
-              ),
+              AppLocalizations.of(dialogContext)!.fileActionDownloadConfirm,
             ),
           ),
         ],
@@ -219,8 +198,7 @@ Future<void> _downloadFile(
 ) async {
   _showFileSnackBar(
     context,
-    arabic: 'جاري تحميل الملف...',
-    english: 'Downloading file...',
+    AppLocalizations.of(context)!.fileActionDownloading,
   );
 
   try {
@@ -234,11 +212,7 @@ Future<void> _downloadFile(
     }
 
     await FilePicker.saveFile(
-      dialogTitle: _localizedText(
-        context,
-        arabic: 'حفظ الملف',
-        english: 'Save file',
-      ),
+      dialogTitle: AppLocalizations.of(context)!.fileActionSaveFile,
       fileName: fileName,
       bytes: Uint8List.fromList(bytes),
     );
@@ -246,8 +220,7 @@ Future<void> _downloadFile(
     if (!context.mounted) return;
     _showFileSnackBar(
       context,
-      arabic: 'تعذر تحميل الملف، سيتم فتحه فقط',
-      english: 'Could not download the file. Opening it instead.',
+      AppLocalizations.of(context)!.fileActionDownloadFailedOpenInstead,
     );
   }
 }
@@ -258,16 +231,14 @@ Future<void> _openFileUri(BuildContext context, Uri uri) async {
     if (!launched && context.mounted) {
       _showFileSnackBar(
         context,
-        arabic: 'تعذر فتح الملف',
-        english: 'Could not open this file',
+        AppLocalizations.of(context)!.fileActionCouldNotOpenFile,
       );
     }
   } catch (_) {
     if (!context.mounted) return;
     _showFileSnackBar(
       context,
-      arabic: 'تعذر فتح الملف',
-      english: 'Could not open this file',
+      AppLocalizations.of(context)!.fileActionCouldNotOpenFile,
     );
   }
 }
@@ -396,23 +367,6 @@ bool _isImageFileReference(String value) {
   ).hasMatch(path);
 }
 
-String _localizedText(
-  BuildContext context, {
-  required String arabic,
-  required String english,
-}) {
-  final locale = Localizations.localeOf(context).languageCode.toLowerCase();
-  return locale == 'ar' ? arabic : english;
-}
-
-void _showFileSnackBar(
-  BuildContext context, {
-  required String arabic,
-  required String english,
-}) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(_localizedText(context, arabic: arabic, english: english)),
-    ),
-  );
+void _showFileSnackBar(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 }

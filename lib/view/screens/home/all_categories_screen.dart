@@ -39,11 +39,7 @@ class _AllCategoriesBody extends StatelessWidget {
             final categories = _flattenCategories(state.categories);
             if (categories.isEmpty) {
               return _EmptyCategoriesState(
-                message: _localizedText(
-                  context,
-                  arabic: 'لا توجد تصنيفات متاحة',
-                  english: 'No categories available',
-                ),
+                message: AppLocalizations.of(context)!.noCategoriesAvailable,
               );
             }
 
@@ -214,13 +210,4 @@ String? _categoryImageUrl(CategoryApiModel category) {
   return category.imageUrl ??
       category.logo?.preferredUrl ??
       category.banner?.preferredUrl;
-}
-
-String _localizedText(
-  BuildContext context, {
-  required String arabic,
-  required String english,
-}) {
-  final locale = Localizations.localeOf(context).languageCode.toLowerCase();
-  return locale == 'ar' ? arabic : english;
 }
