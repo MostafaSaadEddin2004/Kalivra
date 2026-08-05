@@ -6,25 +6,18 @@ import 'package:kalivra/model/services/api/chat_api_service.dart';
 part 'chat_state.dart';
 
 class ChatCubit extends Cubit<ChatState> {
-  ChatCubit() : super(const ChatState()) {
+  ChatCubit() : super(const ChatInitial()) {
     getChatHistory();
   }
 
   final ChatApiService _chatService = ChatApiService();
 
-  Future<void> sendMessage({required String message}) {
-    return _sendMessage(message: message, appendUserMessage: true);
-  }
-
-  Future<void> retryMessage({required String message}) {
-    return _sendMessage(message: message, appendUserMessage: false);
-  }
-
-  Future<void> _sendMessage({
+  Future<void> sendMessage({
     required String message,
     required bool appendUserMessage,
   }) async {
     final trimmed = message.trim();
+    if (trimmed.isEmpty) return;
 
     final sessionId = state.sessionId ?? await _buildSessionId();
     final messages = appendUserMessage
@@ -35,11 +28,11 @@ class ChatCubit extends Cubit<ChatState> {
         : _messagesWithoutRetryError(trimmed);
 
     emit(
-      state.copyWith(
-        status: ChatStatus.sending,
-        sessionId: sessionId,
+      ChatSending(
+        chats: state.chats,
         messages: messages,
-        errorMessage: '',
+        sessionId: sessionId,
+        selectedChatId: state.selectedChatId,
       ),
     );
 
@@ -49,13 +42,13 @@ class ChatCubit extends Cubit<ChatState> {
         sessionId: sessionId,
       );
       final responseText = response.message.trim();
-      if (responseText.isEmpty) {
-        throw 'The association response was empty. Please try again.';
-      }
-
       emit(
-        state.copyWith(
-          status: ChatStatus.success,
+        ChatSuccessed(
+          chats: state.chats,
+          sessionId: response.sessionId.isNotEmpty
+              ? response.sessionId
+              : sessionId,
+          selectedChatId: state.selectedChatId,
           messages: [
             ...state.messages,
             ChatUiMessage.response(
@@ -63,14 +56,16 @@ class ChatCubit extends Cubit<ChatState> {
               createdAt: response.timestamp,
             ),
           ],
-          errorMessage: '',
         ),
       );
       await getChatHistory(keepCurrentMessages: true);
     } catch (e) {
       emit(
-        state.copyWith(
-          status: ChatStatus.failure,
+        ChatFailed(
+          message: e.toString(),
+          chats: state.chats,
+          sessionId: state.sessionId,
+          selectedChatId: state.selectedChatId,
           messages: [
             ...state.messages,
             ChatUiMessage.error(
@@ -79,7 +74,6 @@ class ChatCubit extends Cubit<ChatState> {
               retryText: trimmed,
             ),
           ],
-          errorMessage: e.toString(),
         ),
       );
     }
@@ -99,31 +93,59 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> getChatHistory({bool keepCurrentMessages = false}) async {
     emit(
-      state.copyWith(
-        status: ChatStatus.loadingHistory,
-        errorMessage: '',
-        messages: keepCurrentMessages ? state.messages : state.messages,
+      ChatHistoryLoading(
+        chats: state.chats,
+        messages: state.messages,
+        sessionId: state.sessionId,
+        selectedChatId: state.selectedChatId,
       ),
     );
 
     try {
       final chats = await _chatService.getChatHistory();
+      final recentChats = List<ChatApiModel>.of(chats)
+        ..sort(_compareRecentChats);
+      final selectedChat = keepCurrentMessages
+          ? _selectedChatFromHistory(recentChats)
+          : recentChats.isEmpty
+          ? null
+          : recentChats.first;
+      final selectedMessages = keepCurrentMessages
+          ? state.messages
+          : selectedChat == null
+          ? const <ChatUiMessage>[]
+          : _messagesFromInteractions(selectedChat.interactions);
+
       emit(
-        state.copyWith(status: ChatStatus.idle, chats: chats, errorMessage: ''),
+        ChatFetchedData(
+          chats: recentChats,
+          messages: selectedMessages,
+          sessionId: keepCurrentMessages
+              ? state.sessionId
+              : selectedChat?.sessionId ?? state.sessionId,
+          selectedChatId: selectedChat?.id ?? state.selectedChatId,
+        ),
       );
     } catch (e) {
       emit(
-        state.copyWith(status: ChatStatus.failure, errorMessage: e.toString()),
+        ChatFailed(
+          message: e.toString(),
+          chats: state.chats,
+          messages: state.messages,
+          sessionId: state.sessionId,
+          selectedChatId: state.selectedChatId,
+        ),
       );
     }
   }
 
   Future<void> getChatById({required int sessionId}) async {
     emit(
-      state.copyWith(
-        status: ChatStatus.loadingChat,
+      ChatLoading(
+        chats: state.chats,
+        sessionId: state.sessionId,
+        selectedChatId: sessionId,
         messages: const [],
-        errorMessage: '',
       ),
     );
 
@@ -132,29 +154,55 @@ class ChatCubit extends Cubit<ChatState> {
         chatSessionId: sessionId,
       );
       emit(
-        state.copyWith(
-          status: ChatStatus.idle,
+        ChatFetchedData(
+          chats: state.chats,
           sessionId: _firstSessionId(interactions) ?? sessionId.toString(),
+          selectedChatId: sessionId,
           messages: _messagesFromInteractions(interactions),
-          errorMessage: '',
         ),
       );
     } catch (e) {
       emit(
-        state.copyWith(status: ChatStatus.failure, errorMessage: e.toString()),
+        ChatFailed(
+          message: e.toString(),
+          chats: state.chats,
+          messages: state.messages,
+          sessionId: state.sessionId,
+          selectedChatId: state.selectedChatId,
+        ),
       );
     }
   }
 
   Future<void> startNewChat() async {
     emit(
-      state.copyWith(
-        status: ChatStatus.idle,
+      ChatInitial(
+        chats: state.chats,
         sessionId: await _buildSessionId(),
+        selectedChatId: null,
         messages: const [],
-        errorMessage: '',
       ),
     );
+  }
+
+  int _compareRecentChats(ChatApiModel first, ChatApiModel second) {
+    final firstDate = first.lastMessageAt ?? first.updatedAt ?? first.createdAt;
+    final secondDate =
+        second.lastMessageAt ?? second.updatedAt ?? second.createdAt;
+    if (firstDate == null && secondDate == null) return 0;
+    if (firstDate == null) return 1;
+    if (secondDate == null) return -1;
+    return secondDate.compareTo(firstDate);
+  }
+
+  ChatApiModel? _selectedChatFromHistory(List<ChatApiModel> chats) {
+    for (final chat in chats) {
+      if (chat.id == state.selectedChatId ||
+          chat.sessionId == state.sessionId) {
+        return chat;
+      }
+    }
+    return null;
   }
 
   List<ChatUiMessage> _messagesFromInteractions(

@@ -1,43 +1,92 @@
 part of 'chat_cubit.dart';
 
-enum ChatStatus { idle, loadingHistory, loadingChat, sending, success, failure }
-
-class ChatState {
+abstract class ChatState {
   const ChatState({
-    this.status = ChatStatus.idle,
     this.chats = const [],
     this.messages = const [],
     this.sessionId,
+    this.selectedChatId,
     this.errorMessage = '',
   });
 
-  final ChatStatus status;
   final List<ChatApiModel> chats;
   final List<ChatUiMessage> messages;
   final String? sessionId;
+  final int? selectedChatId;
   final String errorMessage;
 
-  bool get isLoadingHistory => status == ChatStatus.loadingHistory;
+  bool get isLoadingHistory => this is ChatHistoryLoading;
 
-  bool get isLoadingChat => status == ChatStatus.loadingChat;
+  bool get isLoadingChat => this is ChatLoading;
 
-  bool get isSending => status == ChatStatus.sending;
+  bool get isSending => this is ChatSending;
+}
 
-  ChatState copyWith({
-    ChatStatus? status,
-    List<ChatApiModel>? chats,
-    List<ChatUiMessage>? messages,
-    String? sessionId,
-    String? errorMessage,
-  }) {
-    return ChatState(
-      status: status ?? this.status,
-      chats: chats ?? this.chats,
-      messages: messages ?? this.messages,
-      sessionId: sessionId ?? this.sessionId,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
-  }
+final class ChatInitial extends ChatState {
+  const ChatInitial({
+    super.chats,
+    super.messages,
+    super.sessionId,
+    super.selectedChatId,
+    super.errorMessage,
+  });
+}
+
+final class ChatHistoryLoading extends ChatState {
+  const ChatHistoryLoading({
+    super.chats,
+    super.messages,
+    super.sessionId,
+    super.selectedChatId,
+  });
+}
+
+final class ChatLoading extends ChatState {
+  const ChatLoading({
+    super.chats,
+    super.messages,
+    super.sessionId,
+    super.selectedChatId,
+  });
+}
+
+final class ChatSending extends ChatState {
+  const ChatSending({
+    required super.messages,
+    required super.sessionId,
+    super.chats,
+    super.selectedChatId,
+  });
+}
+
+final class ChatSuccessed extends ChatState {
+  const ChatSuccessed({
+    required super.messages,
+    super.chats,
+    super.sessionId,
+    super.selectedChatId,
+  });
+}
+
+final class ChatFetchedData extends ChatState {
+  const ChatFetchedData({
+    required super.chats,
+    required super.messages,
+    super.sessionId,
+    super.selectedChatId,
+  });
+}
+
+final class ChatFailed extends ChatState {
+  const ChatFailed({
+    required this.message,
+    super.chats,
+    super.messages,
+    super.sessionId,
+    super.selectedChatId,
+  }) : super(errorMessage: message);
+
+  final String message;
 }
 
 class ChatUiMessage {

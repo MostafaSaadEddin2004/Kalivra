@@ -26,13 +26,6 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   Timer? _waitingTimer;
   int _waitingMessageCount = 0;
 
-  static const _waitingMessageIcons = [
-    Icons.auto_awesome_rounded,
-    Icons.hourglass_top_rounded,
-    Icons.manage_search_rounded,
-    Icons.support_agent_rounded,
-  ];
-
   @override
   void dispose() {
     _waitingTimer?.cancel();
@@ -47,10 +40,9 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
     if (text.isEmpty) return;
     FocusScope.of(context).unfocus();
     if (retryText == null) {
-      _chatCubit.sendMessage(message: text);
-    } else {
-      _chatCubit.retryMessage(message: text);
+      _messageController.clear();
     }
+    _chatCubit.sendMessage(appendUserMessage: retryText == null, message: text);
   }
 
   void _startNewChat() {
@@ -91,20 +83,6 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
     }
   }
 
-  String _formatMessageTime(DateTime time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-
-  String _formatSessionDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final hour = date.hour.toString().padLeft(2, '0');
-    final minute = date.minute.toString().padLeft(2, '0');
-    return '$day/$month $hour:$minute';
-  }
-
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!_scrollController.hasClients) return;
@@ -119,13 +97,12 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
 
     return BlocProvider.value(
       value: _chatCubit,
       child: BlocConsumer<ChatCubit, ChatState>(
         listenWhen: (previous, current) =>
-            previous.status != current.status ||
+            previous.runtimeType != current.runtimeType ||
             previous.messages.length != current.messages.length,
         listener: (context, state) {
           if (state.isSending && _waitingMessageCount == 0) {
@@ -149,19 +126,14 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
                 ),
               ],
             ),
-            drawer: _buildDrawer(context, state),
+            drawer: _buildDrawer(context),
             body: Column(
               children: [
                 Expanded(
-                  child: state.isLoadingChat
-                      ? Center(
-                          child: SpinKitFadingCircle(
-                            size: 40.r,
-                            color: theme.colorScheme.onTertiary,
-                            itemCount: 14,
-                          ),
-                        )
-                      : _buildMessagesList(theme, state),
+                  child: MessageList(
+                    scrollController: _scrollController,
+                    waitingMessageCount: _waitingMessageCount,
+                  ),
                 ),
                 _buildMessageInput(context, state),
               ],
@@ -172,267 +144,121 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
     );
   }
 
-  Widget _buildDrawer(BuildContext context, ChatState state) {
+  Widget _buildDrawer(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Drawer(
       backgroundColor: theme.colorScheme.secondaryFixed,
-
       child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(18.w, 18.h, 18.w, 10.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.associationChats,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    l10n.associationChatsSubtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(
-                        alpha: 0.72,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  FilledButton.icon(
-                    onPressed: _startNewChat,
-                    icon: const Icon(Icons.add_comment_rounded),
-                    label: Text(l10n.newChat),
-                    style: FilledButton.styleFrom(
-                      minimumSize: Size.fromHeight(48.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.r),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Divider(
-              height: 1,
-              color: theme.dividerColor.withValues(alpha: 0.4),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(18.w, 14.h, 18.w, 6.h),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.chatHistory,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  if (state.isLoadingHistory)
-                    SpinKitFadingCircle(
-                      size: 24.r,
-                      color: theme.colorScheme.onTertiary,
-                    ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: state.chats.isEmpty
-                  ? Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(24.w),
+        child: BlocBuilder<ChatCubit, ChatState>(
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(8.w, 14.h, 8.w, 6.h),
+                  child: Row(
+                    children: [
+                      Expanded(
                         child: Text(
-                          l10n.noChatsYet,
-                          style: theme.textTheme.bodyMedium,
-                          textAlign: TextAlign.center,
+                          l10n.chatHistory,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: theme.colorScheme.onTertiary,
+                          ),
                         ),
                       ),
-                    )
-                  : ListView.separated(
-                      padding: EdgeInsets.symmetric(vertical: 6.h),
-                      itemCount: state.chats.length,
-                      separatorBuilder: (_, _) => SizedBox(height: 4.h),
-                      itemBuilder: (context, index) {
-                        final chat = state.chats[index];
-                        final selected = chat.sessionId == state.sessionId;
-                        final title = chat.name.trim().isNotEmpty
-                            ? chat.name
-                            : l10n.chatTitle(chat.id);
-                        final date = chat.lastMessageAt ?? chat.createdAt;
-
-                        return ListTile(
-                          selected: selected,
-                          selectedTileColor: theme.colorScheme.primary
-                              .withValues(alpha: 0.08),
-                          leading: CircleAvatar(
-                            radius: 18.r,
-                            backgroundColor: selected
-                                ? theme.colorScheme.primary
-                                : theme.colorScheme.tertiaryFixed,
-                            child: Icon(
-                              Icons.chat_bubble_outline_rounded,
-                              size: 18.r,
-                              color: selected
-                                  ? theme.colorScheme.onPrimaryFixed
-                                  : theme.colorScheme.primary,
-                            ),
-                          ),
-                          title: Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          subtitle: Text(
-                            date == null
-                                ? l10n.chatSessionTitle(chat.sessionId)
-                                : _formatSessionDate(date),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          onTap: () => _openChat(chat.id),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessagesList(ThemeData theme, ChatState state) {
-    final l10n = AppLocalizations.of(context)!;
-
-    if (state.messages.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: EdgeInsets.all(28.w),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 34.r,
-                backgroundColor: theme.colorScheme.tertiaryFixed,
-                child: Icon(
-                  Icons.support_agent_rounded,
-                  size: 34.r,
-                  color: theme.colorScheme.primary,
+                      Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 18.r,
+                        color: theme.colorScheme.onTertiary,
+                      ),
+                      IconButton(
+                        onPressed: _startNewChat,
+                        icon: const Icon(Icons.add_comment_rounded),
+                        tooltip: l10n.newChat,
+                        color: theme.colorScheme.onTertiary,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SizedBox(height: 14.h),
-              Text(
-                l10n.askAssociation,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              SizedBox(height: 6.h),
-              Text(
-                l10n.chooseChatOrAskQuestion,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      controller: _scrollController,
-      padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 18.h),
-      itemCount: state.messages.length + (state.isSending ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index == state.messages.length && state.isSending) {
-          return _buildWaitingPanel(context, theme);
-        }
-
-        final message = state.messages[index];
-        return _MessageBubble(
-          message: message,
-          timeText: _formatMessageTime(message.createdAt),
-          onRetry: message.retryText == null
-              ? null
-              : () => _sendMessage(retryText: message.retryText),
-        );
-      },
-    );
-  }
-
-  Widget _buildWaitingPanel(BuildContext context, ThemeData theme) {
-    final l10n = AppLocalizations.of(context)!;
-    final waitingMessages = [
-      _WaitingMessage(
-        icon: _waitingMessageIcons[0],
-        text: l10n.chatWaitingPreparing,
-      ),
-      _WaitingMessage(
-        icon: _waitingMessageIcons[1],
-        text: l10n.chatWaitingLongTime,
-      ),
-      _WaitingMessage(
-        icon: _waitingMessageIcons[2],
-        text: l10n.chatWaitingChecking,
-      ),
-      _WaitingMessage(
-        icon: _waitingMessageIcons[3],
-        text: l10n.chatWaitingAlmostDone,
-      ),
-    ];
-    final visibleMessages = waitingMessages.take(_waitingMessageCount);
-
-    return Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: Container(
-        width: 0.78.sw,
-        margin: EdgeInsets.symmetric(vertical: 6.h),
-        padding: EdgeInsets.all(14.w),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.tertiaryFixed,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(6.r),
-            topRight: Radius.circular(18.r),
-            bottomLeft: Radius.circular(18.r),
-            bottomRight: Radius.circular(18.r),
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ...visibleMessages.map(
-              (message) => Padding(
-                padding: EdgeInsets.only(bottom: 10.h),
-                child: Row(
-                  children: [
-                    Icon(
-                      message.icon,
-                      size: 18.r,
-                      color: theme.colorScheme.primary,
-                    ),
-                    SizedBox(width: 8.w),
-                    Expanded(
-                      child: Text(
-                        message.text,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                if (state.isLoadingHistory)
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12.h),
+                    child: Center(
+                      child: SpinKitFadingCircle(
+                        size: 24.r,
+                        color: theme.colorScheme.onTertiary,
                       ),
                     ),
-                  ],
+                  ),
+                Expanded(
+                  child: state.chats.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(24.w),
+                            child: Text(
+                              l10n.noChatsYet,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onTertiary,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          padding: EdgeInsets.symmetric(vertical: 6.h),
+                          itemCount: state.chats.length,
+                          separatorBuilder: (_, _) => SizedBox(height: 2.h),
+                          itemBuilder: (context, index) {
+                            final chat = state.chats[index];
+                            final selected =
+                                chat.id == state.selectedChatId ||
+                                chat.sessionId == state.sessionId;
+                            final title = chat.name.trim().isNotEmpty
+                                ? chat.name
+                                : l10n.chatTitle(chat.id);
+
+                            return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.w),
+                              child: ListTile(
+                                dense: true,
+                                selected: selected,
+                                selectedTileColor: theme.colorScheme.primary
+                                    .withValues(alpha: 0.14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                title: Text(
+                                  title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onTertiary,
+                                    fontWeight: selected
+                                        ? FontWeight.w800
+                                        : FontWeight.w500,
+                                  ),
+                                ),
+                                trailing: selected
+                                    ? Icon(
+                                        Icons.check_rounded,
+                                        size: 18.r,
+                                        color: theme.colorScheme.onTertiary,
+                                      )
+                                    : null,
+                                onTap: () => _openChat(chat.id),
+                              ),
+                            );
+                          },
+                        ),
                 ),
-              ),
-            ),
-            SpinKitThreeBounce(color: theme.colorScheme.primary, size: 22.r),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
@@ -452,7 +278,10 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
             Expanded(
               child: TextField(
                 controller: _messageController,
-                enabled: !state.isSending && !state.isLoadingChat,
+                enabled:
+                    !state.isSending &&
+                    !state.isLoadingChat &&
+                    !state.isLoadingHistory,
                 minLines: 1,
                 maxLines: 5,
                 textInputAction: TextInputAction.newline,
@@ -487,7 +316,10 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
             ),
             SizedBox(width: 10.w),
             IconButton.filled(
-              onPressed: state.isSending || state.isLoadingChat
+              onPressed:
+                  state.isSending ||
+                      state.isLoadingChat ||
+                      state.isLoadingHistory
                   ? null
                   : _sendMessage,
               icon: const Icon(Icons.send_rounded),
@@ -507,6 +339,189 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+Widget _buildWaitingPanel(
+  BuildContext context,
+  ThemeData theme,
+  int waitingMessageCount,
+) {
+  final l10n = AppLocalizations.of(context)!;
+  final waitingMessages = [
+    _WaitingMessage(
+      icon: _waitingMessageIcons[0],
+      text: l10n.chatWaitingPreparing,
+    ),
+    _WaitingMessage(
+      icon: _waitingMessageIcons[1],
+      text: l10n.chatWaitingLongTime,
+    ),
+    _WaitingMessage(
+      icon: _waitingMessageIcons[2],
+      text: l10n.chatWaitingChecking,
+    ),
+    _WaitingMessage(
+      icon: _waitingMessageIcons[3],
+      text: l10n.chatWaitingAlmostDone,
+    ),
+  ];
+  final visibleMessages = waitingMessages.take(waitingMessageCount);
+  final isRtl = Directionality.of(context) == TextDirection.rtl;
+
+  return Align(
+    alignment: AlignmentDirectional.centerStart,
+    child: Container(
+      width: 0.78.sw,
+      margin: EdgeInsets.symmetric(vertical: 6.h),
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.tertiaryFixed,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(isRtl ? 18.r : 6.r),
+          topRight: Radius.circular(isRtl ? 6.r : 18.r),
+          bottomLeft: Radius.circular(18.r),
+          bottomRight: Radius.circular(18.r),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ...visibleMessages.map(
+            (message) => Padding(
+              padding: EdgeInsets.only(bottom: 10.h),
+              child: Row(
+                children: [
+                  Icon(
+                    message.icon,
+                    size: 18.r,
+                    color: theme.colorScheme.primary,
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Text(
+                      message.text,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onTertiary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SpinKitThreeBounce(color: theme.colorScheme.primary, size: 22.r),
+        ],
+      ),
+    ),
+  );
+}
+
+String _formatMessageTime(DateTime time) {
+  final hour = time.hour.toString().padLeft(2, '0');
+  final minute = time.minute.toString().padLeft(2, '0');
+  return '$hour:$minute';
+}
+
+const _waitingMessageIcons = [
+  Icons.auto_awesome_rounded,
+  Icons.hourglass_top_rounded,
+  Icons.manage_search_rounded,
+  Icons.support_agent_rounded,
+];
+
+class MessageList extends StatelessWidget {
+  const MessageList({
+    super.key,
+    required this.scrollController,
+    required this.waitingMessageCount,
+  });
+  final ScrollController scrollController;
+  final int waitingMessageCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    return BlocBuilder<ChatCubit, ChatState>(
+      builder: (context, state) {
+        if (state.isLoadingChat ||
+            (state.isLoadingHistory && state.messages.isEmpty)) {
+          return Center(
+            child: SpinKitFadingCircle(
+              size: 40.r,
+              color: theme.colorScheme.onTertiary,
+              itemCount: 14,
+            ),
+          );
+        }
+
+        if (state.messages.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: EdgeInsets.all(28.w),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 34.r,
+                    backgroundColor: theme.colorScheme.tertiaryFixed,
+                    child: Icon(
+                      Icons.support_agent_rounded,
+                      size: 34.r,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  SizedBox(height: 14.h),
+                  Text(
+                    l10n.askAssociation,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    l10n.chooseChatOrAskQuestion,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        return ListView.builder(
+          controller: scrollController,
+          padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 18.h),
+          itemCount: state.messages.length + (state.isSending ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index == state.messages.length && state.isSending) {
+              return _buildWaitingPanel(
+                context,
+                theme,
+                waitingMessageCount == 0
+                    ? _waitingMessageIcons.length
+                    : waitingMessageCount,
+              );
+            }
+
+            final message = state.messages[index];
+            return _MessageBubble(
+              message: message,
+              timeText: _formatMessageTime(message.createdAt),
+              onRetry: message.retryText == null
+                  ? null
+                  : () => context.read<ChatCubit>().sendMessage(
+                      appendUserMessage: false,
+                      message: message.retryText!.trim(),
+                    ),
+            );
+          },
+        );
+      },
     );
   }
 }
@@ -534,9 +549,11 @@ class _MessageBubble extends StatelessWidget {
         ? theme.colorScheme.onTertiaryFixed
         : theme.colorScheme.tertiaryFixed;
     final textColor = _textColorFor(color);
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+    final smallTopLeft = message.isUser ? isRtl : !isRtl;
     final radius = BorderRadius.only(
-      topLeft: Radius.circular(message.isUser ? 18.r : 6.r),
-      topRight: Radius.circular(message.isUser ? 6.r : 18.r),
+      topLeft: Radius.circular(smallTopLeft ? 6.r : 18.r),
+      topRight: Radius.circular(smallTopLeft ? 18.r : 6.r),
       bottomLeft: Radius.circular(18.r),
       bottomRight: Radius.circular(18.r),
     );
