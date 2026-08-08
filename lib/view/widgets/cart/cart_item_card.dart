@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_api_model.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
@@ -10,13 +11,15 @@ class CartItemCard extends StatelessWidget {
     required this.item,
     required this.onEdit,
     required this.onDelete,
-    this.isLoading = false,
+    this.isDeleting = false,
+    this.isEditing = false,
   });
 
   final CartItemApiModel item;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  final bool isLoading;
+  final bool isDeleting;
+  final bool isEditing;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +60,7 @@ class CartItemCard extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: 112.w),
                 child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       productName,
@@ -116,12 +119,14 @@ class CartItemCard extends StatelessWidget {
                         _CartActionIcon(
                           icon: Icons.delete_outline_rounded,
                           tooltip: l10n.deleteItem,
-                          onPressed: isLoading ? null : onDelete,
+                          onPressed: isDeleting || isEditing ? null : onDelete,
+                          isLoading: isDeleting,
                         ),
                         _CartActionIcon(
                           icon: Icons.edit_outlined,
                           tooltip: l10n.editItem,
-                          onPressed: isLoading ? null : onEdit,
+                          onPressed: isDeleting || isEditing ? null : onEdit,
+                          isLoading: isEditing,
                         ),
                       ],
                     ),
@@ -141,11 +146,13 @@ class _CartActionIcon extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -158,13 +165,18 @@ class _CartActionIcon extends StatelessWidget {
         tooltip: tooltip,
         onPressed: onPressed,
         padding: EdgeInsets.zero,
-        icon: Icon(
-          icon,
-          size: 24.r,
-          color: onPressed == null
-              ? theme.colorScheme.onSurface
-              : theme.colorScheme.primaryFixed,
-        ),
+        icon: isLoading
+            ? SpinKitFadingCircle(
+                size: 22.r,
+                color: theme.colorScheme.primaryFixed,
+              )
+            : Icon(
+                icon,
+                size: 24.r,
+                color: onPressed == null
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.primaryFixed,
+              ),
       ),
     );
   }

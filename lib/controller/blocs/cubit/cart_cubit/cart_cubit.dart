@@ -136,13 +136,13 @@ class CartCubit extends Cubit<CartState> {
     final l10n = AppLocalizations.of(context)!;
     _emitLoading(operation: CartOperation.addingItem);
     try {
-      final cart = await _cartService.addToCart(
+      await _cartService.addToCart(
         productId: int.parse(productId),
         quantity: quantity,
         color: color,
         size: size,
       );
-      _cart = cart ?? await _cartService.getCart();
+      _cart = await _cartService.getCart();
       final message = l10n.addToCartSuccess(productName);
       emit(AddToCartSuccessed(message: message, cart: _cart!));
       _emitLoaded();
@@ -178,7 +178,6 @@ class CartCubit extends Cubit<CartState> {
       emit(RemoveFromCartSuccessed(message: message, cart: _cart!));
       _emitLoaded();
       CustomSnackBar.show(context, message);
-      getCart();
       return true;
     } catch (e) {
       final message = e.toString();
@@ -203,12 +202,11 @@ class CartCubit extends Cubit<CartState> {
 
     try {
       await _cartService.clearCart();
-      _cart = const CartApiModel();
+      _cart = await _cartService.getCart();
       final message = l10n.cartClearedSuccessfully;
       emit(DeleteCartSuccessed(message: message));
       _emitLoaded();
       CustomSnackBar.show(context, message);
-      getCart();
       return true;
     } catch (e) {
       final message = e.toString();
@@ -238,13 +236,12 @@ class CartCubit extends Cubit<CartState> {
     );
 
     try {
-      await _cartService.updateItemQuantity(itemId, quantity);
+      await _updateCartItemDetials(itemId, quantity);
       _cart = await _cartService.getCart();
       final message = l10n.itemUpdatedSuccessfully;
       emit(UpdateItemQuantitySuccessed(message: message, cart: _cart!));
       _emitLoaded();
       CustomSnackBar.show(context, message);
-      getCart();
       return true;
     } catch (e) {
       final message = e.toString();
@@ -280,7 +277,6 @@ class CartCubit extends Cubit<CartState> {
       emit(UpdateItemDetialsSuccessed(message: message, cart: _cart!));
       _emitLoaded();
       CustomSnackBar.show(context, message);
-      getCart();
       return true;
     } catch (e) {
       final message = e.toString();
@@ -307,6 +303,28 @@ class CartCubit extends Cubit<CartState> {
     final itemId = int.tryParse(productId);
     if (itemId == null) return;
     await updateItemQuantity(context, itemId, quantity);
+  }
+
+  Future<void> _updateCartItemDetials(int itemId, int quantity) async {
+    final item = _cartItemById(itemId);
+    await _cartService.updateItemDetials(
+      itemId,
+      quantity,
+      _optionId(item?.colorOption),
+      _optionId(item?.sizeOption),
+    );
+  }
+
+  CartItemApiModel? _cartItemById(int itemId) {
+    final items = _cart?.items ?? const <CartItemApiModel>[];
+    for (final item in items) {
+      if (item.id == itemId) return item;
+    }
+    return null;
+  }
+
+  String _optionId(CartItemOptionApiModel? option) {
+    return option?.optionId?.toString() ?? '';
   }
 
   void _emitLoading({

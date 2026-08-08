@@ -19,12 +19,29 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CartCubit>().getCart();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final cartCubit = context.read<CartCubit>();
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     return BlocBuilder<CartCubit, CartState>(
-      bloc: CartCubit()..getCart(),
       builder: (context, state) {
+        final currentCart = state is CartLoaded ? state.cart : cartCubit.cart;
+        if (currentCart != null) {
+          final items = currentCart.items;
+          if (items.isEmpty) {
+            return EmptyCartView();
+          }
+          return CartItemsView(cart: currentCart);
+        }
+
         switch (state) {
           case CartLoginRequired():
             return LoginRequiredPlaceholder(
@@ -38,18 +55,15 @@ class _CartPageState extends State<CartPage> {
               color: theme.colorScheme.onTertiaryFixed,
               size: 40.r,
             );
-          case CartLoaded():
-            final items = state.cart.items;
-            if (items.isEmpty) {
-              return EmptyCartView();
-            }
-            else{return CartItemsView(cart: state.cart);}
           case CartFailure():
             return Center(
               child: Text(state.message.isEmpty ? l10n.error : state.message),
             );
           default:
-            return Center(child: Text(l10n.error));
+            return SpinKitFadingCircle(
+              color: theme.colorScheme.onTertiaryFixed,
+              size: 40.r,
+            );
         }
       },
     );

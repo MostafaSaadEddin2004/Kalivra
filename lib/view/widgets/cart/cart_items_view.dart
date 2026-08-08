@@ -33,9 +33,8 @@ class CartItemsView extends StatelessWidget {
               final item = items[index];
               return CartItemCard(
                 item: item,
-                isLoading:
-                    cartCubit.isRemovingItem(item.id) ||
-                    cartCubit.isUpdatingItem(item.id),
+                isDeleting: cartCubit.isRemovingItem(item.id),
+                isEditing: cartCubit.isUpdatingItem(item.id),
                 onEdit: () => _showEditDialog(context, item),
                 onDelete: () => _confirmRemoveItem(context, item),
               );
@@ -54,7 +53,7 @@ class CartItemsView extends StatelessWidget {
                   isLoading: cartCubit.isClearingCart,
                   onClearPressed: items.isEmpty
                       ? null
-                      : () => _confirmClearCart(context, cartCubit.isClearingCart),
+                      : () => _confirmClearCart(context),
                 ),
                 SizedBox(height: 16.h),
                 _CouponSection(cart: cart),
@@ -96,31 +95,35 @@ class CartItemsView extends StatelessWidget {
     CartItemApiModel item,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-     await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ConfirmDialog(
         title: l10n.deleteItem,
         message: l10n.removeItemConfirmation(item.name ?? ''),
-        onConfirm: () =>
-            context.read<CartCubit>().removeCartItem(context, item.id),
+        onConfirm: () async {
+          final removed = await context.read<CartCubit>().removeCartItem(
+            context,
+            item.id,
+          );
+          if (removed) Navigator.of(dialogContext).pop(true);
+        },
       ),
     );
   }
 
-  Future<void> _confirmClearCart(BuildContext context,bool isLoading) async {
+  Future<void> _confirmClearCart(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ConfirmDialog(
-        isLoading: isLoading,
         title: l10n.clearCart,
         message: l10n.clearCartConfirmation,
-        onConfirm: () => Navigator.of(dialogContext).pop(true),
+        onConfirm: () async {
+          final cleared = await context.read<CartCubit>().clearCart(context);
+          if (cleared) Navigator.of(dialogContext).pop(true);
+        },
       ),
     );
-    if (!context.mounted || confirmed != true) return;
-
-    await context.read<CartCubit>().clearCart(context);
   }
 }
 
@@ -253,6 +256,7 @@ class _CouponSection extends StatefulWidget {
 
 class _CouponSectionState extends State<_CouponSection> {
   late final TextEditingController _couponController;
+  bool _isDisposed = false;
 
   @override
   void initState() {
@@ -263,6 +267,7 @@ class _CouponSectionState extends State<_CouponSection> {
 
   @override
   void dispose() {
+    _isDisposed = true;
     _couponController
       ..removeListener(_onCouponChanged)
       ..dispose();
@@ -286,7 +291,8 @@ class _CouponSectionState extends State<_CouponSection> {
 
     FocusScope.of(context).unfocus();
     await cartCubit.removeCoupon(context);
-    if (mounted) _couponController.clear();
+    if (_isDisposed) return;
+    _couponController.clear();
   }
 
   @override

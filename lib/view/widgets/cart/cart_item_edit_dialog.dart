@@ -43,6 +43,7 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
   late int _quantity;
   bool _isLoadingProduct = true;
   bool _isSaving = false;
+  bool _isDisposed = false;
   String? _errorText;
 
   bool get _isAddMode => widget.item == null;
@@ -67,22 +68,30 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
     }
   }
 
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
   Future<void> _loadProductOptions() async {
     final item = widget.item;
     if (item == null) return;
 
     try {
       final product = await context.read<CartCubit>().loadCartItemProduct(item);
-      if (!mounted) return;
+      if (_isDisposed) return;
       _product = product;
       _selectedSize = _findSelectedSize(product);
       _selectedColor = _findSelectedColor(_selectedSize);
       _normalizeQuantity();
     } catch (_) {
-      if (!mounted) return;
+      if (_isDisposed) return;
       _product = null;
     } finally {
-      if (mounted) setState(() => _isLoadingProduct = false);
+      if (!_isDisposed) {
+        setState(() => _isLoadingProduct = false);
+      }
     }
   }
 
@@ -233,26 +242,39 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
     });
 
     final cartCubit = context.read<CartCubit>();
-    setState(() => _isSaving = false);
+    var shouldCloseDialog = false;
     try {
-      if (_isAddMode) {
-        await _addSelectedItem(cartCubit);
-      } else {
-        await _updateSelectedItem(cartCubit);
+      final saved = _isAddMode
+          ? await _addSelectedItem(cartCubit)
+          : await _updateSelectedItem(cartCubit);
+      if (saved) {
+        shouldCloseDialog = true;
+        context.pop();
+        return;
       }
-      context.pop();
-    } catch (_) {
+      if (_isDisposed) return;
       setState(
         () => _errorText = _isAddMode
             ? l10n.unableToAddItem
             : l10n.unableToUpdateItem,
       );
+    } catch (_) {
+      if (_isDisposed) return;
+      setState(
+        () => _errorText = _isAddMode
+            ? l10n.unableToAddItem
+            : l10n.unableToUpdateItem,
+      );
+    } finally {
+      if (!shouldCloseDialog && !_isDisposed) {
+        setState(() => _isSaving = false);
+      }
     }
   }
 
-  Future<void> _addSelectedItem(CartCubit cartCubit) async {
+  Future<bool> _addSelectedItem(CartCubit cartCubit) async {
     final product = _product;
-    cartCubit.addItem(
+    return cartCubit.addItem(
       context,
       (_selectedColor?.variantId ?? product!.id).toString(),
       quantity: _quantity,
@@ -262,11 +284,11 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
     );
   }
 
-  Future<void> _updateSelectedItem(CartCubit cartCubit) async {
+  Future<bool> _updateSelectedItem(CartCubit cartCubit) async {
     final item = widget.item;
     final colorId = _selectedColorOptionId;
     final sizeId = _selectedSizeOptionId;
-    cartCubit.updateItemDetials(
+    return cartCubit.updateItemDetials(
       context,
       item!.id,
       _quantity,
