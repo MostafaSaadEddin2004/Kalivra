@@ -64,7 +64,7 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
   void _startWaitingMessages() {
     _waitingTimer?.cancel();
     setState(() => _waitingMessageCount = 1);
-    _waitingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _waitingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
       if (!mounted) return;
       if (_waitingMessageCount >= _waitingMessageIcons.length) {
         timer.cancel();
@@ -285,7 +285,7 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
                 minLines: 1,
                 maxLines: 5,
                 textInputAction: TextInputAction.newline,
-                cursorColor: theme.colorScheme.secondaryFixed,
+                cursorColor: theme.colorScheme.onPrimaryFixed,
                 cursorHeight: 16.h,
                 cursorWidth: 0.5.w,
                 style: theme.textTheme.bodyMedium!.copyWith(
@@ -548,7 +548,6 @@ class _MessageBubble extends StatelessWidget {
         : message.isUser
         ? theme.colorScheme.onTertiaryFixed
         : theme.colorScheme.tertiaryFixed;
-    final textColor = _textColorFor(color);
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final smallTopLeft = message.isUser ? isRtl : !isRtl;
     final radius = BorderRadius.only(
@@ -572,7 +571,7 @@ class _MessageBubble extends StatelessWidget {
               Text(
                 message.text,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: textColor,
+                  color: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed,
                   height: 1.45,
                 ),
               )
@@ -581,15 +580,15 @@ class _MessageBubble extends StatelessWidget {
                 data: message.text,
                 styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
                   p: theme.textTheme.bodyMedium?.copyWith(
-                    color: textColor,
+                    color: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed,
                     height: 1.45,
                   ),
                   strong: theme.textTheme.bodyMedium?.copyWith(
-                    color: textColor,
+                    color: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed,
                     fontWeight: FontWeight.w800,
                   ),
                   listBullet: theme.textTheme.bodyMedium?.copyWith(
-                    color: textColor,
+                    color: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed,
                   ),
                 ),
               ),
@@ -600,8 +599,8 @@ class _MessageBubble extends StatelessWidget {
                 icon: const Icon(Icons.refresh_rounded),
                 label: Text(AppLocalizations.of(context)!.retry),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: textColor,
-                  side: BorderSide(color: textColor.withValues(alpha: 0.55)),
+                  foregroundColor: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed,
+                  side: BorderSide(color: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed.withValues(alpha: 0.55)),
                   visualDensity: VisualDensity.compact,
                 ),
               ),
@@ -612,7 +611,7 @@ class _MessageBubble extends StatelessWidget {
               child: Text(
                 timeText,
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: textColor.withValues(alpha: 0.75),
+                  color: message.isUser? theme.colorScheme.secondaryFixed: theme.colorScheme.primaryFixed.withValues(alpha: 0.75),
                   fontSize: 10.sp,
                 ),
               ),
@@ -621,12 +620,6 @@ class _MessageBubble extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Color _textColorFor(Color color) {
-    return ThemeData.estimateBrightnessForColor(color) == Brightness.dark
-        ? Colors.white
-        : AppColors.black;
   }
 }
 
