@@ -27,6 +27,7 @@ import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart
 import 'package:kalivra/view/screens/profile_screens/confirm_new_phone_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/language_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/otp_phone_entry_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/notification_preferences_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/settings_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/set_new_password_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/theme_mode_screen.dart';
@@ -92,6 +93,7 @@ abstract class AppRoutes {
   static const String cart = '/cart';
   static const String search = '/search';
   static const String notifications = '/notifications';
+  static const String notificationPreferences = '/notification-preferences';
   static const String checkout = '/checkout';
   static const String associationMemberProfile = '/association-member-profile';
   static const String associationSubmittedRequests =
@@ -144,6 +146,7 @@ abstract class AppRoutesName {
   static const String cart = 'cart';
   static const String search = 'search';
   static const String notifications = 'notifications';
+  static const String notificationPreferences = 'notification-preferences';
   static const String checkout = 'checkout';
   static const String associationMemberProfile = 'association-member-profile';
   static const String associationSubmittedRequests =
@@ -441,6 +444,11 @@ abstract class AppRouter {
             path: AppRoutes.notifications,
             name: AppRoutesName.notifications,
             builder: (_, _) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.notificationPreferences,
+            name: AppRoutesName.notificationPreferences,
+            builder: (_, _) => const NotificationPreferencesScreen(),
           ),
           GoRoute(
             path: AppRoutes.checkout,

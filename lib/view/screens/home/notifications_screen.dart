@@ -47,6 +47,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             );
           }
 
+          if (state.isLoading) {
+            return Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            );
+          }
+
+          if (state.errorMessage.isNotEmpty) {
+            return EmptyStateView(
+              icon: Icons.notifications_off_outlined,
+              title: AppLocalizations.of(context)!.error,
+              description: state.errorMessage,
+            );
+          }
+
           if (state.notifications.isEmpty) {
             final l10n = AppLocalizations.of(context)!;
             return EmptyStateView(

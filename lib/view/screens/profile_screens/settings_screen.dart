@@ -5,13 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_cubit.dart';
+import 'package:kalivra/controller/blocs/cubit/notification_preferences_cubit/notification_preferences_cubit.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/notification_preferences_text.dart';
 import 'package:kalivra/view/widgets/confirm_dialog.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -98,27 +101,33 @@ class SettingsScreen extends StatelessWidget {
                     case UnAuthinticated():
                       return const SizedBox.shrink();
                     default:
-                      return _SettingsSection(
-                        title: l10n.settingsAccountSecurity,
+                      return Column(
                         children: [
-                          _SettingsTile(
-                            icon: Icons.lock_outline_rounded,
-                            label: l10n.settingsChangePassword,
-                            onTap: () => _openProtectedScreen(
-                              context,
-                              () => context.push(AppRoutes.changePassword),
-                            ),
-                          ),
-                          _SettingsTile(
-                            icon: Icons.phone_android_rounded,
-                            label: l10n.settingsChangePhone,
-                            onTap: () => _openProtectedScreen(
-                              context,
-                              () => context.push(
-                                AppRoutes.otp,
-                                extra: OtpScreenMode.changePhone,
+                          _buildNotificationSection(context),
+                          SizedBox(height: 16.h),
+                          _SettingsSection(
+                            title: l10n.settingsAccountSecurity,
+                            children: [
+                              _SettingsTile(
+                                icon: Icons.lock_outline_rounded,
+                                label: l10n.settingsChangePassword,
+                                onTap: () => _openProtectedScreen(
+                                  context,
+                                  () => context.push(AppRoutes.changePassword),
+                                ),
                               ),
-                            ),
+                              _SettingsTile(
+                                icon: Icons.phone_android_rounded,
+                                label: l10n.settingsChangePhone,
+                                onTap: () => _openProtectedScreen(
+                                  context,
+                                  () => context.push(
+                                    AppRoutes.otp,
+                                    extra: OtpScreenMode.changePhone,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       );
@@ -130,6 +139,55 @@ class SettingsScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildNotificationSection(BuildContext context) {
+    final copy = NotificationPreferencesText.of(context);
+
+    return BlocProvider(
+      create: (_) => NotificationPreferencesCubit(),
+      child:
+          BlocConsumer<
+            NotificationPreferencesCubit,
+            NotificationPreferencesState
+          >(
+            listenWhen: (previous, current) =>
+                previous.errorMessage != current.errorMessage,
+            listener: (context, state) {
+              if (state.errorMessage.isNotEmpty) {
+                CustomSnackBar.show(context, state.errorMessage);
+              }
+            },
+            builder: (context, state) {
+              return _SettingsSection(
+                title: copy.sectionTitle,
+                children: [
+                  _NotificationSwitchTile(
+                    icon: Icons.notifications_active_outlined,
+                    label: copy.switchTitle,
+                    subtitle: state.isEnabled
+                        ? copy.enabledSubtitle
+                        : copy.disabledSubtitle,
+                    value: state.isEnabled,
+                    isBusy: state.isLoading || state.isSaving,
+                    onChanged: (enabled) => context
+                        .read<NotificationPreferencesCubit>()
+                        .setNotificationsEnabled(enabled),
+                  ),
+                  _SettingsTile(
+                    icon: Icons.tune_rounded,
+                    label: copy.channelsTitle,
+                    subtitle: copy.channelsSubtitle,
+                    onTap: () => _openProtectedScreen(
+                      context,
+                      () => context.push(AppRoutes.notificationPreferences),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
     );
   }
 }
@@ -237,5 +295,77 @@ class _SettingsTile extends StatelessWidget {
       );
     }
     return content;
+  }
+}
+
+class _NotificationSwitchTile extends StatelessWidget {
+  const _NotificationSwitchTile({
+    required this.icon,
+    required this.label,
+    required this.subtitle,
+    required this.value,
+    required this.isBusy,
+    required this.onChanged,
+  });
+
+  final IconData icon;
+  final String label;
+  final String subtitle;
+  final bool value;
+  final bool isBusy;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+      child: Row(
+        children: [
+          Icon(icon, size: 24.r, color: theme.colorScheme.primary),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.primaryFixed,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 2.h),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isBusy)
+            SizedBox(
+              width: 22.r,
+              height: 22.r,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: theme.colorScheme.primary,
+              ),
+            )
+          else
+            Switch(
+              value: value,
+              activeThumbColor: AppColors.offWhite,
+              activeTrackColor: theme.colorScheme.primary,
+              inactiveThumbColor: theme.colorScheme.onSurface,
+              inactiveTrackColor: theme.colorScheme.tertiaryFixed,
+              onChanged: onChanged,
+            ),
+        ],
+      ),
+    );
   }
 }
