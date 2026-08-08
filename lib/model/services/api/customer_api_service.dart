@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
-import 'package:kalivra/controller/prefs/pref_keys.dart';
+import 'package:kalivra/core/firebase_helper.dart';
 import 'package:kalivra/core/network/dio_client.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
 
@@ -24,27 +24,22 @@ class CustomerApiService {
     return CustomerApiModel.fromJson(json);
   }
 
-  Future<void> login({
-    required String phone,
-    required String password,
-    String? fcmToken,
-  }) async {
+  Future<void> login({required String phone, required String password}) async {
+    final fcmToken = await FirebaseHelper.createFcmToken();
     final res = await _client.post(
       'customer/login',
       data: {
         'whatsapp_number': phone,
         'password': password,
-        if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
+        'fcm_token': fcmToken,
       },
     );
 
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
-      final token = res.data[PrefKeys.tokenKey]?.toString();
-      if (token == null || token.isEmpty) {
-        throw 'حدث خطأ غير متوقع';
-      }
+      final token = res.data['token'];
+      final userId = res.data['personal_information']['user_id'];
       await LocalStore.setToken(token);
-      await _storeUserIdFromResponse(res.data);
+      await LocalStore.setUserId(userId);
       return;
     }
     final message = res.data is Map ? res.data['message']?.toString() : null;
@@ -59,27 +54,25 @@ class CustomerApiService {
     required String password,
     required String passwordConfirmation,
     String? referralCode,
-    String? fcmToken,
   }) async {
+    final fcmToken = await FirebaseHelper.createFcmToken();
     final Map<String, dynamic> body = {
       'first_name': firstName,
       'last_name': lastName,
-      // 'email': email,
       'whatsapp_number': whatsappNumber,
       'password': password,
       'password_confirmation': passwordConfirmation,
-      // if (fcmToken != null && fcmToken.isNotEmpty) 'fcm_token': fcmToken,
-      // if (referralCode != null && referralCode.trim().isNotEmpty)
-      //   'referral_code_input': referralCode.trim(),
+      'fcm_token': fcmToken,
+      if (referralCode != null && referralCode.trim().isNotEmpty)
+        'referral_code_input': referralCode.trim(),
     };
 
     final res = await _client.post('customer/register', data: body);
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
-      final token = _extractToken(res.data);
-      if (token != null && token.isNotEmpty) {
-        await LocalStore.setToken(token);
-      }
-      await _storeUserIdFromResponse(res.data);
+      final token = res.data['token'];
+      final userId = res.data['personal_information']['user_id'];
+      await LocalStore.setToken(token);
+      await LocalStore.setUserId(userId);
       return res.data;
     }
     final message = res.data is Map ? res.data['message']?.toString() : null;
@@ -105,27 +98,15 @@ class CustomerApiService {
   Future<void> verifyOtp({
     required String otp,
     required String whatsappNumber,
-    String? email,
-    required String token,
   }) async {
     try {
-      final res = await _client.post(
+     await _client.post(
         'customer/verify',
         data: {
-          'email': email ?? '',
-          if (token.trim().isNotEmpty) 'token': token,
           'otp': otp,
           'whatsapp_number': whatsappNumber,
         },
       );
-
-      if (res.statusCode! >= 200 && res.statusCode! < 300) {
-        final newToken = _extractToken(res.data);
-        if (newToken != null && newToken.isNotEmpty) {
-          await LocalStore.setToken(newToken);
-        }
-        await _storeUserIdFromResponse(res.data);
-      }
     } on DioException catch (e) {
       throw e.message.toString();
     }
@@ -320,56 +301,5 @@ class CustomerApiService {
       await _client.put('customer/profile', data: fields);
     }
     return true;
-  }
-
-  Future<void> _storeUserIdFromResponse(dynamic data) async {
-    final userId = _extractUserId(data);
-    if (userId != null && userId.isNotEmpty) {
-      await LocalStore.setUserId(userId);
-      return;
-    }
-
-    try {
-      final profile = await getProfile();
-      if (profile.id > 0) {
-        await LocalStore.setUserId(profile.id.toString());
-      }
-    } catch (_) {
-      return;
-    }
-  }
-
-  String? _extractUserId(dynamic data) {
-    if (data is! Map) return null;
-
-    for (final key in const ['user_id', 'customer_id', 'id']) {
-      final value = data[key];
-      final text = value?.toString().trim();
-      if (text != null && text.isNotEmpty) return text;
-    }
-
-    for (final key in const ['user', 'customer', 'data']) {
-      final nested = _extractUserId(data[key]);
-      if (nested != null) return nested;
-    }
-
-    return null;
-  }
-
-  String? _extractToken(dynamic data) {
-    if (data is! Map) return null;
-
-    for (final key in const ['token', 'access_token', 'bearer_token']) {
-      final value = data[key];
-      final text = value?.toString().trim();
-      if (text != null && text.isNotEmpty && text != 'null') return text;
-    }
-
-    for (final key in const ['user', 'customer', 'data']) {
-      final nested = _extractToken(data[key]);
-      if (nested != null) return nested;
-    }
-
-    return null;
   }
 }

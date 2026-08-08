@@ -105,8 +105,16 @@ class ChatCubit extends Cubit<ChatState> {
       final chats = await _chatService.getChatHistory();
       final recentChats = List<ChatApiModel>.of(chats)
         ..sort(_compareRecentChats);
-      final selectedChat = keepCurrentMessages
-          ? _selectedChatFromHistory(recentChats)
+      final keepEmptyNewChat =
+          !keepCurrentMessages &&
+          state.selectedChatId == null &&
+          state.messages.isEmpty &&
+          state.sessionId != null;
+      final selectedChat = keepEmptyNewChat
+          ? null
+          : keepCurrentMessages
+          ? _selectedChatFromHistory(recentChats) ??
+                _latestChatForCurrentMessages(recentChats)
           : recentChats.isEmpty
           ? null
           : recentChats.first;
@@ -120,9 +128,7 @@ class ChatCubit extends Cubit<ChatState> {
         ChatFetchedData(
           chats: recentChats,
           messages: selectedMessages,
-          sessionId: keepCurrentMessages
-              ? state.sessionId
-              : selectedChat?.sessionId ?? state.sessionId,
+          sessionId: selectedChat?.sessionId ?? state.sessionId,
           selectedChatId: selectedChat?.id ?? state.selectedChatId,
         ),
       );
@@ -205,6 +211,23 @@ class ChatCubit extends Cubit<ChatState> {
     return null;
   }
 
+  ChatApiModel? _latestChatForCurrentMessages(List<ChatApiModel> chats) {
+    if (state.messages.isEmpty || chats.isEmpty) return null;
+    final latestUserMessage = state.messages.reversed
+        .where((message) => message.isUser)
+        .map((message) => message.text.trim())
+        .firstWhere((message) => message.isNotEmpty, orElse: () => '');
+    if (latestUserMessage.isNotEmpty) {
+      for (final chat in chats) {
+        final hasMatchingMessage = chat.interactions.any(
+          (interaction) => interaction.userMessage.trim() == latestUserMessage,
+        );
+        if (hasMatchingMessage) return chat;
+      }
+    }
+    return chats.first;
+  }
+
   List<ChatUiMessage> _messagesFromInteractions(
     List<ChatInteractionModel> interactions,
   ) {
@@ -250,8 +273,6 @@ class ChatCubit extends Cubit<ChatState> {
   Future<String> _buildSessionId() async {
     final userId = await LocalStore.getUserId() ?? '';
     final now = DateTime.now();
-    final dateNumbers =
-        '${now.day}${now.month}${now.year}${now.hour}${now.minute}${now.second}';
-    return '$userId$dateNumbers';
+    return '$userId${now.microsecondsSinceEpoch}';
   }
 }

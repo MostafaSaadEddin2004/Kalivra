@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/auth_cubit/auth_state.dart';
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/firebase_helper.dart';
 import 'package:kalivra/core/network/api_exception.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/services/api/customer_api_service.dart';
@@ -28,11 +27,10 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     final l10n = AppLocalizations.of(context)!;
     try {
-      final fcmToken = await FirebaseHelper.createFcmToken();
+      
       await _customerApiService.login(
         phone: phone,
         password: password,
-        fcmToken: fcmToken,
       );
       if (!context.mounted) return;
       emit(AuthSuccessed(message: l10n.loginSuccess));
@@ -45,7 +43,6 @@ class AuthCubit extends Cubit<AuthState> {
       if (errorCode == 'ACCOUNT_NOT_VERIFIED') {
         final token =
             apiError?.data?['token']?.toString() ?? await LocalStore.getToken();
-        if (!context.mounted) return;
         context.goNamed(
           AppRoutesName.authOtp,
           extra: AuthOtpArgs(
@@ -116,8 +113,6 @@ class AuthCubit extends Cubit<AuthState> {
     required BuildContext context,
     required String otp,
     required String whatsappNumber,
-    String? email,
-    required String token,
     String purpose = 'login',
     String? name,
     String? password,
@@ -129,8 +124,6 @@ class AuthCubit extends Cubit<AuthState> {
       await _customerApiService.verifyOtp(
         otp: otp,
         whatsappNumber: whatsappNumber,
-        email: email,
-        token: token,
       );
       if (!context.mounted) return;
       emit(VerifySuccessed(message: l10n.authOtpVerifySuccess));
@@ -140,8 +133,6 @@ class AuthCubit extends Cubit<AuthState> {
           extra: OtpOnboardingArgs(
             mode: OtpScreenMode.signUp,
             whatsappNumber: whatsappNumber,
-            email: email,
-            token: token,
             name: name,
             password: password,
             referralCode: referralCode,
@@ -171,7 +162,6 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(AuthLoading());
     try {
-      final fcmToken = await FirebaseHelper.createFcmToken();
       final data = await _customerApiService.register(
         firstName: firstName,
         lastName: lastName,
@@ -180,7 +170,6 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
         passwordConfirmation: passwordConfirmation,
         referralCode: referralCode,
-        fcmToken: fcmToken,
       );
       final token = data?['token']?.toString() ?? await LocalStore.getToken();
       emit(AuthSuccessed(message: 'تم تسجيل الدخول بنجاح'));

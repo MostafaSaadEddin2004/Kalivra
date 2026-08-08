@@ -285,8 +285,6 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
                               context: context,
                               otp: _otpController.text.trim(),
                               whatsappNumber: widget.args.phone?.trim() ?? '',
-                              email: widget.args.email?.trim(),
-                              token: widget.args.token ?? '',
                               purpose: widget.args.purpose,
                               name: widget.args.name,
                               password: widget.args.password,

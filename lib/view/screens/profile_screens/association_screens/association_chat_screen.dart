@@ -8,6 +8,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/controller/blocs/cubit/chat_cubit/chat_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/chat/chat_api_model.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class AssociationChatScreen extends StatefulWidget {
@@ -226,9 +227,7 @@ class _AssociationChatScreenState extends State<AssociationChatScreen> {
                               final selected =
                                   chat.id == state.selectedChatId ||
                                   chat.sessionId == state.sessionId;
-                              final title = chat
-                                  .interactions[chat.interactions.length - 1]
-                                  .userMessage;
+                              final title = _chatHistoryTitle(chat, l10n);
                               return Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 8.w),
                                 child: FilledButton(
@@ -428,6 +427,17 @@ String _formatMessageTime(DateTime time) {
   return '$hour:$minute';
 }
 
+String _chatHistoryTitle(ChatApiModel chat, AppLocalizations l10n) {
+  for (final interaction in chat.interactions.reversed) {
+    final userMessage = interaction.userMessage.trim();
+    if (userMessage.isNotEmpty) return userMessage;
+  }
+
+  final name = chat.name.trim();
+  if (name.isNotEmpty) return name;
+  return l10n.chatTitle(chat.id);
+}
+
 const _waitingMessageIcons = [
   Icons.auto_awesome_rounded,
   Icons.hourglass_top_rounded,
@@ -618,11 +628,11 @@ class _MessageBubble extends StatelessWidget {
                       ? theme.colorScheme.secondaryFixed
                       : theme.colorScheme.primaryFixed.withValues(alpha: 0.75),
                   side: BorderSide(
-                    color:message.isError
-                      ? AppColors.offWhite
-                      : message.isUser
-                      ? theme.colorScheme.secondaryFixed
-                      : theme.colorScheme.primaryFixed.withValues(alpha: 0.5),
+                    color: message.isError
+                        ? AppColors.offWhite
+                        : message.isUser
+                        ? theme.colorScheme.secondaryFixed
+                        : theme.colorScheme.primaryFixed.withValues(alpha: 0.5),
                   ),
                   visualDensity: VisualDensity.compact,
                 ),
