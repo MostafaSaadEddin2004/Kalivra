@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_api_model.dart';
@@ -231,15 +233,15 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
     });
 
     final cartCubit = context.read<CartCubit>();
-    final success = _isAddMode
-        ? await _addSelectedItem(cartCubit)
-        : await _updateSelectedItem(cartCubit);
-
-    if (!mounted) return;
     setState(() => _isSaving = false);
-    if (success) {
-      Navigator.of(context).pop(true);
-    } else {
+    try {
+      if (_isAddMode) {
+        await _addSelectedItem(cartCubit);
+      } else {
+        await _updateSelectedItem(cartCubit);
+      }
+      context.pop();
+    } catch (_) {
       setState(
         () => _errorText = _isAddMode
             ? l10n.unableToAddItem
@@ -248,38 +250,29 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
     }
   }
 
-  Future<bool> _addSelectedItem(CartCubit cartCubit) async {
+  Future<void> _addSelectedItem(CartCubit cartCubit) async {
     final product = _product;
-    if (product == null) return false;
-
-    return cartCubit.addItem(
+    cartCubit.addItem(
       context,
-      (_selectedColor?.variantId ?? product.id).toString(),
+      (_selectedColor?.variantId ?? product!.id).toString(),
       quantity: _quantity,
       color: _selectedColor?.colorName ?? '',
       size: _selectedSize?.sizeName ?? '',
-      productName: product.name,
+      productName: product!.name,
     );
   }
 
-  Future<bool> _updateSelectedItem(CartCubit cartCubit) async {
+  Future<void> _updateSelectedItem(CartCubit cartCubit) async {
     final item = widget.item;
-    if (item == null) return false;
-
-    if (_colorChanged || _sizeChanged) {
-      final colorId = _selectedColorOptionId;
-      final sizeId = _selectedSizeOptionId;
-      if (colorId == null || sizeId == null) return false;
-      return cartCubit.updateItemDetials(
-        context,
-        item.id,
-        _quantity,
-        colorId.toString(),
-        sizeId.toString(),
-      );
-    }
-
-    return cartCubit.updateItemQuantity(context, item.id, _quantity);
+    final colorId = _selectedColorOptionId;
+    final sizeId = _selectedSizeOptionId;
+    cartCubit.updateItemDetials(
+      context,
+      item!.id,
+      _quantity,
+      colorId.toString(),
+      sizeId.toString(),
+    );
   }
 
   @override
@@ -448,7 +441,7 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: _isSaving ? null : () => Navigator.of(context).pop(false),
+          onPressed: _isSaving ? null : () => context.pop(),
           child: Text(l10n.cancel),
         ),
         FilledButton(
@@ -457,7 +450,10 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
               ? SizedBox(
                   width: 18.r,
                   height: 18.r,
-                  child: const CircularProgressIndicator(strokeWidth: 2),
+                  child: SpinKitFadingCircle(
+                    itemSize: 20.r,
+                    color: theme.colorScheme.secondaryFixed,
+                  ),
                 )
               : Text(_isAddMode ? l10n.addToCart : l10n.saveChanges),
         ),

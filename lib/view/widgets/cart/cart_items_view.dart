@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
@@ -53,7 +54,7 @@ class CartItemsView extends StatelessWidget {
                   isLoading: cartCubit.isClearingCart,
                   onClearPressed: items.isEmpty
                       ? null
-                      : () => _confirmClearCart(context),
+                      : () => _confirmClearCart(context, cartCubit.isClearingCart),
                 ),
                 SizedBox(height: 16.h),
                 _CouponSection(cart: cart),
@@ -106,11 +107,12 @@ class CartItemsView extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmClearCart(BuildContext context) async {
+  Future<void> _confirmClearCart(BuildContext context,bool isLoading) async {
     final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => ConfirmDialog(
+        isLoading: isLoading,
         title: l10n.clearCart,
         message: l10n.clearCartConfirmation,
         onConfirm: () => Navigator.of(dialogContext).pop(true),
@@ -172,8 +174,8 @@ class _CartActionsBar extends StatelessWidget {
                   ? SizedBox(
                       width: 20.r,
                       height: 20.r,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+                      child: SpinKitFadingCircle(
+                        itemSize: 20.r,
                         color: foreground,
                       ),
                     )
