@@ -37,7 +37,7 @@ class CustomerApiService {
 
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
       final token = res.data['token'];
-      final userId = res.data['customer']['id'];
+      final userId = res.data['data']['customer']['id'].toString();
       await LocalStore.setToken(token);
       await LocalStore.setUserId(userId);
       return;
@@ -70,7 +70,7 @@ class CustomerApiService {
     final res = await _client.post('customer/register', data: body);
     if (res.statusCode! >= 200 && res.statusCode! < 300) {
       final token = res.data['token'];
-      final userId = res.data['customer']['id'];
+      final userId = res.data['data']['customer']['id'].toString();
       await LocalStore.setToken(token);
       await LocalStore.setUserId(userId);
       return res.data;
