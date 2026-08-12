@@ -12,10 +12,19 @@ class AdCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: CustomNetworkImage(
-        imageUrl: imageUrl,
-        width: double.infinity,
-        height: 152.h,
+      child: Container(
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(4.r),
+            bottomRight: Radius.circular(4),
+          ),
+        ),
+        child: CustomNetworkImage(
+          imageUrl: imageUrl,
+          width: double.infinity,
+          height: 152.h,
+        ),
       ),
     );
   }

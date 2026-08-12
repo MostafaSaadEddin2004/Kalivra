@@ -39,7 +39,7 @@ class CartApiService {
     await _client.put(
       'checkout/cart',
       data: {
-        "qty": {itemId: quantity},
+        "qty": {'$itemId': quantity},
       },
     );
   }

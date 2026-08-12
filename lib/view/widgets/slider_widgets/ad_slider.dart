@@ -2,11 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/ads_cubit/ads_cubit.dart';
-import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/app_theme.dart';
-import 'package:kalivra/model/ad/advertisement_model.dart';
 import 'package:kalivra/model/ads_model.dart';
 import 'package:kalivra/view/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/view/widgets/slider_widgets/custom_indicator.dart';
@@ -71,40 +67,28 @@ class AdSliderState extends State<AdSlider> {
     super.dispose();
   }
 
-  Widget _skeletonSlideCard(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-        ),
-      ),
-    );
-  }
-
-  void _openDetails(
-    BuildContext context,
-    AdsModel carousel,
-    AdsInfoModel slide,
-  ) {
-    final title = slide.title.trim().isNotEmpty
-        ? slide.title.trim()
-        : carousel.name;
-    context.push(
-      AppRoutes.adDetails,
-      extra: AdvertisementModel(
-        title: title,
-        subtitle: carousel.name,
-        gradientStart: AppColors.burgundy,
-        gradientEnd: AppColors.goldLight,
-      ),
-    );
-  }
+  // void _openDetails(
+  //   BuildContext context,
+  //   AdsModel carousel,
+  //   AdsInfoModel slide,
+  // ) {
+  //   final title = slide.title.trim().isNotEmpty
+  //       ? slide.title.trim()
+  //       : carousel.name;
+  //   context.push(
+  //     AppRoutes.adDetails,
+  //     extra: AdvertisementModel(
+  //       title: title,
+  //       subtitle: carousel.name,
+  //       gradientStart: AppColors.burgundy,
+  //       gradientEnd: AppColors.goldLight,
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return BlocBuilder<AdsCubit, AdsState>(
       bloc: _adsCubit,
       builder: (context, state) {
@@ -132,8 +116,8 @@ class AdSliderState extends State<AdSlider> {
                         padding: EdgeInsets.symmetric(horizontal: 6.w),
                         child: AdCard(
                           imageUrl: item.slide.image,
-                          onTap: () =>
-                              _openDetails(context, item.carousel, item.slide),
+                          // onTap: () =>
+                          //     _openDetails(context, item.carousel, item.slide),
                         ),
                       );
                     },
@@ -161,7 +145,18 @@ class AdSliderState extends State<AdSlider> {
                       itemBuilder: (context, index) {
                         return Padding(
                           padding: EdgeInsets.symmetric(horizontal: 6.w),
-                          child: _skeletonSlideCard(context),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20.w,
+                            ),
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16.r),
+                                color: colorScheme.surfaceContainerHighest
+                                    .withValues(alpha: 0.45),
+                              ),
+                            ),
+                          ),
                         );
                       },
                     ),
