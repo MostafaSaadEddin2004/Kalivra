@@ -37,7 +37,15 @@ class CustomNetworkImage extends StatelessWidget {
         height: height,
         width: width,
         fit: BoxFit.cover,
-        placeholder: (context, url) => Skeletonizer(child: Container()),
+        placeholder: (context, url) => Skeletonizer(
+          child: Container(
+            width: width ?? double.infinity,
+            height: height ?? double.infinity,
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.22),
+          ),
+        ),
         errorWidget: (context, url, error) {
           return Center(child: Icon(Icons.broken_image, size: 35.sp));
         },

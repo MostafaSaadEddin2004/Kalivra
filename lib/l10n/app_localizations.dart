@@ -4472,6 +4472,48 @@ abstract class AppLocalizations {
   /// **'Stages'**
   String get associationMemberStages;
 
+  /// No description provided for @associationMemberProjects.
+  ///
+  /// In en, this message translates to:
+  /// **'Projects'**
+  String get associationMemberProjects;
+
+  /// No description provided for @associationMemberProjectStages.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Stages'**
+  String get associationMemberProjectStages;
+
+  /// No description provided for @associationMemberBuildingStages.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Stages'**
+  String get associationMemberBuildingStages;
+
+  /// No description provided for @associationMemberBuildingInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Information'**
+  String get associationMemberBuildingInformation;
+
+  /// No description provided for @associationMemberStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get associationMemberStartDate;
+
+  /// No description provided for @associationMemberEndDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get associationMemberEndDate;
+
+  /// No description provided for @associationMemberStageGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Stage gallery'**
+  String get associationMemberStageGallery;
+
   /// No description provided for @associationMemberProjectBuildings.
   ///
   /// In en, this message translates to:
@@ -4483,6 +4525,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Progress'**
   String get associationMemberProgress;
+
+  /// No description provided for @associationMemberNoProjectsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no projects available yet.'**
+  String get associationMemberNoProjectsAvailable;
+
+  /// No description provided for @associationMemberNoProjectStagesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No construction stages are available for this project yet.'**
+  String get associationMemberNoProjectStagesAvailable;
+
+  /// No description provided for @associationMemberNoBuildingsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no buildings available for this project yet.'**
+  String get associationMemberNoBuildingsAvailable;
+
+  /// No description provided for @associationMemberNoBuildingStagesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No construction stages are available for this building yet.'**
+  String get associationMemberNoBuildingStagesAvailable;
 
   /// No description provided for @associationMemberAssignedToProject.
   ///

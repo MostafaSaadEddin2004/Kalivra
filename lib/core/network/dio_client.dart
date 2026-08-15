@@ -11,9 +11,9 @@ class DioClient {
     Future<String?> Function()? getToken,
     bool enableLogging = true,
     bool logResponseBody = true,
-    Duration connectTimeout = const Duration(seconds: 30),
-    Duration receiveTimeout = const Duration(seconds: 30),
-    Duration sendTimeout = const Duration(seconds: 30),
+    Duration connectTimeout = const Duration(minutes: 1),
+    Duration receiveTimeout = const Duration(minutes: 1),
+    Duration sendTimeout = const Duration(minutes: 1),
   }) : _dio = Dio(
          BaseOptions(
            baseUrl: baseUrl,

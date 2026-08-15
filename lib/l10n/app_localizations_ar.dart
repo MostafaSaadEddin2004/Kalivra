@@ -2302,10 +2302,47 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationMemberStages => 'مراحل التنفيذ';
 
   @override
+  String get associationMemberProjects => 'المشاريع';
+
+  @override
+  String get associationMemberProjectStages => 'مراحل المشروع';
+
+  @override
+  String get associationMemberBuildingStages => 'مراحل البناء';
+
+  @override
+  String get associationMemberBuildingInformation => 'معلومات الأبنية';
+
+  @override
+  String get associationMemberStartDate => 'تاريخ البدء';
+
+  @override
+  String get associationMemberEndDate => 'تاريخ الانتهاء';
+
+  @override
+  String get associationMemberStageGallery => 'معرض المرحلة';
+
+  @override
   String get associationMemberProjectBuildings => 'الأبنية ضمن المشروع';
 
   @override
   String get associationMemberProgress => 'الإنجاز';
+
+  @override
+  String get associationMemberNoProjectsAvailable =>
+      'لا توجد مشاريع متاحة حالياً.';
+
+  @override
+  String get associationMemberNoProjectStagesAvailable =>
+      'لا توجد مراحل تنفيذ متاحة لهذا المشروع بعد.';
+
+  @override
+  String get associationMemberNoBuildingsAvailable =>
+      'لا توجد أبنية متاحة لهذا المشروع حالياً.';
+
+  @override
+  String get associationMemberNoBuildingStagesAvailable =>
+      'لا توجد مراحل تنفيذ متاحة لهذا البناء بعد.';
 
   @override
   String get associationMemberAssignedToProject => 'مخصص لمشروع';

@@ -11,7 +11,6 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_member_profile_model.dart';
 import 'package:kalivra/model/association/association_news_model.dart';
-import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
 import 'package:kalivra/view/widgets/files/network_file_action_tile.dart';
@@ -600,6 +599,116 @@ class _MembershipTabs extends StatelessWidget {
   }
 }
 
+class _ExpandableProfileSection extends StatefulWidget {
+  const _ExpandableProfileSection({
+    required this.title,
+    required this.icon,
+    required this.children,
+  });
+
+  final String title;
+  final IconData icon;
+  final List<Widget> children;
+
+  @override
+  State<_ExpandableProfileSection> createState() =>
+      _ExpandableProfileSectionState();
+}
+
+class _ExpandableProfileSectionState extends State<_ExpandableProfileSection> {
+  late bool _expanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = true;
+  }
+
+  @override
+  void didUpdateWidget(covariant _ExpandableProfileSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.title != widget.title) {
+      _expanded = true;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.offWhite : AppColors.burgundy;
+    final borderColor = isDark
+        ? AppColors.taupe.withValues(alpha: 0.35)
+        : AppColors.burgundy.withValues(alpha: 0.12);
+
+    return Card(
+      margin: EdgeInsets.only(bottom: 16.h),
+      color: isDark ? AppColors.burgundy.withValues(alpha: 0.08) : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+        side: BorderSide(color: borderColor),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, _expanded ? 20.h : 14.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(12.r),
+              onTap: () => setState(() => _expanded = !_expanded),
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 2.h),
+                child: Row(
+                  children: [
+                    Icon(widget.icon, size: 22.r, color: titleColor),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        widget.title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: titleColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    AnimatedRotation(
+                      turns: _expanded ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 220),
+                      curve: Curves.easeOut,
+                      child: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: titleColor,
+                        size: 24.r,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            AnimatedCrossFade(
+              firstChild: const SizedBox(width: double.infinity),
+              secondChild: Padding(
+                padding: EdgeInsets.only(top: 16.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: widget.children,
+                ),
+              ),
+              crossFadeState: _expanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 240),
+              firstCurve: Curves.easeOut,
+              secondCurve: Curves.easeOut,
+              sizeCurve: Curves.easeInOut,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _MemberContactSection extends StatelessWidget {
   const _MemberContactSection({required this.profile});
 
@@ -610,7 +719,7 @@ class _MemberContactSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final person = profile.person;
 
-    return AssociationFormSection(
+    return _ExpandableProfileSection(
       title: l10n.associationLinkContactSection,
       icon: Icons.contact_phone_outlined,
       children: [
@@ -661,9 +770,7 @@ class _MembershipDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final project = membership.project;
     final unit = membership.unit ?? membership.allocatedUnit;
-    final building = membership.building ?? unit?.building;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -677,7 +784,7 @@ class _MembershipDetailsSection extends StatelessWidget {
           obligations: membership.financialObligations,
         ),
         SizedBox(height: 16.h),
-        AssociationFormSection(
+        _ExpandableProfileSection(
           title: l10n.associationLinkMembershipSection,
           icon: Icons.badge_outlined,
           children: [
@@ -713,8 +820,8 @@ class _MembershipDetailsSection extends StatelessWidget {
             ),
           ],
         ),
-        if (project != null) _ProjectDetailsSection(project: project),
-        if (building != null) _BuildingDetailsSection(building: building),
+        _ProjectsInformationSection(projects: profile.projects),
+        _BuildingsInformationSection(projects: profile.projects),
         if (unit != null) _UnitDetailsSection(unit: unit),
       ],
     );
@@ -731,7 +838,7 @@ class _FinancialInformationSection extends StatelessWidget {
     final financial = membership.financialInformation;
     if (financial == null) return const SizedBox.shrink();
 
-    return AssociationFormSection(
+    return _ExpandableProfileSection(
       title: AppLocalizations.of(
         context,
       )!.associationMemberFinancialInformation,
@@ -792,7 +899,7 @@ class _PaymentsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AssociationFormSection(
+    return _ExpandableProfileSection(
       title: AppLocalizations.of(context)!.associationMemberPayments,
       icon: Icons.payments_outlined,
       children: payments.isEmpty
@@ -899,7 +1006,7 @@ class _FinancialObligationsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AssociationFormSection(
+    return _ExpandableProfileSection(
       title: AppLocalizations.of(
         context,
       )!.associationMemberFinancialObligations,
@@ -1171,6 +1278,32 @@ class _EmptyInlineState extends StatelessWidget {
   }
 }
 
+class _ProjectsInformationSection extends StatelessWidget {
+  const _ProjectsInformationSection({required this.projects});
+
+  final List<AssociationProject> projects;
+
+  @override
+  Widget build(BuildContext context) {
+    return _ExpandableProfileSection(
+      title: AppLocalizations.of(context)!.associationMemberProjects,
+      icon: Icons.apartment_rounded,
+      children: projects.isEmpty
+          ? [
+              _EmptyInlineState(
+                icon: Icons.apartment_rounded,
+                text: AppLocalizations.of(
+                  context,
+                )!.associationMemberNoProjectsAvailable,
+              ),
+            ]
+          : projects
+                .map((project) => _ProjectDetailsSection(project: project))
+                .toList(),
+    );
+  }
+}
+
 class _ProjectDetailsSection extends StatelessWidget {
   const _ProjectDetailsSection({required this.project});
 
@@ -1180,30 +1313,27 @@ class _ProjectDetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    return AssociationFormSection(
-      title: l10n.associationLinkProjectName,
-      icon: Icons.apartment_rounded,
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           project.name,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            fontWeight: FontWeight.w600,
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: isDark ? AppColors.offWhite : AppColors.burgundy,
+            fontWeight: FontWeight.w800,
           ),
         ),
-        SizedBox(height: 12.h),
+
         _MediaGallery(
           title: AppLocalizations.of(context)!.associationMemberProjectGallery,
           imageUrl: project.imageUrl,
           galleryImages: [...project.images, ...project.galleryImages],
           fallbackIcon: Icons.apartment_rounded,
         ),
-        InfoRow(
-          label: l10n.associationMemberType,
-          value: project.typeLabel.isNotEmpty
-              ? project.typeLabel
-              : project.type,
-        ),
-        InfoRow(
+        SizedBox(height: 12.h),
+        _infoRowIfValue(
           label: l10n.associationMemberLocation,
           value: _joinValues([
             project.governorate,
@@ -1221,48 +1351,53 @@ class _ProjectDetailsSection extends StatelessWidget {
             context,
           )!.associationMemberProjectMasterPlanFile,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberBuildings,
           value: _formatNullableNumber(
             project.numberOfBuildings ?? project.buildings.length,
           ),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberTotalUnits,
           value: _formatNullableNumber(
             project.totalUnits ?? project.totalNumberOfUnits,
           ),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberAvailableUnits,
           value: _formatNullableNumber(project.availableUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberAllocatedUnits,
           value: _formatNullableNumber(project.allocatedUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberDeliveredUnits,
           value: _formatNullableNumber(project.deliveredUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberRemainingUnits,
           value: _formatNullableNumber(project.remainingUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberEstimatedCost,
           value: _formatNullableMoney(context, project.estimatedCost),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberEngineer,
           value: project.projectEngineer,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberLandArea,
           value: _formatNullableNumber(project.landArea),
         ),
-        _StagesTimeline(stages: project.stages),
-        _ProjectBuildingsGallery(buildings: project.buildings),
+        _StagesTimeline(
+          title: AppLocalizations.of(context)!.associationMemberProjectStages,
+          stages: project.stages,
+          emptyText: AppLocalizations.of(
+            context,
+          )!.associationMemberNoProjectStagesAvailable,
+        ),
       ],
     );
   }
@@ -1354,6 +1489,82 @@ class _ProjectLocationButton extends StatelessWidget {
   }
 }
 
+class _BuildingsInformationSection extends StatelessWidget {
+  const _BuildingsInformationSection({required this.projects});
+
+  final List<AssociationProject> projects;
+
+  @override
+  Widget build(BuildContext context) {
+    final projectsWithBuildings = projects
+        .where((project) => project.buildings.isNotEmpty)
+        .toList();
+
+    return _ExpandableProfileSection(
+      title: AppLocalizations.of(context)!.associationMemberBuildingInformation,
+      icon: Icons.business_rounded,
+      children: projectsWithBuildings.isEmpty
+          ? [
+              _EmptyInlineState(
+                icon: Icons.business_rounded,
+                text: AppLocalizations.of(
+                  context,
+                )!.associationMemberNoBuildingsAvailable,
+              ),
+            ]
+          : projectsWithBuildings
+                .map((project) => _ProjectBuildingsGroup(project: project))
+                .toList(),
+    );
+  }
+}
+
+class _ProjectBuildingsGroup extends StatelessWidget {
+  const _ProjectBuildingsGroup({required this.project});
+
+  final AssociationProject project;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (project.name.trim().isNotEmpty) ...[
+            Row(
+              children: [
+                Icon(
+                  Icons.apartment_rounded,
+                  size: 18.r,
+                  color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    project.name,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: isDark ? AppColors.offWhite : AppColors.burgundy,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10.h),
+          ],
+          ...project.buildings.map(
+            (building) => _BuildingDetailsSection(building: building),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _BuildingDetailsSection extends StatelessWidget {
   const _BuildingDetailsSection({required this.building});
 
@@ -1362,10 +1573,8 @@ class _BuildingDetailsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
-    return AssociationFormSection(
-      title: l10n.associationLinkBuilding,
-      icon: Icons.business_rounded,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _MediaGallery(
           title: AppLocalizations.of(context)!.associationMemberBuildingGallery,
@@ -1376,25 +1585,25 @@ class _BuildingDetailsSection extends StatelessWidget {
           ],
           fallbackIcon: Icons.business_rounded,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(
             context,
           )!.associationMemberCompletionPercentage,
           value: _formatNullablePercent(building.completionPercentage),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: l10n.associationLinkBuilding,
           value: building.displayName,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberBuildingNumber,
           value: building.buildingNumber,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberDescription,
           value: building.description,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: l10n.associationMemberLocation,
           value: building.physicalAddress,
         ),
@@ -1405,29 +1614,41 @@ class _BuildingDetailsSection extends StatelessWidget {
             context,
           )!.associationMemberBuildingPlanFile,
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberFloors,
           value: _formatNullableNumber(building.numberOfFloors),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberUnits,
-          value: _formatNullableNumber(
-            building.numberOfUnits ?? building.totalUnits,
-          ),
+          value: _formatNullableNumber(building.numberOfUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
+          label: AppLocalizations.of(context)!.associationMemberTotalUnits,
+          value: _formatNullableNumber(building.totalUnits),
+        ),
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberAvailableUnits,
           value: _formatNullableNumber(building.availableUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberAllocatedUnits,
           value: _formatNullableNumber(building.allocatedUnits),
         ),
-        InfoRow(
+        _infoRowIfValue(
+          label: AppLocalizations.of(context)!.associationMemberDeliveredUnits,
+          value: _formatNullableNumber(building.deliveredUnits),
+        ),
+        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberSpecifications,
           value: building.specifications,
         ),
-        _StagesTimeline(stages: building.stages),
+        _StagesTimeline(
+          title: AppLocalizations.of(context)!.associationMemberBuildingStages,
+          stages: building.stages,
+          emptyText: AppLocalizations.of(
+            context,
+          )!.associationMemberNoBuildingStagesAvailable,
+        ),
       ],
     );
   }
@@ -1442,7 +1663,7 @@ class _UnitDetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return AssociationFormSection(
+    return _ExpandableProfileSection(
       title: l10n.residentialUnit,
       icon: Icons.home_work_outlined,
       children: [
@@ -1556,7 +1777,7 @@ class _MediaGallery extends StatefulWidget {
   });
 
   final String title;
-  final String imageUrl;
+  final String? imageUrl;
   final List<String> galleryImages;
   final IconData fallbackIcon;
 
@@ -1608,16 +1829,9 @@ class _MediaGalleryState extends State<_MediaGallery> {
         .where((image) => image.trim().isNotEmpty)
         .toSet()
         .toList();
-    final fallbackImage = widget.imageUrl.trim();
-    final visibleImages = galleryImages.isNotEmpty
-        ? galleryImages
-        : fallbackImage.isNotEmpty
-        ? [fallbackImage]
-        : const <String>[];
-    if (visibleImages.isEmpty) return const SizedBox.shrink();
+    final visibleImages = galleryImages;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 16.h),
+    return SizedBox(
       height: visibleImages.length == 1 ? 220.h : 290.h,
       child: Column(
         children: [
@@ -1725,171 +1939,348 @@ class _GalleryMainImage extends StatelessWidget {
 }
 
 class _StagesTimeline extends StatelessWidget {
-  const _StagesTimeline({required this.stages});
+  const _StagesTimeline({
+    required this.title,
+    required this.stages,
+    required this.emptyText,
+  });
 
-  final List<AssociationProjectStage> stages;
+  final String title;
+  final List<StageModel> stages;
+  final String emptyText;
 
   @override
   Widget build(BuildContext context) {
-    if (stages.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
-
-    return Padding(
-      padding: EdgeInsets.only(top: 4.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.associationMemberStages,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w800,
           ),
-          SizedBox(height: 10.h),
-          ...stages.map((stage) => _StageTile(stage: stage)),
-        ],
-      ),
+        ),
+        SizedBox(height: 10.h),
+        if (stages.isEmpty)
+          _EmptyInlineState(icon: Icons.construction_rounded, text: emptyText)
+        else
+          ...List.generate(
+            stages.length,
+            (index) => _StageTile(stage: stages[index], index: index),
+          ),
+      ],
     );
   }
 }
 
 class _StageTile extends StatelessWidget {
-  const _StageTile({required this.stage});
+  const _StageTile({required this.stage, required this.index});
 
-  final AssociationProjectStage stage;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: 10.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            stage.isActive ? Icons.radio_button_checked : Icons.check_circle,
-            size: 20.r,
-            color: stage.isActive ? AppColors.goldDark : Colors.green,
-          ),
-          SizedBox(width: 10.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  stage.stageName,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                SizedBox(height: 3.h),
-                Text(
-                  _joinValues([
-                    stage.startDate,
-                    stage.endDate,
-                    '${_formatNullableNumber(stage.completionPercentage)}%',
-                    stage.notes,
-                  ]),
-                  style: theme.textTheme.bodySmall,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProjectBuildingsGallery extends StatelessWidget {
-  const _ProjectBuildingsGallery({required this.buildings});
-
-  final List<AssociationBuilding> buildings;
-
-  @override
-  Widget build(BuildContext context) {
-    if (buildings.isEmpty) return const SizedBox.shrink();
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: EdgeInsets.only(top: 8.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.of(context)!.associationMemberProjectBuildings,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 10.h),
-          ...buildings.map(
-            (building) => _BuildingSummaryCard(building: building),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BuildingSummaryCard extends StatelessWidget {
-  const _BuildingSummaryCard({required this.building});
-
-  final AssociationBuilding building;
+  final StageModel stage;
+  final int index;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
+    final stageName = stage.stageName?.trim() ?? '';
+    final title = stageName.isEmpty
+        ? '${AppLocalizations.of(context)!.associationMemberStages} ${index + 1}'
+        : stageName;
+    final notes = stage.notes?.trim() ?? '';
+    final images = stage.allImages;
+    final percentText = _formatNullablePercent(stage.completionPercentage);
+    final displayPercent = percentText.isEmpty ? '-' : percentText;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 10.h),
+      margin: EdgeInsets.only(bottom: 8.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.taupe.withValues(alpha: 0.1)
-            : AppColors.burgundy.withValues(alpha: 0.045),
+        color: theme.colorScheme.secondaryFixed.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(22.r),
+        border: Border.all(color: accent.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            '${l10n.associationMemberStage} ${(index + 1).toString()}',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: theme.colorScheme.onTertiaryFixed,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          _StageHero(
+            title: title,
+            percentText: displayPercent,
+            imageUrl: images.isEmpty ? null : images.first,
+            fallbackIcon: Icons.business_rounded,
+          ),
+          SizedBox(height: 16.h),
+          Divider(color: accent.withValues(alpha: 0.12), height: 1),
+          SizedBox(height: 16.h),
+          Text(
+            AppLocalizations.of(context)!.associationMemberCompletion,
+            style: theme.textTheme.titleSmall?.copyWith(
+              color: isDark ? AppColors.taupe : AppColors.burgundy,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          _StageProgressRow(
+            percentage: stage.completionPercentage,
+            accent: accent,
+            isDark: isDark,
+          ),
+          SizedBox(height: 16.h),
+          _StageDatesColumn(stage: stage),
+          ...[
+            Text(
+              notes,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: isDark ? AppColors.taupe : AppColors.black,
+                height: 1.35,
+              ),
+            ),
+          ],
+          if (images.isNotEmpty) ...[
+            SizedBox(height: 16.h),
+            _StageGalleryPanel(
+              title: title,
+              images: images,
+              fallbackIcon: Icons.image_outlined,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _StageHero extends StatelessWidget {
+  const _StageHero({
+    required this.title,
+    required this.percentText,
+    required this.imageUrl,
+    required this.fallbackIcon,
+  });
+
+  final String title;
+  final String percentText;
+  final String? imageUrl;
+  final IconData fallbackIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18.r),
+      child: SizedBox(
+        height: 210.h,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            CustomNetworkImage(
+              imageUrl: imageUrl,
+              defaultIcon: fallbackIcon,
+              defaultIconColor: AppColors.burgundy,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    color: AppColors.burgundy.withValues(alpha: 0.58),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: AppColors.black.withValues(alpha: 0.12),
+                  ),
+                ),
+              ],
+            ),
+            PositionedDirectional(
+              top: 34.h,
+              start: 28.w,
+              end: 28.w,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    percentText,
+                    style: theme.textTheme.headlineLarge?.copyWith(
+                      color: AppColors.offWhite,
+                      fontSize: 44.sp,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  SizedBox(height: 12.h),
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: AppColors.offWhite,
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StageProgressRow extends StatelessWidget {
+  const _StageProgressRow({
+    required this.percentage,
+    required this.accent,
+    required this.isDark,
+  });
+
+  final num? percentage;
+  final Color accent;
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final percent = _formatNullablePercent(percentage);
+
+    return Row(
+      spacing: 8.w,
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: _percentRatio(percentage),
+              minHeight: 9.h,
+              backgroundColor: AppColors.burgundy.withValues(alpha: 0.12),
+              valueColor: AlwaysStoppedAnimation<Color>(accent),
+            ),
+          ),
+        ),
+        Text(
+          percent.isEmpty ? '-' : percent,
+          style: theme.textTheme.titleSmall?.copyWith(
+            color: AppColors.burgundy,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StageDatesColumn extends StatelessWidget {
+  const _StageDatesColumn({required this.stage});
+
+  final StageModel stage;
+
+  @override
+  Widget build(BuildContext context) {
+    final dates = [
+      _StageDateData(
+        label: AppLocalizations.of(context)!.associationMemberStartDate,
+        value: stage.startDate,
+      ),
+      _StageDateData(
+        label: AppLocalizations.of(context)!.associationMemberEndDate,
+        value: stage.endDate,
+      ),
+    ].where((date) => date.hasValue).toList();
+
+    if (dates.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      spacing: 4.h,
+      children: List.generate(dates.length, (index) {
+        return SizedBox(
+          width: double.infinity,
+          child: _StageDateCard(data: dates[index]),
+        );
+      }),
+    );
+  }
+}
+
+class _StageDateData {
+  const _StageDateData({required this.label, required this.value});
+
+  final String label;
+  final String? value;
+
+  bool get hasValue => value?.trim().isNotEmpty == true;
+}
+
+class _StageDateCard extends StatelessWidget {
+  const _StageDateCard({required this.data});
+
+  final _StageDateData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color ?? Colors.white,
         borderRadius: BorderRadius.circular(14.r),
+        border: Border.all(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.12),
+        ),
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12.r),
-            child: SizedBox(
-              width: 74.r,
-              height: 74.r,
-              child: CustomNetworkImage(
-                imageUrl: building.allImages.isEmpty
-                    ? null
-                    : building.allImages.first,
-                defaultIcon: Icons.business_rounded,
+          Container(
+            width: 42.r,
+            height: 42.r,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12.r),
+              border: Border.all(
+                color: AppColors.burgundy.withValues(alpha: 0.12),
               ),
             ),
+            child: Icon(
+              Icons.calendar_month_outlined,
+              color: AppColors.burgundy,
+              size: 22.r,
+            ),
           ),
-          SizedBox(width: 12.w),
+          SizedBox(width: 10.w),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  building.displayName,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
+                  data.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.black.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  _joinValues([
-                    building.physicalAddress,
-                    _formatNullableNumber(building.numberOfFloors),
-                    _formatNullableNumber(
-                      building.numberOfUnits ?? building.totalUnits,
-                    ),
-                  ]),
-                  maxLines: 2,
+                  data.value!.trim(),
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: AppColors.burgundy,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
               ],
             ),
@@ -1898,6 +2289,71 @@ class _BuildingSummaryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StageGalleryPanel extends StatelessWidget {
+  const _StageGalleryPanel({
+    required this.title,
+    required this.images,
+    required this.fallbackIcon,
+  });
+
+  final String title;
+  final List<String> images;
+  final IconData fallbackIcon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final visibleImages = images
+        .where((image) => image.trim().isNotEmpty)
+        .toSet()
+        .toList();
+
+    return Column(
+      spacing: 8.h,
+      children: [
+        Row(
+          spacing: 8.w,
+          children: [
+            Container(
+              width: 44.r,
+              height: 44.r,
+              decoration: BoxDecoration(
+                color: AppColors.burgundy.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12.r),
+              ),
+              child: Icon(
+                Icons.image_outlined,
+                color: AppColors.burgundy,
+                size: 24.r,
+              ),
+            ),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context)!.associationMemberStageGallery,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: theme.colorScheme.onTertiaryFixed,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ],
+        ),
+        _MediaGallery(
+          title: title,
+          imageUrl: visibleImages.first,
+          galleryImages: visibleImages,
+          fallbackIcon: fallbackIcon,
+        ),
+      ],
+    );
+  }
+}
+
+double _percentRatio(num? value) {
+  if (value == null) return 0;
+  return (value.toDouble() / 100).clamp(0, 1).toDouble();
 }
 
 class _MembershipSummaryCard extends StatelessWidget {
@@ -2077,6 +2533,16 @@ enum _AccosiciationMemberProfileMenuActions {
   associationContactUs,
   requestsAndServices,
   announcements,
+}
+
+Widget _infoRowIfValue({
+  required String label,
+  required Object? value,
+  String? labelNumber,
+}) {
+  final display = value?.toString().trim() ?? '';
+  if (display.isEmpty || display == '-') return const SizedBox.shrink();
+  return InfoRow(label: label, value: display, labelNumber: labelNumber);
 }
 
 class InfoRow extends StatelessWidget {

@@ -985,7 +985,7 @@ class AssociationProject {
   final int? deliveredUnits;
   final int? remainingUnits;
   final String createdAt;
-  final List<AssociationProjectStage> stages;
+  final List<StageModel> stages;
   final List<AssociationBuilding> buildings;
 
   String get displayStatus {
@@ -1045,7 +1045,7 @@ class AssociationProject {
       deliveredUnits: _intValue(json['delivered_units']),
       remainingUnits: _intValue(json['remaining_units']),
       createdAt: _stringValue(json['created_at']),
-      stages: _listOf(json['stages'], AssociationProjectStage.fromJson),
+      stages: _listOf(json['stages'], StageModel.fromJson),
       buildings: _listOf(json['buildings'], AssociationBuilding.fromJson),
     );
   }
@@ -1099,18 +1099,18 @@ class AssociationBuilding {
   const AssociationBuilding({
     this.id,
     this.projectId,
-    this.buildingNumber = '',
-    this.name = '',
-    this.description = '',
-    this.physicalAddress = '',
+    this.buildingNumber,
+    this.name,
+    this.description,
+    this.physicalAddress,
     this.latitude,
     this.longitude,
     this.numberOfFloors,
     this.numberOfUnits,
-    this.buildingPlanUrl = '',
+    this.buildingPlanUrl,
     this.floorPlanImages = const [],
     this.galleryImages = const [],
-    this.specifications = '',
+    this.specifications,
     this.completionPercentage,
     this.totalUnits,
     this.availableUnits,
@@ -1121,30 +1121,34 @@ class AssociationBuilding {
 
   final int? id;
   final int? projectId;
-  final String buildingNumber;
-  final String name;
-  final String description;
-  final String physicalAddress;
+  final String? buildingNumber;
+  final String? name;
+  final String? description;
+  final String? physicalAddress;
   final num? latitude;
   final num? longitude;
   final int? numberOfFloors;
   final int? numberOfUnits;
-  final String buildingPlanUrl;
+  final String? buildingPlanUrl;
   final List<String> floorPlanImages;
   final List<String> galleryImages;
-  final String specifications;
+  final String? specifications;
   final num? completionPercentage;
   final int? totalUnits;
   final int? availableUnits;
   final int? allocatedUnits;
   final int? deliveredUnits;
-  final List<AssociationProjectStage> stages;
+  final List<StageModel> stages;
 
-  String get displayName => name.isNotEmpty ? name : buildingNumber;
+  String get displayName {
+    final buildingName = name?.trim() ?? '';
+    if (buildingName.isNotEmpty) return buildingName;
+    return buildingNumber?.trim() ?? '';
+  }
 
   List<String> get allImages {
     return [
-      buildingPlanUrl,
+      buildingPlanUrl ?? '',
       ...floorPlanImages,
       ...galleryImages,
     ].where((item) => item.trim().isNotEmpty).toSet().toList();
@@ -1154,24 +1158,24 @@ class AssociationBuilding {
     return AssociationBuilding(
       id: _intValue(json['id']),
       projectId: _intValue(json['project_id']),
-      buildingNumber: _stringValue(json['building_number']),
-      name: _stringValue(json['name']),
-      description: _stringValue(json['description']),
-      physicalAddress: _stringValue(json['physical_address']),
+      buildingNumber: _stringOrNull(json['building_number']),
+      name: _stringOrNull(json['name']),
+      description: _stringOrNull(json['description']),
+      physicalAddress: _stringOrNull(json['physical_address']),
       latitude: _numValue(json['latitude']),
       longitude: _numValue(json['longitude']),
       numberOfFloors: _intValue(json['number_of_floors']),
       numberOfUnits: _intValue(json['number_of_units']),
-      buildingPlanUrl: _stringValue(json['building_plan_url']),
+      buildingPlanUrl: _stringOrNull(json['building_plan_url']),
       floorPlanImages: _stringList(json['floor_plan_images']),
       galleryImages: _stringList(json['gallery_images']),
-      specifications: _stringValue(json['specifications']),
+      specifications: _stringOrNull(json['specifications']),
       completionPercentage: _numValue(json['completion_percentage']),
       totalUnits: _intValue(json['total_units']),
       availableUnits: _intValue(json['available_units']),
       allocatedUnits: _intValue(json['allocated_units']),
       deliveredUnits: _intValue(json['delivered_units']),
-      stages: _listOf(json['stages'], AssociationProjectStage.fromJson),
+      stages: _listOf(json['stages'], StageModel.fromJson),
     );
   }
 
@@ -1289,40 +1293,67 @@ class AssociationUnit {
   }
 }
 
-class AssociationProjectStage {
-  const AssociationProjectStage({
+class StageModel {
+  const StageModel({
     this.id,
     this.stageDefinitionId,
-    this.stageName = '',
-    this.startDate = '',
-    this.endDate = '',
+    this.stageName,
+    this.imageUrl,
+    this.images = const [],
+    this.galleryImages = const [],
+    this.startDate,
+    this.endDate,
     this.completionPercentage,
     this.actualOrder,
-    this.isActive = false,
-    this.notes = '',
+    this.isActive,
+    this.notes,
   });
 
   final int? id;
   final int? stageDefinitionId;
-  final String stageName;
-  final String startDate;
-  final String endDate;
+  final String? stageName;
+  final String? imageUrl;
+  final List<String> images;
+  final List<String> galleryImages;
+  final String? startDate;
+  final String? endDate;
   final num? completionPercentage;
   final int? actualOrder;
-  final bool isActive;
-  final String notes;
+  final bool? isActive;
+  final String? notes;
 
-  factory AssociationProjectStage.fromJson(Map<String, dynamic> json) {
-    return AssociationProjectStage(
+  List<String> get allImages {
+    return [
+      imageUrl ?? '',
+      ...images,
+      ...galleryImages,
+    ].where((item) => item.trim().isNotEmpty).toSet().toList();
+  }
+
+  factory StageModel.fromJson(Map<String, dynamic> json) {
+    return StageModel(
       id: _intValue(json['id']),
       stageDefinitionId: _intValue(json['stage_definition_id']),
-      stageName: _stringValue(json['stage_name']),
-      startDate: _stringValue(json['start_date']),
-      endDate: _stringValue(json['end_date']),
+      stageName: _stringOrNull(json['stage_name']),
+      imageUrl: _stringOrNull(
+        json['image_url'] ??
+            json['image'] ??
+            json['cover_image'] ??
+            json['cover_image_url'],
+      ),
+      images: _mediaUrlList(json['images']),
+      galleryImages: _mediaUrlList(
+        json['gallery_images'] ??
+            json['gallery'] ??
+            json['photos'] ??
+            json['media'],
+      ),
+      startDate: _stringOrNull(json['start_date']),
+      endDate: _stringOrNull(json['end_date']),
       completionPercentage: _numValue(json['completion_percentage']),
       actualOrder: _intValue(json['actual_order']),
-      isActive: _boolValue(json['is_active']),
-      notes: _stringValue(json['notes']),
+      isActive: _boolOrNull(json['is_active']),
+      notes: _stringOrNull(json['notes']),
     );
   }
 
@@ -1331,6 +1362,9 @@ class AssociationProjectStage {
       'id': id,
       'stage_definition_id': stageDefinitionId,
       'stage_name': stageName,
+      'image_url': imageUrl,
+      'images': images,
+      'gallery_images': galleryImages,
       'start_date': startDate,
       'end_date': endDate,
       'completion_percentage': completionPercentage,
@@ -1340,6 +1374,8 @@ class AssociationProjectStage {
     };
   }
 }
+
+typedef AssociationProjectStage = StageModel;
 
 class MembershipLifecycle {
   const MembershipLifecycle({
@@ -1521,6 +1557,33 @@ List<String> _stringList(Object? raw) {
   return raw.map(_stringValue).where((item) => item.isNotEmpty).toList();
 }
 
+List<String> _mediaUrlList(Object? raw) {
+  if (raw is! List) return const [];
+
+  return raw
+      .expand((item) {
+        if (item is Map) {
+          return [
+            item['url'],
+            item['image_url'],
+            item['file_url'],
+            item['download_url'],
+            item['preview_url'],
+            item['full_url'],
+            item['media_url'],
+            item['src'],
+            item['path'],
+            item['file'],
+          ];
+        }
+        return [item];
+      })
+      .map(_stringValue)
+      .where((item) => item.isNotEmpty)
+      .toSet()
+      .toList();
+}
+
 Map<String, String> _stringMap(Object? raw) {
   if (raw is! Map) return const {};
   return raw.map((key, value) => MapEntry(key.toString(), _stringValue(value)));
@@ -1532,10 +1595,25 @@ String _stringValue(Object? value) {
   return text == 'null' ? '' : text;
 }
 
+String? _stringOrNull(Object? value) {
+  final text = _stringValue(value);
+  return text.isEmpty ? null : text;
+}
+
 bool _boolValue(Object? value) {
   if (value is bool) return value;
   final text = _stringValue(value).toLowerCase();
   return text == 'true' || text == '1' || text == 'yes';
+}
+
+bool? _boolOrNull(Object? value) {
+  if (value == null) return null;
+  if (value is bool) return value;
+  final text = _stringValue(value).toLowerCase();
+  if (text.isEmpty) return null;
+  if (text == 'true' || text == '1' || text == 'yes') return true;
+  if (text == 'false' || text == '0' || text == 'no') return false;
+  return null;
 }
 
 int? _intValue(Object? value) {

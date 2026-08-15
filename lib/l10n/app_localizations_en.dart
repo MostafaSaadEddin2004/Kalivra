@@ -2320,10 +2320,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationMemberStages => 'Stages';
 
   @override
+  String get associationMemberProjects => 'Projects';
+
+  @override
+  String get associationMemberProjectStages => 'Project Stages';
+
+  @override
+  String get associationMemberBuildingStages => 'Building Stages';
+
+  @override
+  String get associationMemberBuildingInformation => 'Building Information';
+
+  @override
+  String get associationMemberStartDate => 'Start date';
+
+  @override
+  String get associationMemberEndDate => 'End date';
+
+  @override
+  String get associationMemberStageGallery => 'Stage gallery';
+
+  @override
   String get associationMemberProjectBuildings => 'Project Buildings';
 
   @override
   String get associationMemberProgress => 'Progress';
+
+  @override
+  String get associationMemberNoProjectsAvailable =>
+      'There are no projects available yet.';
+
+  @override
+  String get associationMemberNoProjectStagesAvailable =>
+      'No construction stages are available for this project yet.';
+
+  @override
+  String get associationMemberNoBuildingsAvailable =>
+      'There are no buildings available for this project yet.';
+
+  @override
+  String get associationMemberNoBuildingStagesAvailable =>
+      'No construction stages are available for this building yet.';
 
   @override
   String get associationMemberAssignedToProject => 'Assigned to project';

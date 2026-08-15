@@ -90,12 +90,6 @@ class NetworkFileActionTile extends StatelessWidget {
                   size: 20.r,
                   color: isDark ? AppColors.goldLight : AppColors.burgundy,
                 ),
-                SizedBox(width: 8.w),
-                Icon(
-                  Icons.open_in_new_rounded,
-                  size: 19.r,
-                  color: isDark ? AppColors.taupe : AppColors.burgundy,
-                ),
               ],
             ),
           ),
