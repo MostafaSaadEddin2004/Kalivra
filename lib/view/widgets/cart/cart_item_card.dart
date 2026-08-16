@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_api_model.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
@@ -27,114 +28,144 @@ class CartItemCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final textTheme = theme.textTheme;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     final productName = item.name?.trim().isNotEmpty == true
         ? item.name!.trim()
         : l10n.productDetails;
     final quantity = item.quantity ?? 1;
     final unitPrice = item.formattedPrice ?? item.price?.toString() ?? '';
     final itemTotal = item.formattedTotal ?? item.total?.toString() ?? '';
+    final imageSize = 118.w;
+    final horizontalImageInset = imageSize + 14.w;
 
     return Card(
-      elevation: 1,
+      margin: EdgeInsets.symmetric(vertical: 8.h),
+      elevation: 2,
+      color: theme.cardTheme.color,
+      shadowColor: AppColors.black.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
-        padding: EdgeInsets.all(10.w),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.r),
-              child: Container(
-                width: 112.w,
-                height: 112.w,
-                color: colorScheme.tertiaryFixed,
-                child: CustomNetworkImage(
-                  imageUrl: item.imageUrl,
-                  width: 112.w,
-                  height: 112.w,
-                  defaultIcon: Icons.inventory_2_outlined,
+        padding: EdgeInsets.all(14.w),
+        child: SizedBox(
+          height: 132.w,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                top: 0,
+                right: isRtl ? 0 : null,
+                left: isRtl ? null : 0,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12.r),
+                  child: Container(
+                    width: imageSize,
+                    height: imageSize,
+                    color: colorScheme.tertiaryFixed,
+                    child: CustomNetworkImage(
+                      imageUrl: item.imageUrl,
+                      width: imageSize,
+                      height: imageSize,
+                      defaultIcon: Icons.image_outlined,
+                      defaultIconColor: AppColors.burgundy.withValues(
+                        alpha: 0.48,
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(width: 14.w),
-            Expanded(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: 112.w),
+              Positioned(
+                top: 4.h,
+                left: isRtl ? 0 : horizontalImageInset,
+                right: isRtl ? horizontalImageInset : 0,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: isRtl
+                      ? CrossAxisAlignment.end
+                      : CrossAxisAlignment.start,
                   children: [
                     Text(
                       productName,
                       style: textTheme.titleMedium?.copyWith(
-                        color: colorScheme.primary,
-                        fontWeight: FontWeight.w700,
+                        color: colorScheme.primaryFixed,
+                        fontWeight: FontWeight.w800,
                       ),
+                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 10.h),
+                    Text(
+                      '$unitPrice x $quantity',
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.primaryFixed.withValues(alpha: 0.7),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     if (item.options.isNotEmpty)
                       Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: isRtl
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
                         children: item.options.map((option) {
                           return Padding(
-                            padding: EdgeInsets.only(bottom: 3.h),
+                            padding: EdgeInsets.only(top: 4.h),
                             child: Text(
                               '${option.attributeName ?? ''}: ${option.optionLabel ?? ''}',
                               style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.primaryFixed,
+                                color: colorScheme.primaryFixed.withValues(
+                                  alpha: 0.6,
+                                ),
                               ),
+                              textAlign: isRtl
+                                  ? TextAlign.right
+                                  : TextAlign.left,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           );
                         }).toList(),
                       ),
-                    if (item.options.isNotEmpty) SizedBox(height: 8.h),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '$unitPrice x  ${l10n.unit} $quantity',
-                            style: textTheme.bodyLarge?.copyWith(
-                              color: colorScheme.primaryFixed,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          itemTotal,
-                          style: textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.primaryFixed,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                  ],
+                ),
+              ),
+              Positioned(
+                left: 0,
+                bottom: 2.h,
+                child: Text(
+                  itemTotal,
+                  style: textTheme.titleMedium?.copyWith(
+                    color: colorScheme.primaryFixed,
+                    fontWeight: FontWeight.w900,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _CartActionIcon(
+                      icon: Icons.delete_outline_rounded,
+                      tooltip: l10n.deleteItem,
+                      onPressed: isDeleting || isEditing ? null : onDelete,
+                      isLoading: isDeleting,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        _CartActionIcon(
-                          icon: Icons.delete_outline_rounded,
-                          tooltip: l10n.deleteItem,
-                          onPressed: isDeleting || isEditing ? null : onDelete,
-                          isLoading: isDeleting,
-                        ),
-                        _CartActionIcon(
-                          icon: Icons.edit_outlined,
-                          tooltip: l10n.editItem,
-                          onPressed: isDeleting || isEditing ? null : onEdit,
-                          isLoading: isEditing,
-                        ),
-                      ],
+                    SizedBox(width: 12.w),
+                    _CartActionIcon(
+                      icon: Icons.edit_outlined,
+                      tooltip: l10n.editItem,
+                      onPressed: isDeleting || isEditing ? null : onEdit,
+                      isLoading: isEditing,
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -157,26 +188,35 @@ class _CartActionIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final enabled = onPressed != null;
 
     return SizedBox(
-      width: 40.r,
-      height: 40.r,
-      child: IconButton(
-        tooltip: tooltip,
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        icon: isLoading
-            ? SpinKitFadingCircle(
-                size: 22.r,
-                color: theme.colorScheme.primaryFixed,
-              )
-            : Icon(
-                icon,
-                size: 24.r,
-                color: onPressed == null
-                    ? theme.colorScheme.onSurface
-                    : theme.colorScheme.primaryFixed,
-              ),
+      width: 42.r,
+      height: 42.r,
+      child: Material(
+        color: AppColors.burgundy.withValues(alpha: enabled ? 0.08 : 0.04),
+        borderRadius: BorderRadius.circular(10.r),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10.r),
+          onTap: onPressed,
+          child: Tooltip(
+            message: tooltip,
+            child: Center(
+              child: isLoading
+                  ? SpinKitFadingCircle(
+                      size: 22.r,
+                      color: theme.colorScheme.primaryFixed,
+                    )
+                  : Icon(
+                      icon,
+                      size: 22.r,
+                      color: enabled
+                          ? theme.colorScheme.primaryFixed
+                          : theme.colorScheme.onSurface,
+                    ),
+            ),
+          ),
+        ),
       ),
     );
   }

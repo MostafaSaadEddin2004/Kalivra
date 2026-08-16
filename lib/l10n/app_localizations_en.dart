@@ -54,6 +54,58 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerShare => 'Share';
 
   @override
+  String get profileWelcome => 'Welcome back';
+
+  @override
+  String get profileGuestName => 'Guest user';
+
+  @override
+  String get profileActiveMember => 'Active member';
+
+  @override
+  String get profileGuestStatus => 'Sign in to manage your account';
+
+  @override
+  String get profileSectionAccountOrders => 'Account and orders';
+
+  @override
+  String get profileSectionSettingsSupport => 'Settings and support';
+
+  @override
+  String get profileAssociationProfileSubtitle =>
+      'Manage your association profile';
+
+  @override
+  String get profileOrdersSubtitle => 'Track and manage your orders';
+
+  @override
+  String get profileFavoritesSubtitle => 'Your saved items';
+
+  @override
+  String get profileSettingsSubtitle => 'Customize app and general settings';
+
+  @override
+  String get profileContactSubtitle => 'We\'re here to help';
+
+  @override
+  String get profileAboutSubtitle => 'App and version information';
+
+  @override
+  String get profilePrivacySubtitle => 'How your data is protected';
+
+  @override
+  String get profileTermsSubtitle => 'Learn about terms and conditions';
+
+  @override
+  String get profileFaqSubtitle => 'Answers to your questions';
+
+  @override
+  String get profileShareApp => 'Share app';
+
+  @override
+  String get profileShareSubtitle => 'Invite others to Kalivra';
+
+  @override
   String get settingsTitle => 'Settings';
 
   @override
@@ -596,6 +648,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get placeOrderFailed => 'Failed to place order. Please try again.';
+
+  @override
+  String get checkoutMyAddresses => 'My addresses';
+
+  @override
+  String get checkoutAddNewAddress => 'Add new address';
+
+  @override
+  String get checkoutAddAddressTitle => 'Add new address';
+
+  @override
+  String get checkoutFirstName => 'First name';
+
+  @override
+  String get checkoutLastName => 'Last name';
+
+  @override
+  String get checkoutEnterFirstName => 'Enter first name';
+
+  @override
+  String get checkoutEnterLastName => 'Enter last name';
+
+  @override
+  String get checkoutEmail => 'Email';
+
+  @override
+  String get checkoutEmailHint => 'example@email.com';
+
+  @override
+  String get checkoutPhoneNumber => 'Phone number';
+
+  @override
+  String get checkoutFullAddress => 'Full address';
+
+  @override
+  String get checkoutFullAddressHint => 'Enter the address in detail';
+
+  @override
+  String get checkoutCity => 'City';
+
+  @override
+  String get checkoutChooseCity => 'Choose city';
+
+  @override
+  String get checkoutProvince => 'Governorate';
+
+  @override
+  String get checkoutChooseProvince => 'Choose governorate';
+
+  @override
+  String get checkoutPostalCodeOptional => 'Postal code (optional)';
+
+  @override
+  String get checkoutEnterPostalCode => 'Enter postal code';
+
+  @override
+  String get checkoutSaveAsDefaultAddress => 'Save as default address';
+
+  @override
+  String get checkoutDefaultAddressHelper =>
+      'This address will be used for upcoming orders';
+
+  @override
+  String get checkoutSaveAddress => 'Save address';
+
+  @override
+  String get checkoutContinueToShipping => 'Continue to shipping';
+
+  @override
+  String get checkoutContinueToPayment => 'Continue to payment';
+
+  @override
+  String get checkoutContinueToSummary => 'Continue to summary';
+
+  @override
+  String get checkoutChooseShippingMethod => 'Choose shipping method';
+
+  @override
+  String get checkoutChoosePaymentMethod => 'Choose payment method';
+
+  @override
+  String checkoutProducts(int count) {
+    return 'Products ($count)';
+  }
+
+  @override
+  String get checkoutDeliveryAddress => 'Delivery address';
+
+  @override
+  String get checkoutOrderDetails => 'Order details';
+
+  @override
+  String get checkoutFree => 'Free';
+
+  @override
+  String get checkoutNoAddressesAvailable =>
+      'No saved addresses are available.';
 
   @override
   String get myAccount => 'My Account';

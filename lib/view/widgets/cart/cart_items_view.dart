@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/nav_cubit/nav_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
+import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/cart/cart_api_model.dart';
 import 'package:kalivra/view/widgets/cart/cart_item_card.dart';
@@ -21,12 +22,11 @@ class CartItemsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cartCubit = context.watch<CartCubit>();
     final items = cart.items;
-    final theme = Theme.of(context);
 
     return CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
           sliver: SliverList.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
@@ -42,29 +42,23 @@ class CartItemsView extends StatelessWidget {
           ),
         ),
         SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           sliver: SliverToBoxAdapter(
             child: Column(
               children: [
-                SizedBox(height: 8.h),
-                Divider(height: 1.h, color: theme.colorScheme.primaryFixed),
-                SizedBox(height: 8.h),
+                SizedBox(height: 16.h),
+                _PriceBreak(cart: cart),
+                SizedBox(height: 16.h),
+                _CouponSection(cart: cart),
+                SizedBox(height: 18.h),
                 _CartActionsBar(
                   isLoading: cartCubit.isClearingCart,
                   onClearPressed: items.isEmpty
                       ? null
                       : () => _confirmClearCart(context),
                 ),
-                SizedBox(height: 16.h),
-                _CouponSection(cart: cart),
-                SizedBox(height: 16.h),
-                _PriceBreak(cart: cart),
-                SizedBox(height: 16.h),
+                SizedBox(height: 18.h),
                 CartBottomBar(
-                  amount:
-                      cart.formattedGrandTotal ??
-                      cart.grandTotal?.toString() ??
-                      '',
                   onProceed: () => context.push(AppRoutes.checkout),
                 ),
                 SizedBox(height: 80.h),
@@ -141,62 +135,60 @@ class _CartActionsBar extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final foreground = colorScheme.primaryFixed;
 
-    return Card(
-      elevation: 1,
-      child: Row(
-        children: [
-          Expanded(
-            child: TextButton.icon(
-              onPressed: () => context.read<NavCubit>().goTo(0),
-              icon: Icon(Icons.arrow_forward_rounded, size: 28.r),
-              label: Text(
-                l10n.continueShopping,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: foreground,
-                textStyle: theme.textTheme.bodyLarge,
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+    return Row(
+      children: [
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: () => context.read<NavCubit>().goTo(0),
+            icon: Icon(Icons.arrow_back_rounded, size: 24.r),
+            label: Text(
+              l10n.continueShopping,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            style: FilledButton.styleFrom(
+              backgroundColor: colorScheme.onTertiaryFixed,
+              foregroundColor: colorScheme.secondaryFixed,
+              textStyle: theme.textTheme.titleMedium,
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
               ),
             ),
           ),
-          SizedBox(
-            height: 34.h,
-            child: VerticalDivider(
-              width: 1.w,
-              color: colorScheme.primary.withValues(alpha: 0.12),
+        ),
+        SizedBox(width: 14.w),
+        Expanded(
+          child: OutlinedButton.icon(
+            onPressed: isLoading ? null : onClearPressed,
+            icon: isLoading
+                ? SizedBox(
+                    width: 20.r,
+                    height: 20.r,
+                    child: SpinKitFadingCircle(
+                      itemSize: 20.r,
+                      color: colorScheme.primaryFixed,
+                    ),
+                  )
+                : Icon(Icons.delete_outline_rounded, size: 28.r),
+            label: Text(
+              l10n.emptyCart,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          Expanded(
-            child: TextButton.icon(
-              onPressed: isLoading ? null : onClearPressed,
-              icon: isLoading
-                  ? SizedBox(
-                      width: 20.r,
-                      height: 20.r,
-                      child: SpinKitFadingCircle(
-                        itemSize: 20.r,
-                        color: foreground,
-                      ),
-                    )
-                  : Icon(Icons.delete_outline_rounded, size: 28.r),
-              label: Text(
-                l10n.emptyCart,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: foreground,
-                textStyle: theme.textTheme.bodyLarge,
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 14.h),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: colorScheme.primaryFixed,
+              side: BorderSide(color: AppColors.burgundy),
+              textStyle: theme.textTheme.titleMedium,
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 15.h),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -210,6 +202,7 @@ class _PriceBreak extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final rows = <_SummaryRowData>[
       _SummaryRowData(l10n.subtotal, cart.formattedSubTotal),
       _SummaryRowData(l10n.discount, cart.formattedDiscountAmount),
@@ -218,19 +211,30 @@ class _PriceBreak extends StatelessWidget {
     ];
 
     return Card(
-      elevation: 1,
+      elevation: 2,
+      color: theme.cardTheme.color,
+      shadowColor: AppColors.black.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(l10n.priceDetails, style: theme.textTheme.headlineSmall),
-            SizedBox(height: 26.h),
+            _SectionTitle(
+              icon: Icons.receipt_long_outlined,
+              title: l10n.orderSummary,
+              iconColor: colorScheme.onTertiaryFixed,
+            ),
+            SizedBox(height: 24.h),
             ...rows.map(
               (row) => Padding(
                 padding: EdgeInsets.only(bottom: 13.h),
                 child: _SummaryLine(label: row.label, value: row.value ?? ''),
               ),
+            ),
+            Divider(
+              height: 24.h,
+              color: colorScheme.primaryFixed.withValues(alpha: 0.08),
             ),
             _SummaryLine(
               label: l10n.total,
@@ -308,13 +312,20 @@ class _CouponSectionState extends State<_CouponSection> {
     final canApply = _couponController.text.trim().isNotEmpty && !isApplying;
 
     return Card(
-      elevation: 1,
+      elevation: 2,
+      color: theme.cardTheme.color,
+      shadowColor: AppColors.black.withValues(alpha: 0.08),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
+        padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(l10n.applyCouponTitle, style: theme.textTheme.headlineSmall),
+            _SectionTitle(
+              icon: Icons.local_offer_outlined,
+              title: l10n.applyCouponTitle,
+              iconColor: colorScheme.primaryFixed,
+            ),
             SizedBox(height: 20.h),
             if (hasCoupon)
               Row(
@@ -340,7 +351,7 @@ class _CouponSectionState extends State<_CouponSection> {
               )
             else
               Row(
-                spacing: 8.w,
+                spacing: 10.w,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
@@ -353,16 +364,26 @@ class _CouponSectionState extends State<_CouponSection> {
                       },
                       style: theme.textTheme.bodyMedium,
                       decoration: InputDecoration(
-                        labelText: l10n.couponCode,
-                        labelStyle: theme.textTheme.bodySmall?.copyWith(
-                          color: colorScheme.primaryFixed,
+                        hintText: l10n.couponCode,
+                        hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.primaryFixed.withValues(
+                            alpha: 0.52,
+                          ),
                         ),
                         contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 4.h,
+                          horizontal: 14.w,
+                          vertical: 14.h,
                         ),
                         border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(10.r),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.r),
+                          borderSide: BorderSide(
+                            color: colorScheme.primaryFixed.withValues(
+                              alpha: 0.12,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -373,7 +394,11 @@ class _CouponSectionState extends State<_CouponSection> {
                       backgroundColor: colorScheme.onTertiaryFixed,
                       foregroundColor: colorScheme.secondaryFixed,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 22.w,
+                        vertical: 16.h,
                       ),
                     ),
                     child: isApplying
@@ -403,6 +428,42 @@ class _CouponSectionState extends State<_CouponSection> {
   }
 }
 
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.icon,
+    required this.title,
+    required this.iconColor,
+  });
+
+  final IconData icon;
+  final String title;
+  final Color iconColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Row(
+      children: [
+        Icon(icon, color: iconColor, size: 24.r),
+        SizedBox(width: 8.w),
+        Expanded(
+          child: Text(
+            title,
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: colorScheme.primaryFixed,
+              fontWeight: FontWeight.w800,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _SummaryLine extends StatelessWidget {
   const _SummaryLine({
     required this.label,
@@ -418,19 +479,23 @@ class _SummaryLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final style = theme.textTheme.bodyLarge?.copyWith(
+    final labelStyle = theme.textTheme.bodyLarge?.copyWith(
       color: colorScheme.primaryFixed,
       fontWeight: bold ? FontWeight.w800 : FontWeight.w500,
+    );
+    final valueStyle = theme.textTheme.bodyLarge?.copyWith(
+      color: bold ? colorScheme.onTertiaryFixed : colorScheme.primaryFixed,
+      fontWeight: bold ? FontWeight.w900 : FontWeight.w500,
     );
 
     return Row(
       children: [
-        Expanded(child: Text(label, style: style)),
+        Expanded(child: Text(label, style: labelStyle)),
         SizedBox(width: 12.w),
         Flexible(
           child: Text(
             value,
-            style: style,
+            style: valueStyle,
             textAlign: TextAlign.end,
             overflow: TextOverflow.ellipsis,
           ),
@@ -441,71 +506,37 @@ class _SummaryLine extends StatelessWidget {
 }
 
 class CartBottomBar extends StatelessWidget {
-  const CartBottomBar({
-    super.key,
-    required this.amount,
-    required this.onProceed,
-  });
+  const CartBottomBar({super.key, required this.onProceed});
 
-  final String amount;
   final VoidCallback onProceed;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final textTheme = theme.textTheme;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              spacing: 4.h,
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${AppLocalizations.of(context)!.amountDue}:',
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.primaryFixed,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  amount,
-                  style: textTheme.headlineSmall?.copyWith(
-                    color: colorScheme.primaryFixed,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
+    return SizedBox(
+      width: double.infinity,
+      child: FilledButton.icon(
+        onPressed: onProceed,
+        icon: Icon(Icons.lock_rounded, size: 22.r),
+        label: Text(
+          AppLocalizations.of(context)!.proceed,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        style: FilledButton.styleFrom(
+          backgroundColor: colorScheme.onTertiaryFixed,
+          foregroundColor: colorScheme.secondaryFixed,
+          textStyle: theme.textTheme.titleMedium?.copyWith(
+            color: colorScheme.secondaryFixed,
+            fontWeight: FontWeight.w800,
           ),
-          Expanded(
-            child: FilledButton(
-              onPressed: onProceed,
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.onTertiaryFixed,
-                foregroundColor: colorScheme.secondaryFixed,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28.r),
-                ),
-              ),
-              child: Text(
-                AppLocalizations.of(context)!.proceed,
-                style: textTheme.titleMedium?.copyWith(
-                  color: colorScheme.secondaryFixed,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+          padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 18.w),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14.r),
           ),
-        ],
+        ),
       ),
     );
   }

@@ -49,6 +49,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
           button: ProfilePageItem(
             icon: Icons.logout_rounded,
             label: AppLocalizations.of(context)!.signOut,
+            variant: ProfilePageItemVariant.danger,
             onTap: () => showDialog(
               context: context,
               builder: (context) {
@@ -91,6 +92,7 @@ class MiddlewareCubit extends Cubit<MiddlewareState> {
           button: ProfilePageItem(
             icon: Icons.login_rounded,
             label: AppLocalizations.of(context)!.signIn,
+            variant: ProfilePageItemVariant.action,
             onTap: () => context.go(AppRoutes.login),
           ),
         ),

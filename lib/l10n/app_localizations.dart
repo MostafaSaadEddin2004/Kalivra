@@ -188,6 +188,108 @@ abstract class AppLocalizations {
   /// **'Share'**
   String get drawerShare;
 
+  /// No description provided for @profileWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get profileWelcome;
+
+  /// No description provided for @profileGuestName.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest user'**
+  String get profileGuestName;
+
+  /// No description provided for @profileActiveMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Active member'**
+  String get profileActiveMember;
+
+  /// No description provided for @profileGuestStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to manage your account'**
+  String get profileGuestStatus;
+
+  /// No description provided for @profileSectionAccountOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Account and orders'**
+  String get profileSectionAccountOrders;
+
+  /// No description provided for @profileSectionSettingsSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings and support'**
+  String get profileSectionSettingsSupport;
+
+  /// No description provided for @profileAssociationProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your association profile'**
+  String get profileAssociationProfileSubtitle;
+
+  /// No description provided for @profileOrdersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track and manage your orders'**
+  String get profileOrdersSubtitle;
+
+  /// No description provided for @profileFavoritesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your saved items'**
+  String get profileFavoritesSubtitle;
+
+  /// No description provided for @profileSettingsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize app and general settings'**
+  String get profileSettingsSubtitle;
+
+  /// No description provided for @profileContactSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'re here to help'**
+  String get profileContactSubtitle;
+
+  /// No description provided for @profileAboutSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App and version information'**
+  String get profileAboutSubtitle;
+
+  /// No description provided for @profilePrivacySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How your data is protected'**
+  String get profilePrivacySubtitle;
+
+  /// No description provided for @profileTermsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn about terms and conditions'**
+  String get profileTermsSubtitle;
+
+  /// No description provided for @profileFaqSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Answers to your questions'**
+  String get profileFaqSubtitle;
+
+  /// No description provided for @profileShareApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share app'**
+  String get profileShareApp;
+
+  /// No description provided for @profileShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite others to Kalivra'**
+  String get profileShareSubtitle;
+
   /// No description provided for @settingsTitle.
   ///
   /// In en, this message translates to:
@@ -1207,6 +1309,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to place order. Please try again.'**
   String get placeOrderFailed;
+
+  /// No description provided for @checkoutMyAddresses.
+  ///
+  /// In en, this message translates to:
+  /// **'My addresses'**
+  String get checkoutMyAddresses;
+
+  /// No description provided for @checkoutAddNewAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new address'**
+  String get checkoutAddNewAddress;
+
+  /// No description provided for @checkoutAddAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new address'**
+  String get checkoutAddAddressTitle;
+
+  /// No description provided for @checkoutFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get checkoutFirstName;
+
+  /// No description provided for @checkoutLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get checkoutLastName;
+
+  /// No description provided for @checkoutEnterFirstName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter first name'**
+  String get checkoutEnterFirstName;
+
+  /// No description provided for @checkoutEnterLastName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter last name'**
+  String get checkoutEnterLastName;
+
+  /// No description provided for @checkoutEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get checkoutEmail;
+
+  /// No description provided for @checkoutEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'example@email.com'**
+  String get checkoutEmailHint;
+
+  /// No description provided for @checkoutPhoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get checkoutPhoneNumber;
+
+  /// No description provided for @checkoutFullAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Full address'**
+  String get checkoutFullAddress;
+
+  /// No description provided for @checkoutFullAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the address in detail'**
+  String get checkoutFullAddressHint;
+
+  /// No description provided for @checkoutCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City'**
+  String get checkoutCity;
+
+  /// No description provided for @checkoutChooseCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose city'**
+  String get checkoutChooseCity;
+
+  /// No description provided for @checkoutProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'Governorate'**
+  String get checkoutProvince;
+
+  /// No description provided for @checkoutChooseProvince.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose governorate'**
+  String get checkoutChooseProvince;
+
+  /// No description provided for @checkoutPostalCodeOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Postal code (optional)'**
+  String get checkoutPostalCodeOptional;
+
+  /// No description provided for @checkoutEnterPostalCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter postal code'**
+  String get checkoutEnterPostalCode;
+
+  /// No description provided for @checkoutSaveAsDefaultAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as default address'**
+  String get checkoutSaveAsDefaultAddress;
+
+  /// No description provided for @checkoutDefaultAddressHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'This address will be used for upcoming orders'**
+  String get checkoutDefaultAddressHelper;
+
+  /// No description provided for @checkoutSaveAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Save address'**
+  String get checkoutSaveAddress;
+
+  /// No description provided for @checkoutContinueToShipping.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to shipping'**
+  String get checkoutContinueToShipping;
+
+  /// No description provided for @checkoutContinueToPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to payment'**
+  String get checkoutContinueToPayment;
+
+  /// No description provided for @checkoutContinueToSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to summary'**
+  String get checkoutContinueToSummary;
+
+  /// No description provided for @checkoutChooseShippingMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose shipping method'**
+  String get checkoutChooseShippingMethod;
+
+  /// No description provided for @checkoutChoosePaymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose payment method'**
+  String get checkoutChoosePaymentMethod;
+
+  /// No description provided for @checkoutProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Products ({count})'**
+  String checkoutProducts(int count);
+
+  /// No description provided for @checkoutDeliveryAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery address'**
+  String get checkoutDeliveryAddress;
+
+  /// No description provided for @checkoutOrderDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Order details'**
+  String get checkoutOrderDetails;
+
+  /// No description provided for @checkoutFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get checkoutFree;
+
+  /// No description provided for @checkoutNoAddressesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved addresses are available.'**
+  String get checkoutNoAddressesAvailable;
 
   /// No description provided for @myAccount.
   ///

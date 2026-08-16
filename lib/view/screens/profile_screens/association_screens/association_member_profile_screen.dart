@@ -621,14 +621,14 @@ class _ExpandableProfileSectionState extends State<_ExpandableProfileSection> {
   @override
   void initState() {
     super.initState();
-    _expanded = true;
+    _expanded = false;
   }
 
   @override
   void didUpdateWidget(covariant _ExpandableProfileSection oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.title != widget.title) {
-      _expanded = true;
+      _expanded = false;
     }
   }
 

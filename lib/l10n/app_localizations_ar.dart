@@ -54,6 +54,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerShare => 'مشاركة';
 
   @override
+  String get profileWelcome => 'مرحباً بك';
+
+  @override
+  String get profileGuestName => 'زائر';
+
+  @override
+  String get profileActiveMember => 'عضو نشط';
+
+  @override
+  String get profileGuestStatus => 'سجّل الدخول لإدارة حسابك';
+
+  @override
+  String get profileSectionAccountOrders => 'الحساب والطلبات';
+
+  @override
+  String get profileSectionSettingsSupport => 'الإعدادات والدعم';
+
+  @override
+  String get profileAssociationProfileSubtitle => 'إدارة ملفك في الجمعية';
+
+  @override
+  String get profileOrdersSubtitle => 'تتبع وإدارة طلباتك';
+
+  @override
+  String get profileFavoritesSubtitle => 'العناصر المفضلة لديك';
+
+  @override
+  String get profileSettingsSubtitle => 'تخصيص التطبيق والإعدادات العامة';
+
+  @override
+  String get profileContactSubtitle => 'نحن هنا لمساعدتك';
+
+  @override
+  String get profileAboutSubtitle => 'معلومات عن التطبيق والإصدار';
+
+  @override
+  String get profilePrivacySubtitle => 'كيفية حماية بياناتك';
+
+  @override
+  String get profileTermsSubtitle => 'تعرف على الشروط والأحكام';
+
+  @override
+  String get profileFaqSubtitle => 'إجابات على استفساراتك';
+
+  @override
+  String get profileShareApp => 'مشاركة التطبيق';
+
+  @override
+  String get profileShareSubtitle => 'ادعُ الآخرين إلى كليفرة';
+
+  @override
   String get settingsTitle => 'الإعدادات';
 
   @override
@@ -592,6 +643,102 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get placeOrderFailed => 'فشل إتمام الطلب. جرّب مرة أخرى.';
+
+  @override
+  String get checkoutMyAddresses => 'عناويني';
+
+  @override
+  String get checkoutAddNewAddress => 'إضافة عنوان جديد';
+
+  @override
+  String get checkoutAddAddressTitle => 'إضافة عنوان جديد';
+
+  @override
+  String get checkoutFirstName => 'الاسم الأول';
+
+  @override
+  String get checkoutLastName => 'الاسم الأخير';
+
+  @override
+  String get checkoutEnterFirstName => 'ادخل الاسم الأول';
+
+  @override
+  String get checkoutEnterLastName => 'ادخل الاسم الأخير';
+
+  @override
+  String get checkoutEmail => 'البريد الإلكتروني';
+
+  @override
+  String get checkoutEmailHint => 'example@email.com';
+
+  @override
+  String get checkoutPhoneNumber => 'رقم الهاتف';
+
+  @override
+  String get checkoutFullAddress => 'العنوان الكامل';
+
+  @override
+  String get checkoutFullAddressHint => 'ادخل العنوان بالتفصيل';
+
+  @override
+  String get checkoutCity => 'المدينة';
+
+  @override
+  String get checkoutChooseCity => 'اختر المدينة';
+
+  @override
+  String get checkoutProvince => 'المحافظة';
+
+  @override
+  String get checkoutChooseProvince => 'اختر المحافظة';
+
+  @override
+  String get checkoutPostalCodeOptional => 'الرمز البريدي (اختياري)';
+
+  @override
+  String get checkoutEnterPostalCode => 'ادخل الرمز البريدي';
+
+  @override
+  String get checkoutSaveAsDefaultAddress => 'حفظ كعنوان افتراضي';
+
+  @override
+  String get checkoutDefaultAddressHelper =>
+      'سيتم استخدام هذا العنوان في الطلبات القادمة';
+
+  @override
+  String get checkoutSaveAddress => 'حفظ العنوان';
+
+  @override
+  String get checkoutContinueToShipping => 'متابعة إلى التوصيل';
+
+  @override
+  String get checkoutContinueToPayment => 'متابعة إلى الدفع';
+
+  @override
+  String get checkoutContinueToSummary => 'متابعة إلى الملخص';
+
+  @override
+  String get checkoutChooseShippingMethod => 'اختر طريقة التوصيل';
+
+  @override
+  String get checkoutChoosePaymentMethod => 'اختر طريقة الدفع';
+
+  @override
+  String checkoutProducts(int count) {
+    return 'المنتجات ($count)';
+  }
+
+  @override
+  String get checkoutDeliveryAddress => 'عنوان التوصيل';
+
+  @override
+  String get checkoutOrderDetails => 'تفاصيل الطلب';
+
+  @override
+  String get checkoutFree => 'مجانا';
+
+  @override
+  String get checkoutNoAddressesAvailable => 'لا توجد عناوين محفوظة.';
 
   @override
   String get myAccount => 'حسابي';
