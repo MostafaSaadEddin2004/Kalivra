@@ -1328,6 +1328,30 @@ abstract class AppLocalizations {
   /// **'Add new address'**
   String get checkoutAddAddressTitle;
 
+  /// No description provided for @checkoutEditAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit address'**
+  String get checkoutEditAddressTitle;
+
+  /// No description provided for @checkoutEditAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit address'**
+  String get checkoutEditAddress;
+
+  /// No description provided for @checkoutSetAsDefaultAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Set as default'**
+  String get checkoutSetAsDefaultAddress;
+
+  /// No description provided for @checkoutDeleteAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete address'**
+  String get checkoutDeleteAddress;
+
   /// No description provided for @checkoutFirstName.
   ///
   /// In en, this message translates to:
@@ -1435,6 +1459,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save address'**
   String get checkoutSaveAddress;
+
+  /// No description provided for @checkoutUpdateAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Update address'**
+  String get checkoutUpdateAddress;
+
+  /// No description provided for @checkoutAddressAddedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Address added successfully'**
+  String get checkoutAddressAddedSuccessfully;
+
+  /// No description provided for @checkoutAddressUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Address updated successfully'**
+  String get checkoutAddressUpdatedSuccessfully;
+
+  /// No description provided for @checkoutAddressDefaultUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Default address updated successfully'**
+  String get checkoutAddressDefaultUpdatedSuccessfully;
+
+  /// No description provided for @checkoutAddressDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Address deleted successfully'**
+  String get checkoutAddressDeletedSuccessfully;
 
   /// No description provided for @checkoutContinueToShipping.
   ///

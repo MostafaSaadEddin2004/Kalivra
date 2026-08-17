@@ -10,9 +10,10 @@ class ProfilePageFooter extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             AppLocalizations.of(context)!.version,

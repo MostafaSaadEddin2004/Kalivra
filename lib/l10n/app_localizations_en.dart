@@ -659,6 +659,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkoutAddAddressTitle => 'Add new address';
 
   @override
+  String get checkoutEditAddressTitle => 'Edit address';
+
+  @override
+  String get checkoutEditAddress => 'Edit address';
+
+  @override
+  String get checkoutSetAsDefaultAddress => 'Set as default';
+
+  @override
+  String get checkoutDeleteAddress => 'Delete address';
+
+  @override
   String get checkoutFirstName => 'First name';
 
   @override
@@ -712,6 +724,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkoutSaveAddress => 'Save address';
+
+  @override
+  String get checkoutUpdateAddress => 'Update address';
+
+  @override
+  String get checkoutAddressAddedSuccessfully => 'Address added successfully';
+
+  @override
+  String get checkoutAddressUpdatedSuccessfully =>
+      'Address updated successfully';
+
+  @override
+  String get checkoutAddressDefaultUpdatedSuccessfully =>
+      'Default address updated successfully';
+
+  @override
+  String get checkoutAddressDeletedSuccessfully =>
+      'Address deleted successfully';
 
   @override
   String get checkoutContinueToShipping => 'Continue to shipping';

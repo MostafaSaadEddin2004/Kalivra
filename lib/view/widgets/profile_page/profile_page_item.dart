@@ -49,8 +49,8 @@ class ProfilePageItem extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: isAction ? 34.r : 42.r,
-                height: isAction ? 34.r : 42.r,
+                width: isAction ? 28.r : 42.r,
+                height: isAction ? 28.r : 42.r,
                 decoration: BoxDecoration(
                   color: iconBackground,
                   borderRadius: BorderRadius.circular(10.r),
@@ -58,7 +58,7 @@ class ProfilePageItem extends StatelessWidget {
                 child: Icon(
                   icon,
                   color: foreground,
-                  size: isAction ? 20.r : 24.r,
+                  size: isAction ? 16.r : 24.r,
                 ),
               ),
               SizedBox(width: 12.w),

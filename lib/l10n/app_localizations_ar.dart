@@ -654,6 +654,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get checkoutAddAddressTitle => 'إضافة عنوان جديد';
 
   @override
+  String get checkoutEditAddressTitle => 'تعديل العنوان';
+
+  @override
+  String get checkoutEditAddress => 'تعديل العنوان';
+
+  @override
+  String get checkoutSetAsDefaultAddress => 'تعيين كافتراضي';
+
+  @override
+  String get checkoutDeleteAddress => 'حذف العنوان';
+
+  @override
   String get checkoutFirstName => 'الاسم الأول';
 
   @override
@@ -707,6 +719,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get checkoutSaveAddress => 'حفظ العنوان';
+
+  @override
+  String get checkoutUpdateAddress => 'تحديث العنوان';
+
+  @override
+  String get checkoutAddressAddedSuccessfully => 'تمت إضافة العنوان بنجاح';
+
+  @override
+  String get checkoutAddressUpdatedSuccessfully => 'تم تحديث العنوان بنجاح';
+
+  @override
+  String get checkoutAddressDefaultUpdatedSuccessfully =>
+      'تم تحديث العنوان الافتراضي بنجاح';
+
+  @override
+  String get checkoutAddressDeletedSuccessfully => 'تم حذف العنوان بنجاح';
 
   @override
   String get checkoutContinueToShipping => 'متابعة إلى التوصيل';

@@ -3,6 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/checkout/checkout_summary_model.dart';
+import 'package:kalivra/model/customer/address_api_model.dart';
+import 'package:kalivra/model/services/api/address_info_services.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class AddressStep extends StatefulWidget {
   const AddressStep({
@@ -19,14 +23,30 @@ class AddressStep extends StatefulWidget {
 }
 
 class AddressStepState extends State<AddressStep> {
-  int _selectedIndex = 0;
+  final AddressInfoServices _addressServices = AddressInfoServices();
+  var _apiAddresses = <AddressApiModel>[];
+  var _loadingAddresses = false;
+  var _mutatingAddress = false;
+  var _selectedIndex = 0;
+  int? _selectedAddressId;
+  String? _addressLoadError;
 
-  List<CheckoutAddressData> get addresses =>
-      CheckoutAddressData.fromSummary(widget.summary);
+  List<CheckoutAddressData> get addresses {
+    if (_apiAddresses.isNotEmpty || _addressLoadError == null) {
+      return _apiAddresses.map(CheckoutAddressData.fromApi).toList();
+    }
+    return CheckoutAddressData.fromSummary(widget.summary);
+  }
 
   CheckoutAddressData? get selectedAddress {
     final list = addresses;
     if (list.isEmpty) return null;
+    final selectedId = _selectedAddressId;
+    if (selectedId != null) {
+      for (final address in list) {
+        if (address.id == selectedId) return address;
+      }
+    }
     final index = _selectedIndex.clamp(0, list.length - 1);
     return list[index];
   }
@@ -34,12 +54,201 @@ class AddressStepState extends State<AddressStep> {
   bool validateStep() => selectedAddress?.isUsable ?? false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadAddresses(preferDefault: true);
+  }
+
+  @override
   void didUpdateWidget(covariant AddressStep oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final list = addresses;
-    if (_selectedIndex >= list.length) {
-      _selectedIndex = list.isEmpty ? 0 : list.length - 1;
+    _ensureSelectedAddress();
+  }
+
+  Future<void> _loadAddresses({
+    bool preferDefault = false,
+    int? preferredId,
+  }) async {
+    if (mounted) {
+      setState(() {
+        _loadingAddresses = true;
+        _addressLoadError = null;
+      });
     }
+
+    try {
+      final addresses = await _addressServices.getAddresses();
+      if (!mounted) return;
+      setState(() {
+        _apiAddresses = addresses;
+        _loadingAddresses = false;
+        _selectAddressAfterLoad(
+          preferDefault: preferDefault,
+          preferredId: preferredId,
+        );
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _addressLoadError = e.toString();
+        _loadingAddresses = false;
+        _ensureSelectedAddress();
+      });
+    }
+  }
+
+  Future<bool> _createAddress(_AddressFormData data) async {
+    return _runAddressMutation(
+      successMessage: AppLocalizations.of(
+        context,
+      )!.checkoutAddressAddedSuccessfully,
+      preferredId: null,
+      preferDefault: data.defaultAddress,
+      action: () async {
+        final created = await _addressServices.createAddress(data.toPayload());
+        return created?.id;
+      },
+    );
+  }
+
+  Future<bool> _updateAddress(
+    AddressApiModel address,
+    _AddressFormData data,
+  ) async {
+    return _runAddressMutation(
+      successMessage: AppLocalizations.of(
+        context,
+      )!.checkoutAddressUpdatedSuccessfully,
+      preferredId: address.id,
+      preferDefault: data.defaultAddress,
+      action: () async {
+        final updated = await _addressServices.updateAddress(
+          address.id,
+          data.toPayload(),
+        );
+        return updated?.id ?? address.id;
+      },
+    );
+  }
+
+  Future<void> _setDefaultAddress(AddressApiModel address) async {
+    await _runAddressMutation(
+      successMessage: AppLocalizations.of(
+        context,
+      )!.checkoutAddressDefaultUpdatedSuccessfully,
+      preferredId: address.id,
+      preferDefault: true,
+      action: () async {
+        await _addressServices.setDefaultAddress(address.id);
+        return address.id;
+      },
+    );
+  }
+
+  Future<void> _deleteAddress(AddressApiModel address) async {
+    await _runAddressMutation(
+      successMessage: AppLocalizations.of(
+        context,
+      )!.checkoutAddressDeletedSuccessfully,
+      preferDefault: true,
+      action: () async {
+        await _addressServices.deleteAddress(address.id);
+        return null;
+      },
+    );
+  }
+
+  Future<bool> _runAddressMutation({
+    required String successMessage,
+    required Future<int?> Function() action,
+    bool preferDefault = false,
+    int? preferredId,
+  }) async {
+    if (_mutatingAddress) return false;
+
+    setState(() => _mutatingAddress = true);
+    try {
+      final changedId = await action();
+      await _loadAddresses(
+        preferDefault: preferDefault,
+        preferredId: changedId ?? preferredId,
+      );
+      if (!mounted) return false;
+      CustomSnackBar.show(context, successMessage);
+      return true;
+    } catch (e) {
+      if (!mounted) return false;
+      CustomSnackBar.show(context, e.toString());
+      return false;
+    } finally {
+      if (mounted) setState(() => _mutatingAddress = false);
+    }
+  }
+
+  void _selectAddressAfterLoad({bool preferDefault = false, int? preferredId}) {
+    final list = _apiAddresses.map(CheckoutAddressData.fromApi).toList();
+    if (list.isEmpty) {
+      _selectedAddressId = null;
+      _selectedIndex = 0;
+      return;
+    }
+
+    CheckoutAddressData? selected;
+    if (preferDefault) {
+      selected = _defaultAddress(list);
+    }
+
+    if (selected == null && preferredId != null) {
+      selected = _addressById(list, preferredId);
+    }
+
+    if (selected == null && _selectedAddressId != null) {
+      selected = _addressById(list, _selectedAddressId!);
+    }
+
+    selected ??= _defaultAddress(list) ?? list.first;
+    _selectedAddressId = selected.id;
+    _selectedIndex = list.indexOf(selected);
+  }
+
+  void _ensureSelectedAddress() {
+    final list = addresses;
+    if (list.isEmpty) {
+      _selectedAddressId = null;
+      _selectedIndex = 0;
+      return;
+    }
+
+    final selectedId = _selectedAddressId;
+    if (selectedId != null && _addressById(list, selectedId) != null) return;
+
+    if (_selectedIndex >= list.length) _selectedIndex = list.length - 1;
+
+    final defaultAddress = _defaultAddress(list);
+    if (defaultAddress != null) {
+      _selectedAddressId = defaultAddress.id;
+      _selectedIndex = list.indexOf(defaultAddress);
+      return;
+    }
+
+    _selectedAddressId = list[_selectedIndex].id;
+  }
+
+  CheckoutAddressData? _defaultAddress(List<CheckoutAddressData> list) {
+    for (final address in list) {
+      if (address.isDefault) return address;
+    }
+    return null;
+  }
+
+  CheckoutAddressData? _addressById(
+    List<CheckoutAddressData> list,
+    int addressId,
+  ) {
+    for (final address in list) {
+      if (address.id == addressId) return address;
+    }
+    return null;
   }
 
   @override
@@ -54,25 +263,68 @@ class AddressStepState extends State<AddressStep> {
         children: [
           _CheckoutSectionTitle(title: l10n.checkoutMyAddresses),
           SizedBox(height: 12.h),
-          if (list.isEmpty)
+          if (_loadingAddresses)
+            Skeletonizer(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 12.h),
+                child: _AddressCard(
+                  onTap: () {},
+                  address: CheckoutAddressData(
+                    firstName: 'firstName',
+                    lastName: 'lastName',
+                    email: 'email',
+                    phone: 'phone',
+                    address: 'address',
+                    country: 'country',
+                    state: 'state',
+                    city: 'city',
+                    postcode: 'postcode',
+                    tags: [],
+                  ),
+                  selected: false,
+                  menuEnabled: false,
+                  onEdit: () {},
+                  onSetDefault: () {},
+                  onDelete: () {},
+                ),
+              ),
+            )
+          else if (list.isEmpty)
             _EmptyAddressCard(text: l10n.checkoutNoAddressesAvailable)
           else
             ...List.generate(list.length, (index) {
+              final address = list[index];
+              final apiAddress = _apiAddressById(address.id);
               return Padding(
                 padding: EdgeInsets.only(bottom: 12.h),
                 child: _AddressCard(
-                  address: list[index],
-                  selected: index == _selectedIndex,
-                  onTap: () => setState(() => _selectedIndex = index),
+                  address: address,
+                  selected: address.id == null
+                      ? index == _selectedIndex
+                      : address.id == _selectedAddressId,
+                  menuEnabled: !_mutatingAddress && apiAddress != null,
+                  onTap: () => setState(() {
+                    _selectedIndex = index;
+                    _selectedAddressId = address.id;
+                  }),
+                  onEdit: apiAddress == null
+                      ? null
+                      : () => _showAddressSheet(context, address: apiAddress),
+                  onSetDefault: apiAddress == null
+                      ? null
+                      : () => _setDefaultAddress(apiAddress),
+                  onDelete: apiAddress == null
+                      ? null
+                      : () => _deleteAddress(apiAddress),
                 ),
               );
             }),
           SizedBox(height: 12.h),
           _AddAddressPreviewButton(
             label: l10n.checkoutAddNewAddress,
-            onTap: () => _showAddAddressSheet(context),
+            onTap: _mutatingAddress ? null : () => _showAddressSheet(context),
           ),
-          SizedBox(height: 34.h),
+          SizedBox(height: 12.h),
           _CheckoutPrimaryButton(
             label: l10n.checkoutContinueToShipping,
             icon: Icons.local_shipping_outlined,
@@ -83,19 +335,33 @@ class AddressStepState extends State<AddressStep> {
     );
   }
 
-  void _showAddAddressSheet(BuildContext context) {
+  AddressApiModel? _apiAddressById(int? id) {
+    if (id == null) return null;
+    for (final address in _apiAddresses) {
+      if (address.id == id) return address;
+    }
+    return null;
+  }
+
+  void _showAddressSheet(BuildContext context, {AddressApiModel? address}) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const _AddAddressSheet(),
+      builder: (context) => _AddressFormSheet(
+        address: address,
+        onSubmit: address == null
+            ? _createAddress
+            : (data) => _updateAddress(address, data),
+      ),
     );
   }
 }
 
 class CheckoutAddressData {
   const CheckoutAddressData({
+    this.id,
     required this.firstName,
     required this.lastName,
     required this.email,
@@ -106,8 +372,10 @@ class CheckoutAddressData {
     required this.city,
     required this.postcode,
     required this.tags,
+    this.isDefault = false,
   });
 
+  final int? id;
   final String firstName;
   final String lastName;
   final String email;
@@ -118,6 +386,7 @@ class CheckoutAddressData {
   final String city;
   final String postcode;
   final List<String> tags;
+  final bool isDefault;
 
   String get fullName {
     final value = [
@@ -190,6 +459,7 @@ class CheckoutAddressData {
     final city = _text(json['city']) ?? '';
     final state = _text(json['state'] ?? json['region']) ?? '';
     return CheckoutAddressData(
+      id: _asInt(json['id']),
       firstName: firstName ?? fullName,
       lastName: lastName ?? '',
       email: _text(json['email']) ?? '',
@@ -201,6 +471,32 @@ class CheckoutAddressData {
       postcode:
           _text(json['postcode'] ?? json['postal_code'] ?? json['zip']) ?? '',
       tags: [city, state].where((part) => part.trim().isNotEmpty).toList(),
+      isDefault: _asBool(json['default_address']) ?? false,
+    );
+  }
+
+  factory CheckoutAddressData.fromApi(AddressApiModel address) {
+    final addressText =
+        address.address1
+            ?.map((line) => line.trim())
+            .where((line) => line.isNotEmpty)
+            .join('، ') ??
+        '';
+    final city = address.city ?? '';
+    final state = address.state ?? '';
+    return CheckoutAddressData(
+      id: address.id,
+      firstName: address.firstName ?? '',
+      lastName: address.lastName ?? '',
+      email: address.email ?? '',
+      phone: address.phone ?? '',
+      address: addressText,
+      country: address.country ?? address.countryName ?? '',
+      state: state,
+      city: city,
+      postcode: address.postcode ?? '',
+      tags: [city, state].where((part) => part.trim().isNotEmpty).toList(),
+      isDefault: address.defaultAddress ?? false,
     );
   }
 
@@ -225,18 +521,44 @@ class CheckoutAddressData {
     final text = value.toString().trim();
     return text.isEmpty ? null : text;
   }
+
+  static int? _asInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    if (value is String) return int.tryParse(value);
+    return null;
+  }
+
+  static bool? _asBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value != 0;
+    if (value is String) {
+      final normalized = value.toLowerCase().trim();
+      if (normalized == 'true' || normalized == '1') return true;
+      if (normalized == 'false' || normalized == '0') return false;
+    }
+    return null;
+  }
 }
 
 class _AddressCard extends StatelessWidget {
   const _AddressCard({
     required this.address,
     required this.selected,
+    required this.menuEnabled,
     required this.onTap,
+    required this.onEdit,
+    required this.onSetDefault,
+    required this.onDelete,
   });
 
   final CheckoutAddressData address;
   final bool selected;
+  final bool menuEnabled;
   final VoidCallback onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onSetDefault;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -308,24 +630,61 @@ class _AddressCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                  if (address.tags.isNotEmpty) ...[
+                  if (address.isDefault || address.tags.isNotEmpty) ...[
                     SizedBox(height: 10.h),
                     Wrap(
                       spacing: 8.w,
                       runSpacing: 6.h,
-                      children: address.tags
-                          .map((tag) => _AddressChip(label: tag))
-                          .toList(),
+                      children: [
+                        if (address.isDefault)
+                          _AddressChip(
+                            label: AppLocalizations.of(context)!.mainAddress,
+                          ),
+                        ...address.tags.map((tag) => _AddressChip(label: tag)),
+                      ],
                     ),
                   ],
                 ],
               ),
             ),
             SizedBox(width: 8.w),
-            Icon(
-              Icons.more_vert_rounded,
-              color: colorScheme.primaryFixed,
-              size: 22.r,
+            PopupMenuButton<_AddressMenuAction>(
+              enabled: menuEnabled,
+              icon: Icon(
+                Icons.more_vert_rounded,
+                color: colorScheme.primaryFixed,
+                size: 22.r,
+              ),
+              onSelected: (action) {
+                switch (action) {
+                  case _AddressMenuAction.edit:
+                    onEdit?.call();
+                    break;
+                  case _AddressMenuAction.setDefault:
+                    onSetDefault?.call();
+                    break;
+                  case _AddressMenuAction.delete:
+                    onDelete?.call();
+                    break;
+                }
+              },
+              itemBuilder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return [
+                  PopupMenuItem(
+                    value: _AddressMenuAction.edit,
+                    child: Text(l10n.checkoutEditAddress),
+                  ),
+                  PopupMenuItem(
+                    value: _AddressMenuAction.setDefault,
+                    child: Text(l10n.checkoutSetAsDefaultAddress),
+                  ),
+                  PopupMenuItem(
+                    value: _AddressMenuAction.delete,
+                    child: Text(l10n.checkoutDeleteAddress),
+                  ),
+                ];
+              },
             ),
           ],
         ),
@@ -333,6 +692,8 @@ class _AddressCard extends StatelessWidget {
     );
   }
 }
+
+enum _AddressMenuAction { edit, setDefault, delete }
 
 class _AddressChip extends StatelessWidget {
   const _AddressChip({required this.label});
@@ -360,57 +721,81 @@ class _AddAddressPreviewButton extends StatelessWidget {
   const _AddAddressPreviewButton({required this.label, required this.onTap});
 
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14.r),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20.h),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(
-            color: AppColors.burgundy.withValues(alpha: 0.55),
-            style: BorderStyle.solid,
-          ),
+    final colorScheme = theme.colorScheme;
+    return OutlinedButton(
+      onPressed: () {},
+      style: OutlinedButton.styleFrom(
+        textStyle: theme.textTheme.titleMedium?.copyWith(
+          color: colorScheme.secondaryFixed,
+          fontWeight: FontWeight.w800,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_rounded, color: AppColors.burgundy, size: 24.r),
-            SizedBox(width: 8.w),
-            Text(
-              label,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: AppColors.burgundy,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+        shape: RoundedRectangleBorder(
+          side: BorderSide(width: 1.w),
+          borderRadius: BorderRadius.circular(14.r),
+        ),
+      ),
+      child: Text(
+        label,
+        style: theme.textTheme.titleSmall?.copyWith(
+          color: colorScheme.onTertiaryFixed,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
   }
 }
 
-class _AddAddressSheet extends StatefulWidget {
-  const _AddAddressSheet();
+class _AddressFormSheet extends StatefulWidget {
+  const _AddressFormSheet({required this.onSubmit, this.address});
+
+  final AddressApiModel? address;
+  final Future<bool> Function(_AddressFormData data) onSubmit;
 
   @override
-  State<_AddAddressSheet> createState() => _AddAddressSheetState();
+  State<_AddressFormSheet> createState() => _AddressFormSheetState();
 }
 
-class _AddAddressSheetState extends State<_AddAddressSheet> {
+class _AddressFormSheetState extends State<_AddressFormSheet> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
+  final _stateController = TextEditingController();
+  final _cityController = TextEditingController();
   final _postalCodeController = TextEditingController();
   bool _saveAsDefault = false;
+  bool _isSaving = false;
+  String? _errorText;
+
+  bool get _isEditMode => widget.address != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final address = widget.address;
+    if (address == null) return;
+
+    _firstNameController.text = address.firstName ?? '';
+    _lastNameController.text = address.lastName ?? '';
+    _emailController.text = address.email ?? '';
+    _phoneController.text = address.phone ?? '';
+    _addressController.text =
+        address.address1
+            ?.map((line) => line.trim())
+            .where((line) => line.isNotEmpty)
+            .join('، ') ??
+        '';
+    _stateController.text = address.state ?? '';
+    _cityController.text = address.city ?? '';
+    _postalCodeController.text = address.postcode ?? '';
+    _saveAsDefault = address.defaultAddress ?? false;
+  }
 
   @override
   void dispose() {
@@ -419,8 +804,44 @@ class _AddAddressSheetState extends State<_AddAddressSheet> {
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
+    _stateController.dispose();
+    _cityController.dispose();
     _postalCodeController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
+    final data = _AddressFormData(
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      email: _emailController.text.trim(),
+      phone: _phoneController.text.trim(),
+      address: _addressController.text.trim(),
+      state: _stateController.text.trim(),
+      city: _cityController.text.trim(),
+      postcode: _postalCodeController.text.trim(),
+      defaultAddress: _saveAsDefault,
+    );
+
+    if (!data.isValid) {
+      setState(() => _errorText = l10n.completeStepData);
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+      _errorText = null;
+    });
+
+    final saved = await widget.onSubmit(data);
+    if (!mounted) return;
+    if (saved) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    setState(() => _isSaving = false);
   }
 
   @override
@@ -467,7 +888,9 @@ class _AddAddressSheetState extends State<_AddAddressSheet> {
                     alignment: Alignment.center,
                     children: [
                       Text(
-                        l10n.checkoutAddAddressTitle,
+                        _isEditMode
+                            ? l10n.checkoutEditAddressTitle
+                            : l10n.checkoutAddAddressTitle,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           color: AppColors.burgundy,
                           fontWeight: FontWeight.w800,
@@ -537,6 +960,7 @@ class _AddAddressSheetState extends State<_AddAddressSheet> {
                     children: [
                       Expanded(
                         child: _SheetSelectField(
+                          controller: _stateController,
                           label: l10n.checkoutProvince,
                           hint: l10n.checkoutChooseProvince,
                           required: true,
@@ -545,6 +969,7 @@ class _AddAddressSheetState extends State<_AddAddressSheet> {
                       SizedBox(width: 12.w),
                       Expanded(
                         child: _SheetSelectField(
+                          controller: _cityController,
                           label: l10n.checkoutCity,
                           hint: l10n.checkoutChooseCity,
                           required: true,
@@ -569,11 +994,26 @@ class _AddAddressSheetState extends State<_AddAddressSheet> {
                       setState(() => _saveAsDefault = value);
                     },
                   ),
+                  if (_errorText != null) ...[
+                    SizedBox(height: 14.h),
+                    Text(
+                      _errorText!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                   SizedBox(height: 34.h),
                   _CheckoutPrimaryButton(
-                    label: l10n.checkoutSaveAddress,
+                    label: _isSaving
+                        ? l10n.checkoutSaveAddress
+                        : _isEditMode
+                        ? l10n.checkoutUpdateAddress
+                        : l10n.checkoutSaveAddress,
                     icon: Icons.check_rounded,
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: _isSaving ? null : _submit,
                   ),
                 ],
               ),
@@ -582,6 +1022,54 @@ class _AddAddressSheetState extends State<_AddAddressSheet> {
         },
       ),
     );
+  }
+}
+
+class _AddressFormData {
+  const _AddressFormData({
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.phone,
+    required this.address,
+    required this.state,
+    required this.city,
+    required this.postcode,
+    required this.defaultAddress,
+  });
+
+  final String firstName;
+  final String lastName;
+  final String email;
+  final String phone;
+  final String address;
+  final String state;
+  final String city;
+  final String postcode;
+  final bool defaultAddress;
+
+  bool get isValid =>
+      firstName.isNotEmpty &&
+      lastName.isNotEmpty &&
+      email.isNotEmpty &&
+      phone.isNotEmpty &&
+      address.isNotEmpty &&
+      state.isNotEmpty &&
+      city.isNotEmpty;
+
+  Map<String, dynamic> toPayload() {
+    return {
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'phone': phone,
+      'address': [address],
+      'city': city,
+      'state': state,
+      'country': 'SY',
+      'postcode': postcode.isEmpty ? '0000' : postcode,
+      'default_address': defaultAddress ? 1 : 0,
+    };
   }
 }
 
@@ -705,11 +1193,13 @@ class _CountryCodePrefix extends StatelessWidget {
 
 class _SheetSelectField extends StatelessWidget {
   const _SheetSelectField({
+    required this.controller,
     required this.label,
     required this.hint,
     this.required = false,
   });
 
+  final TextEditingController controller;
   final String label;
   final String hint;
   final bool required;
@@ -717,59 +1207,23 @@ class _SheetSelectField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      height: 78.h,
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 9.h),
-      decoration: BoxDecoration(
-        color: theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(14.r),
-        border: Border.all(
-          color: theme.colorScheme.primaryFixed.withValues(alpha: 0.08),
-        ),
+    return TextField(
+      controller: controller,
+      textInputAction: TextInputAction.next,
+      cursorColor: AppColors.burgundy,
+      style: theme.textTheme.bodyMedium?.copyWith(
+        color: theme.colorScheme.primaryFixed,
+        fontWeight: FontWeight.w600,
       ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 22.r,
-            color: theme.colorScheme.primaryFixed,
-          ),
-          SizedBox(width: 8.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  required ? '$label *' : label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primaryFixed,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 6.h),
-                Text(
-                  hint,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.primaryFixed.withValues(
-                      alpha: 0.42,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 6.w),
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 20.r,
-            color: theme.colorScheme.primaryFixed,
-          ),
-        ],
+      decoration: _sheetInputDecoration(
+        context,
+        label: required ? '$label *' : label,
+        hint: hint,
+        suffixIcon: Icon(
+          Icons.location_city_outlined,
+          size: 22.r,
+          color: AppColors.burgundy,
+        ),
       ),
     );
   }

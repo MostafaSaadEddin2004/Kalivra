@@ -36,7 +36,8 @@ class AddressInfoServices {
     final data = res.data['data'];
     if (data is List) {
       return data
-          .map((e) => AddressApiModel.fromJson(e as Map<String, dynamic>))
+          .whereType<Map>()
+          .map((e) => AddressApiModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
     }
     return [];
@@ -49,6 +50,29 @@ class AddressInfoServices {
       return AddressApiModel.fromJson(data);
     }
     return null;
+  }
+
+  Future<AddressApiModel?> updateAddress(
+    int addressId,
+    Map<String, dynamic> body,
+  ) async {
+    final res = await _client.put(
+      'customer/addresses/edit/$addressId',
+      data: body,
+    );
+    final data = res.data['data'];
+    if (data is Map<String, dynamic>) {
+      return AddressApiModel.fromJson(data);
+    }
+    return null;
+  }
+
+  Future<void> setDefaultAddress(int addressId) async {
+    await _client.patch('customer/addresses/$addressId/default');
+  }
+
+  Future<void> deleteAddress(int addressId) async {
+    await _client.delete('customer/addresses/$addressId');
   }
 
   List<T> _parseList<T>(
