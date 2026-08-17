@@ -43,7 +43,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               description: AppLocalizations.of(
                 context,
               )!.notificationsLoginPrompt,
-              onLoginTap: () => context.push(AppRoutes.login),
             );
           }
 

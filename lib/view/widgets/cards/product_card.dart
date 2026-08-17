@@ -197,14 +197,11 @@ class _ProductCardState extends State<ProductCard> {
                           ],
                         ),
                         child: _wishlistLoading
-                            ? SizedBox(
-                                height: 22.r,
-                                width: 22.r,
-                                child: SpinKitFadingCircle(
-                                  size: 20.r,
-                                  color: AppColors.offWhite,
-                                ),
-                              )
+                            ? SpinKitFadingCircle(
+                              size: 20.r,
+                              color: AppColors.offWhite,
+                              itemCount: 14,
+                            )
                             : Icon(
                                 isWishlist
                                     ? Icons.favorite_rounded

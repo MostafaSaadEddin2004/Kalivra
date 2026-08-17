@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
-import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/cart/cart_items_view.dart';
@@ -41,7 +40,6 @@ class _CartScreenState extends State<CartScreen> {
               icon: Icons.shopping_cart_outlined,
               title: AppLocalizations.of(context)!.loginRequiredForCartView,
               description: AppLocalizations.of(context)!.cartLoginPrompt,
-              onLoginTap: () => context.push(AppRoutes.login),
             ),
           );
         }

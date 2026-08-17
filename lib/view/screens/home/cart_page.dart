@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
-import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/cart/cart_items_view.dart';
 import 'package:kalivra/view/widgets/cart/empty_cart_view.dart';
@@ -48,7 +46,6 @@ class _CartPageState extends State<CartPage> {
               icon: Icons.shopping_cart_outlined,
               title: AppLocalizations.of(context)!.loginRequiredForCartView,
               description: AppLocalizations.of(context)!.cartLoginPrompt,
-              onLoginTap: () => context.push(AppRoutes.login),
             );
           case CartLoading():
             return SpinKitFadingCircle(

@@ -4915,6 +4915,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open this link'**
   String get contactOpenLinkFailed;
+
+  /// No description provided for @checkOutStepsScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order compeletion steps'**
+  String get checkOutStepsScreenTitle;
 }
 
 class _AppLocalizationsDelegate

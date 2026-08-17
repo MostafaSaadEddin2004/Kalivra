@@ -59,19 +59,25 @@ class _ProfilePageState extends State<ProfilePage> {
         return ListView(
           padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 90.h),
           children: [
-            _ProfileHeroCard(customer: customer),
             if (isLoggedIn) ...[
+              _ProfileHeroCard(customer: customer),
               SizedBox(height: 24.h),
               _ProfileSectionTitle(title: l10n.profileSectionAccountOrders),
               SizedBox(height: 8.h),
               if (customer.isLinkedPerson != null ||
                   customer.isLinkedPerson == true)
                 ProfilePageItem(
-                  icon: Icons.groups_rounded,
-                  label: l10n.associationPersonalProfileButton,
-                  subtitle: l10n.profileAssociationProfileSubtitle,
-                  onTap: () => context.push(AppRoutes.associationMemberProfile),
+                  icon: Icons.person,
+                  label: l10n.myAccount,
+                  subtitle: l10n.accountInfo,
+                  onTap: () => context.push(AppRoutes.account),
                 ),
+              ProfilePageItem(
+                icon: Icons.groups_rounded,
+                label: l10n.associationPersonalProfileButton,
+                subtitle: l10n.profileAssociationProfileSubtitle,
+                onTap: () => context.push(AppRoutes.associationMemberProfile),
+              ),
               ProfilePageItem(
                 icon: Icons.receipt_long_outlined,
                 label: l10n.drawerMyOrders,

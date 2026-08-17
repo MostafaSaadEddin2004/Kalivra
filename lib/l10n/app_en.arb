@@ -870,5 +870,6 @@
   "contactWorkingDays": "{count} days",
   "@contactWorkingDays": {"placeholders":{"count":{"type":"int"}}},
   "contactLoadingInfo": "Loading contact info",
-  "contactOpenLinkFailed": "Could not open this link"
+  "contactOpenLinkFailed": "Could not open this link",
+  "checkOutStepsScreenTitle": "Order compeletion steps"
 }

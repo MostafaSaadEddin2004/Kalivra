@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/app_info_cubit/app_info_cubit.dart';
-import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
@@ -77,7 +75,6 @@ class _RateScreenState extends State<RateScreen> {
               icon: Icons.star_border_rounded,
               title: l10n.loginRequiredForRating,
               description: l10n.ratingLoginPrompt,
-              onLoginTap: () => context.push(AppRoutes.login),
             );
           }
 

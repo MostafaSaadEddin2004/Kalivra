@@ -38,7 +38,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 icon: Icons.receipt_long_outlined,
                 title: AppLocalizations.of(context)!.loginRequiredForOrders,
                 description: AppLocalizations.of(context)!.ordersLoginPrompt,
-                onLoginTap: () => context.push(AppRoutes.login),
               );
             case OrdersLoaded():
               final orders = state.orders;

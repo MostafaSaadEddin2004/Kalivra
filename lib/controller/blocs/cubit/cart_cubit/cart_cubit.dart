@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_state.dart';
@@ -16,9 +18,16 @@ export 'cart_state.dart';
 class CartCubit extends Cubit<CartState> {
   CartCubit() : super(const CartInitial());
 
+  static const Duration _quantityDebounceDuration = Duration(seconds: 1);
+
   final CartApiService _cartService = CartApiService();
   final ProductApiService _productService = ProductApiService();
   final Map<int, ProductModel> _productCache = {};
+  final Map<int, Timer> _quantityDebounceTimers = {};
+  final Map<int, int> _localQuantities = {};
+  final Map<int, int> _scheduledQuantities = {};
+  final Map<int, int> _confirmedQuantities = {};
+  final Map<int, int> _quantityRequestVersions = {};
 
   CartApiModel? _cart;
   CartOperation _operation = CartOperation.none;
@@ -58,6 +67,10 @@ class CartCubit extends Cubit<CartState> {
           _operation == CartOperation.updatingDetails) &&
       _activeItemId == itemId;
 
+  int quantityForItem(CartItemApiModel item) {
+    return _localQuantities[item.id] ?? item.quantity ?? 1;
+  }
+
   List<CartItem> _mapCartItems(CartApiModel? cart) {
     final apiItems = cart?.items;
     if (apiItems == null || apiItems.isEmpty) return const [];
@@ -95,6 +108,7 @@ class CartCubit extends Cubit<CartState> {
 
     try {
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       _emitLoaded();
     } catch (e) {
       emit(CartFailure(message: e.toString(), cart: _cart));
@@ -143,6 +157,7 @@ class CartCubit extends Cubit<CartState> {
         size: size,
       );
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.addToCartSuccess(productName);
       emit(AddToCartSuccessed(message: message, cart: _cart!));
       _emitLoaded();
@@ -174,6 +189,7 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.removeCartItem(cartItemId);
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.itemDeletedSuccessfully;
       emit(RemoveFromCartSuccessed(message: message, cart: _cart!));
       _emitLoaded();
@@ -203,6 +219,7 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.clearCart();
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.cartClearedSuccessfully;
       emit(DeleteCartSuccessed(message: message));
       _emitLoaded();
@@ -238,6 +255,7 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _updateCartItemDetials(itemId, quantity);
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.itemUpdatedSuccessfully;
       emit(UpdateItemQuantitySuccessed(message: message, cart: _cart!));
       _emitLoaded();
@@ -273,6 +291,7 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.updateItemDetials(itemId, quantity, colorId, sizeId);
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.itemUpdatedSuccessfully;
       emit(UpdateItemDetialsSuccessed(message: message, cart: _cart!));
       _emitLoaded();
@@ -302,17 +321,95 @@ class CartCubit extends Cubit<CartState> {
     if (quantity < 1) return;
     final itemId = int.tryParse(productId);
     if (itemId == null) return;
-    await updateItemQuantity(context, itemId, quantity);
+    scheduleItemQuantityUpdate(context, itemId, quantity);
+  }
+
+  void scheduleItemQuantityUpdate(
+    BuildContext context,
+    int itemId,
+    int quantity,
+  ) {
+    if (quantity < 1 || _cartItemById(itemId) == null) return;
+
+    _confirmedQuantities.putIfAbsent(
+      itemId,
+      () => _cartItemById(itemId)?.quantity ?? 1,
+    );
+    _localQuantities[itemId] = quantity;
+    _scheduledQuantities[itemId] = quantity;
+
+    final requestVersion = (_quantityRequestVersions[itemId] ?? 0) + 1;
+    _quantityRequestVersions[itemId] = requestVersion;
+    _quantityDebounceTimers[itemId]?.cancel();
+    _quantityDebounceTimers[itemId] = Timer(_quantityDebounceDuration, () {
+      _quantityDebounceTimers.remove(itemId);
+      final scheduledQuantity = _scheduledQuantities[itemId];
+      if (scheduledQuantity == null || scheduledQuantity < 1) return;
+      _sendScheduledQuantity(
+        context,
+        itemId,
+        scheduledQuantity,
+        requestVersion,
+      );
+    });
+
+    _emitLoaded();
   }
 
   Future<void> _updateCartItemDetials(int itemId, int quantity) async {
-    final item = _cartItemById(itemId);
-    await _cartService.updateItemDetials(
-      itemId,
-      quantity,
-      _optionId(item?.colorOption),
-      _optionId(item?.sizeOption),
-    );
+    await _cartService.updateItemQuantity(itemId, quantity);
+  }
+
+  Future<void> _sendScheduledQuantity(
+    BuildContext context,
+    int itemId,
+    int quantity,
+    int requestVersion,
+  ) async {
+    try {
+      await _updateCartItemDetials(itemId, quantity);
+      final updatedCart = await _cartService.getCart();
+      if (!_isLatestQuantityRequest(itemId, quantity, requestVersion)) return;
+
+      _scheduledQuantities.remove(itemId);
+      _cart = updatedCart;
+      _syncQuantitiesFromCart();
+      _localQuantities.remove(itemId);
+
+      if (context.mounted) {
+        final message = AppLocalizations.of(context)!.itemUpdatedSuccessfully;
+        emit(UpdateItemQuantitySuccessed(message: message, cart: _cart!));
+        _emitLoaded();
+        CustomSnackBar.show(context, message);
+      } else {
+        _emitLoaded();
+      }
+    } catch (e) {
+      if (!_isLatestQuantityRequest(itemId, quantity, requestVersion)) return;
+
+      final confirmedQuantity =
+          _confirmedQuantities[itemId] ?? _cartItemById(itemId)?.quantity ?? 1;
+      _scheduledQuantities.remove(itemId);
+      _localQuantities[itemId] = confirmedQuantity;
+
+      final message = e.toString();
+      emit(
+        CartFailure(
+          message: message,
+          cart: _cart,
+          operation: CartOperation.updatingQuantity,
+          activeItemId: itemId,
+        ),
+      );
+      _emitLoaded();
+      if (context.mounted) CustomSnackBar.show(context, message);
+    }
+  }
+
+  bool _isLatestQuantityRequest(int itemId, int quantity, int requestVersion) {
+    return _quantityRequestVersions[itemId] == requestVersion &&
+        _scheduledQuantities[itemId] == quantity &&
+        _localQuantities[itemId] == quantity;
   }
 
   CartItemApiModel? _cartItemById(int itemId) {
@@ -323,8 +420,36 @@ class CartCubit extends Cubit<CartState> {
     return null;
   }
 
-  String _optionId(CartItemOptionApiModel? option) {
-    return option?.optionId?.toString() ?? '';
+  void _syncQuantitiesFromCart() {
+    final items = _cart?.items ?? const <CartItemApiModel>[];
+    final itemIds = items.map((item) => item.id).toSet();
+
+    for (final entry in _quantityDebounceTimers.entries.toList()) {
+      if (!itemIds.contains(entry.key)) {
+        entry.value.cancel();
+        _quantityDebounceTimers.remove(entry.key);
+      }
+    }
+
+    _localQuantities.removeWhere((itemId, _) => !itemIds.contains(itemId));
+    _scheduledQuantities.removeWhere((itemId, _) => !itemIds.contains(itemId));
+    _confirmedQuantities.removeWhere((itemId, _) => !itemIds.contains(itemId));
+    _quantityRequestVersions.removeWhere(
+      (itemId, _) => !itemIds.contains(itemId),
+    );
+
+    for (final item in items) {
+      final itemId = item.id;
+      _confirmedQuantities[itemId] = item.quantity ?? 1;
+      if (!_hasPendingQuantityChange(itemId)) {
+        _localQuantities.remove(itemId);
+      }
+    }
+  }
+
+  bool _hasPendingQuantityChange(int itemId) {
+    return _quantityDebounceTimers.containsKey(itemId) ||
+        _scheduledQuantities.containsKey(itemId);
   }
 
   void _emitLoading({
@@ -361,6 +486,7 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.postCoupon(code: code);
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.couponAppliedSuccessfully;
       emit(CouponSent(message: message));
       _emitLoaded();
@@ -385,6 +511,7 @@ class CartCubit extends Cubit<CartState> {
     try {
       await _cartService.removeCoupon();
       _cart = await _cartService.getCart();
+      _syncQuantitiesFromCart();
       final message = l10n.couponRemovedSuccessfully;
       emit(CouponRemoved(message: message));
       _emitLoaded();
@@ -401,5 +528,14 @@ class CartCubit extends Cubit<CartState> {
       if (_cart != null) _emitLoaded();
       CustomSnackBar.show(context, message);
     }
+  }
+
+  @override
+  Future<void> close() {
+    for (final timer in _quantityDebounceTimers.values) {
+      timer.cancel();
+    }
+    _quantityDebounceTimers.clear();
+    return super.close();
   }
 }

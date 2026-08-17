@@ -10,6 +10,7 @@ import 'package:kalivra/view/screens/checkout/steps/checkout_step.dart';
 import 'package:kalivra/view/screens/checkout/steps/payment_step.dart';
 import 'package:kalivra/view/screens/checkout/steps/shipping_step.dart';
 import 'package:kalivra/view/screens/checkout/widgets/checkout_step_indicator.dart';
+import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -95,6 +96,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocConsumer<CheckoutCubit, CheckoutState>(
       listener: (context, state) {
         if (state.hasError) {
@@ -112,6 +114,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return Stack(
           children: [
             Scaffold(
+              appBar: ScreenAppBar(title: l10n.checkOutStepsScreenTitle),
               body: SafeArea(
                 child: Column(
                   children: [

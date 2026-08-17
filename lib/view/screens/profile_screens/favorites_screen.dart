@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dart';
-import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
@@ -51,7 +49,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 icon: Icons.favorite_border_rounded,
                 title: l10n.loginRequiredForFavorites,
                 description: l10n.favoritesLoginPrompt,
-                onLoginTap: () => context.push(AppRoutes.login),
               );
             case WishlistLoaded():
               final products = state.wishlist;

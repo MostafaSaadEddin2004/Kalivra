@@ -2536,4 +2536,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get contactOpenLinkFailed => 'تعذر فتح الرابط';
+
+  @override
+  String get checkOutStepsScreenTitle => 'خطوات اتمام الطلب';
 }

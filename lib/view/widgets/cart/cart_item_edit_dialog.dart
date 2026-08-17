@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -11,22 +10,27 @@ import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 
 class CartItemEditDialog extends StatefulWidget {
-  const CartItemEditDialog({super.key, required this.item})
-    : product = null,
-      initialSize = null,
-      initialColor = null;
+  const CartItemEditDialog({
+    super.key,
+    required this.item,
+    this.isBottomSheet = false,
+  }) : product = null,
+       initialSize = null,
+       initialColor = null;
 
   const CartItemEditDialog.add({
     super.key,
     required this.product,
     this.initialSize,
     this.initialColor,
+    this.isBottomSheet = false,
   }) : item = null;
 
   final CartItemApiModel? item;
   final ProductModel? product;
   final VariantBySize? initialSize;
   final ColorVariant? initialColor;
+  final bool isBottomSheet;
 
   @override
   State<CartItemEditDialog> createState() => _CartItemEditDialogState();
@@ -269,7 +273,7 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
           : await _updateSelectedItem(cartCubit);
       if (saved) {
         shouldCloseDialog = true;
-        context.pop();
+        Navigator.of(context).pop(true);
         return;
       }
       if (_isDisposed) return;
@@ -340,198 +344,197 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
         product?.baseImage?.largeImageUrl ??
         product?.baseImage?.originalImageUrl ??
         '';
-    final maxHeight = MediaQuery.sizeOf(context).height * 0.88;
+    final maxHeight =
+        MediaQuery.sizeOf(context).height * (widget.isBottomSheet ? 0.9 : 0.88);
+    final content = ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 430.w, maxHeight: maxHeight),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 22.h),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (widget.isBottomSheet) ...[
+              Center(
+                child: Container(
+                  width: 44.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryFixed.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(100.r),
+                  ),
+                ),
+              ),
+              SizedBox(height: 8.h),
+            ],
+            Text(
+                    title,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: colorScheme.onTertiaryFixed,
+                      fontWeight: FontWeight.w800,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+            SizedBox(height: 16.h),
+            _DialogProductHeader(
+              imageUrl: imageUrl,
+              name: productName,
+              price: _displayPrice,
+            ),
+            SizedBox(height: 16.h),
+            Divider(
+              color: colorScheme.primaryFixed.withValues(alpha: 0.08),
+              height: 1.h,
+            ),
+            SizedBox(height: 16.h),
+            if (_isLoadingProduct)
+              LinearProgressIndicator(color: colorScheme.onTertiaryFixed)
+            else ...[
+              _DialogOptionLabel(
+                icon: Icons.straighten_rounded,
+                label: l10n.size,
+              ),
+              SizedBox(height: 8.h),
+              if (sizes.isNotEmpty)
+                _StyledDropdown<VariantBySize>(
+                  value: _selectedSize,
+                  hint: l10n.size,
+                  items: sizes
+                      .map(
+                        (size) => DropdownMenuItem(
+                          value: size,
+                          child: Text(size.sizeName),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: _isSaving ? null : _selectSize,
+                )
+              else
+                _ReadOnlyOption(
+                  value: item?.sizeOption?.optionLabel ?? l10n.noSizeOptions,
+                ),
+              SizedBox(height: 12.h),
+              _DialogOptionLabel(
+                icon: Icons.palette_outlined,
+                label: l10n.colour,
+              ),
+              SizedBox(height: 8.h),
+              if (colors.isNotEmpty)
+                _StyledDropdown<ColorVariant>(
+                  value: _selectedColor,
+                  hint: l10n.colour,
+                  items: colors
+                      .map(
+                        (color) => DropdownMenuItem(
+                          value: color,
+                          child: Text(color.colorName),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: _isSaving ? null : _selectColor,
+                )
+              else
+                _ReadOnlyOption(
+                  value: item?.colorOption?.optionLabel ?? l10n.noColourOptions,
+                ),
+            ],
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: _DialogOptionLabel(
+                    icon: Icons.inventory_2_outlined,
+                    label: l10n.quantity,
+                  ),
+                ),Text(
+                l10n.availableQuantity(maxQuantity!),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primaryFixed.withValues(alpha: 0.55),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              ],
+            ),
+            SizedBox(height: 8.h),
+            _DialogQuantitySelector(
+              value: _quantity,
+              maxQuantity: maxQuantity,
+              enabled: _canChangeQty && !_isSaving,
+              onChanged: _changeQuantity,
+            ),
+            if (!_canChangeQty) ...[
+              SizedBox(height: 8.h),
+              Text(
+                l10n.quantityReadOnly,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.primaryFixed.withValues(alpha: 0.62),
+                ),
+              ),
+            ],
+            ...?item?.options
+                .where(
+                  (option) =>
+                      option.optionLabel != null &&
+                      option != item.colorOption &&
+                      option != item.sizeOption,
+                )
+                .map(
+                  (option) => Padding(
+                    padding: EdgeInsets.only(top: 14.h),
+                    child: _ReadOnlyOption(value: option.optionLabel),
+                  ),
+                ),
+            if (_errorText != null) ...[
+              SizedBox(height: 12.h),
+              Text(
+                _errorText!,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            SizedBox(height: 16.h),
+            FilledButton(
+              onPressed: canSave ? _save : null,
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.onTertiaryFixed,
+                foregroundColor: colorScheme.secondaryFixed,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28.r),
+                ),
+              ),
+              child: _isSaving
+                  ? SpinKitFadingCircle(
+                      itemSize: 20.r,
+                      size: 22.r,
+                      color: colorScheme.secondaryFixed,
+                    )
+                  : Text(
+                      _isAddMode ? l10n.addToCart : l10n.saveChanges,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.secondaryFixed,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (widget.isBottomSheet) {
+      return SafeArea(top: false, child: content);
+    }
 
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 24.h),
       backgroundColor: theme.cardTheme.color,
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28.r)),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 430.w, maxHeight: maxHeight),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(24.w, 18.h, 24.w, 22.h),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                height: 44.h,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        onPressed: _isSaving ? null : () => context.pop(),
-                        icon: Icon(
-                          Icons.close_rounded,
-                          color: colorScheme.primaryFixed,
-                          size: 24.r,
-                        ),
-                        tooltip: l10n.cancel,
-                      ),
-                    ),
-                    Text(
-                      title,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: colorScheme.onTertiaryFixed,
-                        fontWeight: FontWeight.w800,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 22.h),
-              _DialogProductHeader(
-                imageUrl: imageUrl,
-                name: productName,
-                price: _displayPrice,
-              ),
-              SizedBox(height: 24.h),
-              Divider(
-                color: colorScheme.primaryFixed.withValues(alpha: 0.08),
-                height: 1.h,
-              ),
-              SizedBox(height: 26.h),
-              if (_isLoadingProduct)
-                LinearProgressIndicator(color: colorScheme.onTertiaryFixed)
-              else ...[
-                _DialogOptionLabel(
-                  icon: Icons.straighten_rounded,
-                  label: l10n.size,
-                ),
-                SizedBox(height: 10.h),
-                if (sizes.isNotEmpty)
-                  _StyledDropdown<VariantBySize>(
-                    value: _selectedSize,
-                    hint: l10n.size,
-                    items: sizes
-                        .map(
-                          (size) => DropdownMenuItem(
-                            value: size,
-                            child: Text(size.sizeName),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: _isSaving ? null : _selectSize,
-                  )
-                else
-                  _ReadOnlyOption(
-                    value: item?.sizeOption?.optionLabel ?? l10n.noSizeOptions,
-                  ),
-                SizedBox(height: 22.h),
-                _DialogOptionLabel(
-                  icon: Icons.palette_outlined,
-                  label: l10n.colour,
-                ),
-                SizedBox(height: 10.h),
-                if (colors.isNotEmpty)
-                  _StyledDropdown<ColorVariant>(
-                    value: _selectedColor,
-                    hint: l10n.colour,
-                    items: colors
-                        .map(
-                          (color) => DropdownMenuItem(
-                            value: color,
-                            child: Text(color.colorName),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: _isSaving ? null : _selectColor,
-                  )
-                else
-                  _ReadOnlyOption(
-                    value:
-                        item?.colorOption?.optionLabel ?? l10n.noColourOptions,
-                  ),
-              ],
-              SizedBox(height: 22.h),
-              _DialogOptionLabel(
-                icon: Icons.inventory_2_outlined,
-                label: l10n.quantity,
-              ),
-              SizedBox(height: 10.h),
-              _DialogQuantitySelector(
-                value: _quantity,
-                maxQuantity: maxQuantity,
-                enabled: _canChangeQty && !_isSaving,
-                onChanged: _changeQuantity,
-              ),
-              if (!_canChangeQty) ...[
-                SizedBox(height: 8.h),
-                Text(
-                  l10n.quantityReadOnly,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primaryFixed.withValues(alpha: 0.62),
-                  ),
-                ),
-              ],
-              ...?item?.options
-                  .where(
-                    (option) =>
-                        option.optionLabel != null &&
-                        option != item.colorOption &&
-                        option != item.sizeOption,
-                  )
-                  .map(
-                    (option) => Padding(
-                      padding: EdgeInsets.only(top: 14.h),
-                      child: _ReadOnlyOption(value: option.optionLabel),
-                    ),
-                  ),
-              if (_errorText != null) ...[
-                SizedBox(height: 14.h),
-                Text(
-                  _errorText!,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.error,
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-              SizedBox(height: 28.h),
-              FilledButton(
-                onPressed: canSave ? _save : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: colorScheme.onTertiaryFixed,
-                  foregroundColor: colorScheme.secondaryFixed,
-                  padding: EdgeInsets.symmetric(vertical: 18.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28.r),
-                  ),
-                ),
-                child: _isSaving
-                    ? SpinKitFadingCircle(
-                        itemSize: 20.r,
-                        size: 22.r,
-                        color: colorScheme.secondaryFixed,
-                      )
-                    : Text(
-                        _isAddMode ? l10n.addToCart : l10n.saveChanges,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: colorScheme.secondaryFixed,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-              ),
-              SizedBox(height: 14.h),
-              TextButton(
-                onPressed: _isSaving ? null : () => context.pop(),
-                child: Text(
-                  l10n.cancel,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: colorScheme.onTertiaryFixed,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      child: content,
     );
   }
 }
@@ -590,7 +593,7 @@ class _DialogProductHeader extends StatelessWidget {
                   price,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: colorScheme.primaryFixed,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w800,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -737,7 +740,6 @@ class _DialogQuantitySelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final canDecrease = enabled && value > 1;
@@ -745,7 +747,7 @@ class _DialogQuantitySelector extends StatelessWidget {
         enabled && (maxQuantity == null || value < maxQuantity!);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 8.h),
       decoration: BoxDecoration(
         color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(10.r),
@@ -753,43 +755,27 @@ class _DialogQuantitySelector extends StatelessWidget {
           color: colorScheme.primaryFixed.withValues(alpha: 0.12),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              _QuantityRoundButton(
-                icon: Icons.remove_rounded,
-                enabled: canDecrease,
-                onTap: () => onChanged(value - 1),
-              ),
-              Expanded(
-                child: Text(
-                  '$value',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.primaryFixed,
-                    fontWeight: FontWeight.w800,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              _QuantityRoundButton(
-                icon: Icons.add_rounded,
-                enabled: canIncrease,
-                onTap: () => onChanged(value + 1),
-              ),
-            ],
+          _QuantityRoundButton(
+            icon: Icons.remove_rounded,
+            enabled: canDecrease,
+            onTap: () => onChanged(value - 1),
           ),
-          if (maxQuantity != null) ...[
-            SizedBox(height: 10.h),
-            Text(
-              l10n.availableQuantity(maxQuantity!),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colorScheme.primaryFixed.withValues(alpha: 0.55),
-                fontWeight: FontWeight.w600,
-              ),
+          Text(
+            '$value',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.primaryFixed,
+              fontWeight: FontWeight.w800,
             ),
-          ],
+            textAlign: TextAlign.center,
+          ),
+          _QuantityRoundButton(
+            icon: Icons.add_rounded,
+            enabled: canIncrease,
+            onTap: () => onChanged(value + 1),
+          ),
         ],
       ),
     );
@@ -812,8 +798,8 @@ class _QuantityRoundButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      width: 48.r,
-      height: 48.r,
+      width: 36.r,
+      height: 36.r,
       child: Material(
         color: colorScheme.primaryFixed.withValues(alpha: 0.05),
         shape: const CircleBorder(),
@@ -825,7 +811,7 @@ class _QuantityRoundButton extends StatelessWidget {
             color: enabled
                 ? colorScheme.primaryFixed
                 : colorScheme.primaryFixed.withValues(alpha: 0.24),
-            size: 22.r,
+            size: 20.r,
           ),
         ),
       ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 
@@ -9,13 +11,11 @@ class LoginRequiredPlaceholder extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.description,
-    required this.onLoginTap,
   });
 
   final IconData icon;
   final String title;
   final String description;
-  final VoidCallback onLoginTap;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class LoginRequiredPlaceholder extends StatelessWidget {
             ),
             SizedBox(height: 24.h),
             FilledButton(
-              onPressed: onLoginTap,
+              onPressed: () => context.go(AppRoutes.login),
               child: Text(AppLocalizations.of(context)!.signIn),
             ),
           ],

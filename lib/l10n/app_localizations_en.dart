@@ -2556,4 +2556,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get contactOpenLinkFailed => 'Could not open this link';
+
+  @override
+  String get checkOutStepsScreenTitle => 'Order compeletion steps';
 }

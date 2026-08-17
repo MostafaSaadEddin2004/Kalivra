@@ -22,7 +22,6 @@ class CartItemsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final cartCubit = context.watch<CartCubit>();
     final items = cart.items;
-
     return CustomScrollView(
       slivers: [
         SliverPadding(
@@ -31,12 +30,26 @@ class CartItemsView extends StatelessWidget {
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
+              final isDetailsUpdating =
+                  cartCubit.operation == CartOperation.updatingDetails &&
+                  cartCubit.activeItemId == item.id;
+              final canChangeQuantity = item.canChangeQty ?? true;
               return CartItemCard(
                 item: item,
+                quantity: cartCubit.quantityForItem(item),
                 isDeleting: cartCubit.isRemovingItem(item.id),
-                isEditing: cartCubit.isUpdatingItem(item.id),
-                onEdit: () => _showEditDialog(context, item),
+                isEditing: isDetailsUpdating,
+                onEdit: () => _showEditSheet(context, item),
                 onDelete: () => _confirmRemoveItem(context, item),
+                onQuantityChanged: canChangeQuantity
+                    ? (quantity) {
+                        context.read<CartCubit>().scheduleItemQuantityUpdate(
+                          context,
+                          item.id,
+                          quantity,
+                        );
+                      }
+                    : null,
               );
             },
           ),
@@ -46,18 +59,18 @@ class CartItemsView extends StatelessWidget {
           sliver: SliverToBoxAdapter(
             child: Column(
               children: [
-                SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
                 _PriceBreak(cart: cart),
-                SizedBox(height: 16.h),
+                SizedBox(height: 12.h),
                 _CouponSection(cart: cart),
-                SizedBox(height: 18.h),
+                SizedBox(height: 12.h),
                 _CartActionsBar(
                   isLoading: cartCubit.isClearingCart,
                   onClearPressed: items.isEmpty
                       ? null
                       : () => _confirmClearCart(context),
                 ),
-                SizedBox(height: 18.h),
+                SizedBox(height: 12.h),
                 CartBottomBar(
                   onProceed: () => context.push(AppRoutes.checkout),
                 ),
@@ -70,16 +83,23 @@ class CartItemsView extends StatelessWidget {
     );
   }
 
-  Future<void> _showEditDialog(
+  Future<void> _showEditSheet(
     BuildContext context,
     CartItemApiModel item,
   ) async {
-    await showDialog<bool>(
+    final theme = Theme.of(context);
+
+    await showModalBottomSheet<bool>(
       context: context,
-      barrierDismissible: false,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: theme.cardTheme.color,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
+      ),
       builder: (_) => BlocProvider.value(
         value: context.read<CartCubit>(),
-        child: CartItemEditDialog(item: item),
+        child: CartItemEditDialog(item: item, isBottomSheet: true),
       ),
     );
   }
@@ -141,7 +161,7 @@ class _CartActionsBar extends StatelessWidget {
         Expanded(
           child: FilledButton.icon(
             onPressed: () => context.read<NavCubit>().goTo(0),
-            icon: Icon(Icons.arrow_back_rounded, size: 24.r),
+            icon: Icon(Icons.arrow_back_rounded, size: 20.r),
             label: Text(
               l10n.continueShopping,
               maxLines: 1,
@@ -151,7 +171,6 @@ class _CartActionsBar extends StatelessWidget {
               backgroundColor: colorScheme.onTertiaryFixed,
               foregroundColor: colorScheme.secondaryFixed,
               textStyle: theme.textTheme.titleMedium,
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.r),
               ),
@@ -171,7 +190,7 @@ class _CartActionsBar extends StatelessWidget {
                       color: colorScheme.primaryFixed,
                     ),
                   )
-                : Icon(Icons.delete_outline_rounded, size: 28.r),
+                : Icon(Icons.delete_outline_rounded, size: 22.r),
             label: Text(
               l10n.emptyCart,
               maxLines: 1,
@@ -181,7 +200,6 @@ class _CartActionsBar extends StatelessWidget {
               foregroundColor: colorScheme.primaryFixed,
               side: BorderSide(color: AppColors.burgundy),
               textStyle: theme.textTheme.titleMedium,
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 15.h),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.r),
               ),
@@ -517,14 +535,8 @@ class CartBottomBar extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      child: FilledButton.icon(
+      child: FilledButton(
         onPressed: onProceed,
-        icon: Icon(Icons.lock_rounded, size: 22.r),
-        label: Text(
-          AppLocalizations.of(context)!.proceed,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
         style: FilledButton.styleFrom(
           backgroundColor: colorScheme.onTertiaryFixed,
           foregroundColor: colorScheme.secondaryFixed,
@@ -532,10 +544,14 @@ class CartBottomBar extends StatelessWidget {
             color: colorScheme.secondaryFixed,
             fontWeight: FontWeight.w800,
           ),
-          padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 18.w),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14.r),
           ),
+        ),
+        child: Text(
+          AppLocalizations.of(context)!.proceed,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
