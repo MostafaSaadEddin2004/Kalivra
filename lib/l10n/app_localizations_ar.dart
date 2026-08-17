@@ -616,7 +616,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noOffersForBrand => 'لا توجد عروض لهذه العلامة حالياً';
 
   @override
-  String get orderSummary => 'ملخص الطلب';
+  String get orderSummary => 'الملخص';
 
   @override
   String quantityLabel(int count) {

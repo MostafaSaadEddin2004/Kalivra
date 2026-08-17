@@ -76,11 +76,10 @@ class CheckoutStep extends StatelessWidget {
             onPressed: isLoading ? null : onConfirm,
             icon: isLoading
                 ? SpinKitFadingCircle(
-                    itemSize: 18.r,
                     size: 20.r,
                     color: AppColors.offWhite,
                   )
-                : Icon(Icons.lock_rounded, size: 21.r),
+                : Icon(Icons.done_all_rounded, size: 21.r),
             label: Text(
               AppLocalizations.of(context)!.confirmOrder,
               maxLines: 1,

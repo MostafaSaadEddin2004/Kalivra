@@ -1064,14 +1064,10 @@ class GallerySection extends StatelessWidget {
                   ],
                 ),
                 child: wishlistLoading
-                    ? SizedBox(
-                        width: 22.r,
-                        height: 22.r,
-                        child: SpinKitFadingCircle(
-                          size: 20.r,
-                          color: AppColors.offWhite,
-                        ),
-                      )
+                    ? SpinKitFadingCircle(
+                      size: 20.r,
+                      color: AppColors.offWhite,
+                    )
                     : WishlistIcon(isActive: isWishlist),
               ),
             ),

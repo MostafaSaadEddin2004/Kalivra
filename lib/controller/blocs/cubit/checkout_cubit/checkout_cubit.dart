@@ -45,20 +45,37 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   void reset() => emit(const CheckoutInitial());
 
   Future<void> loadSummary() async {
-    emit(CheckoutLoading(previous: _currentSummary));
+    final currentSummary = _currentSummary;
+    final currentShippingMethods = _currentShippingMethods;
+    final currentPaymentMethods = _currentPaymentMethods;
+    final selectedShippingMethod = _selectedShippingMethod;
+    final selectedPaymentMethod = _selectedPaymentMethod;
+    emit(
+      CheckoutLoading(
+        previous: currentSummary,
+        shippingMethods: currentShippingMethods,
+        paymentMethods: currentPaymentMethods,
+        selectedShippingMethod: selectedShippingMethod,
+        selectedPaymentMethod: selectedPaymentMethod,
+      ),
+    );
     try {
       final summary = await _checkoutService.getSummary();
       emit(
         CheckoutLoaded(
           summary: summary,
-          shippingMethods: summary.shippingMethods,
-          paymentMethods: summary.paymentMethods,
-          selectedShippingMethod: _selectedShippingMethod,
-          selectedPaymentMethod: _selectedPaymentMethod,
+          shippingMethods: summary.shippingMethods.isNotEmpty
+              ? summary.shippingMethods
+              : currentShippingMethods,
+          paymentMethods: summary.paymentMethods.isNotEmpty
+              ? summary.paymentMethods
+              : currentPaymentMethods,
+          selectedShippingMethod: selectedShippingMethod,
+          selectedPaymentMethod: selectedPaymentMethod,
         ),
       );
     } catch (e) {
-      emit(CheckoutFailed(e, _currentSummary));
+      emit(CheckoutFailed(e, currentSummary));
     }
   }
 
@@ -70,9 +87,22 @@ class CheckoutCubit extends Cubit<CheckoutState> {
     required String country,
     required String state,
     required String city,
+    required String postcode,
     required String phone,
   }) async {
-    emit(CheckoutLoading(previous: _currentSummary));
+    final currentShippingMethods = _currentShippingMethods;
+    final currentPaymentMethods = _currentPaymentMethods;
+    final selectedShippingMethod = _selectedShippingMethod;
+    final selectedPaymentMethod = _selectedPaymentMethod;
+    emit(
+      CheckoutLoading(
+        previous: _currentSummary,
+        shippingMethods: currentShippingMethods,
+        paymentMethods: currentPaymentMethods,
+        selectedShippingMethod: selectedShippingMethod,
+        selectedPaymentMethod: selectedPaymentMethod,
+      ),
+    );
     try {
       final summary = await _checkoutService.storeAddresses(
         firstName: firstName,
@@ -82,6 +112,7 @@ class CheckoutCubit extends Cubit<CheckoutState> {
         country: country,
         state: state,
         city: city,
+        postcode: postcode,
         phone: phone,
       );
       emit(
@@ -89,12 +120,12 @@ class CheckoutCubit extends Cubit<CheckoutState> {
           summary: summary,
           shippingMethods: summary.shippingMethods.isNotEmpty
               ? summary.shippingMethods
-              : _currentShippingMethods,
+              : currentShippingMethods,
           paymentMethods: summary.paymentMethods.isNotEmpty
               ? summary.paymentMethods
-              : _currentPaymentMethods,
-          selectedShippingMethod: _selectedShippingMethod,
-          selectedPaymentMethod: _selectedPaymentMethod,
+              : currentPaymentMethods,
+          selectedShippingMethod: selectedShippingMethod,
+          selectedPaymentMethod: selectedPaymentMethod,
         ),
       );
       return true;
@@ -105,7 +136,18 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   }
 
   Future<bool> saveShippingMethod(String shippingMethod) async {
-    emit(CheckoutLoading(previous: _currentSummary));
+    final currentShippingMethods = _currentShippingMethods;
+    final currentPaymentMethods = _currentPaymentMethods;
+    final selectedPaymentMethod = _selectedPaymentMethod;
+    emit(
+      CheckoutLoading(
+        previous: _currentSummary,
+        shippingMethods: currentShippingMethods,
+        paymentMethods: currentPaymentMethods,
+        selectedShippingMethod: shippingMethod,
+        selectedPaymentMethod: selectedPaymentMethod,
+      ),
+    );
     try {
       final summary = await _checkoutService.storeShippingMethod(
         shippingMethod,
@@ -115,12 +157,44 @@ class CheckoutCubit extends Cubit<CheckoutState> {
           summary: summary,
           shippingMethods: summary.shippingMethods.isNotEmpty
               ? summary.shippingMethods
-              : _currentShippingMethods,
+              : currentShippingMethods,
           paymentMethods: summary.paymentMethods.isNotEmpty
               ? summary.paymentMethods
-              : _currentPaymentMethods,
+              : currentPaymentMethods,
           selectedShippingMethod: shippingMethod,
-          selectedPaymentMethod: _selectedPaymentMethod,
+          selectedPaymentMethod: selectedPaymentMethod,
+        ),
+      );
+      return true;
+    } catch (e) {
+      emit(CheckoutFailed(e, _currentSummary));
+      return false;
+    }
+  }
+
+  Future<bool> loadShippingMethods() async {
+    final currentSummary = _currentSummary;
+    final currentPaymentMethods = _currentPaymentMethods;
+    final selectedShippingMethod = _selectedShippingMethod;
+    final selectedPaymentMethod = _selectedPaymentMethod;
+    emit(
+      CheckoutLoading(
+        previous: currentSummary,
+        shippingMethods: _currentShippingMethods,
+        paymentMethods: currentPaymentMethods,
+        selectedShippingMethod: selectedShippingMethod,
+        selectedPaymentMethod: selectedPaymentMethod,
+      ),
+    );
+    try {
+      final shippingMethods = await _checkoutService.getShippingMethods();
+      emit(
+        CheckoutLoaded(
+          summary: currentSummary ?? const CheckoutSummaryModel(),
+          shippingMethods: shippingMethods,
+          paymentMethods: currentPaymentMethods,
+          selectedShippingMethod: selectedShippingMethod,
+          selectedPaymentMethod: selectedPaymentMethod,
         ),
       );
       return true;
@@ -131,7 +205,18 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   }
 
   Future<bool> savePaymentMethod(String paymentMethod) async {
-    emit(CheckoutLoading(previous: _currentSummary));
+    final currentShippingMethods = _currentShippingMethods;
+    final currentPaymentMethods = _currentPaymentMethods;
+    final selectedShippingMethod = _selectedShippingMethod;
+    emit(
+      CheckoutLoading(
+        previous: _currentSummary,
+        shippingMethods: currentShippingMethods,
+        paymentMethods: currentPaymentMethods,
+        selectedShippingMethod: selectedShippingMethod,
+        selectedPaymentMethod: paymentMethod,
+      ),
+    );
     try {
       final summary = await _checkoutService.storePaymentMethod(paymentMethod);
       emit(
@@ -139,11 +224,11 @@ class CheckoutCubit extends Cubit<CheckoutState> {
           summary: summary,
           shippingMethods: summary.shippingMethods.isNotEmpty
               ? summary.shippingMethods
-              : _currentShippingMethods,
+              : currentShippingMethods,
           paymentMethods: summary.paymentMethods.isNotEmpty
               ? summary.paymentMethods
-              : _currentPaymentMethods,
-          selectedShippingMethod: _selectedShippingMethod,
+              : currentPaymentMethods,
+          selectedShippingMethod: selectedShippingMethod,
           selectedPaymentMethod: paymentMethod,
         ),
       );
@@ -155,7 +240,19 @@ class CheckoutCubit extends Cubit<CheckoutState> {
   }
 
   Future<void> placeOrder() async {
-    emit(CheckoutLoading(previous: _currentSummary));
+    final currentShippingMethods = _currentShippingMethods;
+    final currentPaymentMethods = _currentPaymentMethods;
+    final selectedShippingMethod = _selectedShippingMethod;
+    final selectedPaymentMethod = _selectedPaymentMethod;
+    emit(
+      CheckoutLoading(
+        previous: _currentSummary,
+        shippingMethods: currentShippingMethods,
+        paymentMethods: currentPaymentMethods,
+        selectedShippingMethod: selectedShippingMethod,
+        selectedPaymentMethod: selectedPaymentMethod,
+      ),
+    );
     try {
       final result = await _checkoutService.placeOrder();
       emit(CheckoutOrderPlaced(result));

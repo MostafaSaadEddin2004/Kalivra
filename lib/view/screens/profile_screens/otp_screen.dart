@@ -358,14 +358,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         child: FilledButton.icon(
                           onPressed: _isLoading ? null : _verify,
                           icon: _isLoading
-                              ? SizedBox(
-                                  width: 20.r,
-                                  height: 20.r,
-                                  child: SpinKitFadingCircle(
-                                    size: 20.r,
-                                    color: AppColors.offWhite,
-                                  ),
-                                )
+                              ? SpinKitFadingCircle(
+                                size: 20.r,
+                                color: AppColors.offWhite,
+                              )
                               : Icon(Icons.verified_user_rounded, size: 20.r),
                           label: Text(
                             l10n.verify,

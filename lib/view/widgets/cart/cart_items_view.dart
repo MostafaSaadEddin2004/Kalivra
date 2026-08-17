@@ -182,14 +182,10 @@ class _CartActionsBar extends StatelessWidget {
           child: OutlinedButton.icon(
             onPressed: isLoading ? null : onClearPressed,
             icon: isLoading
-                ? SizedBox(
-                    width: 20.r,
-                    height: 20.r,
-                    child: SpinKitFadingCircle(
-                      itemSize: 20.r,
-                      color: colorScheme.primaryFixed,
-                    ),
-                  )
+                ? SpinKitFadingCircle(
+                  size: 20.r,
+                  color: colorScheme.primaryFixed,
+                )
                 : Icon(Icons.delete_outline_rounded, size: 22.r),
             label: Text(
               l10n.emptyCart,

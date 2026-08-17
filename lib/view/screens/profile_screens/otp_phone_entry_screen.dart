@@ -302,14 +302,10 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                         child: FilledButton.icon(
                           onPressed: _isLoading ? null : _sendCode,
                           icon: _isLoading
-                              ? SizedBox(
-                                  width: 20.r,
-                                  height: 20.r,
-                                  child: SpinKitFadingCircle(
-                                    size: 20.r,
-                                    color: AppColors.offWhite,
-                                  ),
-                                )
+                              ? SpinKitFadingCircle(
+                                size: 20.r,
+                                color: AppColors.offWhite,
+                              )
                               : Icon(Icons.chat_rounded, size: 20.r),
                           label: Text(
                             AppLocalizations.of(context)!.sendCodeViaWhatsApp,

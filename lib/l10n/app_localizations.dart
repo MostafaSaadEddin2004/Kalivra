@@ -1259,7 +1259,7 @@ abstract class AppLocalizations {
   /// No description provided for @orderSummary.
   ///
   /// In en, this message translates to:
-  /// **'Order Summary'**
+  /// **'Summary'**
   String get orderSummary;
 
   /// No description provided for @quantityLabel.

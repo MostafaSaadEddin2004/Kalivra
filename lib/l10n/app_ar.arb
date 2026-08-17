@@ -216,7 +216,7 @@
   "noProductsForBrand": "لا توجد منتجات لهذه العلامة حالياً",
   "noOffersForBrand": "لا توجد عروض لهذه العلامة حالياً",
 
-  "orderSummary": "ملخص الطلب",
+  "orderSummary": "الملخص",
   "quantityLabel": "الكمية: {count}",
   "shipping": "الشحن",
 

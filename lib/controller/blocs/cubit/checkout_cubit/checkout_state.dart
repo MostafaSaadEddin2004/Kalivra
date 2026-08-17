@@ -19,9 +19,27 @@ final class CheckoutInitial extends CheckoutState {
 }
 
 final class CheckoutLoading extends CheckoutState {
-  const CheckoutLoading({this.previous});
+  const CheckoutLoading({
+    this.previous,
+    this.shippingMethods = const [],
+    this.paymentMethods = const [],
+    this.selectedShippingMethod,
+    this.selectedPaymentMethod,
+  });
 
   final CheckoutSummaryModel? previous;
+
+  @override
+  final List<CheckoutShippingMethodModel> shippingMethods;
+
+  @override
+  final List<CheckoutPaymentMethodModel> paymentMethods;
+
+  @override
+  final String? selectedShippingMethod;
+
+  @override
+  final String? selectedPaymentMethod;
 
   @override
   bool get isLoading => true;

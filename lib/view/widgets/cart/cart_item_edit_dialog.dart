@@ -508,7 +508,6 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
               ),
               child: _isSaving
                   ? SpinKitFadingCircle(
-                      itemSize: 20.r,
                       size: 22.r,
                       color: colorScheme.secondaryFixed,
                     )

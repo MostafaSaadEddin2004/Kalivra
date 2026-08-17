@@ -23,8 +23,10 @@ class CheckoutApiService {
     required String country,
     required String state,
     required String city,
+    required String postcode,
     required String phone,
   }) async {
+    final addressLines = [address];
     final res = await _client.post(
       'checkout/onepage/addresses',
       data: {
@@ -32,20 +34,22 @@ class CheckoutApiService {
           'first_name': firstName,
           'last_name': lasttName,
           'email': email,
-          'address': address,
+          'address': addressLines,
           'country': country,
           'state': state,
           'city': city,
+          'postcode': postcode,
           'phone': phone,
         },
         'shipping': {
           'first_name': firstName,
           'last_name': lasttName,
           'email': email,
-          'address': address,
+          'address': addressLines,
           'country': country,
           'state': state,
           'city': city,
+          'postcode': postcode,
           'phone': phone,
         },
       },
@@ -69,6 +73,15 @@ class CheckoutApiService {
       return CheckoutSummaryModel.fromJson(data);
     }
     return getSummary();
+  }
+
+  Future<List<CheckoutShippingMethodModel>> getShippingMethods() async {
+    final res = await _client.get('checkout/onepage/shipping-methods');
+    final data = res.data;
+    if (data is Map<String, dynamic>) {
+      return CheckoutSummaryModel.parseShippingMethods(data);
+    }
+    return const [];
   }
 
   Future<CheckoutSummaryModel> storePaymentMethod(String paymentMethod) async {

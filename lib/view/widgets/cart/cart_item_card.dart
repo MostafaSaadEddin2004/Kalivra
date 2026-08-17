@@ -292,7 +292,7 @@ class _QuantityPreview extends StatelessWidget {
             child: Center(
               child: isLoading
                   ? SpinKitFadingCircle(
-                      size: 18.r,
+                      size: 16.r,
                       color: colorScheme.primaryFixed,
                     )
                   : Text(

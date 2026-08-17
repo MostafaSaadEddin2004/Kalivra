@@ -219,7 +219,7 @@
   "noProductsForBrand": "No products for this brand at the moment",
   "noOffersForBrand": "No offers for this brand at the moment",
 
-  "orderSummary": "Order Summary",
+  "orderSummary": "Summary",
   "quantityLabel": "Quantity: {count}",
   "@quantityLabel": {"placeholders": {"count": {"type": "int"}}},
   "shipping": "Shipping",

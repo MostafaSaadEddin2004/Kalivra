@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/checkout_cubit/checkout_cubit.dart';
-import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/checkout/steps/address_step.dart';
 import 'package:kalivra/view/screens/checkout/steps/checkout_step.dart';
 import 'package:kalivra/view/screens/checkout/steps/payment_step.dart';
 import 'package:kalivra/view/screens/checkout/steps/shipping_step.dart';
 import 'package:kalivra/view/screens/checkout/widgets/checkout_step_indicator.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final checkoutCubit = context.read<CheckoutCubit>();
 
     if (_currentIndex == 3) {
-      checkoutCubit.placeOrder();
+      await checkoutCubit.placeOrder();
       return;
     }
 
@@ -62,9 +63,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         country: address.country.isEmpty ? 'SY' : address.country,
         state: address.state,
         city: address.city,
+        postcode: address.postcode.isEmpty ? '0000' : address.postcode,
         phone: address.phone,
       );
       if (!ok || !mounted) return;
+
+      final loadedShippingMethods = await checkoutCubit.loadShippingMethods();
+      if (!loadedShippingMethods || !mounted) return;
     } else if (_currentIndex == 1) {
       final method = _shippingStepKey.currentState?.selectedMethodCode;
       if (method == null || method.isEmpty) {
@@ -100,78 +105,69 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return BlocConsumer<CheckoutCubit, CheckoutState>(
       listener: (context, state) {
         if (state.hasError) {
+          final message = state.error?.toString() ?? l10n.error;
+          CustomSnackBar.show(context, message);
           context.read<CheckoutCubit>().reset();
         }
         if (state is CheckoutOrderPlaced) {
           context.read<CartCubit>().clearCart(context);
-          if (context.mounted) context.pop();
           context.read<CheckoutCubit>().reset();
+          if (context.mounted) context.go(AppRoutes.home);
         }
       },
       builder: (context, checkoutState) {
         final isLoading = checkoutState.isLoading;
 
-        return Stack(
-          children: [
-            Scaffold(
-              appBar: ScreenAppBar(title: l10n.checkOutStepsScreenTitle),
-              body: SafeArea(
-                child: Column(
-                  children: [
-                    CheckoutStepIndicator(
-                      currentStep: _currentIndex,
-                      onStepTap: (index) {
-                        if (!isLoading && index <= _currentIndex) {
-                          setState(() => _currentIndex = index);
-                        }
-                      },
-                    ),
-                    Expanded(
-                      child: IndexedStack(
-                        index: _currentIndex,
-                        children: [
-                          AddressStep(
-                            key: _addressStepKey,
-                            summary: checkoutState.summary,
-                            onContinue: isLoading ? null : _goNext,
-                          ),
-                          ShippingStep(
-                            key: _shippingStepKey,
-                            methods: checkoutState.shippingMethods,
-                            summary: checkoutState.summary,
-                            onContinue: isLoading ? null : _goNext,
-                          ),
-                          PaymentStep(
-                            key: _paymentStepKey,
-                            methods: checkoutState.paymentMethods,
-                            summary: checkoutState.summary,
-                            onContinue: isLoading ? null : _goNext,
-                          ),
-                          CheckoutStep(
-                            isLoading: isLoading,
-                            onConfirm: isLoading ? null : _goNext,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+        return PopScope(
+          canPop: !isLoading,
+          child: Scaffold(
+            appBar: ScreenAppBar(
+              title: l10n.checkOutStepsScreenTitle,
+              noBackArrow: !isLoading,
             ),
-            if (isLoading)
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: Container(
-                    color: Colors.black.withValues(alpha: 0.12),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.burgundy,
-                      ),
+            body: SafeArea(
+              child: Column(
+                children: [
+                  CheckoutStepIndicator(
+                    currentStep: _currentIndex,
+                    onStepTap: (index) {
+                      if (!isLoading && index <= _currentIndex) {
+                        setState(() => _currentIndex = index);
+                      }
+                    },
+                  ),
+                  Expanded(
+                    child: IndexedStack(
+                      index: _currentIndex,
+                      children: [
+                        AddressStep(
+                          key: _addressStepKey,
+                          summary: checkoutState.summary,
+                          onContinue: isLoading ? null : _goNext,
+                        ),
+                        ShippingStep(
+                          key: _shippingStepKey,
+                          methods: checkoutState.shippingMethods,
+                          summary: checkoutState.summary,
+                          onContinue: isLoading ? null : _goNext,
+                        ),
+                        PaymentStep(
+                          key: _paymentStepKey,
+                          methods: checkoutState.paymentMethods,
+                          summary: checkoutState.summary,
+                          onContinue: isLoading ? null : _goNext,
+                        ),
+                        CheckoutStep(
+                          isLoading: isLoading,
+                          onConfirm: isLoading ? null : _goNext,
+                        ),
+                      ],
                     ),
                   ),
-                ),
+                ],
               ),
-          ],
+            ),
+          ),
         );
       },
     );

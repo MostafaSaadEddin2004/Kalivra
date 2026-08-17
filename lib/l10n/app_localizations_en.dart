@@ -620,7 +620,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noOffersForBrand => 'No offers for this brand at the moment';
 
   @override
-  String get orderSummary => 'Order Summary';
+  String get orderSummary => 'Summary';
 
   @override
   String quantityLabel(int count) {

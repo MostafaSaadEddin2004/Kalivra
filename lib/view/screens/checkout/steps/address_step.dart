@@ -728,7 +728,7 @@ class _AddAddressPreviewButton extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     return OutlinedButton(
-      onPressed: () {},
+      onPressed: onTap,
       style: OutlinedButton.styleFrom(
         textStyle: theme.textTheme.titleMedium?.copyWith(
           color: colorScheme.secondaryFixed,

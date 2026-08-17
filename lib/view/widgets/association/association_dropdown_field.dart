@@ -16,6 +16,7 @@ class AssociationDropdownField extends StatelessWidget {
     this.trailing,
     this.itemLabelBuilder,
     this.validator,
+    this.showDropdownIcon = true,
   });
 
   final String label;
@@ -27,6 +28,7 @@ class AssociationDropdownField extends StatelessWidget {
   final Widget? trailing;
   final String Function(String item)? itemLabelBuilder;
   final String? Function(String?)? validator;
+  final bool showDropdownIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +56,7 @@ class AssociationDropdownField extends StatelessWidget {
       ),
       suffixProps: DropdownSuffixProps(
         dropdownButtonProps: DropdownButtonProps(
+          isVisible: showDropdownIcon,
           iconClosed: Icon(Icons.arrow_drop_down_rounded, size: 24.r),
           color: canSelect
               ? theme.colorScheme.onTertiaryFixed

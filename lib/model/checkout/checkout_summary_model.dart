@@ -26,26 +26,40 @@ class CheckoutSummaryModel {
 
     return CheckoutSummaryModel(
       cart: cart,
-      shippingMethods: _parseShippingMethods(data),
+      shippingMethods: parseShippingMethods(data),
       paymentMethods: _parsePaymentMethods(data),
       raw: data,
     );
   }
 
-  static List<CheckoutShippingMethodModel> _parseShippingMethods(
+  static List<CheckoutShippingMethodModel> parseShippingMethods(
     Map<String, dynamic> data,
   ) {
-    final methods = data['shipping_methods'] ?? data['shippingMethods'];
+    final nestedData = data['data'];
+    final methods =
+        data['shipping_methods'] ??
+        data['shippingMethods'] ??
+        (nestedData is Map ? nestedData['shipping_methods'] : null) ??
+        (nestedData is Map ? nestedData['shippingMethods'] : null);
     if (methods is! List) return const [];
 
-    return methods
-        .whereType<Map>()
-        .map(
-          (e) => CheckoutShippingMethodModel.fromJson(
-            Map<String, dynamic>.from(e),
-          ),
-        )
-        .toList();
+    final result = <CheckoutShippingMethodModel>[];
+    for (final item in methods.whereType<Map>()) {
+      final methodGroup = Map<String, dynamic>.from(item);
+      final rates = methodGroup['rates'];
+      if (rates is List) {
+        for (final rate in rates.whereType<Map>()) {
+          result.add(
+            CheckoutShippingMethodModel.fromJson(
+              Map<String, dynamic>.from(rate),
+            ),
+          );
+        }
+      } else {
+        result.add(CheckoutShippingMethodModel.fromJson(methodGroup));
+      }
+    }
+    return result;
   }
 
   static List<CheckoutPaymentMethodModel> _parsePaymentMethods(
@@ -84,6 +98,7 @@ class CheckoutShippingMethodModel {
       method: (json['method'] ?? json['code'] ?? '').toString(),
       title:
           (json['method_title'] ??
+                  json['carrier_title'] ??
                   json['title'] ??
                   json['method'] ??
                   json['code'] ??
