@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
+import 'package:kalivra/model/address/capiltal_model.dart';
 import 'package:kalivra/model/checkout/checkout_summary_model.dart';
 import 'package:kalivra/model/customer/address_api_model.dart';
 import 'package:kalivra/model/services/api/address_info_services.dart';
+import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -349,11 +353,14 @@ class AddressStepState extends State<AddressStep> {
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _AddressFormSheet(
-        address: address,
-        onSubmit: address == null
-            ? _createAddress
-            : (data) => _updateAddress(address, data),
+      builder: (context) => BlocProvider(
+        create: (_) => AddressInfoCubit()..fetchCapitals(),
+        child: _AddressFormSheet(
+          address: address,
+          onSubmit: address == null
+              ? _createAddress
+              : (data) => _updateAddress(address, data),
+        ),
       ),
     );
   }
@@ -769,6 +776,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
   final _stateController = TextEditingController();
   final _cityController = TextEditingController();
   final _postalCodeController = TextEditingController();
+  String? _selectedCapitalId;
   bool _saveAsDefault = false;
   bool _isSaving = false;
   String? _errorText;
@@ -795,6 +803,91 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
     _cityController.text = address.city ?? '';
     _postalCodeController.text = address.postcode ?? '';
     _saveAsDefault = address.defaultAddress ?? false;
+  }
+
+  void _handleAddressInfoState(
+    BuildContext context,
+    AddressInfoState addressInfoState,
+  ) {
+    if (addressInfoState.failureRequest != null &&
+        addressInfoState.errorMessage != null) {
+      setState(() => _errorText = addressInfoState.errorMessage);
+    }
+
+    if (_selectedCapitalId != null ||
+        _stateController.text.trim().isEmpty ||
+        addressInfoState.capitals.isEmpty) {
+      return;
+    }
+
+    final capital = _capitalByName(
+      addressInfoState.capitals,
+      _stateController.text,
+    );
+    if (capital == null) return;
+
+    _selectedCapitalId = capital.id;
+    context.read<AddressInfoCubit>().fetchCities(capitalId: capital.id);
+  }
+
+  void _selectCapital(String? value, AddressInfoState addressInfoState) {
+    if (value == null) return;
+    final capital = _capitalByName(addressInfoState.capitals, value);
+    setState(() {
+      _stateController.text = value;
+      _cityController.clear();
+      _selectedCapitalId = capital?.id;
+      _errorText = null;
+    });
+    if (capital != null) {
+      context.read<AddressInfoCubit>().fetchCities(capitalId: capital.id);
+    }
+  }
+
+  void _selectCity(String? value) {
+    if (value == null) return;
+    setState(() {
+      _cityController.text = value;
+      _errorText = null;
+    });
+  }
+
+  CapitalModel? _capitalByName(List<CapitalModel> capitals, String name) {
+    final normalizedName = name.trim();
+    for (final capital in capitals) {
+      if (capital.name.trim() == normalizedName) return capital;
+    }
+    return null;
+  }
+
+  List<String> _capitalNames(AddressInfoState addressInfoState) {
+    return _namesWithCurrent(
+      addressInfoState.capitals.map((capital) => capital.name),
+      _stateController.text,
+    );
+  }
+
+  List<String> _cityNames(AddressInfoState addressInfoState) {
+    return _namesWithCurrent(
+      addressInfoState.cities.map((city) => city.name),
+      _cityController.text,
+    );
+  }
+
+  List<String> _namesWithCurrent(Iterable<String> names, String current) {
+    final result = <String>[];
+    for (final name in names) {
+      final trimmed = name.trim();
+      if (trimmed.isNotEmpty && !result.contains(trimmed)) {
+        result.add(trimmed);
+      }
+    }
+
+    final selected = current.trim();
+    if (selected.isNotEmpty && !result.contains(selected)) {
+      result.add(selected);
+    }
+    return result;
   }
 
   @override
@@ -850,177 +943,187 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
     final l10n = AppLocalizations.of(context)!;
     final bottomPadding = MediaQuery.viewInsetsOf(context).bottom;
 
-    return AnimatedPadding(
-      duration: const Duration(milliseconds: 220),
-      curve: Curves.easeOutCubic,
-      padding: EdgeInsets.only(bottom: bottomPadding),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.86,
-        minChildSize: 0.58,
-        maxChildSize: 0.94,
-        expand: false,
-        builder: (context, scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(28.r)),
-            ),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: EdgeInsets.fromLTRB(18.w, 10.h, 18.w, 24.h),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 48.w,
-                      height: 4.h,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryFixed.withValues(
-                          alpha: 0.18,
-                        ),
-                        borderRadius: BorderRadius.circular(999.r),
-                      ),
-                    ),
+    return BlocConsumer<AddressInfoCubit, AddressInfoState>(
+      listener: _handleAddressInfoState,
+      builder: (context, addressInfoState) {
+        return AnimatedPadding(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.only(bottom: bottomPadding),
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.86,
+            minChildSize: 0.58,
+            maxChildSize: 0.94,
+            expand: false,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: theme.scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(28.r),
                   ),
-                  SizedBox(height: 18.h),
-                  Stack(
-                    alignment: Alignment.center,
+                ),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  padding: EdgeInsets.fromLTRB(18.w, 10.h, 18.w, 24.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        _isEditMode
-                            ? l10n.checkoutEditAddressTitle
-                            : l10n.checkoutAddAddressTitle,
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: AppColors.burgundy,
-                          fontWeight: FontWeight.w800,
+                      Center(
+                        child: Container(
+                          width: 48.w,
+                          height: 4.h,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryFixed.withValues(
+                              alpha: 0.18,
+                            ),
+                            borderRadius: BorderRadius.circular(999.r),
+                          ),
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      Align(
-                        alignment: AlignmentDirectional.centerStart,
-                        child: IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: Icon(Icons.close_rounded, size: 24.r),
-                          color: theme.colorScheme.primaryFixed,
-                          tooltip: l10n.cancel,
+                      SizedBox(height: 18.h),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Text(
+                            _isEditMode
+                                ? l10n.checkoutEditAddressTitle
+                                : l10n.checkoutAddAddressTitle,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: AppColors.burgundy,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: IconButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              icon: Icon(Icons.close_rounded, size: 24.r),
+                              color: theme.colorScheme.primaryFixed,
+                              tooltip: l10n.cancel,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 18.h),
+                      _SheetInputField(
+                        controller: _firstNameController,
+                        label: l10n.checkoutFirstName,
+                        hint: l10n.checkoutEnterFirstName,
+                        icon: Icons.person_outline_rounded,
+                        required: true,
+                      ),
+                      SizedBox(height: 14.h),
+                      _SheetInputField(
+                        controller: _lastNameController,
+                        label: l10n.checkoutLastName,
+                        hint: l10n.checkoutEnterLastName,
+                        icon: Icons.person_outline_rounded,
+                        required: true,
+                      ),
+                      SizedBox(height: 14.h),
+                      _SheetInputField(
+                        controller: _emailController,
+                        label: l10n.checkoutEmail,
+                        hint: l10n.checkoutEmailHint,
+                        icon: Icons.mail_outline_rounded,
+                        keyboardType: TextInputType.emailAddress,
+                        required: true,
+                      ),
+                      SizedBox(height: 14.h),
+                      _PhoneInputField(
+                        controller: _phoneController,
+                        label: l10n.checkoutPhoneNumber,
+                        hint: '51234567',
+                      ),
+                      SizedBox(height: 14.h),
+                      _SheetInputField(
+                        controller: _addressController,
+                        label: l10n.checkoutFullAddress,
+                        hint: l10n.checkoutFullAddressHint,
+                        icon: Icons.location_on_outlined,
+                        required: true,
+                      ),
+                      SizedBox(height: 14.h),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AssociationDropdownField(
+                              label: '${l10n.checkoutProvince} *',
+                              value: _stateController.text.trim().isEmpty
+                                  ? null
+                                  : _stateController.text.trim(),
+                              items: _capitalNames(addressInfoState),
+                              enabled: !addressInfoState.isLoadingCapitals,
+                              showDropdownIcon: false,
+                              onChanged: (value) =>
+                                  _selectCapital(value, addressInfoState),
+                            ),
+                          ),
+                          SizedBox(width: 12.w),
+                          Expanded(
+                            child: AssociationDropdownField(
+                              label: '${l10n.checkoutCity} *',
+                              value: _cityController.text.trim().isEmpty
+                                  ? null
+                                  : _cityController.text.trim(),
+                              items: _cityNames(addressInfoState),
+                              enabled:
+                                  _selectedCapitalId != null &&
+                                  !addressInfoState.isLoadingCities,
+                              showDropdownIcon: false,
+                              onChanged: _selectCity,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 14.h),
+                      _SheetInputField(
+                        controller: _postalCodeController,
+                        label: l10n.checkoutPostalCodeOptional,
+                        hint: l10n.checkoutEnterPostalCode,
+                        icon: Icons.mail_outline_rounded,
+                        keyboardType: TextInputType.number,
+                      ),
+                      SizedBox(height: 20.h),
+                      _DefaultAddressToggle(
+                        title: l10n.checkoutSaveAsDefaultAddress,
+                        subtitle: l10n.checkoutDefaultAddressHelper,
+                        value: _saveAsDefault,
+                        onChanged: (value) {
+                          setState(() => _saveAsDefault = value);
+                        },
+                      ),
+                      if (_errorText != null) ...[
+                        SizedBox(height: 14.h),
+                        Text(
+                          _errorText!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.error,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
+                      ],
+                      SizedBox(height: 34.h),
+                      _CheckoutPrimaryButton(
+                        label: _isSaving
+                            ? l10n.checkoutSaveAddress
+                            : _isEditMode
+                            ? l10n.checkoutUpdateAddress
+                            : l10n.checkoutSaveAddress,
+                        icon: Icons.check_rounded,
+                        onPressed: _isSaving ? null : _submit,
                       ),
                     ],
                   ),
-                  SizedBox(height: 18.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _SheetInputField(
-                          controller: _lastNameController,
-                          label: l10n.checkoutLastName,
-                          hint: l10n.checkoutEnterLastName,
-                          icon: Icons.person_outline_rounded,
-                          required: true,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: _SheetInputField(
-                          controller: _firstNameController,
-                          label: l10n.checkoutFirstName,
-                          hint: l10n.checkoutEnterFirstName,
-                          icon: Icons.person_outline_rounded,
-                          required: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 14.h),
-                  _SheetInputField(
-                    controller: _emailController,
-                    label: l10n.checkoutEmail,
-                    hint: l10n.checkoutEmailHint,
-                    icon: Icons.mail_outline_rounded,
-                    keyboardType: TextInputType.emailAddress,
-                    required: true,
-                  ),
-                  SizedBox(height: 14.h),
-                  _PhoneInputField(
-                    controller: _phoneController,
-                    label: l10n.checkoutPhoneNumber,
-                    hint: '51234567',
-                  ),
-                  SizedBox(height: 14.h),
-                  _SheetInputField(
-                    controller: _addressController,
-                    label: l10n.checkoutFullAddress,
-                    hint: l10n.checkoutFullAddressHint,
-                    icon: Icons.location_on_outlined,
-                    required: true,
-                  ),
-                  SizedBox(height: 14.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _SheetSelectField(
-                          controller: _stateController,
-                          label: l10n.checkoutProvince,
-                          hint: l10n.checkoutChooseProvince,
-                          required: true,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: _SheetSelectField(
-                          controller: _cityController,
-                          label: l10n.checkoutCity,
-                          hint: l10n.checkoutChooseCity,
-                          required: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 14.h),
-                  _SheetInputField(
-                    controller: _postalCodeController,
-                    label: l10n.checkoutPostalCodeOptional,
-                    hint: l10n.checkoutEnterPostalCode,
-                    icon: Icons.mail_outline_rounded,
-                    keyboardType: TextInputType.number,
-                  ),
-                  SizedBox(height: 20.h),
-                  _DefaultAddressToggle(
-                    title: l10n.checkoutSaveAsDefaultAddress,
-                    subtitle: l10n.checkoutDefaultAddressHelper,
-                    value: _saveAsDefault,
-                    onChanged: (value) {
-                      setState(() => _saveAsDefault = value);
-                    },
-                  ),
-                  if (_errorText != null) ...[
-                    SizedBox(height: 14.h),
-                    Text(
-                      _errorText!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.error,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                  SizedBox(height: 34.h),
-                  _CheckoutPrimaryButton(
-                    label: _isSaving
-                        ? l10n.checkoutSaveAddress
-                        : _isEditMode
-                        ? l10n.checkoutUpdateAddress
-                        : l10n.checkoutSaveAddress,
-                    icon: Icons.check_rounded,
-                    onPressed: _isSaving ? null : _submit,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -1170,60 +1273,14 @@ class _CountryCodePrefix extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('🇰🇼', style: TextStyle(fontSize: 20.sp)),
-          SizedBox(width: 8.w),
           Text(
-            '+965',
+            '+963',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.primaryFixed,
               fontWeight: FontWeight.w700,
             ),
           ),
-          SizedBox(width: 4.w),
-          Icon(
-            Icons.keyboard_arrow_down_rounded,
-            size: 18.r,
-            color: theme.colorScheme.primaryFixed,
-          ),
         ],
-      ),
-    );
-  }
-}
-
-class _SheetSelectField extends StatelessWidget {
-  const _SheetSelectField({
-    required this.controller,
-    required this.label,
-    required this.hint,
-    this.required = false,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final String hint;
-  final bool required;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return TextField(
-      controller: controller,
-      textInputAction: TextInputAction.next,
-      cursorColor: AppColors.burgundy,
-      style: theme.textTheme.bodyMedium?.copyWith(
-        color: theme.colorScheme.primaryFixed,
-        fontWeight: FontWeight.w600,
-      ),
-      decoration: _sheetInputDecoration(
-        context,
-        label: required ? '$label *' : label,
-        hint: hint,
-        suffixIcon: Icon(
-          Icons.location_city_outlined,
-          size: 22.r,
-          color: AppColors.burgundy,
-        ),
       ),
     );
   }
@@ -1269,7 +1326,7 @@ class _DefaultAddressToggle extends StatelessWidget {
           SizedBox(width: 14.w),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
@@ -1277,7 +1334,7 @@ class _DefaultAddressToggle extends StatelessWidget {
                     color: theme.colorScheme.primaryFixed,
                     fontWeight: FontWeight.w800,
                   ),
-                  textAlign: TextAlign.end,
+                  textAlign: TextAlign.start,
                 ),
                 SizedBox(height: 6.h),
                 Text(
@@ -1287,7 +1344,7 @@ class _DefaultAddressToggle extends StatelessWidget {
                       alpha: 0.45,
                     ),
                   ),
-                  textAlign: TextAlign.end,
+                  textAlign: TextAlign.start,
                 ),
               ],
             ),

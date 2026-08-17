@@ -26,6 +26,26 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  Future<void> _refreshCart() {
+    return context.read<CartCubit>().getCart();
+  }
+
+  Widget _refreshable(Widget child) {
+    return RefreshIndicator(onRefresh: _refreshCart, child: child);
+  }
+
+  Widget _refreshableBox(Widget child) {
+    return _refreshable(
+      SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.sizeOf(context).height * 0.68,
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartCubit = context.read<CartCubit>();
@@ -36,10 +56,12 @@ class _CartScreenState extends State<CartScreen> {
         if (state is CartLoginRequired) {
           return Scaffold(
             appBar: _CartAppBar(title: AppLocalizations.of(context)!.cart),
-            body: LoginRequiredPlaceholder(
-              icon: Icons.shopping_cart_outlined,
-              title: AppLocalizations.of(context)!.loginRequiredForCartView,
-              description: AppLocalizations.of(context)!.cartLoginPrompt,
+            body: _refreshableBox(
+              LoginRequiredPlaceholder(
+                icon: Icons.shopping_cart_outlined,
+                title: AppLocalizations.of(context)!.loginRequiredForCartView,
+                description: AppLocalizations.of(context)!.cartLoginPrompt,
+              ),
             ),
           );
         }
@@ -47,15 +69,19 @@ class _CartScreenState extends State<CartScreen> {
         if (state is CartLoading && cartCubit.apiItems.isEmpty) {
           return Scaffold(
             appBar: _CartAppBar(title: AppLocalizations.of(context)!.cart),
-            body: const Center(child: CircularProgressIndicator()),
+            body: _refreshableBox(
+              const Center(child: CircularProgressIndicator()),
+            ),
           );
         }
 
         if (state is CartFailure && state.cart == null) {
           return Scaffold(
             appBar: _CartAppBar(title: l10n.cart),
-            body: Center(
-              child: Text(state.message.isEmpty ? l10n.error : state.message),
+            body: _refreshableBox(
+              Center(
+                child: Text(state.message.isEmpty ? l10n.error : state.message),
+              ),
             ),
           );
         }
@@ -65,8 +91,8 @@ class _CartScreenState extends State<CartScreen> {
         return Scaffold(
           appBar: _CartAppBar(title: l10n.cart),
           body: items.isEmpty
-              ? const EmptyCartView()
-              : CartItemsView(cart: cart!),
+              ? _refreshableBox(const EmptyCartView())
+              : _refreshable(CartItemsView(cart: cart!)),
         );
       },
     );

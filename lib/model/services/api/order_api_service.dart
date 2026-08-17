@@ -9,11 +9,13 @@ class OrderApiService {
   final DioClient _client = DioClient();
 
   Future<List<OrderModel>> getOrders() async {
-    final res = await _client.get('orders', queryParameters: {'per_page': 100});
-    final data = res.data['data'];
+    final res = await _client.get('customer/orders');
+    final body = res.data;
+    final data = body is Map ? body['data'] : null;
     if (data is List) {
       return data
-          .map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+          .whereType<Map>()
+          .map((e) => OrderModel.fromJson(Map<String, dynamic>.from(e)))
           .toList();
     }
     return [];

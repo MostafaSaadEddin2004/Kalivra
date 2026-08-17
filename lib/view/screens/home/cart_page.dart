@@ -24,6 +24,30 @@ class _CartPageState extends State<CartPage> {
     });
   }
 
+  Future<void> _refreshCart() {
+    return context.read<CartCubit>().getCart();
+  }
+
+  Widget _refreshable(Widget child) {
+    return RefreshIndicator(
+      color: Theme.of(context).colorScheme.onTertiaryFixed,
+      onRefresh: _refreshCart,
+      child: child,
+    );
+  }
+
+  Widget _refreshableBox(Widget child) {
+    return _refreshable(
+      SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.sizeOf(context).height * 0.68,
+          child: child,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cartCubit = context.read<CartCubit>();
@@ -35,31 +59,39 @@ class _CartPageState extends State<CartPage> {
         if (currentCart != null) {
           final items = currentCart.items;
           if (items.isEmpty) {
-            return EmptyCartView();
+            return _refreshableBox(const EmptyCartView());
           }
-          return CartItemsView(cart: currentCart);
+          return _refreshable(CartItemsView(cart: currentCart));
         }
 
         switch (state) {
           case CartLoginRequired():
-            return LoginRequiredPlaceholder(
-              icon: Icons.shopping_cart_outlined,
-              title: AppLocalizations.of(context)!.loginRequiredForCartView,
-              description: AppLocalizations.of(context)!.cartLoginPrompt,
+            return _refreshableBox(
+              LoginRequiredPlaceholder(
+                icon: Icons.shopping_cart_outlined,
+                title: AppLocalizations.of(context)!.loginRequiredForCartView,
+                description: AppLocalizations.of(context)!.cartLoginPrompt,
+              ),
             );
           case CartLoading():
-            return SpinKitFadingCircle(
-              color: theme.colorScheme.onTertiaryFixed,
-              size: 40.r,
+            return _refreshableBox(
+              SpinKitFadingCircle(
+                color: theme.colorScheme.onTertiaryFixed,
+                size: 40.r,
+              ),
             );
           case CartFailure():
-            return Center(
-              child: Text(state.message.isEmpty ? l10n.error : state.message),
+            return _refreshableBox(
+              Center(
+                child: Text(state.message.isEmpty ? l10n.error : state.message),
+              ),
             );
           default:
-            return SpinKitFadingCircle(
-              color: theme.colorScheme.onTertiaryFixed,
-              size: 40.r,
+            return _refreshableBox(
+              SpinKitFadingCircle(
+                color: theme.colorScheme.onTertiaryFixed,
+                size: 40.r,
+              ),
             );
         }
       },

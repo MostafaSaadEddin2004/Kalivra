@@ -22,6 +22,7 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   int _currentIndex = 0;
+  bool _isCompletingOrder = false;
 
   final GlobalKey<AddressStepState> _addressStepKey =
       GlobalKey<AddressStepState>();
@@ -99,24 +100,66 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
+  Future<void> _handleOrderPlaced(CheckoutOrderPlaced state) async {
+    if (_isCompletingOrder) return;
+    setState(() => _isCompletingOrder = true);
+
+    final checkoutCubit = context.read<CheckoutCubit>();
+    final cartCubit = context.read<CartCubit>();
+    final message =
+        _responseMessage(state.result) ??
+        AppLocalizations.of(context)!.requestSentSuccessfully;
+
+    await cartCubit.getCart();
+    if (!mounted) return;
+    cartCubit.markCartEmptyAfterOrder();
+
+    checkoutCubit.reset();
+    CustomSnackBar.show(context, message);
+    context.go(AppRoutes.home);
+  }
+
+  String? _responseMessage(Map<String, dynamic>? response) {
+    if (response == null) return null;
+
+    final keys = ['message', 'success_message', 'successMessage'];
+    for (final key in keys) {
+      final message = _stringValue(response[key]);
+      if (message != null) return message;
+    }
+
+    final data = response['data'];
+    if (data is Map<String, dynamic>) return _responseMessage(data);
+    if (data is Map) return _responseMessage(Map<String, dynamic>.from(data));
+    return null;
+  }
+
+  String? _stringValue(dynamic value) {
+    if (value == null) return null;
+    final text = value.toString().trim();
+    return text.isEmpty ? null : text;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return BlocConsumer<CheckoutCubit, CheckoutState>(
       listener: (context, state) {
+        if (state is CheckoutOrderPlaced) {
+          _handleOrderPlaced(state);
+          return;
+        }
         if (state.hasError) {
+          if (_isCompletingOrder) {
+            setState(() => _isCompletingOrder = false);
+          }
           final message = state.error?.toString() ?? l10n.error;
           CustomSnackBar.show(context, message);
           context.read<CheckoutCubit>().reset();
         }
-        if (state is CheckoutOrderPlaced) {
-          context.read<CartCubit>().clearCart(context);
-          context.read<CheckoutCubit>().reset();
-          if (context.mounted) context.go(AppRoutes.home);
-        }
       },
       builder: (context, checkoutState) {
-        final isLoading = checkoutState.isLoading;
+        final isLoading = checkoutState.isLoading || _isCompletingOrder;
 
         return PopScope(
           canPop: !isLoading,

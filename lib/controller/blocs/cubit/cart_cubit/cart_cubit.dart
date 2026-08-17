@@ -67,6 +67,26 @@ class CartCubit extends Cubit<CartState> {
           _operation == CartOperation.updatingDetails) &&
       _activeItemId == itemId;
 
+  void markCartEmptyAfterOrder() {
+    for (final timer in _quantityDebounceTimers.values) {
+      timer.cancel();
+    }
+    _quantityDebounceTimers.clear();
+    _localQuantities.clear();
+    _scheduledQuantities.clear();
+    _confirmedQuantities.clear();
+    _quantityRequestVersions.clear();
+    _cart = const CartApiModel(
+      success: true,
+      items: [],
+      itemsCount: 0,
+      itemQuantity: 0,
+      subTotal: 0,
+      grandTotal: 0,
+    );
+    _emitLoaded();
+  }
+
   int quantityForItem(CartItemApiModel item) {
     return _localQuantities[item.id] ?? item.quantity ?? 1;
   }

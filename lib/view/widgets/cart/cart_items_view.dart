@@ -23,6 +23,7 @@ class CartItemsView extends StatelessWidget {
     final cartCubit = context.watch<CartCubit>();
     final items = cart.items;
     return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       slivers: [
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
@@ -183,9 +184,9 @@ class _CartActionsBar extends StatelessWidget {
             onPressed: isLoading ? null : onClearPressed,
             icon: isLoading
                 ? SpinKitFadingCircle(
-                  size: 20.r,
-                  color: colorScheme.primaryFixed,
-                )
+                    size: 20.r,
+                    color: colorScheme.primaryFixed,
+                  )
                 : Icon(Icons.delete_outline_rounded, size: 22.r),
             label: Text(
               l10n.emptyCart,

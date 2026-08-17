@@ -122,10 +122,14 @@ class AssociationDropdownField extends StatelessWidget {
               ),
               hintText: l10n.search,
               hintStyle: theme.textTheme.bodyMedium!.copyWith(
-                color: theme.colorScheme.onTertiaryFixedVariant.withValues(alpha: 0.7),
+                color: theme.colorScheme.onTertiaryFixedVariant.withValues(
+                  alpha: 0.7,
+                ),
               ),
               labelStyle: theme.textTheme.bodyMedium!.copyWith(
-                color: theme.colorScheme.onTertiaryFixedVariant.withValues(alpha: 0.7),
+                color: theme.colorScheme.onTertiaryFixedVariant.withValues(
+                  alpha: 0.7,
+                ),
               ),
               prefixIconConstraints: BoxConstraints(
                 minWidth: 40.w,

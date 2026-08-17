@@ -18,7 +18,6 @@ import 'package:kalivra/view/screens/profile_screens/association_screens/associa
 import 'package:kalivra/view/screens/profile_screens/profile_screens/edit_profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/favorites_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/kalivra_faq_screen.dart';
-import 'package:kalivra/model/order/order_model.dart';
 import 'package:kalivra/view/screens/profile_screens/orders_screens/order_details_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/orders_screens/orders_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/privacy_policy_screen.dart';
@@ -252,15 +251,20 @@ abstract class AppRouter {
             path: AppRoutes.orderDetails,
             name: AppRoutesName.orderDetails,
             builder: (context, state) {
-              final order = state.extra as OrderModel?;
-              if (order == null) {
+              final extra = state.extra;
+              final orderId = extra is int
+                  ? extra
+                  : extra is String
+                  ? int.tryParse(extra)
+                  : null;
+              if (orderId == null) {
                 return Scaffold(
                   body: Center(
                     child: Text(AppLocalizations.of(context)!.noOrder),
                   ),
                 );
               }
-              return OrderDetailsScreen(order: order);
+              return OrderDetailsScreen(orderId: orderId);
             },
           ),
           GoRoute(

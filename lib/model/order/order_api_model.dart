@@ -1,4 +1,4 @@
-/// GET /api/shop/v1/orders, GET /api/shop/v1/orders/{id} – order list and detail.
+/// GET /api/customer/orders, GET /api/shop/v1/orders/{id} - order list and detail.
 class OrderApiModel {
   const OrderApiModel({
     required this.id,
@@ -54,32 +54,33 @@ class OrderApiModel {
 
   factory OrderApiModel.fromJson(Map<String, dynamic> json) {
     return OrderApiModel(
-      id: json['id'] as int,
-      incrementId: json['increment_id'] as String?,
-      status: json['status'] as String?,
-      statusLabel: json['status_label'] as String?,
-      channelName: json['channel_name'] as String?,
-      isGuest: json['is_guest'] as bool?,
-      customerEmail: json['customer_email'] as String?,
-      customerFirstName: json['customer_first_name'] as String?,
-      customerLastName: json['customer_last_name'] as String?,
-      customerPhone: json['customer_phone'] as String?,
-      shippingMethod: json['shipping_method'] as String?,
-      shippingTitle: json['shipping_title'] as String?,
-      paymentTitle: json['payment_title'] as String?,
-      formattedGrandTotal: json['formatted_grand_total'] as String?,
-      grandTotal: (json['grand_total'] as num?)?.toDouble(),
-      subTotal: (json['sub_total'] as num?)?.toDouble(),
-      taxAmount: (json['tax_amount'] as num?)?.toDouble(),
-      discountAmount: (json['discount_amount'] as num?)?.toDouble(),
-      shippingAmount: (json['shipping_amount'] as num?)?.toDouble(),
+      id: _asInt(json['id']) ?? 0,
+      incrementId: _nullableText(json['increment_id']),
+      status: _nullableText(json['status']),
+      statusLabel: _nullableText(json['status_label']),
+      channelName: _nullableText(json['channel_name']),
+      isGuest: _asBool(json['is_guest']),
+      customerEmail: _nullableText(json['customer_email']),
+      customerFirstName: _nullableText(json['customer_first_name']),
+      customerLastName: _nullableText(json['customer_last_name']),
+      customerPhone: _nullableText(json['customer_phone']),
+      shippingMethod: _nullableText(json['shipping_method']),
+      shippingTitle: _nullableText(json['shipping_title']),
+      paymentTitle: _nullableText(json['payment_title']),
+      formattedGrandTotal: _nullableText(json['formatted_grand_total']),
+      grandTotal: _asDouble(json['grand_total']),
+      subTotal: _asDouble(json['sub_total']),
+      taxAmount: _asDouble(json['tax_amount']),
+      discountAmount: _asDouble(json['discount_amount']),
+      shippingAmount: _asDouble(json['shipping_amount']),
       items: (json['items'] as List<dynamic>?)
-          ?.map((e) => OrderItemApiModel.fromJson(e as Map<String, dynamic>))
+          ?.whereType<Map>()
+          .map((e) => OrderItemApiModel.fromJson(Map<String, dynamic>.from(e)))
           .toList(),
-      shippingAddress: json['shipping_address'] as Map<String, dynamic>?,
-      billingAddress: json['billing_address'] as Map<String, dynamic>?,
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      shippingAddress: _asMap(json['shipping_address']),
+      billingAddress: _asMap(json['billing_address']),
+      createdAt: _nullableText(json['created_at']),
+      updatedAt: _nullableText(json['updated_at']),
     );
   }
 }
@@ -113,17 +114,54 @@ class OrderItemApiModel {
 
   factory OrderItemApiModel.fromJson(Map<String, dynamic> json) {
     return OrderItemApiModel(
-      id: json['id'] as int,
-      sku: json['sku'] as String?,
-      name: json['name'] as String?,
-      type: json['type'] as String?,
-      quantity: json['quantity'] as int?,
-      price: (json['price'] as num?)?.toDouble(),
-      total: (json['total'] as num?)?.toDouble(),
-      formattedPrice: json['formatted_price'] as String?,
-      formattedTotal: json['formatted_total'] as String?,
-      productId: json['product_id'] as int?,
-      imageUrl: json['image_url'] as String?,
+      id: _asInt(json['id']) ?? 0,
+      sku: _nullableText(json['sku']),
+      name: _nullableText(json['name']),
+      type: _nullableText(json['type']),
+      quantity: _asInt(json['quantity']),
+      price: _asDouble(json['price']),
+      total: _asDouble(json['total']),
+      formattedPrice: _nullableText(json['formatted_price']),
+      formattedTotal: _nullableText(json['formatted_total']),
+      productId: _asInt(json['product_id']),
+      imageUrl: _nullableText(json['image_url']),
     );
   }
+}
+
+String? _nullableText(dynamic value) {
+  if (value == null) return null;
+  final text = value.toString().trim();
+  return text.isEmpty ? null : text;
+}
+
+int? _asInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value);
+  return null;
+}
+
+double? _asDouble(dynamic value) {
+  if (value is double) return value;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value);
+  return null;
+}
+
+bool? _asBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final normalized = value.toLowerCase().trim();
+    if (normalized == 'true' || normalized == '1') return true;
+    if (normalized == 'false' || normalized == '0') return false;
+  }
+  return null;
+}
+
+Map<String, dynamic>? _asMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) return Map<String, dynamic>.from(value);
+  return null;
 }
