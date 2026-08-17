@@ -871,5 +871,6 @@
   "@contactWorkingDays": {"placeholders":{"count":{"type":"int"}}},
   "contactLoadingInfo": "Loading contact info",
   "contactOpenLinkFailed": "Could not open this link",
-  "checkOutStepsScreenTitle": "Order compeletion steps"
+  "checkOutStepsScreenTitle": "Order compeletion steps",
+  "rateSubTitle": "Share your feedback and help us improve"
 }

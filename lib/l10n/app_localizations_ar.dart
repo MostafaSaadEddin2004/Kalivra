@@ -2539,4 +2539,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get checkOutStepsScreenTitle => 'خطوات اتمام الطلب';
+
+  @override
+  String get rateSubTitle => 'شاركنا رأيك وساعدنا على التحسين';
 }

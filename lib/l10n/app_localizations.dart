@@ -4921,6 +4921,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Order compeletion steps'**
   String get checkOutStepsScreenTitle;
+
+  /// No description provided for @rateSubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share your feedback and help us improve'**
+  String get rateSubTitle;
 }
 
 class _AppLocalizationsDelegate

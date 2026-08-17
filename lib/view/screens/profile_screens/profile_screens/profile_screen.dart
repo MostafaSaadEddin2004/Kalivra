@@ -12,8 +12,6 @@ import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-const String _kMediaOrigin = 'https://test1.zedan-world.com';
-
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -22,14 +20,6 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  static String? _resolveAvatarUrl(String? avatar) {
-    if (avatar == null || avatar.isEmpty) return null;
-    if (avatar.startsWith('http')) return avatar;
-    return avatar.startsWith('/')
-        ? '$_kMediaOrigin$avatar'
-        : '$_kMediaOrigin/$avatar';
-  }
-
   String _formatBalance(num? value) {
     if (value == null) return '---';
     if (value % 1 == 0) return value.toInt().toString();
@@ -305,69 +295,113 @@ class _ProfileState extends State<Profile> {
               final lastName = customer.lastName ?? '';
               final fullName = '$firstName $lastName'.trim();
               final addressInfo = customer.addressInformation;
-              final avatarUrl = _resolveAvatarUrl(customer.displayImageUrl);
               final referralCode = customer.referralCode;
               return ListView(
                 padding: EdgeInsets.all(20.w),
                 children: [
                   Column(
                     children: [
-                      Row(
-                        spacing: 16.w,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 96.r,
-                            height: 96.r,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: theme.colorScheme.onTertiaryFixed,
+                      Container(
+                        padding: EdgeInsets.all(18.w),
+                        decoration: BoxDecoration(
+                          color: AppColors.burgundy,
+                          borderRadius: BorderRadius.circular(18.r),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.black.withValues(alpha: 0.16),
+                              blurRadius: 16.r,
+                              offset: Offset(0, 8.h),
                             ),
-                            child: ClipOval(
-                              child: CustomNetworkImage(
-                                imageUrl: avatarUrl,
-                                defaultIcon: Icons.person_rounded,
-                                defaultIconColor:
-                                    theme.colorScheme.onTertiaryFixed,
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Stack(
+                              clipBehavior: Clip.none,
                               children: [
-                                Text(
-                                  fullName,
-                                  style: theme.textTheme.bodyLarge?.copyWith(
-                                    fontWeight: FontWeight.w900,
+                                ClipOval(
+                                  child: Container(
+                                    width: 74.r,
+                                    height: 74.r,
+                                    color: AppColors.offWhite,
+                                    child: CustomNetworkImage(
+                                      imageUrl: customer.imageUrl,
+                                      width: 74.r,
+                                      height: 74.r,
+                                      defaultIcon: Icons.person_rounded,
+                                      defaultIconColor: AppColors.burgundy,
+                                    ),
                                   ),
                                 ),
-                                state.customer.email != null
-                                    ? Text(
-                                        state.customer.email!,
-                                        style: theme.textTheme.bodyLarge
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                      )
-                                    : const SizedBox.shrink(),
-                                customer.gender != null
-                                    ? Text(
-                                        customer.gender!,
-                                        style: theme.textTheme.bodyLarge
-                                            ?.copyWith(
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                      )
-                                    : const SizedBox.shrink(),
+                                PositionedDirectional(
+                                  end: -2.w,
+                                  bottom: -2.h,
+                                  child: InkWell(
+                                    child: Container(
+                                      height: 28.h,
+                                      width: 28.w,
+                                      padding: EdgeInsets.all(4.w),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.taupe,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: AppColors.burgundy,
+                                          width: 1.5.w,
+                                        ),
+                                      ),
+                                      child: Icon(
+                                        Icons.edit_rounded,
+                                        color: AppColors.burgundy,
+                                        size: 16.r,
+                                      ),
+                                    ),
+                                    onTap: () =>
+                                        context.push(AppRoutesName.editProfile),
+                                  ),
+                                ),
                               ],
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 16.w),
+                            Expanded(
+                              child: Column(
+                                spacing: 8.h,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    fullName,
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      color: AppColors.offWhite,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Row(
+                                    spacing: 4.w,
+                                    children: [
+                                      Icon(
+                                        Icons.person,
+                                        color: theme.colorScheme.secondaryFixed,
+                                      ),
+                                      Text(
+                                        customer.gender ?? '',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: AppColors.offWhite,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
+
                       SizedBox(height: 12.h),
                     ],
                   ),

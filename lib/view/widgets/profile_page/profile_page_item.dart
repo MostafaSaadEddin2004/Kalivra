@@ -25,6 +25,7 @@ class ProfilePageItem extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isAction = variant != ProfilePageItemVariant.regular;
+
     final foreground = variant == ProfilePageItemVariant.danger
         ? AppColors.burgundy
         : colorScheme.primaryFixed;
@@ -68,12 +69,19 @@ class ProfilePageItem extends StatelessWidget {
                   children: [
                     Text(
                       label,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: foreground,
-                        fontWeight: isAction
-                            ? FontWeight.w700
-                            : FontWeight.w600,
-                      ),
+                      style: variant == ProfilePageItemVariant.danger
+                          ? theme.textTheme.bodyMedium?.copyWith(
+                              color: foreground,
+                              fontWeight: isAction
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                            )
+                          : theme.textTheme.bodyLarge?.copyWith(
+                              color: foreground,
+                              fontWeight: isAction
+                                  ? FontWeight.w700
+                                  : FontWeight.w600,
+                            ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),

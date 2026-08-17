@@ -2559,4 +2559,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkOutStepsScreenTitle => 'Order compeletion steps';
+
+  @override
+  String get rateSubTitle => 'Share your feedback and help us improve';
 }

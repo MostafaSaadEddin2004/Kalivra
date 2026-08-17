@@ -134,6 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ProfilePageItem(
                 icon: Icons.star_rounded,
                 label: l10n.rateTitle,
+                subtitle: l10n.rateSubTitle,
                 onTap: () => context.push(AppRoutes.rate),
               ),
             SizedBox(height: 8.h),
@@ -143,8 +144,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: ProfilePageItem(
                     icon: Icons.share_rounded,
                     label: l10n.profileShareApp,
-                    subtitle: l10n.profileShareSubtitle,
-                    variant: ProfilePageItemVariant.action,
+                    variant: ProfilePageItemVariant.danger,
                     onTap: () => _shareApp(context),
                   ),
                 ),
@@ -197,9 +197,7 @@ class _ProfileHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
     final imageUrl = customer?.displayImageUrl;
-    final isLoggedIn = customer != null;
 
     return Container(
       padding: EdgeInsets.all(18.w),
@@ -236,19 +234,26 @@ class _ProfileHeroCard extends StatelessWidget {
               PositionedDirectional(
                 end: -2.w,
                 bottom: -2.h,
-                child: Container(
-                  width: 24.r,
-                  height: 24.r,
-                  decoration: BoxDecoration(
-                    color: AppColors.taupe,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.burgundy, width: 1.5.w),
+                child: InkWell(
+                  child: Container(
+                    height: 28.h,
+                    width: 28.w,
+                    padding: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      color: AppColors.taupe,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.burgundy,
+                        width: 1.5.w,
+                      ),
+                    ),
+                    child: Icon(
+                      Icons.edit_rounded,
+                      color: AppColors.burgundy,
+                      size: 16.r,
+                    ),
                   ),
-                  child: Icon(
-                    isLoggedIn ? Icons.edit_rounded : Icons.login_rounded,
-                    color: AppColors.burgundy,
-                    size: 14.r,
-                  ),
+                  onTap: () => context.push(AppRoutes.editProfile),
                 ),
               ),
             ],
@@ -256,16 +261,9 @@ class _ProfileHeroCard extends StatelessWidget {
           SizedBox(width: 16.w),
           Expanded(
             child: Column(
+              spacing: 8.h,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.profileWelcome,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.taupe,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 4.h),
                 Text(
                   _displayName(l10n),
                   style: theme.textTheme.titleLarge?.copyWith(
@@ -275,39 +273,26 @@ class _ProfileHeroCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 6.h),
                 Row(
+                  spacing: 4.w,
                   children: [
                     Icon(
-                      isLoggedIn
-                          ? Icons.verified_user_rounded
-                          : Icons.info_outline_rounded,
-                      color: AppColors.taupe,
-                      size: 15.r,
+                      Icons.qr_code_2_rounded,
+                      color: theme.colorScheme.secondaryFixed,
                     ),
-                    SizedBox(width: 5.w),
-                    Expanded(
-                      child: Text(
-                        isLoggedIn
-                            ? l10n.profileActiveMember
-                            : l10n.profileGuestStatus,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.taupe,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    Text(
+                      customer!.referralCode!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.offWhite,
+                        fontWeight: FontWeight.w600,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ],
             ),
-          ),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: colorScheme.secondaryFixed,
-            size: 28.r,
           ),
         ],
       ),

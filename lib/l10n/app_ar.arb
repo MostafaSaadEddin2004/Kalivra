@@ -866,5 +866,6 @@
   "@contactWorkingDays": {"placeholders":{"count":{"type":"int"}}},
   "contactLoadingInfo": "جاري تحميل معلومات التواصل",
   "contactOpenLinkFailed": "تعذر فتح الرابط",
-  "checkOutStepsScreenTitle": "خطوات اتمام الطلب"
+  "checkOutStepsScreenTitle": "خطوات اتمام الطلب",
+  "rateSubTitle": "شاركنا رأيك وساعدنا على التحسين"
 }
