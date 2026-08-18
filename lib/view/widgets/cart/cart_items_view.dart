@@ -30,7 +30,7 @@ class CartItemsView extends StatelessWidget {
           sliver: SliverList.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
-              final item = items[index];
+              final item = items.reversed.toList()[index];
               final isDetailsUpdating =
                   cartCubit.operation == CartOperation.updatingDetails &&
                   cartCubit.activeItemId == item.id;

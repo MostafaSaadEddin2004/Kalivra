@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -368,13 +369,13 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
               SizedBox(height: 8.h),
             ],
             Text(
-                    title,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: colorScheme.onTertiaryFixed,
-                      fontWeight: FontWeight.w800,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+              title,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: colorScheme.onTertiaryFixed,
+                fontWeight: FontWeight.w800,
+              ),
+              textAlign: TextAlign.center,
+            ),
             SizedBox(height: 16.h),
             _DialogProductHeader(
               imageUrl: imageUrl,
@@ -447,13 +448,14 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
                     icon: Icons.inventory_2_outlined,
                     label: l10n.quantity,
                   ),
-                ),Text(
-                l10n.availableQuantity(maxQuantity!),
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.primaryFixed.withValues(alpha: 0.55),
-                  fontWeight: FontWeight.w600,
                 ),
-              ),
+                Text(
+                  l10n.availableQuantity(maxQuantity!),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.primaryFixed.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
             SizedBox(height: 8.h),
@@ -518,6 +520,11 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
+            ),
+            SizedBox(height: 16.h),
+            TextButton(
+              onPressed: () => context.pop(),
+              child: Text(l10n.cancel),
             ),
           ],
         ),

@@ -625,6 +625,9 @@ List<AssociationMembership> _membershipsWithAssociationFlags(
       'is_active',
       'is_assigned_to_project',
       'is_assigned_to_unit',
+      'building',
+      'unit',
+      'total_payments_made',
     ]) {
       if (associationItem.containsKey(key)) {
         mergedItem[key] = associationItem[key];

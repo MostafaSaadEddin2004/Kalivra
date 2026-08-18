@@ -771,6 +771,8 @@ class _MembershipDetailsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final unit = membership.unit ?? membership.allocatedUnit;
+    final projects = _projectsForMembership(profile, membership);
+    final buildings = _buildingsForMembership(membership);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -820,11 +822,38 @@ class _MembershipDetailsSection extends StatelessWidget {
             ),
           ],
         ),
-        _ProjectsInformationSection(projects: profile.projects),
-        _BuildingsInformationSection(projects: profile.projects),
+        _ProjectsInformationSection(projects: projects),
+        _BuildingsInformationSection(projects: projects, buildings: buildings),
         if (unit != null) _UnitDetailsSection(unit: unit),
       ],
     );
+  }
+
+  List<AssociationProject> _projectsForMembership(
+    AssociationMemberProfileModel profile,
+    AssociationMembership membership,
+  ) {
+    final membershipProject = membership.project;
+    if (membershipProject == null) return const [];
+
+    for (final project in profile.projects) {
+      if (project.id != null && project.id == membershipProject.id) {
+        return [project];
+      }
+    }
+    return [membershipProject];
+  }
+
+  List<AssociationBuilding> _buildingsForMembership(
+    AssociationMembership membership,
+  ) {
+    final membershipBuilding = membership.building;
+    if (membershipBuilding != null) return [membershipBuilding];
+
+    final unitBuilding = membership.unit?.building;
+    if (unitBuilding != null) return [unitBuilding];
+
+    return const [];
   }
 }
 
@@ -1490,20 +1519,29 @@ class _ProjectLocationButton extends StatelessWidget {
 }
 
 class _BuildingsInformationSection extends StatelessWidget {
-  const _BuildingsInformationSection({required this.projects});
+  const _BuildingsInformationSection({
+    required this.projects,
+    this.buildings = const [],
+  });
 
   final List<AssociationProject> projects;
+  final List<AssociationBuilding> buildings;
 
   @override
   Widget build(BuildContext context) {
     final projectsWithBuildings = projects
         .where((project) => project.buildings.isNotEmpty)
         .toList();
+    final hasMembershipBuildings = buildings.isNotEmpty;
 
     return _ExpandableProfileSection(
       title: AppLocalizations.of(context)!.associationMemberBuildingInformation,
       icon: Icons.business_rounded,
-      children: projectsWithBuildings.isEmpty
+      children: hasMembershipBuildings
+          ? buildings
+                .map((building) => _BuildingDetailsSection(building: building))
+                .toList()
+          : projectsWithBuildings.isEmpty
           ? [
               _EmptyInlineState(
                 icon: Icons.business_rounded,
