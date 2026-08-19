@@ -692,6 +692,12 @@ abstract class AppLocalizations {
   /// **'Enter a valid quantity'**
   String get invalidQuantity;
 
+  /// No description provided for @noMoreQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'No more quantity is available for this product.'**
+  String get noMoreQuantity;
+
   /// No description provided for @selectRequiredOptions.
   ///
   /// In en, this message translates to:

@@ -111,6 +111,7 @@
   "couponRemovedSuccessfully": "Coupon removed successfully",
   "noChangesDetected": "No changes detected",
   "invalidQuantity": "Enter a valid quantity",
+  "noMoreQuantity": "No more quantity is available for this product.",
   "selectRequiredOptions": "Select the required options",
   "unableToAddItem": "Unable to add item to cart",
   "unableToUpdateItem": "Unable to update item",

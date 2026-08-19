@@ -315,6 +315,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidQuantity => 'Enter a valid quantity';
 
   @override
+  String get noMoreQuantity =>
+      'No more quantity is available for this product.';
+
+  @override
   String get selectRequiredOptions => 'Select the required options';
 
   @override

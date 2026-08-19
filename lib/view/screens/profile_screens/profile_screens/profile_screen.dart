@@ -355,8 +355,10 @@ class _ProfileState extends State<Profile> {
                                         size: 16.r,
                                       ),
                                     ),
-                                    onTap: () =>
-                                        context.push(AppRoutesName.editProfile),
+                                    onTap: () => context.push(
+                                      AppRoutes.editProfile,
+                                      extra: customer,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -398,6 +400,25 @@ class _ProfileState extends State<Profile> {
                                 ],
                               ),
                             ),
+                            if (referralCode != null &&
+                                referralCode.isNotEmpty) ...[
+                              SizedBox(width: 8.w),
+                              InkWell(
+                                onTap: () => showReferralQrDialog(
+                                  context,
+                                  referralCode: referralCode,
+                                ),
+                                borderRadius: BorderRadius.circular(12.r),
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.w),
+                                  child: Icon(
+                                    Icons.qr_code_2_rounded,
+                                    color: theme.colorScheme.secondaryFixed,
+                                    size: 24.r,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -426,9 +447,6 @@ class _ProfileState extends State<Profile> {
                           ),
                         )
                       : const SizedBox.shrink(),
-                  if (referralCode != null && referralCode.isNotEmpty)
-                    ReferralQrCard(referralCode: referralCode),
-                  SizedBox(height: 16.h),
                   _SectionCard(
                     title: l10n.accountInfo,
                     children: [

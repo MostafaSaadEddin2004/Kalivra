@@ -109,6 +109,7 @@
   "couponRemovedSuccessfully": "تم حذف القسيمة بنجاح",
   "noChangesDetected": "لا توجد تغييرات",
   "invalidQuantity": "أدخل كمية صالحة",
+  "noMoreQuantity": "لا توجد كمية إضافية متوفرة لهذا المنتج.",
   "selectRequiredOptions": "اختر الخيارات المطلوبة",
   "unableToAddItem": "تعذر إضافة المنتج إلى السلة",
   "unableToUpdateItem": "تعذر تحديث المنتج",

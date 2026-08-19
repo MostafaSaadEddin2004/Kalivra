@@ -137,6 +137,23 @@ class _ProductCardState extends State<ProductCard> {
     );
   }
 
+  bool _hasNoMoreQuantity(ProductModel product) {
+    final stockQty = product.variants?.stockQty;
+    return !product.isSaleable || stockQty == 0;
+  }
+
+  Future<void> _onAddToCartTap() async {
+    if (_hasNoMoreQuantity(widget.product)) {
+      CustomSnackBar.show(
+        context,
+        AppLocalizations.of(context)!.noMoreQuantity,
+      );
+      return;
+    }
+
+    await _showAddToCartDialog();
+  }
+
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
@@ -198,10 +215,10 @@ class _ProductCardState extends State<ProductCard> {
                         ),
                         child: _wishlistLoading
                             ? SpinKitFadingCircle(
-                              size: 20.r,
-                              color: AppColors.offWhite,
-                              itemCount: 14,
-                            )
+                                size: 20.r,
+                                color: AppColors.offWhite,
+                                itemCount: 14,
+                              )
                             : Icon(
                                 isWishlist
                                     ? Icons.favorite_rounded
@@ -265,11 +282,7 @@ class _ProductCardState extends State<ProductCard> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         _PriceBlock(product: product, isDark: isDark),
-                        CardButton(
-                          onTap: product.isSaleable
-                              ? _showAddToCartDialog
-                              : null,
-                        ),
+                        CardButton(onTap: _onAddToCartTap),
                       ],
                     ),
                   ],

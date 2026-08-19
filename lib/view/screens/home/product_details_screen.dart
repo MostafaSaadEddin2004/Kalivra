@@ -12,7 +12,6 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
-import 'package:kalivra/view/widgets/cart/cart_item_edit_dialog.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
@@ -34,6 +33,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   BuildContext? _ratingDialogContext;
   late bool _isWishlist;
   bool _wishlistLoading = false;
+  bool _isAddingToCart = false;
+  int _quantity = 1;
   int _selectedRating = 0;
 
   @override
@@ -228,31 +229,147 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
-  Future<void> _showAddToCartDialog(
-    ProductModel product, {
-    VariantBySize? initialSize,
-    ColorVariant? initialColor,
-  }) async {
-    final cartCubit = context.read<CartCubit>();
-    var dialogProduct = product;
+  int? _maxQuantity(ProductModel product, ColorVariant? selectedColor) {
+    return selectedColor?.stockQty ?? product.variants?.stockQty;
+  }
 
-    if (dialogProduct.variants == null) {
-      try {
-        dialogProduct = await cartCubit.loadProduct(product.id);
-      } catch (_) {}
+  bool _hasNoMoreQuantity(ProductModel product, ColorVariant? selectedColor) {
+    final maxQuantity = _maxQuantity(product, selectedColor);
+    return !product.isSaleable || maxQuantity == 0;
+  }
+
+  bool _hasRequiredCartOptions(
+    ProductModel product, {
+    required VariantBySize? selectedSize,
+    required ColorVariant? selectedColor,
+  }) {
+    final sizes = product.variants?.variantsBySize ?? const <VariantBySize>[];
+    final colors = selectedSize?.colors ?? const <ColorVariant>[];
+    if (sizes.isNotEmpty && selectedSize == null) return false;
+    if (colors.isNotEmpty && selectedColor == null) return false;
+    return true;
+  }
+
+  void _changeQuantity(int quantity, int? maxQuantity) {
+    if (quantity < 1) return;
+    if (maxQuantity != null && quantity > maxQuantity) {
+      CustomSnackBar.show(
+        context,
+        AppLocalizations.of(context)!.quantityLimitMessage(maxQuantity),
+      );
+      return;
+    }
+    setState(() => _quantity = quantity);
+  }
+
+  void _selectSize(VariantBySize size) {
+    context.read<ProductsCubit>().selectSize(size);
+    setState(() => _quantity = 1);
+  }
+
+  void _selectColor(ColorVariant color) {
+    context.read<ProductsCubit>().selectColor(color);
+    setState(() {
+      if (color.stockQty > 0 && _quantity > color.stockQty) {
+        _quantity = color.stockQty;
+      }
+    });
+  }
+
+  Future<void> _addProductToCart(
+    ProductModel product,
+    ProductVariantSelected? variantState,
+  ) async {
+    if (_isAddingToCart) return;
+
+    final l10n = AppLocalizations.of(context)!;
+    final selectedSize = variantState?.selectedSize;
+    final selectedColor = variantState?.selectedColor;
+    final maxQuantity = _maxQuantity(product, selectedColor);
+
+    if (_hasNoMoreQuantity(product, selectedColor)) {
+      CustomSnackBar.show(context, l10n.noMoreQuantity);
+      return;
     }
 
+    if (!_hasRequiredCartOptions(
+      product,
+      selectedSize: selectedSize,
+      selectedColor: selectedColor,
+    )) {
+      CustomSnackBar.show(context, l10n.selectRequiredOptions);
+      return;
+    }
+
+    if (maxQuantity != null && _quantity > maxQuantity) {
+      CustomSnackBar.show(context, l10n.quantityLimitMessage(maxQuantity));
+      return;
+    }
+
+    setState(() => _isAddingToCart = true);
+    final added = await context.read<CartCubit>().addItem(
+      context,
+      (selectedColor?.variantId ?? product.id).toString(),
+      quantity: _quantity,
+      color: selectedColor?.colorName ?? '',
+      size: selectedSize?.sizeName ?? '',
+      productName: product.name,
+    );
+
     if (!mounted) return;
-    await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => BlocProvider.value(
-        value: cartCubit,
-        child: CartItemEditDialog.add(
-          product: dialogProduct,
-          initialSize: initialSize,
-          initialColor: initialColor,
+    setState(() {
+      _isAddingToCart = false;
+      if (added) _quantity = 1;
+    });
+  }
+
+  int _displayQuantity(int? maxQuantity) {
+    if (maxQuantity == 0) return 0;
+    if (maxQuantity != null && maxQuantity > 0 && _quantity > maxQuantity) {
+      return maxQuantity;
+    }
+    return _quantity;
+  }
+
+  Widget _buildQuantitySelector({
+    required int value,
+    required int? maxQuantity,
+    required bool enabled,
+  }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(10.r),
+        border: Border.all(
+          color: colorScheme.primaryFixed.withValues(alpha: 0.12),
         ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _ProductQuantityButton(
+            icon: Icons.remove_rounded,
+            enabled: enabled && value > 1,
+            onTap: () => _changeQuantity(value - 1, maxQuantity),
+          ),
+          Text(
+            '$value',
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.primaryFixed,
+              fontWeight: FontWeight.w800,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          _ProductQuantityButton(
+            icon: Icons.add_rounded,
+            enabled: enabled && (maxQuantity == null || value < maxQuantity),
+            onTap: () => _changeQuantity(value + 1, maxQuantity),
+          ),
+        ],
       ),
     );
   }
@@ -299,6 +416,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           final product = variantState?.product ?? widget.product;
           final isWishlist = _effectiveWishlist(product, wishlistState);
           final viewData = ProductViewData.fromProduct(product, l10n);
+          final selectedColor = variantState?.selectedColor;
+          final maxQuantity = _maxQuantity(product, selectedColor);
+          final displayQuantity = _displayQuantity(maxQuantity);
+          final canChangeQuantity =
+              !_isAddingToCart &&
+              product.isSaleable &&
+              (maxQuantity == null || maxQuantity > 0);
 
           return ListView(
             padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
@@ -329,10 +453,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ProductVariantsSection(
                   variantState: variantState,
                   isDark: isDark,
-                  onSizeSelected: (size) =>
-                      context.read<ProductsCubit>().selectSize(size),
-                  onColorSelected: (color) =>
-                      context.read<ProductsCubit>().selectColor(color),
+                  onSizeSelected: (size) => _selectSize(size),
+                  onColorSelected: (color) => _selectColor(color),
                 ),
               ],
 
@@ -360,15 +482,42 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
               ],
               SizedBox(height: 24.h),
+              ProductSectionCard(
+                isDark: isDark,
+                title: l10n.quantity,
+                icon: Icons.inventory_2_outlined,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (maxQuantity != null) ...[
+                      Text(
+                        l10n.availableQuantity(maxQuantity),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.primaryFixed.withValues(
+                            alpha: 0.55,
+                          ),
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      SizedBox(height: 8.h),
+                    ],
+                    _buildQuantitySelector(
+                      value: displayQuantity,
+                      maxQuantity: maxQuantity,
+                      enabled: canChangeQuantity,
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16.h),
               FilledButton.icon(
-                onPressed: product.isSaleable
-                    ? () => _showAddToCartDialog(
-                        product,
-                        initialSize: variantState?.selectedSize,
-                        initialColor: variantState?.selectedColor,
-                      )
-                    : null,
-                icon: Icon(Icons.add_shopping_cart_rounded, size: 24.r),
+                onPressed: _isAddingToCart
+                    ? null
+                    : () => _addProductToCart(product, variantState),
+                icon: _isAddingToCart
+                    ? SpinKitFadingCircle(size: 20.r, color: AppColors.offWhite)
+                    : Icon(Icons.add_shopping_cart_rounded, size: 24.r),
                 label: Text(
                   l10n.addToCart,
                   style: theme.textTheme.titleMedium?.copyWith(
@@ -387,6 +536,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _ProductQuantityButton extends StatelessWidget {
+  const _ProductQuantityButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      width: 36.r,
+      height: 36.r,
+      child: Material(
+        color: colorScheme.primaryFixed.withValues(alpha: 0.05),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: enabled ? onTap : null,
+          child: Icon(
+            icon,
+            color: enabled
+                ? colorScheme.primaryFixed
+                : colorScheme.primaryFixed.withValues(alpha: 0.24),
+            size: 20.r,
+          ),
+        ),
       ),
     );
   }
@@ -1064,10 +1250,7 @@ class GallerySection extends StatelessWidget {
                   ],
                 ),
                 child: wishlistLoading
-                    ? SpinKitFadingCircle(
-                      size: 20.r,
-                      color: AppColors.offWhite,
-                    )
+                    ? SpinKitFadingCircle(size: 20.r, color: AppColors.offWhite)
                     : WishlistIcon(isActive: isWishlist),
               ),
             ),

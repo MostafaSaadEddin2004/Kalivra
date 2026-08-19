@@ -9,6 +9,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
+import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:kalivra/view/widgets/profile_page/profile_page_footer.dart';
 import 'package:kalivra/view/widgets/profile_page/profile_page_item.dart';
 import 'package:share_plus/share_plus.dart';
@@ -194,6 +195,7 @@ class _ProfileHeroCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final imageUrl = customer?.displayImageUrl;
+    final referralCode = customer?.referralCode?.trim();
 
     return Container(
       padding: EdgeInsets.all(18.w),
@@ -249,7 +251,8 @@ class _ProfileHeroCard extends StatelessWidget {
                       size: 16.r,
                     ),
                   ),
-                  onTap: () => context.push(AppRoutes.editProfile),
+                  onTap: () =>
+                      context.push(AppRoutes.editProfile, extra: customer),
                 ),
               ),
             ],
@@ -269,27 +272,45 @@ class _ProfileHeroCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  spacing: 4.w,
-                  children: [
-                    Icon(
-                      Icons.qr_code_2_rounded,
-                      color: theme.colorScheme.secondaryFixed,
-                    ),
-                    Text(
-                      customer!.referralCode!,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.offWhite,
-                        fontWeight: FontWeight.w600,
+                if (customer!.gender != null) ...[
+                  Row(
+                    spacing: 4.w,
+                    children: [
+                      Icon(
+                        Icons.person,
+                        color: theme.colorScheme.secondaryFixed,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                      Text(
+                        customer!.gender!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.offWhite,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
+          if (referralCode != null && referralCode.isNotEmpty) ...[
+            SizedBox(width: 8.w),
+            InkWell(
+              onTap: () =>
+                  showReferralQrDialog(context, referralCode: referralCode),
+              borderRadius: BorderRadius.circular(12.r),
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
+                child: Icon(
+                  Icons.qr_code_2_rounded,
+                  color: theme.colorScheme.secondaryFixed,
+                  size: 24.r,
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

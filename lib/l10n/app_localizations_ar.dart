@@ -314,6 +314,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get invalidQuantity => 'أدخل كمية صالحة';
 
   @override
+  String get noMoreQuantity => 'لا توجد كمية إضافية متوفرة لهذا المنتج.';
+
+  @override
   String get selectRequiredOptions => 'اختر الخيارات المطلوبة';
 
   @override
