@@ -326,6 +326,60 @@ abstract class AppLocalizations {
   /// **'Reset WhatsApp Number'**
   String get settingsChangePhone;
 
+  /// No description provided for @settingsAddAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an account'**
+  String get settingsAddAccount;
+
+  /// No description provided for @settingsChangeAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Change account'**
+  String get settingsChangeAccount;
+
+  /// No description provided for @accountEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account email'**
+  String get accountEmailTitle;
+
+  /// No description provided for @connectedAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected account'**
+  String get connectedAccount;
+
+  /// No description provided for @accountEmailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email to receive a code and verify the account.'**
+  String get accountEmailDescription;
+
+  /// No description provided for @sendVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send verification code'**
+  String get sendVerificationCode;
+
+  /// No description provided for @accountVerificationCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code'**
+  String get accountVerificationCodeTitle;
+
+  /// No description provided for @accountVerificationCodeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the verification code sent to your email.'**
+  String get accountVerificationCodeDescription;
+
+  /// No description provided for @verifyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify account'**
+  String get verifyAccount;
+
   /// No description provided for @appearanceTitle.
   ///
   /// In en, this message translates to:

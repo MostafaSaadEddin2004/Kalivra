@@ -101,6 +101,11 @@ class SettingsScreen extends StatelessWidget {
                     case UnAuthinticated():
                       return const SizedBox.shrink();
                     default:
+                      final accountEmail = state is AuthFetchedData
+                          ? state.customer.email?.trim()
+                          : null;
+                      final hasAccount =
+                          accountEmail != null && accountEmail.isNotEmpty;
                       return Column(
                         children: [
                           _buildNotificationSection(context),
@@ -124,6 +129,20 @@ class SettingsScreen extends StatelessWidget {
                                   () => context.push(
                                     AppRoutes.otp,
                                     extra: OtpScreenMode.changePhone,
+                                  ),
+                                ),
+                              ),
+                              _SettingsTile(
+                                icon: Icons.alternate_email_rounded,
+                                label: hasAccount
+                                    ? l10n.settingsChangeAccount
+                                    : l10n.settingsAddAccount,
+                                subtitle: hasAccount ? accountEmail : null,
+                                onTap: () => _openProtectedScreen(
+                                  context,
+                                  () => context.push(
+                                    AppRoutes.accountEmail,
+                                    extra: accountEmail,
                                   ),
                                 ),
                               ),

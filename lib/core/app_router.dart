@@ -12,6 +12,8 @@ import 'package:kalivra/view/screens/profile_screens/terms_conditions_screen.dar
 import 'package:kalivra/view/splash_screen.dart';
 import 'package:kalivra/view/screens/home/home_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/about_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/account_email_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/account_verification_code_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/profile_screens/profile_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/contact_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_member_profile_screen.dart';
@@ -93,6 +95,8 @@ abstract class AppRoutes {
   static const String search = '/search';
   static const String notifications = '/notifications';
   static const String notificationPreferences = '/notification-preferences';
+  static const String accountEmail = '/account-email';
+  static const String accountVerificationCode = '/account-verification-code';
   static const String checkout = '/checkout';
   static const String associationMemberProfile = '/association-member-profile';
   static const String associationSubmittedRequests =
@@ -146,6 +150,8 @@ abstract class AppRoutesName {
   static const String search = 'search';
   static const String notifications = 'notifications';
   static const String notificationPreferences = 'notification-preferences';
+  static const String accountEmail = 'account-email';
+  static const String accountVerificationCode = 'account-verification-code';
   static const String checkout = 'checkout';
   static const String associationMemberProfile = 'association-member-profile';
   static const String associationSubmittedRequests =
@@ -276,6 +282,22 @@ abstract class AppRouter {
             path: AppRoutes.settings,
             name: AppRoutesName.settings,
             builder: (_, _) => const SettingsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.accountEmail,
+            name: AppRoutesName.accountEmail,
+            builder: (context, state) {
+              final accountEmail = state.extra as String?;
+              return AccountEmailScreen(accountEmail: accountEmail);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.accountVerificationCode,
+            name: AppRoutesName.accountVerificationCode,
+            builder: (context, state) {
+              final accountEmail = state.extra as String?;
+              return AccountVerificationCodeScreen(accountEmail: accountEmail);
+            },
           ),
           GoRoute(
             path: AppRoutes.language,

@@ -123,6 +123,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsChangePhone => 'إعادة تعيين رقم واتساب';
 
   @override
+  String get settingsAddAccount => 'إضافة حساب';
+
+  @override
+  String get settingsChangeAccount => 'تغيير الحساب';
+
+  @override
+  String get accountEmailTitle => 'بريد الحساب';
+
+  @override
+  String get connectedAccount => 'الحساب المرتبط';
+
+  @override
+  String get accountEmailDescription =>
+      'أدخل بريدك الإلكتروني لاستلام رمز والتحقق من الحساب.';
+
+  @override
+  String get sendVerificationCode => 'إرسال رمز التحقق';
+
+  @override
+  String get accountVerificationCodeTitle => 'رمز التحقق';
+
+  @override
+  String get accountVerificationCodeDescription =>
+      'أدخل رمز التحقق المرسل إلى بريدك الإلكتروني.';
+
+  @override
+  String get verifyAccount => 'تحقق من الحساب';
+
+  @override
   String get appearanceTitle => 'المظهر';
 
   @override

@@ -422,7 +422,6 @@ class _ProfileState extends State<Profile> {
                           ],
                         ),
                       ),
-
                       SizedBox(height: 12.h),
                     ],
                   ),

@@ -124,6 +124,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsChangePhone => 'Reset WhatsApp Number';
 
   @override
+  String get settingsAddAccount => 'Add an account';
+
+  @override
+  String get settingsChangeAccount => 'Change account';
+
+  @override
+  String get accountEmailTitle => 'Account email';
+
+  @override
+  String get connectedAccount => 'Connected account';
+
+  @override
+  String get accountEmailDescription =>
+      'Enter your email to receive a code and verify the account.';
+
+  @override
+  String get sendVerificationCode => 'Send verification code';
+
+  @override
+  String get accountVerificationCodeTitle => 'Verification code';
+
+  @override
+  String get accountVerificationCodeDescription =>
+      'Enter the verification code sent to your email.';
+
+  @override
+  String get verifyAccount => 'Verify account';
+
+  @override
   String get appearanceTitle => 'Appearance';
 
   @override
