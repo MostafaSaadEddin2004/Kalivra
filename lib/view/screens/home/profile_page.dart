@@ -139,29 +139,25 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () => context.push(AppRoutes.rate),
               ),
             SizedBox(height: 8.h),
-            Expanded(
-              child: ProfilePageItem(
-                icon: Icons.share_rounded,
-                label: l10n.profileShareApp,
-                variant: ProfilePageItemVariant.regular,
-                onTap: () => _shareApp(context),
-              ),
-            ),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: BlocBuilder<MiddlewareCubit, MiddlewareState>(
-                bloc: MiddlewareCubit()..getLoinOrLogoutButton(context),
-                builder: (context, state) {
-                  switch (state) {
-                    case LogOutButton():
-                      return state.button;
-                    case LoginButton():
-                      return state.button;
-                    default:
-                      return const SizedBox.shrink();
-                  }
-                },
-              ),
+                ProfilePageItem(
+                  icon: Icons.share_rounded,
+                  label: l10n.profileShareApp,
+                  variant: ProfilePageItemVariant.regular,
+                  onTap: () => _shareApp(context),
+                ),
+                SizedBox(width: 10.w),
+            BlocBuilder<MiddlewareCubit, MiddlewareState>(
+              bloc: MiddlewareCubit()..getLoinOrLogoutButton(context),
+              builder: (context, state) {
+                switch (state) {
+                  case LogOutButton():
+                    return state.button;
+                  case LoginButton():
+                    return state.button;
+                  default:
+                    return const SizedBox.shrink();
+                }
+              },
             ),
             const ProfilePageFooter(),
           ],
