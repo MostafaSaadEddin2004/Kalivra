@@ -6,6 +6,7 @@ import 'package:kalivra/controller/blocs/cubit/categories_cubit/categories_cubit
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -21,7 +22,14 @@ class AllCategoriesScreen extends StatelessWidget {
       create: (_) => CategoriesCubit()..loadCategories(),
       child: Scaffold(
         appBar: ScreenAppBar(title: l10n.navCategories),
-        body: const _AllCategoriesBody(),
+        body: Builder(
+          builder: (context) {
+            return AppRefreshIndicator(
+              onRefresh: () => context.read<CategoriesCubit>().loadCategories(),
+              child: const _AllCategoriesBody(),
+            );
+          },
+        ),
       ),
     );
   }
@@ -38,12 +46,15 @@ class _AllCategoriesBody extends StatelessWidget {
           case CategoriesLoaded():
             final categories = _flattenCategories(state.categories);
             if (categories.isEmpty) {
-              return _EmptyCategoriesState(
-                message: AppLocalizations.of(context)!.noCategoriesAvailable,
+              return RefreshableStateBox(
+                child: _EmptyCategoriesState(
+                  message: AppLocalizations.of(context)!.noCategoriesAvailable,
+                ),
               );
             }
 
             return CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 28.h),
@@ -70,10 +81,13 @@ class _AllCategoriesBody extends StatelessWidget {
             );
 
           case CategoriesFailed():
-            return Center(child: Text(state.message));
+            return RefreshableStateBox(
+              child: Center(child: Text(state.message)),
+            );
 
           default:
             return CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
                   padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 28.h),

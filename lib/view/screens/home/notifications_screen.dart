@@ -7,6 +7,7 @@ import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/notifications/app_notification.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/notification_card.dart';
 import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/login_required_placeholder.dart';
@@ -26,78 +27,94 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     context.read<NotificationsCubit>().refresh();
   }
 
+  Future<void> _refreshNotifications() {
+    return context.read<NotificationsCubit>().refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ScreenAppBar(
         title: AppLocalizations.of(context)!.navNotifications,
       ),
-      body: BlocBuilder<NotificationsCubit, NotificationsState>(
-        builder: (context, state) {
-          if (state.loginRequired) {
-            return LoginRequiredPlaceholder(
-              icon: Icons.notifications_off_outlined,
-              title: AppLocalizations.of(
-                context,
-              )!.loginRequiredForNotifications,
-              description: AppLocalizations.of(
-                context,
-              )!.notificationsLoginPrompt,
-            );
-          }
+      body: AppRefreshIndicator(
+        onRefresh: _refreshNotifications,
+        child: BlocBuilder<NotificationsCubit, NotificationsState>(
+          builder: (context, state) {
+            if (state.loginRequired) {
+              return RefreshableStateBox(
+                child: LoginRequiredPlaceholder(
+                  icon: Icons.notifications_off_outlined,
+                  title: AppLocalizations.of(
+                    context,
+                  )!.loginRequiredForNotifications,
+                  description: AppLocalizations.of(
+                    context,
+                  )!.notificationsLoginPrompt,
+                ),
+              );
+            }
 
-          if (state.isLoading) {
-            return Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            );
-          }
+            if (state.isLoading) {
+              return RefreshableStateBox(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+              );
+            }
 
-          if (state.errorMessage.isNotEmpty) {
-            return EmptyStateView(
-              icon: Icons.notifications_off_outlined,
-              title: AppLocalizations.of(context)!.error,
-              description: state.errorMessage,
-            );
-          }
+            if (state.errorMessage.isNotEmpty) {
+              return RefreshableStateBox(
+                child: EmptyStateView(
+                  icon: Icons.notifications_off_outlined,
+                  title: AppLocalizations.of(context)!.error,
+                  description: state.errorMessage,
+                ),
+              );
+            }
 
-          if (state.notifications.isEmpty) {
-            final l10n = AppLocalizations.of(context)!;
-            return EmptyStateView(
-              icon: Icons.notifications_none_rounded,
-              title: l10n.noNotifications,
-              description: l10n.notificationsEmptyPrompt,
-            );
-          }
+            if (state.notifications.isEmpty) {
+              final l10n = AppLocalizations.of(context)!;
+              return RefreshableStateBox(
+                child: EmptyStateView(
+                  icon: Icons.notifications_none_rounded,
+                  title: l10n.noNotifications,
+                  description: l10n.notificationsEmptyPrompt,
+                ),
+              );
+            }
 
-          return CustomScrollView(
-            slivers: [
-              SliverToBoxAdapter(child: SizedBox(height: 8.h)),
-              SliverList(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final notification = state.notifications[index];
-                  return NotificationCard(
-                    typeLabel: notification.typeLabel,
-                    priorityLabel: notification.priorityLabel,
-                    statusLabel: notification.statusLabel,
-                    title: notification.title,
-                    body: notification.message,
-                    time: _formatNotificationTime(
-                      context,
-                      notification.createdAt,
-                    ),
-                    icon: notification.icon,
-                    isRead: notification.isRead,
-                    isMandatory: notification.isMandatory,
-                    onTap: () => _openNotification(context, notification),
-                  );
-                }, childCount: state.notifications.length),
-              ),
-              SliverToBoxAdapter(child: SizedBox(height: 16.h)),
-            ],
-          );
-        },
+            return CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(child: SizedBox(height: 8.h)),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final notification = state.notifications[index];
+                    return NotificationCard(
+                      typeLabel: notification.typeLabel,
+                      priorityLabel: notification.priorityLabel,
+                      statusLabel: notification.statusLabel,
+                      title: notification.title,
+                      body: notification.message,
+                      time: _formatNotificationTime(
+                        context,
+                        notification.createdAt,
+                      ),
+                      icon: notification.icon,
+                      isRead: notification.isRead,
+                      isMandatory: notification.isMandatory,
+                      onTap: () => _openNotification(context, notification),
+                    );
+                  }, childCount: state.notifications.length),
+                ),
+                SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+              ],
+            );
+          },
+        ),
       ),
     );
   }

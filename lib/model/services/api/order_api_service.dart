@@ -22,9 +22,17 @@ class OrderApiService {
   }
 
   Future<OrderModel> getOrderDetails(int orderId) async {
-    final res = await _client.get('orders/$orderId');
+    final res = await _client.get('customer/orders/$orderId');
     final data = res.data['data'];
     return OrderModel.fromJson(data);
+  }
+
+  Future<void> reorder(int orderId) async {
+    await _client.post('customer/orders/$orderId/reorder');
+  }
+
+  Future<void> cancelOrder(int orderId) async {
+    await _client.post('customer/orders/$orderId/cancel');
   }
 
   Future<List<InvoiceApiModel>> getInvoices(int orderId) async {

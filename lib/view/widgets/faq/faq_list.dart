@@ -19,6 +19,7 @@ class _FaqListState extends State<FaqList> {
   Widget build(BuildContext context) {
     return ListView.separated(
       clipBehavior: Clip.none,
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(20.w, 18.h, 20.w, 32.h),
       itemCount: widget.faqs.length,
       separatorBuilder: (_, _) => SizedBox(height: 12.h),

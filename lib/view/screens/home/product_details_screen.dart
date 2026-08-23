@@ -11,6 +11,7 @@ import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
@@ -78,6 +79,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       comment: comment,
       rating: _selectedRating,
     );
+  }
+
+  Future<void> _refreshProduct() {
+    return context.read<ProductsCubit>().loadProductById(widget.product.id);
   }
 
   Future<void> _showRatingDialog(ProductModel fallbackProduct) async {
@@ -383,159 +388,168 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.productDetails),
-      body: BlocConsumer<ProductsCubit, ProductsState>(
-        listenWhen: (previous, current) {
-          if (current is! ProductVariantSelected) return false;
-          if (previous is! ProductVariantSelected) return true;
-          return previous.reviewStatus != current.reviewStatus;
-        },
-        listener: (context, state) {
-          if (state is! ProductVariantSelected) return;
+      body: AppRefreshIndicator(
+        onRefresh: _refreshProduct,
+        child: BlocConsumer<ProductsCubit, ProductsState>(
+          listenWhen: (previous, current) {
+            if (current is! ProductVariantSelected) return false;
+            if (previous is! ProductVariantSelected) return true;
+            return previous.reviewStatus != current.reviewStatus;
+          },
+          listener: (context, state) {
+            if (state is! ProductVariantSelected) return;
 
-          if (state.reviewStatus == ProductReviewStatus.submitted) {
-            _reviewTitleController.clear();
-            _reviewCommentController.clear();
-            final dialogContext = _ratingDialogContext;
-            if (dialogContext != null && Navigator.of(dialogContext).canPop()) {
-              Navigator.of(dialogContext).pop();
-              _ratingDialogContext = null;
+            if (state.reviewStatus == ProductReviewStatus.submitted) {
+              _reviewTitleController.clear();
+              _reviewCommentController.clear();
+              final dialogContext = _ratingDialogContext;
+              if (dialogContext != null &&
+                  Navigator.of(dialogContext).canPop()) {
+                Navigator.of(dialogContext).pop();
+                _ratingDialogContext = null;
+              }
+              setState(() => _selectedRating = 0);
+              CustomSnackBar.show(context, l10n.thanksForRating);
+            } else if (state.reviewStatus ==
+                ProductReviewStatus.loginRequired) {
+              CustomSnackBar.show(context, l10n.loginRequiredForRating);
+            } else if (state.reviewStatus == ProductReviewStatus.failure) {
+              CustomSnackBar.show(
+                context,
+                state.reviewError ?? l10n.unexpectedError,
+              );
             }
-            setState(() => _selectedRating = 0);
-            CustomSnackBar.show(context, l10n.thanksForRating);
-          } else if (state.reviewStatus == ProductReviewStatus.loginRequired) {
-            CustomSnackBar.show(context, l10n.loginRequiredForRating);
-          } else if (state.reviewStatus == ProductReviewStatus.failure) {
-            CustomSnackBar.show(
-              context,
-              state.reviewError ?? l10n.unexpectedError,
-            );
-          }
-        },
-        builder: (context, state) {
-          final variantState = state is ProductVariantSelected ? state : null;
-          final product = variantState?.product ?? widget.product;
-          final isWishlist = _effectiveWishlist(product, wishlistState);
-          final viewData = ProductViewData.fromProduct(product, l10n);
-          final selectedColor = variantState?.selectedColor;
-          final maxQuantity = _maxQuantity(product, selectedColor);
-          final displayQuantity = _displayQuantity(maxQuantity);
-          final canChangeQuantity =
-              !_isAddingToCart &&
-              product.isSaleable &&
-              (maxQuantity == null || maxQuantity > 0);
+          },
+          builder: (context, state) {
+            final variantState = state is ProductVariantSelected ? state : null;
+            final product = variantState?.product ?? widget.product;
+            final isWishlist = _effectiveWishlist(product, wishlistState);
+            final viewData = ProductViewData.fromProduct(product, l10n);
+            final selectedColor = variantState?.selectedColor;
+            final maxQuantity = _maxQuantity(product, selectedColor);
+            final displayQuantity = _displayQuantity(maxQuantity);
+            final canChangeQuantity =
+                !_isAddingToCart &&
+                product.isSaleable &&
+                (maxQuantity == null || maxQuantity > 0);
 
-          return ListView(
-            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
-            children: [
-              GallerySection(
-                galleryImages: _galleryImages(product),
-                isDark: isDark,
-                isWishlist: isWishlist,
-                wishlistLoading: _wishlistLoading,
-                onToggleWishlist: () => _toggleWishlist(product),
-              ),
-              SizedBox(height: 20.h),
-              ProductHeaderSection(
-                product: product,
-                viewData: viewData,
-                isDark: isDark,
-                onRatePressed: () => _showRatingDialog(product),
-              ),
-              if (product.brand != null) ...[
-                SizedBox(height: 16.h),
-                ProductBrandSummaryCard(product: product, isDark: isDark),
-              ],
-
-              if (variantState != null &&
-                  (variantState.product.variants?.variantsBySize ?? [])
-                      .isNotEmpty) ...[
-                SizedBox(height: 16.h),
-                ProductVariantsSection(
-                  variantState: variantState,
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+              children: [
+                GallerySection(
+                  galleryImages: _galleryImages(product),
                   isDark: isDark,
-                  onSizeSelected: (size) => _selectSize(size),
-                  onColorSelected: (color) => _selectColor(color),
+                  isWishlist: isWishlist,
+                  wishlistLoading: _wishlistLoading,
+                  onToggleWishlist: () => _toggleWishlist(product),
                 ),
-              ],
+                SizedBox(height: 20.h),
+                ProductHeaderSection(
+                  product: product,
+                  viewData: viewData,
+                  isDark: isDark,
+                  onRatePressed: () => _showRatingDialog(product),
+                ),
+                if (product.brand != null) ...[
+                  SizedBox(height: 16.h),
+                  ProductBrandSummaryCard(product: product, isDark: isDark),
+                ],
 
-              if (viewData.descriptionText.isNotEmpty) ...[
-                SizedBox(height: 16.h),
+                if (variantState != null &&
+                    (variantState.product.variants?.variantsBySize ?? [])
+                        .isNotEmpty) ...[
+                  SizedBox(height: 16.h),
+                  ProductVariantsSection(
+                    variantState: variantState,
+                    isDark: isDark,
+                    onSizeSelected: (size) => _selectSize(size),
+                    onColorSelected: (color) => _selectColor(color),
+                  ),
+                ],
+
+                if (viewData.descriptionText.isNotEmpty) ...[
+                  SizedBox(height: 16.h),
+                  ProductSectionCard(
+                    isDark: isDark,
+                    title: l10n.productDescription,
+                    icon: Icons.description_outlined,
+                    child: Text(
+                      viewData.descriptionText,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: isDark ? AppColors.offWhite : AppColors.black,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                ],
+                if (viewData.infoEntries.isNotEmpty) ...[
+                  SizedBox(height: 16.h),
+                  ProductInfoCard(
+                    isDark: isDark,
+                    sectionTitle: l10n.productInfo,
+                    entries: viewData.infoEntries,
+                  ),
+                ],
+                SizedBox(height: 24.h),
                 ProductSectionCard(
                   isDark: isDark,
-                  title: l10n.productDescription,
-                  icon: Icons.description_outlined,
-                  child: Text(
-                    viewData.descriptionText,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: isDark ? AppColors.offWhite : AppColors.black,
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-              ],
-              if (viewData.infoEntries.isNotEmpty) ...[
-                SizedBox(height: 16.h),
-                ProductInfoCard(
-                  isDark: isDark,
-                  sectionTitle: l10n.productInfo,
-                  entries: viewData.infoEntries,
-                ),
-              ],
-              SizedBox(height: 24.h),
-              ProductSectionCard(
-                isDark: isDark,
-                title: l10n.quantity,
-                icon: Icons.inventory_2_outlined,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (maxQuantity != null) ...[
-                      Text(
-                        l10n.availableQuantity(maxQuantity),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.primaryFixed.withValues(
-                            alpha: 0.55,
+                  title: l10n.quantity,
+                  icon: Icons.inventory_2_outlined,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (maxQuantity != null) ...[
+                        Text(
+                          l10n.availableQuantity(maxQuantity),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.primaryFixed.withValues(
+                              alpha: 0.55,
+                            ),
+                            fontWeight: FontWeight.w600,
                           ),
-                          fontWeight: FontWeight.w600,
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
+                        SizedBox(height: 8.h),
+                      ],
+                      _buildQuantitySelector(
+                        value: displayQuantity,
+                        maxQuantity: maxQuantity,
+                        enabled: canChangeQuantity,
                       ),
-                      SizedBox(height: 8.h),
                     ],
-                    _buildQuantitySelector(
-                      value: displayQuantity,
-                      maxQuantity: maxQuantity,
-                      enabled: canChangeQuantity,
+                  ),
+                ),
+                SizedBox(height: 16.h),
+                FilledButton.icon(
+                  onPressed: _isAddingToCart
+                      ? null
+                      : () => _addProductToCart(product, variantState),
+                  icon: _isAddingToCart
+                      ? SpinKitFadingCircle(
+                          size: 20.r,
+                          color: AppColors.offWhite,
+                        )
+                      : Icon(Icons.add_shopping_cart_rounded, size: 24.r),
+                  label: Text(
+                    l10n.addToCart,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: AppColors.offWhite,
+                      fontWeight: FontWeight.w700,
                     ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16.h),
-              FilledButton.icon(
-                onPressed: _isAddingToCart
-                    ? null
-                    : () => _addProductToCart(product, variantState),
-                icon: _isAddingToCart
-                    ? SpinKitFadingCircle(size: 20.r, color: AppColors.offWhite)
-                    : Icon(Icons.add_shopping_cart_rounded, size: 24.r),
-                label: Text(
-                  l10n.addToCart,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.offWhite,
-                    fontWeight: FontWeight.w700,
+                  ),
+                  style: FilledButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 16.h),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14.r),
+                    ),
+                    elevation: 0,
                   ),
                 ),
-                style: FilledButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14.r),
-                  ),
-                  elevation: 0,
-                ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:kalivra/controller/blocs/cubit/wishlist_cubit/wishlist_cubit.dar
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/login_required_placeholder.dart';
@@ -25,6 +26,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     context.read<WishlistCubit>().loadWishlist();
   }
 
+  Future<void> _refreshWishlist() {
+    return context.read<WishlistCubit>().loadWishlist();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -41,77 +46,88 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
         ],
       ),
-      body: BlocBuilder<WishlistCubit, WishlistState>(
-        builder: (context, state) {
-          switch (state) {
-            case WishlistLoginRequired():
-              return LoginRequiredPlaceholder(
-                icon: Icons.favorite_border_rounded,
-                title: l10n.loginRequiredForFavorites,
-                description: l10n.favoritesLoginPrompt,
-              );
-            case WishlistLoaded():
-              final products = state.wishlist;
-              if (products.isEmpty) {
-                return EmptyStateView(
-                  icon: Icons.favorite_border_rounded,
-                  title: l10n.favoritesEmpty,
-                  description: l10n.favoritesPrompt,
-                );
-              }
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12.h,
-                    crossAxisSpacing: 12.w,
-                    childAspectRatio: 0.72,
+      body: AppRefreshIndicator(
+        onRefresh: _refreshWishlist,
+        child: BlocBuilder<WishlistCubit, WishlistState>(
+          builder: (context, state) {
+            switch (state) {
+              case WishlistLoginRequired():
+                return RefreshableStateBox(
+                  child: LoginRequiredPlaceholder(
+                    icon: Icons.favorite_border_rounded,
+                    title: l10n.loginRequiredForFavorites,
+                    description: l10n.favoritesLoginPrompt,
                   ),
-                  itemBuilder: (context, index) {
-                    return ProductCard(
-                      product: products[index].product,
-                      itemId: products[index].id,
-                    );
-                  },
-                  itemCount: products.length,
-                ),
-              );
-            case WishlistFailed():
-              return Center(child: Text(state.message));
-            default:
-              return ListView.builder(
-                padding: EdgeInsets.all(16.w),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: Skeletonizer(
-                      child: ProductCard(
-                        product: ProductModel(
-                          id: 0,
-                          sku: '',
-                          name: '',
-                          urlKey: '',
-                          images: [],
-                          isNew: true,
-                          prices: ProductPrices(
-                            regular: PriceDetail(price: ''),
-                          ),
-                          isFeatured: true,
-                          onSale: true,
-                          isSaleable: true,
-                          isWishlist: true,
-                          ratings: ProductRatings(average: '', total: 0),
-                          reviews: ProductReviews(total: 0),
-                        ),
-                      ),
+                );
+              case WishlistLoaded():
+                final products = state.wishlist;
+                if (products.isEmpty) {
+                  return RefreshableStateBox(
+                    child: EmptyStateView(
+                      icon: Icons.favorite_border_rounded,
+                      title: l10n.favoritesEmpty,
+                      description: l10n.favoritesPrompt,
                     ),
                   );
-                },
-              );
-          }
-        },
+                }
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: GridView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 12.h,
+                      crossAxisSpacing: 12.w,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemBuilder: (context, index) {
+                      return ProductCard(
+                        product: products[index].product,
+                        itemId: products[index].id,
+                      );
+                    },
+                    itemCount: products.length,
+                  ),
+                );
+              case WishlistFailed():
+                return RefreshableStateBox(
+                  child: Center(child: Text(state.message)),
+                );
+              default:
+                return ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(16.w),
+                  itemCount: 4,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12.h),
+                      child: Skeletonizer(
+                        child: ProductCard(
+                          product: ProductModel(
+                            id: 0,
+                            sku: '',
+                            name: '',
+                            urlKey: '',
+                            images: [],
+                            isNew: true,
+                            prices: ProductPrices(
+                              regular: PriceDetail(price: ''),
+                            ),
+                            isFeatured: true,
+                            onSale: true,
+                            isSaleable: true,
+                            isWishlist: true,
+                            ratings: ProductRatings(average: '', total: 0),
+                            reviews: ProductReviews(total: 0),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+            }
+          },
+        ),
       ),
     );
   }

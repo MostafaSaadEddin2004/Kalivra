@@ -91,6 +91,16 @@ class CartCubit extends Cubit<CartState> {
     return _localQuantities[item.id] ?? item.quantity ?? 1;
   }
 
+  bool isIncreasingQuantityForItem(int itemId) {
+    final delta = _pendingQuantityDelta(itemId);
+    return delta != null && delta > 0;
+  }
+
+  bool isDecreasingQuantityForItem(int itemId) {
+    final delta = _pendingQuantityDelta(itemId);
+    return delta != null && delta < 0;
+  }
+
   List<CartItem> _mapCartItems(CartApiModel? cart) {
     final apiItems = cart?.items;
     if (apiItems == null || apiItems.isEmpty) return const [];
@@ -470,6 +480,21 @@ class CartCubit extends Cubit<CartState> {
   bool _hasPendingQuantityChange(int itemId) {
     return _quantityDebounceTimers.containsKey(itemId) ||
         _scheduledQuantities.containsKey(itemId);
+  }
+
+  int? _pendingQuantityDelta(int itemId) {
+    final localQuantity = _localQuantities[itemId];
+    if (localQuantity == null || !_hasPendingQuantityChange(itemId)) {
+      return null;
+    }
+
+    final confirmedQuantity =
+        _confirmedQuantities[itemId] ?? _cartItemById(itemId)?.quantity;
+    if (confirmedQuantity == null || localQuantity == confirmedQuantity) {
+      return null;
+    }
+
+    return localQuantity - confirmedQuantity;
   }
 
   void _emitLoading({

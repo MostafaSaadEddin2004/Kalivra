@@ -40,6 +40,12 @@ class CartItemsView extends StatelessWidget {
                 quantity: cartCubit.quantityForItem(item),
                 isDeleting: cartCubit.isRemovingItem(item.id),
                 isEditing: isDetailsUpdating,
+                isIncreasingQuantity: cartCubit.isIncreasingQuantityForItem(
+                  item.id,
+                ),
+                isDecreasingQuantity: cartCubit.isDecreasingQuantityForItem(
+                  item.id,
+                ),
                 onEdit: () => _showEditSheet(context, item),
                 onDelete: () => _confirmRemoveItem(context, item),
                 onQuantityChanged: canChangeQuantity

@@ -6,6 +6,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
@@ -22,7 +23,16 @@ class CategoryProductsScreen extends StatelessWidget {
       create: (_) => ProductsCubit()..loadProductByCategoryId(category.id),
       child: Scaffold(
         appBar: ScreenAppBar(title: category.name),
-        body: _CategoryProductsBody(category: category),
+        body: Builder(
+          builder: (context) {
+            return AppRefreshIndicator(
+              onRefresh: () => context
+                  .read<ProductsCubit>()
+                  .loadProductByCategoryId(category.id),
+              child: _CategoryProductsBody(category: category),
+            );
+          },
+        ),
       ),
     );
   }
@@ -46,6 +56,7 @@ class _CategoryProductsBody extends StatelessWidget {
             : category.productCount;
 
         return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
             SliverToBoxAdapter(
               child: Padding(

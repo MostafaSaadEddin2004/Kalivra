@@ -3,11 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/orders_cubit/orders_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/order/order_model.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
+import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/login_required_placeholder.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -28,36 +31,49 @@ class _OrdersScreenState extends State<OrdersScreen> {
     });
   }
 
+  Future<void> _refreshOrders() {
+    return context.read<OrdersCubit>().loadOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.myOrders),
-      body: BlocBuilder<OrdersCubit, OrdersState>(
-        builder: (context, state) {
-          switch (state) {
-            case OrdersLoginRequired():
-              return LoginRequiredPlaceholder(
-                icon: Icons.receipt_long_outlined,
-                title: l10n.loginRequiredForOrders,
-                description: l10n.ordersLoginPrompt,
-              );
-            case OrdersLoaded():
-              if (state.orders.isEmpty) {
-                return _OrdersEmptyCard(
-                  title: l10n.noOrders,
-                  description: l10n.ordersPrompt,
+      body: AppRefreshIndicator(
+        onRefresh: _refreshOrders,
+        child: BlocBuilder<OrdersCubit, OrdersState>(
+          builder: (context, state) {
+            switch (state) {
+              case OrdersLoginRequired():
+                return RefreshableStateBox(
+                  child: LoginRequiredPlaceholder(
+                    icon: Icons.receipt_long_outlined,
+                    title: l10n.loginRequiredForOrders,
+                    description: l10n.ordersLoginPrompt,
+                  ),
                 );
-              }
-              return _OrdersList(orders: state.orders);
-            case OrdersFailed():
-              return _OrdersFailureCard(message: state.message);
-            case OrdersLoading():
-            default:
-              return const _OrdersLoadingList();
-          }
-        },
+              case OrdersLoaded():
+                if (state.orders.isEmpty) {
+                  return RefreshableStateBox(
+                    child: _OrdersEmptyCard(
+                      title: l10n.noOrders,
+                      description: l10n.ordersPrompt,
+                    ),
+                  );
+                }
+                return _OrdersList(orders: state.orders);
+              case OrdersFailed():
+                return RefreshableStateBox(
+                  child: _OrdersFailureCard(message: state.message),
+                );
+              case OrdersLoading():
+              default:
+                return const _OrdersLoadingList();
+            }
+          },
+        ),
       ),
     );
   }
@@ -75,29 +91,46 @@ class _OrdersList extends StatelessWidget {
       itemCount: orders.length,
       separatorBuilder: (_, _) => SizedBox(height: 12.h),
       itemBuilder: (context, index) {
-        return _OrderCard(order: orders[index]);
+        return _OrderCard(order: orders[index], index: getIndexReversed(orders.length));
       },
     );
   }
 }
 
-class _OrderCard extends StatelessWidget {
-  const _OrderCard({required this.order});
+int getIndexReversed(int length){
+  int index = 0;
+  for(int i = 0; i <length;  ){
+    index == i;
+  }
+  return index;
+}
+
+class _OrderCard extends StatefulWidget {
+  const _OrderCard({required this.order, required this.index});
 
   final OrderModel order;
+  final int index;
+
+  @override
+  State<_OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<_OrderCard> {
+  bool _isCancelling = false;
+  bool _isReordering = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final labels = _OrderActionLabels.of(context);
+    final order = widget.order;
     final statusColor = _statusColor(order.status);
-    final orderNumber = order.displayId.isEmpty
-        ? '${order.orderId ?? ''}'
-        : order.displayId;
+    final canCancel = _canCancel(order.status);
+    final isBusy = _isCancelling || _isReordering;
+    final String index = '# ${widget.index + 1}';
 
-    return Material(
-      color: theme.cardTheme.color,
-      borderRadius: BorderRadius.circular(14.r),
+    return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(14.r),
         onTap: () => _openOrderDetails(context),
@@ -140,7 +173,7 @@ class _OrderCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '#$orderNumber',
+                          index,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: colorScheme.primaryFixed,
                             fontWeight: FontWeight.w800,
@@ -189,13 +222,69 @@ class _OrderCard extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 12.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: canCancel && !isBusy
+                          ? () => _cancelOrder(context)
+                          : null,
+                      icon: _isCancelling
+                          ? SizedBox(
+                              width: 16.r,
+                              height: 16.r,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.cancel_outlined),
+                      label: Text(labels.cancelOrder),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.burgundy,
+                        side: BorderSide(
+                          color: AppColors.burgundy.withValues(alpha: 0.34),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: !isBusy ? () => _reorder(context) : null,
+                      icon: _isReordering
+                          ? SizedBox(
+                              width: 16.r,
+                              height: 16.r,
+                              child: const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.replay_outlined),
+                      label: Text(labels.reorder),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 4.h),
               Align(
                 alignment: AlignmentDirectional.centerEnd,
                 child: TextButton(
-                  onPressed: () => _openOrderDetails(context),
+                  onPressed: isBusy ? null : () => _openOrderDetails(context),
                   child: Text(AppLocalizations.of(context)!.viewDetails),
                 ),
               ),
+              if (!canCancel) ...[
+                Text(
+                  labels.cancelUnavailable,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colorScheme.primaryFixed.withValues(alpha: 0.46),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -203,10 +292,53 @@ class _OrderCard extends StatelessWidget {
     );
   }
 
-  void _openOrderDetails(BuildContext context) {
-    final id = order.orderId ?? int.tryParse(order.id);
+  Future<void> _openOrderDetails(BuildContext context) async {
+    final id = widget.order.orderId ?? int.tryParse(widget.order.id);
     if (id == null) return;
-    context.push(AppRoutes.orderDetails, extra: id);
+    final shouldReload = await context.push<bool>(
+      AppRoutes.orderDetails,
+      extra: id,
+    );
+    if (shouldReload == true && context.mounted) {
+      context.read<OrdersCubit>().loadOrders();
+    }
+  }
+
+  Future<void> _cancelOrder(BuildContext context) async {
+    final id = widget.order.orderId ?? int.tryParse(widget.order.id);
+    if (id == null || _isCancelling) return;
+
+    setState(() => _isCancelling = true);
+    final labels = _OrderActionLabels.of(context);
+    try {
+      await context.read<OrdersCubit>().cancelOrder(id);
+      if (!context.mounted) return;
+      CustomSnackBar.show(context, labels.cancelSuccess);
+      await context.read<OrdersCubit>().loadOrders();
+    } catch (e) {
+      if (context.mounted) CustomSnackBar.show(context, e.toString());
+    } finally {
+      if (mounted) setState(() => _isCancelling = false);
+    }
+  }
+
+  Future<void> _reorder(BuildContext context) async {
+    final id = widget.order.orderId ?? int.tryParse(widget.order.id);
+    if (id == null || _isReordering) return;
+
+    setState(() => _isReordering = true);
+    final labels = _OrderActionLabels.of(context);
+    try {
+      await context.read<OrdersCubit>().reorder(id);
+      if (!context.mounted) return;
+      await context.read<CartCubit>().getCart();
+      if (!context.mounted) return;
+      CustomSnackBar.show(context, labels.reorderSuccess);
+    } catch (e) {
+      if (context.mounted) CustomSnackBar.show(context, e.toString());
+    } finally {
+      if (mounted) setState(() => _isReordering = false);
+    }
   }
 
   static String _formatDate(BuildContext context, OrderModel order) {
@@ -238,6 +370,48 @@ class _OrderCard extends StatelessWidget {
       return AppColors.goldLight;
     }
     return AppColors.taupe;
+  }
+
+  static bool _canCancel(String status) {
+    final normalized = status.toLowerCase().trim();
+    return normalized.contains('pending') || normalized.contains('قيد');
+  }
+}
+
+class _OrderActionLabels {
+  const _OrderActionLabels({
+    required this.cancelOrder,
+    required this.reorder,
+    required this.cancelSuccess,
+    required this.reorderSuccess,
+    required this.cancelUnavailable,
+  });
+
+  final String cancelOrder;
+  final String reorder;
+  final String cancelSuccess;
+  final String reorderSuccess;
+  final String cancelUnavailable;
+
+  static _OrderActionLabels of(BuildContext context) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+    if (isArabic) {
+      return const _OrderActionLabels(
+        cancelOrder: 'إلغاء الطلب',
+        reorder: 'إعادة الطلب',
+        cancelSuccess: 'تم إلغاء الطلب بنجاح',
+        reorderSuccess: 'تمت إضافة الطلب إلى السلة بنجاح',
+        cancelUnavailable: 'لا يمكن إلغاء هذا الطلب حالياً',
+      );
+    }
+
+    return const _OrderActionLabels(
+      cancelOrder: 'Cancel',
+      reorder: 'Reorder',
+      cancelSuccess: 'Order cancelled successfully',
+      reorderSuccess: 'Order added to cart successfully',
+      cancelUnavailable: 'This order cannot be cancelled now',
+    );
   }
 }
 
@@ -322,6 +496,7 @@ class _OrdersLoadingList extends StatelessWidget {
         separatorBuilder: (_, _) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
           return const _OrderCard(
+            index: 0,
             order: OrderModel(
               orderId: 0,
               id: '0000',

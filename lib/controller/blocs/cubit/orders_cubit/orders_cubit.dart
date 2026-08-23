@@ -35,4 +35,12 @@ class OrdersCubit extends Cubit<OrdersState> {
       emit(OrdersFailed(message: e.toString()));
     }
   }
+
+  Future<void> reorder(int orderId) async {
+    await _orderService.reorder(orderId);
+  }
+
+  Future<void> cancelOrder(int orderId) async {
+    await _orderService.cancelOrder(orderId);
+  }
 }

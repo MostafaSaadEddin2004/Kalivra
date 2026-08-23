@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/buttons/custom_icon_button.dart';
 import 'package:kalivra/view/widgets/cart/cart_items_view.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -30,22 +31,6 @@ class _CartScreenState extends State<CartScreen> {
     return context.read<CartCubit>().getCart();
   }
 
-  Widget _refreshable(Widget child) {
-    return RefreshIndicator(onRefresh: _refreshCart, child: child);
-  }
-
-  Widget _refreshableBox(Widget child) {
-    return _refreshable(
-      SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: SizedBox(
-          height: MediaQuery.sizeOf(context).height * 0.68,
-          child: child,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final cartCubit = context.read<CartCubit>();
@@ -56,11 +41,14 @@ class _CartScreenState extends State<CartScreen> {
         if (state is CartLoginRequired) {
           return Scaffold(
             appBar: _CartAppBar(title: AppLocalizations.of(context)!.cart),
-            body: _refreshableBox(
-              LoginRequiredPlaceholder(
-                icon: Icons.shopping_cart_outlined,
-                title: AppLocalizations.of(context)!.loginRequiredForCartView,
-                description: AppLocalizations.of(context)!.cartLoginPrompt,
+            body: AppRefreshIndicator(
+              onRefresh: _refreshCart,
+              child: RefreshableStateBox(
+                child: LoginRequiredPlaceholder(
+                  icon: Icons.shopping_cart_outlined,
+                  title: AppLocalizations.of(context)!.loginRequiredForCartView,
+                  description: AppLocalizations.of(context)!.cartLoginPrompt,
+                ),
               ),
             ),
           );
@@ -69,8 +57,11 @@ class _CartScreenState extends State<CartScreen> {
         if (state is CartLoading && cartCubit.apiItems.isEmpty) {
           return Scaffold(
             appBar: _CartAppBar(title: AppLocalizations.of(context)!.cart),
-            body: _refreshableBox(
-              const Center(child: CircularProgressIndicator()),
+            body: AppRefreshIndicator(
+              onRefresh: _refreshCart,
+              child: const RefreshableStateBox(
+                child: Center(child: CircularProgressIndicator()),
+              ),
             ),
           );
         }
@@ -78,9 +69,14 @@ class _CartScreenState extends State<CartScreen> {
         if (state is CartFailure && state.cart == null) {
           return Scaffold(
             appBar: _CartAppBar(title: l10n.cart),
-            body: _refreshableBox(
-              Center(
-                child: Text(state.message.isEmpty ? l10n.error : state.message),
+            body: AppRefreshIndicator(
+              onRefresh: _refreshCart,
+              child: RefreshableStateBox(
+                child: Center(
+                  child: Text(
+                    state.message.isEmpty ? l10n.error : state.message,
+                  ),
+                ),
               ),
             ),
           );
@@ -90,9 +86,12 @@ class _CartScreenState extends State<CartScreen> {
         final items = cart?.items ?? const [];
         return Scaffold(
           appBar: _CartAppBar(title: l10n.cart),
-          body: items.isEmpty
-              ? _refreshableBox(const EmptyCartView())
-              : _refreshable(CartItemsView(cart: cart!)),
+          body: AppRefreshIndicator(
+            onRefresh: _refreshCart,
+            child: items.isEmpty
+                ? const RefreshableStateBox(child: EmptyCartView())
+                : CartItemsView(cart: cart!),
+          ),
         );
       },
     );

@@ -13,6 +13,8 @@ class CartItemCard extends StatelessWidget {
     required this.onDelete,
     this.isDeleting = false,
     this.isEditing = false,
+    this.isIncreasingQuantity = false,
+    this.isDecreasingQuantity = false,
     this.quantity,
     this.onQuantityChanged,
   });
@@ -22,6 +24,8 @@ class CartItemCard extends StatelessWidget {
   final VoidCallback onDelete;
   final bool isDeleting;
   final bool isEditing;
+  final bool isIncreasingQuantity;
+  final bool isDecreasingQuantity;
   final int? quantity;
   final ValueChanged<int>? onQuantityChanged;
 
@@ -63,6 +67,8 @@ class CartItemCard extends StatelessWidget {
                 quantity: quantity,
                 isDeleting: isDeleting,
                 isEditing: isEditing,
+                isIncreasingQuantity: isIncreasingQuantity,
+                isDecreasingQuantity: isDecreasingQuantity,
                 onQuantityChanged: onQuantityChanged,
                 onDelete: onDelete,
                 onEdit: onEdit,
@@ -83,6 +89,8 @@ class _DetailsColumn extends StatelessWidget {
     required this.quantity,
     required this.isDeleting,
     required this.isEditing,
+    required this.isIncreasingQuantity,
+    required this.isDecreasingQuantity,
     required this.onQuantityChanged,
     required this.onDelete,
     required this.onEdit,
@@ -94,6 +102,8 @@ class _DetailsColumn extends StatelessWidget {
   final int quantity;
   final bool isDeleting;
   final bool isEditing;
+  final bool isIncreasingQuantity;
+  final bool isDecreasingQuantity;
   final ValueChanged<int>? onQuantityChanged;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
@@ -129,11 +139,13 @@ class _DetailsColumn extends StatelessWidget {
         _QuantityPreview(
           quantity: quantity,
           enabled: onQuantityChanged != null,
-          isLoading: false,
-          onDecrease: quantity <= 1 || onQuantityChanged == null
+          isDecreaseLoading: isDecreasingQuantity,
+          isIncreaseLoading: isIncreasingQuantity,
+          onDecrease:
+              quantity <= 1 || onQuantityChanged == null || isDecreasingQuantity
               ? null
               : () => onQuantityChanged!(quantity - 1),
-          onIncrease: onQuantityChanged == null
+          onIncrease: onQuantityChanged == null || isIncreasingQuantity
               ? null
               : () => onQuantityChanged!(quantity + 1),
         ),
@@ -256,14 +268,16 @@ class _QuantityPreview extends StatelessWidget {
   const _QuantityPreview({
     required this.quantity,
     required this.enabled,
-    required this.isLoading,
+    required this.isDecreaseLoading,
+    required this.isIncreaseLoading,
     required this.onDecrease,
     required this.onIncrease,
   });
 
   final int quantity;
   final bool enabled;
-  final bool isLoading;
+  final bool isDecreaseLoading;
+  final bool isIncreaseLoading;
   final VoidCallback? onDecrease;
   final VoidCallback? onIncrease;
 
@@ -286,27 +300,24 @@ class _QuantityPreview extends StatelessWidget {
         children: [
           _QuantityIcon(
             icon: Icons.remove_rounded,
+            isLoading: isDecreaseLoading,
             onTap: enabled ? onDecrease : null,
           ),
           Expanded(
             child: Center(
-              child: isLoading
-                  ? SpinKitFadingCircle(
-                      size: 16.r,
-                      color: colorScheme.primaryFixed,
-                    )
-                  : Text(
-                      '$quantity',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.primaryFixed,
-                        fontWeight: FontWeight.w900,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+              child: Text(
+                '$quantity',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.primaryFixed,
+                  fontWeight: FontWeight.w900,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
           ),
           _QuantityIcon(
             icon: Icons.add_rounded,
+            isLoading: isIncreaseLoading,
             onTap: enabled ? onIncrease : null,
           ),
         ],
@@ -316,9 +327,14 @@ class _QuantityPreview extends StatelessWidget {
 }
 
 class _QuantityIcon extends StatelessWidget {
-  const _QuantityIcon({required this.icon, required this.onTap});
+  const _QuantityIcon({
+    required this.icon,
+    required this.isLoading,
+    required this.onTap,
+  });
 
   final IconData icon;
+  final bool isLoading;
   final VoidCallback? onTap;
 
   @override
@@ -336,12 +352,16 @@ class _QuantityIcon extends StatelessWidget {
           color: colorScheme.primaryFixed.withValues(alpha: 0.06),
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          icon,
-          color: colorScheme.primaryFixed.withValues(
-            alpha: enabled ? 0.76 : 0.24,
-          ),
-          size: 18.r,
+        child: Center(
+          child: isLoading
+              ? SpinKitFadingCircle(size: 16.r, color: colorScheme.primaryFixed)
+              : Icon(
+                  icon,
+                  color: colorScheme.primaryFixed.withValues(
+                    alpha: enabled ? 0.76 : 0.24,
+                  ),
+                  size: 18.r,
+                ),
         ),
       ),
     );
