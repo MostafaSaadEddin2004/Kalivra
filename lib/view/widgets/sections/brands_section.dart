@@ -8,10 +8,30 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
 import 'package:kalivra/view/widgets/buttons/show_all_button.dart';
 import 'package:kalivra/view/widgets/cards/brand_card.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class BrandsSection extends StatelessWidget {
+class BrandsSection extends StatefulWidget {
   const BrandsSection({super.key});
+
+  @override
+  State<BrandsSection> createState() => _BrandsSectionState();
+}
+
+class _BrandsSectionState extends State<BrandsSection> {
+  late final BrandCubit _brandCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _brandCubit = BrandCubit()..fetchAllBrands();
+  }
+
+  @override
+  void dispose() {
+    _brandCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,17 +55,26 @@ class BrandsSection extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(
-          height: 120.h,
-          child: BlocBuilder<BrandCubit, BrandState>(
-            bloc: BrandCubit()..fetchAllBrands(),
-            builder: (context, state) {
-              switch (state) {
-                case BrandFailure():
-                  return Center(child: Text(state.message));
-                case BrandsFetched():
-                  final brands = state.brands;
-                  return brands.isNotEmpty
+        BlocBuilder<BrandCubit, BrandState>(
+          bloc: _brandCubit,
+          builder: (context, state) {
+            switch (state) {
+              case BrandFailure():
+                return SizedBox(
+                  height: 260.h,
+                  child: EmptyStateView(
+                    icon: Icons.storefront_outlined,
+                    title: l10n.unexpectedError,
+                    description: state.message,
+                    actionLabel: l10n.retry,
+                    onAction: _brandCubit.fetchAllBrands,
+                  ),
+                );
+              case BrandsFetched():
+                final brands = state.brands;
+                return SizedBox(
+                  height: 120.h,
+                  child: brands.isNotEmpty
                       ? ListView.separated(
                           separatorBuilder: (context, index) =>
                               SizedBox(width: 12.w),
@@ -57,9 +86,12 @@ class BrandsSection extends StatelessWidget {
                             return BrandCard(brand: brands[index]);
                           },
                         )
-                      : SizedBox.shrink();
-                default:
-                  return Skeletonizer(
+                      : SizedBox.shrink(),
+                );
+              default:
+                return SizedBox(
+                  height: 120.h,
+                  child: Skeletonizer(
                     child: ListView.separated(
                       separatorBuilder: (context, index) =>
                           SizedBox(width: 12.w),
@@ -73,10 +105,10 @@ class BrandsSection extends StatelessWidget {
                         );
                       },
                     ),
-                  );
-              }
-            },
-          ),
+                  ),
+                );
+            }
+          },
         ),
       ],
     );

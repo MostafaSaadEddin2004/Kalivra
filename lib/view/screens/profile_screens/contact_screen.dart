@@ -5,6 +5,8 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/app_info/contact_api_model.dart';
 import 'package:kalivra/model/services/api/app_info_services.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
@@ -18,14 +20,12 @@ class ContactScreen extends StatefulWidget {
 class _ContactScreenState extends State<ContactScreen> {
   final _subjectController = TextEditingController();
   final _messageController = TextEditingController();
-  late final Future<_ContactInfo> _contactInfoFuture;
+  late Future<_ContactInfo> _contactInfoFuture;
 
   @override
   void initState() {
     super.initState();
-    _contactInfoFuture = AppInfoServices().getContactInfo().then(
-      (contact) => _ContactInfo.fromApiModel(contact),
-    );
+    _contactInfoFuture = _loadContactInfo();
   }
 
   @override
@@ -33,6 +33,20 @@ class _ContactScreenState extends State<ContactScreen> {
     _subjectController.dispose();
     _messageController.dispose();
     super.dispose();
+  }
+
+  Future<_ContactInfo> _loadContactInfo() {
+    return AppInfoServices().getContactInfo().then(
+      (contact) => _ContactInfo.fromApiModel(contact),
+    );
+  }
+
+  Future<void> _refreshContactInfo() async {
+    final future = _loadContactInfo();
+    setState(() => _contactInfoFuture = future);
+    try {
+      await future;
+    } catch (_) {}
   }
 
   @override
@@ -43,85 +57,104 @@ class _ContactScreenState extends State<ContactScreen> {
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.contactTitle),
-      body: ListView(
-        padding: EdgeInsets.all(20.w),
-        children: [
-          Text(
-            l10n.contactWelcome,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: isDark ? AppColors.offWhite : AppColors.burgundy,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(
-            l10n.contactChannels,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: isDark ? AppColors.taupe : AppColors.black,
-            ),
-          ),
-          SizedBox(height: 24.h),
-          FutureBuilder<_ContactInfo>(
-            future: _contactInfoFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const _ContactLoadingCard();
-              }
-
-              final contactInfo = snapshot.data;
-              if (contactInfo == null || contactInfo.isEmpty) {
-                return const SizedBox.shrink();
-              }
-
-              return _ContactInfoSection(contactInfo: contactInfo);
-            },
-          ),
-          SizedBox(height: 28.h),
-          Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14.r),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.contactHelpTitle,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: isDark ? AppColors.goldLight : AppColors.burgundy,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-                  AppTextField(
-                    controller: _subjectController,
-                    label: l10n.subjectLabel,
-                  ),
-                  SizedBox(height: 12.h),
-                  AppTextField(
-                    controller: _messageController,
-                    label: l10n.messageLabel,
-                    maxLines: 4,
-                  ),
-                  SizedBox(height: 16.h),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: () {},
-                      style: FilledButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                      ),
-                      child: Text(l10n.send),
-                    ),
-                  ),
-                ],
+      body: AppRefreshIndicator(
+        onRefresh: _refreshContactInfo,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.all(20.w),
+          children: [
+            Text(
+              l10n.contactWelcome,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: isDark ? AppColors.offWhite : AppColors.burgundy,
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ),
-          SizedBox(height: 24.h),
-        ],
+            SizedBox(height: 8.h),
+            Text(
+              l10n.contactChannels,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: isDark ? AppColors.taupe : AppColors.black,
+              ),
+            ),
+            SizedBox(height: 24.h),
+            FutureBuilder<_ContactInfo>(
+              future: _contactInfoFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const _ContactLoadingCard();
+                }
+
+                if (snapshot.hasError) {
+                  return SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.42,
+                    child: EmptyStateView(
+                      icon: Icons.contact_support_outlined,
+                      title: l10n.unexpectedError,
+                      description: snapshot.error.toString(),
+                      actionLabel: l10n.retry,
+                      onAction: _refreshContactInfo,
+                    ),
+                  );
+                }
+
+                final contactInfo = snapshot.data;
+                if (contactInfo == null || contactInfo.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+
+                return _ContactInfoSection(contactInfo: contactInfo);
+              },
+            ),
+            SizedBox(height: 28.h),
+            Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(context)!.contactHelpTitle,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: isDark
+                            ? AppColors.goldLight
+                            : AppColors.burgundy,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+                    AppTextField(
+                      controller: _subjectController,
+                      label: l10n.subjectLabel,
+                    ),
+                    SizedBox(height: 12.h),
+                    AppTextField(
+                      controller: _messageController,
+                      label: l10n.messageLabel,
+                      maxLines: 4,
+                    ),
+                    SizedBox(height: 16.h),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () {},
+                        style: FilledButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                        ),
+                        child: Text(l10n.send),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 24.h),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
 
 class EmptyStateView extends StatelessWidget {
   const EmptyStateView({
@@ -8,30 +7,42 @@ class EmptyStateView extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.description,
+    this.actionLabel,
+    this.actionIcon = Icons.refresh_rounded,
+    this.onAction,
   });
 
   final IconData icon;
   final String title;
   final String description;
+  final String? actionLabel;
+  final IconData actionIcon;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.taupe : AppColors.burgundy;
+    final colorScheme = theme.colorScheme;
+    final showAction =
+        onAction != null && actionLabel != null && actionLabel!.isNotEmpty;
 
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 32.w),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 72.r, color: accentColor.withValues(alpha: 0.62)),
+            Icon(
+              icon,
+              size: 72.r,
+              color: colorScheme.primary.withValues(alpha: 0.62),
+            ),
             SizedBox(height: 18.h),
             Text(
               title,
               style: theme.textTheme.titleLarge?.copyWith(
-                color: isDark ? AppColors.offWhite : AppColors.burgundy,
+                color: colorScheme.primaryFixed,
                 fontWeight: FontWeight.w700,
               ),
               textAlign: TextAlign.center,
@@ -40,10 +51,18 @@ class EmptyStateView extends StatelessWidget {
             Text(
               description,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: isDark ? AppColors.taupe : AppColors.black,
+                color: colorScheme.primaryFixed.withValues(alpha: 0.78),
               ),
               textAlign: TextAlign.center,
             ),
+            if (showAction) ...[
+              SizedBox(height: 20.h),
+              FilledButton.icon(
+                onPressed: onAction,
+                icon: Icon(actionIcon),
+                label: Text(actionLabel!),
+              ),
+            ],
           ],
         ),
       ),

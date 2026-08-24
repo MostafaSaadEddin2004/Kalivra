@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/cubit/ads_cubit/ads_cubit.dart';
+import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/ads_model.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/slider_widgets/ad_card.dart';
 import 'package:kalivra/view/widgets/slider_widgets/custom_indicator.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -94,7 +96,17 @@ class AdSliderState extends State<AdSlider> {
       builder: (context, state) {
         switch (state) {
           case AdsFailed():
-            return Center(child: Text(state.errorMessage));
+            final l10n = AppLocalizations.of(context)!;
+            return SizedBox(
+              height: 260.h,
+              child: EmptyStateView(
+                icon: Icons.campaign_outlined,
+                title: l10n.unexpectedError,
+                description: state.errorMessage,
+                actionLabel: l10n.retry,
+                onAction: _adsCubit.fetchAds,
+              ),
+            );
           case AdsFetched():
             final entries = _flattenSlides(state.ads);
             if (entries.isEmpty) {
@@ -146,9 +158,7 @@ class AdSliderState extends State<AdSlider> {
                         return Padding(
                           padding: EdgeInsets.symmetric(horizontal: 6.w),
                           child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 20.w,
-                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
                             child: DecoratedBox(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16.r),

@@ -91,7 +91,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 );
               case WishlistFailed():
                 return RefreshableStateBox(
-                  child: Center(child: Text(state.message)),
+                  child: EmptyStateView(
+                    icon: Icons.favorite_border_rounded,
+                    title: l10n.unexpectedError,
+                    description: state.message,
+                    actionLabel: l10n.retry,
+                    onAction: _refreshWishlist,
+                  ),
                 );
               default:
                 return ListView.builder(

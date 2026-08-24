@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -46,8 +46,6 @@ class _CategoryProductsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return BlocBuilder<ProductsCubit, ProductsState>(
       builder: (context, state) {
@@ -72,24 +70,10 @@ class _CategoryProductsBody extends StatelessWidget {
                 state.products.isEmpty
                     ? SliverFillRemaining(
                         hasScrollBody: false,
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                size: 64.r,
-                                color: isDark
-                                    ? AppColors.taupe
-                                    : AppColors.burgundy.withValues(alpha: 0.6),
-                              ),
-                              SizedBox(height: 16.h),
-                              Text(
-                                l10n.noProductsInCategory,
-                                style: theme.textTheme.titleMedium,
-                              ),
-                            ],
-                          ),
+                        child: EmptyStateView(
+                          icon: Icons.inventory_2_outlined,
+                          title: l10n.noProducts,
+                          description: l10n.noProductsInCategory,
                         ),
                       )
                     : SliverPadding(
@@ -102,7 +86,15 @@ class _CategoryProductsBody extends StatelessWidget {
                       ),
               ProductsFailed() => SliverFillRemaining(
                 hasScrollBody: false,
-                child: Center(child: Text(state.message)),
+                child: EmptyStateView(
+                  icon: Icons.inventory_2_outlined,
+                  title: l10n.unexpectedError,
+                  description: state.message,
+                  actionLabel: l10n.retry,
+                  onAction: () => context
+                      .read<ProductsCubit>()
+                      .loadProductByCategoryId(category.id),
+                ),
               ),
               _ => SliverPadding(
                 padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 28.h),

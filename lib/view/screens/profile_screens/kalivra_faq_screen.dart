@@ -44,6 +44,9 @@ class KalivraFaqScreen extends StatelessWidget {
                           icon: Icons.error_outline_rounded,
                           title: l10n.unexpectedError,
                           description: state.errorMessage,
+                          actionLabel: l10n.retry,
+                          onAction: () =>
+                              context.read<AppInfoCubit>().getKalivraFaqs(),
                         ),
                       );
                     case AppInfoLoading():

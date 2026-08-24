@@ -6,6 +6,7 @@ import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
@@ -90,7 +91,16 @@ class _TermsConditionsScreenState extends State<TermsConditionsScreen> {
                     ),
                   );
                 case AppInfoFailure():
-                  return Center(child: Text(state.errorMessage));
+                  return SizedBox(
+                    height: MediaQuery.sizeOf(context).height * 0.62,
+                    child: EmptyStateView(
+                      icon: Icons.quiz_outlined,
+                      title: l10n.unexpectedError,
+                      description: state.errorMessage,
+                      actionLabel: l10n.retry,
+                      onAction: _refreshTermsConditions,
+                    ),
+                  );
                 case AppInfoLoading():
                   return Skeletonizer(
                     child: Card(

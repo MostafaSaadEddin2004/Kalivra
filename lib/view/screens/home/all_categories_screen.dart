@@ -8,6 +8,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/category/category_api_model.dart';
 import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -47,8 +48,12 @@ class _AllCategoriesBody extends StatelessWidget {
             final categories = _flattenCategories(state.categories);
             if (categories.isEmpty) {
               return RefreshableStateBox(
-                child: _EmptyCategoriesState(
-                  message: AppLocalizations.of(context)!.noCategoriesAvailable,
+                child: EmptyStateView(
+                  icon: Icons.category_outlined,
+                  title: AppLocalizations.of(context)!.navCategories,
+                  description: AppLocalizations.of(
+                    context,
+                  )!.noCategoriesAvailable,
                 ),
               );
             }
@@ -82,7 +87,14 @@ class _AllCategoriesBody extends StatelessWidget {
 
           case CategoriesFailed():
             return RefreshableStateBox(
-              child: Center(child: Text(state.message)),
+              child: EmptyStateView(
+                icon: Icons.category_outlined,
+                title: AppLocalizations.of(context)!.unexpectedError,
+                description: state.message,
+                actionLabel: AppLocalizations.of(context)!.retry,
+                onAction: () =>
+                    context.read<CategoriesCubit>().loadCategories(),
+              ),
             );
 
           default:
@@ -158,39 +170,6 @@ class _CategoryGridCard extends StatelessWidget {
                 fontWeight: FontWeight.w700,
                 height: 1.15,
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyCategoriesState extends StatelessWidget {
-  const _EmptyCategoriesState({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(24.w),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.category_outlined,
-              size: 64.r,
-              color: theme.colorScheme.primary.withValues(alpha: 0.55),
-            ),
-            SizedBox(height: 14.h),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleMedium,
             ),
           ],
         ),

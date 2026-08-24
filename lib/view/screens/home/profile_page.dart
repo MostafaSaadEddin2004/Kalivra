@@ -8,7 +8,9 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:kalivra/view/widgets/profile_page/profile_page_footer.dart';
 import 'package:kalivra/view/widgets/profile_page/profile_page_item.dart';
@@ -31,7 +33,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _authCubit = AuthCubit();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _authCubit.loadProfile(context);
+      if (mounted) _refreshProfile();
     });
   }
 
@@ -47,6 +49,10 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _refreshProfile() {
+    return _authCubit.loadProfile(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -54,113 +60,132 @@ class _ProfilePageState extends State<ProfilePage> {
     return BlocBuilder<AuthCubit, AuthState>(
       bloc: _authCubit,
       builder: (context, state) {
+        if (state is AuthFailed) {
+          return AppRefreshIndicator(
+            onRefresh: _refreshProfile,
+            child: RefreshableStateBox(
+              child: EmptyStateView(
+                icon: Icons.person_off_outlined,
+                title: l10n.unexpectedError,
+                description: state.message,
+                actionLabel: l10n.retry,
+                onAction: _refreshProfile,
+              ),
+            ),
+          );
+        }
+
         final customer = state is AuthFetchedData ? state.customer : null;
         final isLoggedIn = customer != null;
 
-        return ListView(
-          padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 90.h),
-          children: [
-            if (isLoggedIn) ...[
-              _ProfileHeroCard(customer: customer),
+        return AppRefreshIndicator(
+          onRefresh: _refreshProfile,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 90.h),
+            children: [
+              if (isLoggedIn) ...[
+                _ProfileHeroCard(customer: customer),
+                SizedBox(height: 24.h),
+                _ProfileSectionTitle(title: l10n.profileSectionAccountOrders),
+                SizedBox(height: 8.h),
+                if (customer.isLinkedPerson != null ||
+                    customer.isLinkedPerson == true)
+                  ProfilePageItem(
+                    icon: Icons.person,
+                    label: l10n.myAccount,
+                    subtitle: l10n.accountInfo,
+                    onTap: () => context.push(AppRoutes.account),
+                  ),
+                ProfilePageItem(
+                  icon: Icons.groups_rounded,
+                  label: l10n.associationPersonalProfileButton,
+                  subtitle: l10n.profileAssociationProfileSubtitle,
+                  onTap: () => context.push(AppRoutes.associationMemberProfile),
+                ),
+                ProfilePageItem(
+                  icon: Icons.receipt_long_outlined,
+                  label: l10n.drawerMyOrders,
+                  subtitle: l10n.profileOrdersSubtitle,
+                  onTap: () => context.push(AppRoutes.orders),
+                ),
+                ProfilePageItem(
+                  icon: Icons.favorite_border_rounded,
+                  label: l10n.drawerFavorites,
+                  subtitle: l10n.profileFavoritesSubtitle,
+                  onTap: () => context.push(AppRoutes.favorites),
+                ),
+              ],
               SizedBox(height: 24.h),
-              _ProfileSectionTitle(title: l10n.profileSectionAccountOrders),
+              _ProfileSectionTitle(title: l10n.profileSectionSettingsSupport),
               SizedBox(height: 8.h),
-              if (customer.isLinkedPerson != null ||
-                  customer.isLinkedPerson == true)
+              ProfilePageItem(
+                icon: Icons.settings_outlined,
+                label: l10n.drawerSettings,
+                subtitle: l10n.profileSettingsSubtitle,
+                onTap: () => context.push(AppRoutes.settings),
+              ),
+              ProfilePageItem(
+                icon: Icons.phone_outlined,
+                label: l10n.drawerContactUs,
+                subtitle: l10n.profileContactSubtitle,
+                onTap: () => context.push(AppRoutes.contact),
+              ),
+              ProfilePageItem(
+                icon: Icons.info_outline_rounded,
+                label: l10n.drawerAboutApp,
+                subtitle: l10n.profileAboutSubtitle,
+                onTap: () => context.push(AppRoutes.about),
+              ),
+              ProfilePageItem(
+                icon: Icons.privacy_tip_outlined,
+                label: l10n.drawerPrivacyPolicy,
+                subtitle: l10n.profilePrivacySubtitle,
+                onTap: () => context.push(AppRoutes.privacyPolicy),
+              ),
+              ProfilePageItem(
+                icon: Icons.quiz_outlined,
+                label: l10n.drawerTermsConditions,
+                subtitle: l10n.profileTermsSubtitle,
+                onTap: () => context.push(AppRoutes.termsConditions),
+              ),
+              ProfilePageItem(
+                icon: Icons.help_outline_rounded,
+                label: l10n.frequentlyAskedQuestion,
+                subtitle: l10n.profileFaqSubtitle,
+                onTap: () => context.push(AppRoutes.kalivraFaq),
+              ),
+              if (isLoggedIn)
                 ProfilePageItem(
-                  icon: Icons.person,
-                  label: l10n.myAccount,
-                  subtitle: l10n.accountInfo,
-                  onTap: () => context.push(AppRoutes.account),
+                  icon: Icons.star_rounded,
+                  label: l10n.rateTitle,
+                  subtitle: l10n.rateSubTitle,
+                  onTap: () => context.push(AppRoutes.rate),
                 ),
+              SizedBox(height: 8.h),
               ProfilePageItem(
-                icon: Icons.groups_rounded,
-                label: l10n.associationPersonalProfileButton,
-                subtitle: l10n.profileAssociationProfileSubtitle,
-                onTap: () => context.push(AppRoutes.associationMemberProfile),
+                icon: Icons.share_rounded,
+                label: l10n.profileShareApp,
+                variant: ProfilePageItemVariant.regular,
+                onTap: () => _shareApp(context),
               ),
-              ProfilePageItem(
-                icon: Icons.receipt_long_outlined,
-                label: l10n.drawerMyOrders,
-                subtitle: l10n.profileOrdersSubtitle,
-                onTap: () => context.push(AppRoutes.orders),
+              SizedBox(width: 10.w),
+              BlocBuilder<MiddlewareCubit, MiddlewareState>(
+                bloc: MiddlewareCubit()..getLoinOrLogoutButton(context),
+                builder: (context, state) {
+                  switch (state) {
+                    case LogOutButton():
+                      return state.button;
+                    case LoginButton():
+                      return state.button;
+                    default:
+                      return const SizedBox.shrink();
+                  }
+                },
               ),
-              ProfilePageItem(
-                icon: Icons.favorite_border_rounded,
-                label: l10n.drawerFavorites,
-                subtitle: l10n.profileFavoritesSubtitle,
-                onTap: () => context.push(AppRoutes.favorites),
-              ),
+              const ProfilePageFooter(),
             ],
-            SizedBox(height: 24.h),
-            _ProfileSectionTitle(title: l10n.profileSectionSettingsSupport),
-            SizedBox(height: 8.h),
-            ProfilePageItem(
-              icon: Icons.settings_outlined,
-              label: l10n.drawerSettings,
-              subtitle: l10n.profileSettingsSubtitle,
-              onTap: () => context.push(AppRoutes.settings),
-            ),
-            ProfilePageItem(
-              icon: Icons.phone_outlined,
-              label: l10n.drawerContactUs,
-              subtitle: l10n.profileContactSubtitle,
-              onTap: () => context.push(AppRoutes.contact),
-            ),
-            ProfilePageItem(
-              icon: Icons.info_outline_rounded,
-              label: l10n.drawerAboutApp,
-              subtitle: l10n.profileAboutSubtitle,
-              onTap: () => context.push(AppRoutes.about),
-            ),
-            ProfilePageItem(
-              icon: Icons.privacy_tip_outlined,
-              label: l10n.drawerPrivacyPolicy,
-              subtitle: l10n.profilePrivacySubtitle,
-              onTap: () => context.push(AppRoutes.privacyPolicy),
-            ),
-            ProfilePageItem(
-              icon: Icons.quiz_outlined,
-              label: l10n.drawerTermsConditions,
-              subtitle: l10n.profileTermsSubtitle,
-              onTap: () => context.push(AppRoutes.termsConditions),
-            ),
-            ProfilePageItem(
-              icon: Icons.help_outline_rounded,
-              label: l10n.frequentlyAskedQuestion,
-              subtitle: l10n.profileFaqSubtitle,
-              onTap: () => context.push(AppRoutes.kalivraFaq),
-            ),
-            if (isLoggedIn)
-              ProfilePageItem(
-                icon: Icons.star_rounded,
-                label: l10n.rateTitle,
-                subtitle: l10n.rateSubTitle,
-                onTap: () => context.push(AppRoutes.rate),
-              ),
-            SizedBox(height: 8.h),
-                ProfilePageItem(
-                  icon: Icons.share_rounded,
-                  label: l10n.profileShareApp,
-                  variant: ProfilePageItemVariant.regular,
-                  onTap: () => _shareApp(context),
-                ),
-                SizedBox(width: 10.w),
-            BlocBuilder<MiddlewareCubit, MiddlewareState>(
-              bloc: MiddlewareCubit()..getLoinOrLogoutButton(context),
-              builder: (context, state) {
-                switch (state) {
-                  case LogOutButton():
-                    return state.button;
-                  case LoginButton():
-                    return state.button;
-                  default:
-                    return const SizedBox.shrink();
-                }
-              },
-            ),
-            const ProfilePageFooter(),
-          ],
+          ),
         );
       },
     );

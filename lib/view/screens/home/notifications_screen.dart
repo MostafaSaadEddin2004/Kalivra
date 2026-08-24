@@ -71,6 +71,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   icon: Icons.notifications_off_outlined,
                   title: AppLocalizations.of(context)!.error,
                   description: state.errorMessage,
+                  actionLabel: AppLocalizations.of(context)!.retry,
+                  onAction: _refreshNotifications,
                 ),
               );
             }

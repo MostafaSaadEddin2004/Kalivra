@@ -7,8 +7,10 @@ import 'package:kalivra/core/html_utils.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/brand/brand_model.dart';
 import 'package:kalivra/model/product/product_model.dart';
+import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -31,54 +33,77 @@ class BrandDetailsScreen extends StatelessWidget {
       create: (_) => BrandCubit()..fetchProductsByBrandId(brand.id),
       child: Scaffold(
         appBar: ScreenAppBar(title: brand.name),
-        body: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
-              sliver: SliverToBoxAdapter(
-                child: _BrandDetailsContent(
-                  brand: brand,
-                  primary: primary,
-                  surfaceColor: surfaceColor,
-                  isDark: isDark,
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: 20.h)),
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              sliver: SliverToBoxAdapter(
-                child: Text(
-                  l10n.products,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
+        body: Builder(
+          builder: (context) {
+            return AppRefreshIndicator(
+              onRefresh: () =>
+                  context.read<BrandCubit>().fetchProductsByBrandId(brand.id),
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 0),
+                    sliver: SliverToBoxAdapter(
+                      child: _BrandDetailsContent(
+                        brand: brand,
+                        primary: primary,
+                        surfaceColor: surfaceColor,
+                        isDark: isDark,
+                      ),
+                    ),
                   ),
-                ),
+                  SliverToBoxAdapter(child: SizedBox(height: 20.h)),
+                  SliverPadding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        l10n.products,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  BlocBuilder<BrandCubit, BrandState>(
+                    builder: (context, state) {
+                      switch (state) {
+                        case BrandProductsLoading():
+                          return _ProductsGridSliver(
+                            products: _placeholderProducts(),
+                            isLoading: true,
+                          );
+                        case BrandProductFetched():
+                          final products = state.brandProducts;
+                          if (products.isEmpty) {
+                            return _MessageSliver(
+                              icon: Icons.inventory_2_outlined,
+                              title: l10n.noProducts,
+                              message: l10n.noProductsForBrand,
+                            );
+                          }
+                          return _ProductsGridSliver(products: products);
+                        case BrandProductsFailure():
+                          return _MessageSliver(
+                            icon: Icons.storefront_outlined,
+                            title: l10n.unexpectedError,
+                            message: state.message,
+                            actionLabel: l10n.retry,
+                            onAction: () => context
+                                .read<BrandCubit>()
+                                .fetchProductsByBrandId(brand.id),
+                          );
+                        default:
+                          return const SliverToBoxAdapter(
+                            child: SizedBox.shrink(),
+                          );
+                      }
+                    },
+                  ),
+                  SliverToBoxAdapter(child: SizedBox(height: 32.h)),
+                ],
               ),
-            ),
-            BlocBuilder<BrandCubit, BrandState>(
-              builder: (context, state) {
-                switch (state) {
-                  case BrandProductsLoading():
-                    return _ProductsGridSliver(
-                      products: _placeholderProducts(),
-                      isLoading: true,
-                    );
-                  case BrandProductFetched():
-                    final products = state.brandProducts;
-                    if (products.isEmpty) {
-                      return _MessageSliver(message: l10n.noProductsForBrand);
-                    }
-                    return _ProductsGridSliver(products: products);
-                  case BrandProductsFailure():
-                    return _MessageSliver(message: state.message);
-                  default:
-                    return const SliverToBoxAdapter(child: SizedBox.shrink());
-                }
-              },
-            ),
-            SliverToBoxAdapter(child: SizedBox(height: 32.h)),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -640,22 +665,32 @@ class _ProductsGridSliver extends StatelessWidget {
 }
 
 class _MessageSliver extends StatelessWidget {
-  const _MessageSliver({required this.message});
+  const _MessageSliver({
+    required this.icon,
+    required this.title,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
 
+  final IconData icon;
+  final String title;
   final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     return SliverFillRemaining(
       hasScrollBody: false,
-      child: Center(
-        child: Padding(
-          padding: EdgeInsets.all(24.w),
-          child: Text(
-            message,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+      child: Padding(
+        padding: EdgeInsets.all(24.w),
+        child: EmptyStateView(
+          icon: icon,
+          title: title,
+          description: message,
+          actionLabel: actionLabel,
+          onAction: onAction,
         ),
       ),
     );

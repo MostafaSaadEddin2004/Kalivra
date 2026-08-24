@@ -14,6 +14,7 @@ import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
 import 'package:kalivra/view/widgets/product/wishlist_icon.dart';
@@ -421,6 +422,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             }
           },
           builder: (context, state) {
+            if (state is ProductsFailed) {
+              return RefreshableStateBox(
+                child: EmptyStateView(
+                  icon: Icons.inventory_2_outlined,
+                  title: l10n.unexpectedError,
+                  description: state.message,
+                  actionLabel: l10n.retry,
+                  onAction: _refreshProduct,
+                ),
+              );
+            }
+
             final variantState = state is ProductVariantSelected ? state : null;
             final product = variantState?.product ?? widget.product;
             final isWishlist = _effectiveWishlist(product, wishlistState);

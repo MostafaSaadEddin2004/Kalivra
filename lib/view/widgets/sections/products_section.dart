@@ -5,6 +5,7 @@ import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dar
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
+import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class ProductsSection extends StatefulWidget {
@@ -48,7 +49,16 @@ class _ProductsSectionState extends State<ProductsSection> {
             switch (state) {
               case ProductsFailed():
                 return SliverToBoxAdapter(
-                  child: Center(child: Text(state.message)),
+                  child: SizedBox(
+                    height: 260.h,
+                    child: EmptyStateView(
+                      icon: Icons.error_outline_rounded,
+                      title: l10n.unexpectedError,
+                      description: state.message,
+                      actionLabel: l10n.retry,
+                      onAction: _productsCubit.loadProducts,
+                    ),
+                  ),
                 );
 
               case ProductsLoaded():
