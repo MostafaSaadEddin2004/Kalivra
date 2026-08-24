@@ -55,8 +55,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   List<ProductImage> _galleryImages(ProductModel product) {
-    if (product.images.isNotEmpty) return product.images;
-    if (product.baseImage != null) return [product.baseImage!];
+    final images = product.images.isNotEmpty
+        ? product.images
+        : [if (product.baseImage != null) product.baseImage!];
+    final mediaItems = [...images, ...product.videos];
+    if (mediaItems.isNotEmpty) return mediaItems;
     return [];
   }
 

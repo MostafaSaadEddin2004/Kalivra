@@ -9,6 +9,7 @@ class ProductModel {
   final BrandModel? brand;
   final ProductImage? baseImage;
   final List<ProductImage> images;
+  final List<ProductImage> videos;
   final bool isNew;
   final bool isFeatured;
   final bool onSale;
@@ -30,6 +31,7 @@ class ProductModel {
     this.brand,
     this.baseImage,
     required this.images,
+    this.videos = const [],
     required this.isNew,
     required this.isFeatured,
     required this.onSale,
@@ -56,9 +58,14 @@ class ProductModel {
       baseImage: json['base_image'] != null
           ? ProductImage.fromJson(Map<String, dynamic>.from(json['base_image']))
           : null,
-      images: (json['images'] as List? ?? [])
-          .map((e) => ProductImage.fromJson(Map<String, dynamic>.from(e)))
-          .toList(),
+      images: _productMediaList(json['images']),
+      videos: _productMediaList(
+        json['videos'] ??
+            json['gallery_videos'] ??
+            json['media_videos'] ??
+            json['video_urls'],
+        forceVideo: true,
+      ),
       isNew: json['is_new'] as bool? ?? false,
       isFeatured: json['is_featured'] as bool? ?? false,
       onSale: json['on_sale'] as bool? ?? false,
@@ -92,6 +99,7 @@ class ProductModel {
     'brand': brand?.toJson(),
     'base_image': baseImage?.toJson(),
     'images': images.map((e) => e.toJson()).toList(),
+    'videos': videos.map((e) => e.toJson()).toList(),
     'is_new': isNew,
     'is_featured': isFeatured,
     'on_sale': onSale,
@@ -114,6 +122,7 @@ class ProductModel {
     BrandModel? brand,
     ProductImage? baseImage,
     List<ProductImage>? images,
+    List<ProductImage>? videos,
     bool? isNew,
     bool? isFeatured,
     bool? onSale,
@@ -135,6 +144,7 @@ class ProductModel {
       brand: brand ?? this.brand,
       baseImage: baseImage ?? this.baseImage,
       images: images ?? this.images,
+      videos: videos ?? this.videos,
       isNew: isNew ?? this.isNew,
       isFeatured: isFeatured ?? this.isFeatured,
       onSale: onSale ?? this.onSale,
@@ -155,12 +165,24 @@ class ProductImage {
   final String? mediumImageUrl;
   final String? largeImageUrl;
   final String? originalImageUrl;
+  final String? url;
+  final String? fileUrl;
+  final String? videoUrl;
+  final String? previewImageUrl;
+  final String? type;
+  final String? mimeType;
 
   ProductImage({
     this.smallImageUrl,
     this.mediumImageUrl,
     this.largeImageUrl,
     this.originalImageUrl,
+    this.url,
+    this.fileUrl,
+    this.videoUrl,
+    this.previewImageUrl,
+    this.type,
+    this.mimeType,
   });
 
   factory ProductImage.fromJson(Map<String, dynamic> json) {
@@ -169,6 +191,16 @@ class ProductImage {
       mediumImageUrl: json['medium_image_url'],
       largeImageUrl: json['large_image_url'],
       originalImageUrl: json['original_image_url'],
+      url: json['url'],
+      fileUrl: json['file_url'] ?? json['download_url'] ?? json['media_url'],
+      videoUrl: json['video_url'] ?? json['video'],
+      previewImageUrl:
+          json['preview_image_url'] ??
+          json['thumbnail_url'] ??
+          json['poster_url'] ??
+          json['cover_image_url'],
+      type: json['type'] ?? json['media_type'],
+      mimeType: json['mime_type'] ?? json['content_type'],
     );
   }
 
@@ -177,7 +209,39 @@ class ProductImage {
     'medium_image_url': mediumImageUrl,
     'large_image_url': largeImageUrl,
     'original_image_url': originalImageUrl,
+    'url': url,
+    'file_url': fileUrl,
+    'video_url': videoUrl,
+    'preview_image_url': previewImageUrl,
+    'type': type,
+    'mime_type': mimeType,
   };
+}
+
+List<ProductImage> _productMediaList(Object? raw, {bool forceVideo = false}) {
+  final items = raw is List ? raw : [raw];
+
+  return items
+      .map((item) {
+        if (item == null) return null;
+        if (item is Map) {
+          final json = Map<String, dynamic>.from(item);
+          return ProductImage.fromJson(
+            forceVideo ? {...json, 'type': json['type'] ?? 'video'} : json,
+          );
+        }
+
+        final url = item.toString().trim();
+        if (url.isEmpty) return null;
+        return ProductImage(
+          originalImageUrl: forceVideo ? null : url,
+          videoUrl: forceVideo ? url : null,
+          url: url,
+          type: forceVideo ? 'video' : null,
+        );
+      })
+      .whereType<ProductImage>()
+      .toList();
 }
 
 class ProductPrices {

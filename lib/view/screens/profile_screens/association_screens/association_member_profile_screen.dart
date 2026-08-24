@@ -14,6 +14,8 @@ import 'package:kalivra/model/association/association_news_model.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/cards/text_slider.dart';
 import 'package:kalivra/view/widgets/files/network_file_action_tile.dart';
+import 'package:kalivra/view/widgets/media/gallery_media_item.dart';
+import 'package:kalivra/view/widgets/media/network_video_player_screen.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1359,6 +1361,7 @@ class _ProjectDetailsSection extends StatelessWidget {
           title: AppLocalizations.of(context)!.associationMemberProjectGallery,
           imageUrl: project.imageUrl,
           galleryImages: [...project.images, ...project.galleryImages],
+          videoUrls: project.videos,
           fallbackIcon: Icons.apartment_rounded,
         ),
         SizedBox(height: 12.h),
@@ -1621,6 +1624,7 @@ class _BuildingDetailsSection extends StatelessWidget {
             ...building.floorPlanImages,
             ...building.galleryImages,
           ],
+          videoUrls: building.videos,
           fallbackIcon: Icons.business_rounded,
         ),
         _infoRowIfValue(
@@ -1709,6 +1713,7 @@ class _UnitDetailsSection extends StatelessWidget {
           title: AppLocalizations.of(context)!.associationMemberUnitGallery,
           imageUrl: unit.unitPlanUrl,
           galleryImages: [...unit.images, ...unit.galleryImages],
+          videoUrls: unit.videos,
           fallbackIcon: Icons.home_work_outlined,
         ),
         InfoRow(label: l10n.unit, value: unit.unitNumber),
@@ -1811,12 +1816,14 @@ class _MediaGallery extends StatefulWidget {
     required this.title,
     required this.imageUrl,
     required this.galleryImages,
+    this.videoUrls = const [],
     required this.fallbackIcon,
   });
 
   final String title;
   final String? imageUrl;
   final List<String> galleryImages;
+  final List<String> videoUrls;
   final IconData fallbackIcon;
 
   @override
@@ -1837,7 +1844,8 @@ class _MediaGalleryState extends State<_MediaGallery> {
   void didUpdateWidget(covariant _MediaGallery oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl ||
-        oldWidget.galleryImages != widget.galleryImages) {
+        oldWidget.galleryImages != widget.galleryImages ||
+        oldWidget.videoUrls != widget.videoUrls) {
       _currentIndex = 0;
       if (_pageController.hasClients) {
         _pageController.jumpToPage(0);
@@ -1863,14 +1871,15 @@ class _MediaGalleryState extends State<_MediaGallery> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final galleryImages = widget.galleryImages
-        .where((image) => image.trim().isNotEmpty)
-        .toSet()
-        .toList();
-    final visibleImages = galleryImages;
+    final mediaItems = _galleryMediaItems(
+      imageUrls: [widget.imageUrl ?? '', ...widget.galleryImages],
+      videoUrls: widget.videoUrls,
+    );
+
+    if (mediaItems.isEmpty) return const SizedBox.shrink();
 
     return SizedBox(
-      height: visibleImages.length == 1 ? 220.h : 290.h,
+      height: mediaItems.length == 1 ? 220.h : 290.h,
       child: Column(
         children: [
           SizedBox(
@@ -1878,32 +1887,32 @@ class _MediaGalleryState extends State<_MediaGallery> {
             width: double.infinity,
             child: PageView.builder(
               controller: _pageController,
-              itemCount: visibleImages.length,
+              itemCount: mediaItems.length,
               onPageChanged: (index) {
                 setState(() => _currentIndex = index);
               },
               itemBuilder: (context, index) {
-                final imageUrl = visibleImages[index];
+                final media = mediaItems[index];
                 return _GalleryMainImage(
                   title: widget.title,
-                  imageUrl: imageUrl,
+                  media: media,
                   index: index,
                   fallbackIcon: widget.fallbackIcon,
                 );
               },
             ),
           ),
-          if (visibleImages.length > 1) ...[
+          if (mediaItems.length > 1) ...[
             SizedBox(height: 12.h),
             SizedBox(
               height: 58.h,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: visibleImages.length,
+                itemCount: mediaItems.length,
                 separatorBuilder: (context, index) => SizedBox(width: 8.w),
                 itemBuilder: (context, index) {
                   final isSelected = index == _currentIndex;
-                  final imageUrl = visibleImages[index];
+                  final media = mediaItems[index];
                   return GestureDetector(
                     onTap: () => _goToPage(index),
                     child: AnimatedContainer(
@@ -1923,9 +1932,10 @@ class _MediaGalleryState extends State<_MediaGallery> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10.r),
-                        child: CustomNetworkImage(
-                          imageUrl: imageUrl,
+                        child: _GalleryMediaPreview(
+                          media: media,
                           defaultIcon: widget.fallbackIcon,
+                          compact: true,
                         ),
                       ),
                     ),
@@ -1943,13 +1953,13 @@ class _MediaGalleryState extends State<_MediaGallery> {
 class _GalleryMainImage extends StatelessWidget {
   const _GalleryMainImage({
     required this.title,
-    required this.imageUrl,
+    required this.media,
     required this.index,
     required this.fallbackIcon,
   });
 
   final String title;
-  final String imageUrl;
+  final GalleryMediaItem media;
   final int index;
   final IconData fallbackIcon;
 
@@ -1959,21 +1969,102 @@ class _GalleryMainImage extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(16.r),
-        onTap: () => handleNetworkFileTap(
-          context,
-          name: '$title ${index + 1}',
-          url: imageUrl,
-        ),
+        onTap: () {
+          if (media.isVideo) {
+            openNetworkVideoPlayer(
+              context,
+              name: '$title ${index + 1}',
+              url: media.url,
+            );
+            return;
+          }
+
+          handleNetworkFileTap(
+            context,
+            name: '$title ${index + 1}',
+            url: media.url,
+          );
+        },
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16.r),
-          child: CustomNetworkImage(
-            imageUrl: imageUrl,
-            defaultIcon: fallbackIcon,
-          ),
+          child: _GalleryMediaPreview(media: media, defaultIcon: fallbackIcon),
         ),
       ),
     );
   }
+}
+
+class _GalleryMediaPreview extends StatelessWidget {
+  const _GalleryMediaPreview({
+    required this.media,
+    required this.defaultIcon,
+    this.compact = false,
+  });
+
+  final GalleryMediaItem media;
+  final IconData defaultIcon;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!media.isVideo) {
+      return CustomNetworkImage(imageUrl: media.url, defaultIcon: defaultIcon);
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Container(
+          color: AppColors.black,
+          child: Icon(
+            Icons.videocam_outlined,
+            color: AppColors.offWhite.withValues(alpha: 0.72),
+            size: compact ? 24.r : 54.r,
+          ),
+        ),
+        Container(
+          color: AppColors.black.withValues(alpha: compact ? 0.18 : 0.28),
+        ),
+        Center(
+          child: Container(
+            width: compact ? 30.r : 64.r,
+            height: compact ? 30.r : 64.r,
+            decoration: BoxDecoration(
+              color: AppColors.burgundy.withValues(alpha: 0.88),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.play_arrow_rounded,
+              color: AppColors.offWhite,
+              size: compact ? 22.r : 42.r,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+List<GalleryMediaItem> _galleryMediaItems({
+  required List<String> imageUrls,
+  required List<String> videoUrls,
+}) {
+  final seen = <String>{};
+  final mediaItems = <GalleryMediaItem>[];
+
+  for (final url in imageUrls) {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty || !seen.add(cleanUrl)) continue;
+    mediaItems.add(GalleryMediaItem.fromUrl(cleanUrl));
+  }
+
+  for (final url in videoUrls) {
+    final cleanUrl = url.trim();
+    if (cleanUrl.isEmpty || !seen.add(cleanUrl)) continue;
+    mediaItems.add(GalleryMediaItem.video(cleanUrl));
+  }
+
+  return mediaItems;
 }
 
 class _StagesTimeline extends StatelessWidget {
@@ -2029,6 +2120,7 @@ class _StageTile extends StatelessWidget {
         : stageName;
     final notes = stage.notes?.trim() ?? '';
     final images = stage.allImages;
+    final videos = stage.videos;
     final percentText = _formatNullablePercent(stage.completionPercentage);
     final displayPercent = percentText.isEmpty ? '-' : percentText;
     final l10n = AppLocalizations.of(context)!;
@@ -2085,11 +2177,12 @@ class _StageTile extends StatelessWidget {
               ),
             ),
           ],
-          if (images.isNotEmpty) ...[
+          if (images.isNotEmpty || videos.isNotEmpty) ...[
             SizedBox(height: 16.h),
             _StageGalleryPanel(
               title: title,
               images: images,
+              videoUrls: videos,
               fallbackIcon: Icons.image_outlined,
             ),
           ],
@@ -2333,11 +2426,13 @@ class _StageGalleryPanel extends StatelessWidget {
   const _StageGalleryPanel({
     required this.title,
     required this.images,
+    required this.videoUrls,
     required this.fallbackIcon,
   });
 
   final String title;
   final List<String> images;
+  final List<String> videoUrls;
   final IconData fallbackIcon;
 
   @override
@@ -2347,6 +2442,14 @@ class _StageGalleryPanel extends StatelessWidget {
         .where((image) => image.trim().isNotEmpty)
         .toSet()
         .toList();
+    final visibleVideos = videoUrls
+        .where((video) => video.trim().isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (visibleImages.isEmpty && visibleVideos.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       spacing: 8.h,
@@ -2380,8 +2483,9 @@ class _StageGalleryPanel extends StatelessWidget {
         ),
         _MediaGallery(
           title: title,
-          imageUrl: visibleImages.first,
+          imageUrl: visibleImages.isEmpty ? null : visibleImages.first,
           galleryImages: visibleImages,
+          videoUrls: visibleVideos,
           fallbackIcon: fallbackIcon,
         ),
       ],

@@ -922,6 +922,7 @@ class AssociationProject {
     this.imageUrl = '',
     this.images = const [],
     this.galleryImages = const [],
+    this.videos = const [],
     this.latitude,
     this.longitude,
     this.governorate = '',
@@ -963,6 +964,7 @@ class AssociationProject {
   final String imageUrl;
   final List<String> images;
   final List<String> galleryImages;
+  final List<String> videos;
   final num? latitude;
   final num? longitude;
   final String governorate;
@@ -1021,8 +1023,14 @@ class AssociationProject {
       subtitle: _stringValue(json['subtitle']),
       subtitleTranslations: _stringMap(json['subtitle_translations']),
       imageUrl: _stringValue(json['image_url']),
-      images: _stringList(json['images']),
-      galleryImages: _stringList(json['gallery_images']),
+      images: _mediaUrlList(json['images']),
+      galleryImages: _mediaUrlList(json['gallery_images']),
+      videos: _mergedMediaUrlList([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ]),
       latitude: _numValue(json['latitude']),
       longitude: _numValue(json['longitude']),
       governorate: _stringValue(json['governorate']),
@@ -1067,6 +1075,7 @@ class AssociationProject {
       'image_url': imageUrl,
       'images': images,
       'gallery_images': galleryImages,
+      'videos': videos,
       'latitude': latitude,
       'longitude': longitude,
       'governorate': governorate,
@@ -1113,6 +1122,7 @@ class AssociationBuilding {
     this.buildingPlanUrl,
     this.floorPlanImages = const [],
     this.galleryImages = const [],
+    this.videos = const [],
     this.specifications,
     this.completionPercentage,
     this.totalUnits,
@@ -1135,6 +1145,7 @@ class AssociationBuilding {
   final String? buildingPlanUrl;
   final List<String> floorPlanImages;
   final List<String> galleryImages;
+  final List<String> videos;
   final String? specifications;
   final num? completionPercentage;
   final int? totalUnits;
@@ -1170,8 +1181,14 @@ class AssociationBuilding {
       numberOfFloors: _intValue(json['number_of_floors']),
       numberOfUnits: _intValue(json['number_of_units']),
       buildingPlanUrl: _stringOrNull(json['building_plan_url']),
-      floorPlanImages: _stringList(json['floor_plan_images']),
-      galleryImages: _stringList(json['gallery_images']),
+      floorPlanImages: _mediaUrlList(json['floor_plan_images']),
+      galleryImages: _mediaUrlList(json['gallery_images']),
+      videos: _mergedMediaUrlList([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ]),
       specifications: _stringOrNull(json['specifications']),
       completionPercentage: _numValue(json['completion_percentage']),
       totalUnits: _intValue(json['total_units']),
@@ -1197,6 +1214,7 @@ class AssociationBuilding {
       'building_plan_url': buildingPlanUrl,
       'floor_plan_images': floorPlanImages,
       'gallery_images': galleryImages,
+      'videos': videos,
       'specifications': specifications,
       'completion_percentage': completionPercentage,
       'total_units': totalUnits,
@@ -1223,6 +1241,7 @@ class AssociationUnit {
     this.unitPlanUrl = '',
     this.galleryImages = const [],
     this.images = const [],
+    this.videos = const [],
     this.status = '',
     this.statusLabel = '',
     this.building,
@@ -1241,6 +1260,7 @@ class AssociationUnit {
   final String unitPlanUrl;
   final List<String> galleryImages;
   final List<String> images;
+  final List<String> videos;
   final String status;
   final String statusLabel;
   final AssociationBuilding? building;
@@ -1266,8 +1286,14 @@ class AssociationUnit {
       price: _numValue(json['price']),
       specifications: _stringValue(json['specifications']),
       unitPlanUrl: _stringValue(json['unit_plan_url']),
-      galleryImages: _stringList(json['gallery_images']),
-      images: _stringList(json['images']),
+      galleryImages: _mediaUrlList(json['gallery_images']),
+      images: _mediaUrlList(json['images']),
+      videos: _mergedMediaUrlList([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ]),
       status: _stringValue(json['status']),
       statusLabel: _stringValue(json['status_label']),
       building: _mapOrNull(json['building'], AssociationBuilding.fromJson),
@@ -1289,6 +1315,7 @@ class AssociationUnit {
       'unit_plan_url': unitPlanUrl,
       'gallery_images': galleryImages,
       'images': images,
+      'videos': videos,
       'status': status,
       'status_label': statusLabel,
       'building': building?.toJson(),
@@ -1304,6 +1331,7 @@ class StageModel {
     this.imageUrl,
     this.images = const [],
     this.galleryImages = const [],
+    this.videos = const [],
     this.startDate,
     this.endDate,
     this.completionPercentage,
@@ -1318,6 +1346,7 @@ class StageModel {
   final String? imageUrl;
   final List<String> images;
   final List<String> galleryImages;
+  final List<String> videos;
   final String? startDate;
   final String? endDate;
   final num? completionPercentage;
@@ -1351,6 +1380,12 @@ class StageModel {
             json['photos'] ??
             json['media'],
       ),
+      videos: _mergedMediaUrlList([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ]),
       startDate: _stringOrNull(json['start_date']),
       endDate: _stringOrNull(json['end_date']),
       completionPercentage: _numValue(json['completion_percentage']),
@@ -1368,6 +1403,7 @@ class StageModel {
       'image_url': imageUrl,
       'images': images,
       'gallery_images': galleryImages,
+      'videos': videos,
       'start_date': startDate,
       'end_date': endDate,
       'completion_percentage': completionPercentage,
@@ -1561,30 +1597,36 @@ List<String> _stringList(Object? raw) {
 }
 
 List<String> _mediaUrlList(Object? raw) {
-  if (raw is! List) return const [];
+  if (raw is List) {
+    return raw
+        .expand(_mediaUrlList)
+        .where((item) => item.isNotEmpty)
+        .toSet()
+        .toList();
+  }
 
-  return raw
-      .expand((item) {
-        if (item is Map) {
-          return [
-            item['url'],
-            item['image_url'],
-            item['file_url'],
-            item['download_url'],
-            item['preview_url'],
-            item['full_url'],
-            item['media_url'],
-            item['src'],
-            item['path'],
-            item['file'],
-          ];
-        }
-        return [item];
-      })
-      .map(_stringValue)
-      .where((item) => item.isNotEmpty)
-      .toSet()
-      .toList();
+  if (raw is Map) {
+    return [
+      raw['url'],
+      raw['image_url'],
+      raw['video_url'],
+      raw['file_url'],
+      raw['download_url'],
+      raw['preview_url'],
+      raw['full_url'],
+      raw['media_url'],
+      raw['src'],
+      raw['path'],
+      raw['file'],
+    ].map(_stringValue).where((item) => item.isNotEmpty).toSet().toList();
+  }
+
+  final value = _stringValue(raw);
+  return value.isEmpty ? const [] : [value];
+}
+
+List<String> _mergedMediaUrlList(List<Object?> sources) {
+  return sources.expand(_mediaUrlList).toSet().toList();
 }
 
 Map<String, String> _stringMap(Object? raw) {
