@@ -15,6 +15,7 @@ import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/date_of_birth_scroll_picker.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -152,30 +153,16 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<void> _pickDateOfBirth() async {
     final now = DateTime.now();
+    final minimumDate = DateTime(194);
     final currentValue = DateTime.tryParse(_dobController.text.trim());
     final initialDate = currentValue != null && !currentValue.isAfter(now)
         ? currentValue
-        : DateTime(now.year - 18, now.month, now.day);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final pickedDate = await showDatePicker(
+        : DateTime(now.year - 15, now.month, now.day);
+    final pickedDate = await showDateOfBirthScrollPicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime(1950),
-      lastDate: now,
-      helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: isDark ? AppColors.taupe : AppColors.burgundy,
-              onPrimary: AppColors.offWhite,
-              surface: isDark ? AppColors.black : Colors.white,
-              onSurface: isDark ? AppColors.black : AppColors.offWhite,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      minimumDate: minimumDate,
+      maximumDate: now,
     );
     if (pickedDate == null || !mounted) return;
     setState(() {
@@ -760,7 +747,7 @@ class _ProfileAddressesSection extends StatelessWidget {
           SizedBox(height: 14.h),
           OutlinedButton.icon(
             onPressed: onAddAddress,
-            icon: const Icon(Icons.add_rounded,),
+            icon: const Icon(Icons.add_rounded),
             label: Text(
               hasCurrentAddress
                   ? l10n.associationAdditionalAddress

@@ -649,127 +649,66 @@ class _AddressDisplayCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                width: 40.r,
-                height: 40.r,
+                width: 32.r,
+                height: 32.r,
                 decoration: BoxDecoration(
                   color: primary.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: primary, size: 22.r),
+                child: Icon(icon, color: primary, size: 18.r),
               ),
               SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: primary,
-                        fontWeight: FontWeight.w800,
-                      ),
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: primary,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          address.displayAddress.isEmpty
+              ? Text('---')
+              : _AddressDetailGrid(
+                  rows: [
+                    _AddressDetail(
+                      l10n.associationLinkGovernorate,
+                      _dash(address.capital),
                     ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      address.displayAddress.isEmpty
-                          ? '---'
-                          : address.displayAddress,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: isDark ? AppColors.offWhite : AppColors.black,
-                        height: 1.35,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    _AddressDetail(l10n.profileCity, _dash(address.city)),
+                    _AddressDetail(
+                      l10n.associationLinkTown,
+                      _dash(address.town),
                     ),
+                    _AddressDetail(
+                      l10n.associationLinkVillage,
+                      _dash(address.village),
+                    ),
+                    _AddressDetail(
+                      l10n.associationLinkStreet,
+                      _dash(address.streetName),
+                    ),
+                    _AddressDetail(
+                      l10n.associationStreetNumber,
+                      _dash(address.streetNumber),
+                    ),
+                    _AddressDetail(
+                      l10n.associationLinkBuilding,
+                      _dash(address.building),
+                    ),
+                    if (address.notes != null)
+                      _AddressDetail('Notes', _dash(address.notes)),
                   ],
+                  muted: muted,
                 ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Wrap(
-            spacing: 8.w,
-            runSpacing: 8.h,
-            children: [
-              if (address.label != null)
-                _AddressChip(
-                  label: l10n.associationAddressLabel,
-                  value: address.label!,
-                ),
-              if (address.type != null)
-                _AddressChip(
-                  label: l10n.associationAddressType,
-                  value: address.type!,
-                ),
-            ],
-          ),
-          if (address.label != null || address.type != null)
-            SizedBox(height: 10.h),
-          _AddressDetailGrid(
-            rows: [
-              _AddressDetail(
-                l10n.associationLinkGovernorate,
-                _dash(address.capital),
-              ),
-              _AddressDetail(l10n.profileCity, _dash(address.city)),
-              _AddressDetail(l10n.associationLinkTown, _dash(address.town)),
-              _AddressDetail(
-                l10n.associationLinkVillage,
-                _dash(address.village),
-              ),
-              _AddressDetail(
-                l10n.associationLinkStreet,
-                _dash(address.streetName),
-              ),
-              _AddressDetail(
-                l10n.associationStreetNumber,
-                _dash(address.streetNumber),
-              ),
-              _AddressDetail(
-                l10n.associationLinkBuilding,
-                _dash(address.building),
-              ),
-              if (address.notes != null)
-                _AddressDetail('Notes', _dash(address.notes)),
-            ],
-            muted: muted,
-          ),
         ],
       ),
     );
   }
 }
-
-class _AddressChip extends StatelessWidget {
-  const _AddressChip({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final color = isDark ? AppColors.goldLight : AppColors.burgundy;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999.r),
-      ),
-      child: Text(
-        '$label: $value',
-        style: theme.textTheme.bodySmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-}
-
 class _AddressDetail {
   const _AddressDetail(this.label, this.value);
 

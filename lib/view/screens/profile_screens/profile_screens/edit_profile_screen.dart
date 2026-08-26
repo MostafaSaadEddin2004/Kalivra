@@ -13,6 +13,7 @@ import 'package:kalivra/model/services/api/customer_api_service.dart';
 import 'package:kalivra/view/widgets/app_text_field.dart';
 import 'package:kalivra/view/widgets/association/association_dropdown_field.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
+import 'package:kalivra/view/widgets/profile_page/date_of_birth_scroll_picker.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 
 const String _kMediaOrigin = 'https://test1.zedan-world.com';
@@ -219,19 +220,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _pickDateOfBirth() async {
     final now = DateTime.now();
+    final minimumDate = DateTime(1940);
     final currentValue = DateTime.tryParse(_dobController.text.trim());
     final initialDate = currentValue != null && !currentValue.isAfter(now)
         ? currentValue
-        : DateTime(now.year - 18, now.month, now.day);
-    final pickedDate = await showDatePicker(
+        : DateTime(now.year - 15, now.month, now.day);
+    final pickedDate = await showDateOfBirthScrollPicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime(1900),
-      lastDate: now,
-      helpText: AppLocalizations.of(context)!.dateOfBirthLabel,
-      builder: (context, child) {
-        return child!;
-      },
+      minimumDate: minimumDate,
+      maximumDate: now,
     );
     if (pickedDate == null || !mounted) return;
     setState(() {
@@ -942,7 +940,10 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
               IconButton(
                 onPressed: widget.onRemove,
                 tooltip: l10n.associationDeleteAddress,
-                icon:  Icon(Icons.delete_outline_rounded,color: theme.colorScheme.onTertiaryFixed,),
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  color: theme.colorScheme.onTertiaryFixed,
+                ),
               ),
           ],
         ),
