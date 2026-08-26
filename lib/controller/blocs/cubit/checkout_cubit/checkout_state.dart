@@ -12,6 +12,7 @@ abstract class CheckoutState {
   List<CheckoutPaymentMethodModel> get paymentMethods => const [];
   String? get selectedShippingMethod => null;
   String? get selectedPaymentMethod => null;
+  int get currentStep => 0;
 }
 
 final class CheckoutInitial extends CheckoutState {
@@ -25,6 +26,7 @@ final class CheckoutLoading extends CheckoutState {
     this.paymentMethods = const [],
     this.selectedShippingMethod,
     this.selectedPaymentMethod,
+    this.currentStep = 0,
   });
 
   final CheckoutSummaryModel? previous;
@@ -42,6 +44,9 @@ final class CheckoutLoading extends CheckoutState {
   final String? selectedPaymentMethod;
 
   @override
+  final int currentStep;
+
+  @override
   bool get isLoading => true;
 
   @override
@@ -55,6 +60,7 @@ final class CheckoutLoaded extends CheckoutState {
     this.paymentMethods = const [],
     this.selectedShippingMethod,
     this.selectedPaymentMethod,
+    this.currentStep = 0,
   });
 
   @override
@@ -71,6 +77,9 @@ final class CheckoutLoaded extends CheckoutState {
 
   @override
   final String? selectedPaymentMethod;
+
+  @override
+  final int currentStep;
 }
 
 final class CheckoutOrderPlaced extends CheckoutState {
@@ -81,10 +90,33 @@ final class CheckoutOrderPlaced extends CheckoutState {
 }
 
 final class CheckoutFailed extends CheckoutState {
-  CheckoutFailed(this._error, [this.previous]);
+  CheckoutFailed(
+    this._error, [
+    this.previous,
+    this.shippingMethods = const [],
+    this.paymentMethods = const [],
+    this.selectedShippingMethod,
+    this.selectedPaymentMethod,
+    this.currentStep = 0,
+  ]);
 
   final Object _error;
   final CheckoutSummaryModel? previous;
+
+  @override
+  final List<CheckoutShippingMethodModel> shippingMethods;
+
+  @override
+  final List<CheckoutPaymentMethodModel> paymentMethods;
+
+  @override
+  final String? selectedShippingMethod;
+
+  @override
+  final String? selectedPaymentMethod;
+
+  @override
+  final int currentStep;
 
   @override
   bool get hasError => true;

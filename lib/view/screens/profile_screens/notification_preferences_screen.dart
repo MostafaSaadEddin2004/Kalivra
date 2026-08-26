@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/controller/blocs/cubit/notification_preferences_cubit/notification_preferences_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/notifications/notification_preference.dart';
@@ -56,7 +57,8 @@ class _NotificationPreferencesViewState
           appBar: ScreenAppBar(title: copy.screenTitle),
           body: state.isLoading
               ? Center(
-                  child: CircularProgressIndicator(
+                  child: SpinKitFadingCircle(
+                    size: 42.r,
                     color: theme.colorScheme.primary,
                   ),
                 )
@@ -107,13 +109,9 @@ class _NotificationPreferencesViewState
                 ),
               ),
               child: state.isSaving
-                  ? SizedBox(
-                      width: 20.r,
-                      height: 20.r,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: theme.colorScheme.onPrimaryFixed,
-                      ),
+                  ? SpinKitFadingCircle(
+                      size: 20.r,
+                      color: theme.colorScheme.onPrimaryFixed,
                     )
                   : Text(
                       copy.save,

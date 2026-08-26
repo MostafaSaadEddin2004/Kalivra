@@ -358,12 +358,9 @@ class _CouponSectionState extends State<_CouponSection> {
                   OutlinedButton.icon(
                     onPressed: isRemoving ? null : _removeCoupon,
                     icon: isRemoving
-                        ? SizedBox(
-                            width: 16.r,
-                            height: 16.r,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2,
-                            ),
+                        ? SpinKitFadingCircle(
+                            size: 16.r,
+                            color: colorScheme.primaryFixed,
                           )
                         : Icon(Icons.close_rounded, size: 18.r),
                     label: Text(l10n.remove),
@@ -423,13 +420,9 @@ class _CouponSectionState extends State<_CouponSection> {
                       ),
                     ),
                     child: isApplying
-                        ? SizedBox(
-                            width: 18.r,
-                            height: 18.r,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: colorScheme.secondaryFixed,
-                            ),
+                        ? SpinKitFadingCircle(
+                            size: 18.r,
+                            color: colorScheme.secondaryFixed,
                           )
                         : Text(
                             l10n.applyCoupon,

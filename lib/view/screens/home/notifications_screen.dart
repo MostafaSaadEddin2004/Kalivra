@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kalivra/controller/blocs/cubit/notifications_cubit/notifications_cubit.dart';
@@ -58,7 +59,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             if (state.isLoading) {
               return RefreshableStateBox(
                 child: Center(
-                  child: CircularProgressIndicator(
+                  child: SpinKitFadingCircle(
+                    size: 42.r,
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),

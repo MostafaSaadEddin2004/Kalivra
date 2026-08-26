@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
@@ -91,15 +92,18 @@ class _OrdersList extends StatelessWidget {
       itemCount: orders.length,
       separatorBuilder: (_, _) => SizedBox(height: 12.h),
       itemBuilder: (context, index) {
-        return _OrderCard(order: orders[index], index: getIndexReversed(orders.length));
+        return _OrderCard(
+          order: orders[index],
+          index: getIndexReversed(orders.length),
+        );
       },
     );
   }
 }
 
-int getIndexReversed(int length){
+int getIndexReversed(int length) {
   int index = 0;
-  for(int i = 0; i <length;  ){
+  for (int i = 0; i < length;) {
     index == i;
   }
   return index;
@@ -230,12 +234,9 @@ class _OrderCardState extends State<_OrderCard> {
                           ? () => _cancelOrder(context)
                           : null,
                       icon: _isCancelling
-                          ? SizedBox(
-                              width: 16.r,
-                              height: 16.r,
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
+                          ? SpinKitFadingCircle(
+                              size: 16.r,
+                              color: AppColors.burgundy,
                             )
                           : const Icon(Icons.cancel_outlined),
                       label: Text(labels.cancelOrder),
@@ -255,12 +256,9 @@ class _OrderCardState extends State<_OrderCard> {
                     child: FilledButton.icon(
                       onPressed: !isBusy ? () => _reorder(context) : null,
                       icon: _isReordering
-                          ? SizedBox(
-                              width: 16.r,
-                              height: 16.r,
-                              child: const CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
+                          ? SpinKitFadingCircle(
+                              size: 16.r,
+                              color: AppColors.offWhite,
                             )
                           : const Icon(Icons.replay_outlined),
                       label: Text(labels.reorder),

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/core/network/dio_client.dart' as network;
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -268,8 +269,8 @@ class _NetworkImagePhotoViewScreen extends StatelessWidget {
               : loadedBytes / expectedBytes;
 
           return Center(
-            child: CircularProgressIndicator(
-              value: progress,
+            child: SpinKitFadingCircle(
+              size: progress == null ? 42.r : 42.r,
               color: Colors.white,
             ),
           );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/cubit/cart_cubit/cart_cubit.dart';
 import 'package:kalivra/controller/blocs/cubit/checkout_cubit/checkout_cubit.dart';
@@ -12,6 +13,7 @@ import 'package:kalivra/view/screens/checkout/steps/shipping_step.dart';
 import 'package:kalivra/view/screens/checkout/widgets/checkout_step_indicator.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -23,6 +25,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   int _currentIndex = 0;
   bool _isCompletingOrder = false;
+  bool _isRestoringCheckoutProgress = true;
 
   final GlobalKey<AddressStepState> _addressStepKey =
       GlobalKey<AddressStepState>();
@@ -35,7 +38,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CheckoutCubit>().loadSummary();
+      _restoreCheckoutProgress();
+    });
+  }
+
+  Future<void> _restoreCheckoutProgress() async {
+    final step = await context.read<CheckoutCubit>().restoreCheckoutProgress();
+    if (!mounted) return;
+    setState(() {
+      _currentIndex = step;
+      _isRestoringCheckoutProgress = false;
     });
   }
 
@@ -71,6 +83,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       final loadedShippingMethods = await checkoutCubit.loadShippingMethods();
       if (!loadedShippingMethods || !mounted) return;
+
+      setState(() => _currentIndex = 1);
+      await checkoutCubit.saveCheckoutStep(CheckoutCubit.shippingMethodStep);
+      return;
     } else if (_currentIndex == 1) {
       final method = _shippingStepKey.currentState?.selectedMethodCode;
       if (method == null || method.isEmpty) {
@@ -79,6 +95,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       }
       final ok = await checkoutCubit.saveShippingMethod(method);
       if (!ok || !mounted) return;
+
+      setState(() => _currentIndex = 2);
+      await checkoutCubit.saveCheckoutStep(CheckoutCubit.paymentMethodStep);
+      return;
     } else if (_currentIndex == 2) {
       if (!(_paymentStepKey.currentState?.validateStep() ?? false)) {
         _showStepError(l10n.completeStepData);
@@ -88,10 +108,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final ok = await checkoutCubit.savePaymentMethod(payment);
       if (!ok || !mounted) return;
       await checkoutCubit.loadSummary();
-    }
 
-    if (!mounted) return;
-    setState(() => _currentIndex++);
+      if (!mounted) return;
+      setState(() => _currentIndex = 3);
+      await checkoutCubit.saveCheckoutStep(CheckoutCubit.orderConfirmationStep);
+      return;
+    }
   }
 
   void _showStepError(String message) {
@@ -114,6 +136,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     if (!mounted) return;
     cartCubit.markCartEmptyAfterOrder();
 
+    await checkoutCubit.resetCheckoutProgress();
     checkoutCubit.reset();
     CustomSnackBar.show(context, message);
     context.go(AppRoutes.home);
@@ -159,7 +182,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       },
       builder: (context, checkoutState) {
-        final isLoading = checkoutState.isLoading || _isCompletingOrder;
+        final isLoading =
+            checkoutState.isLoading ||
+            _isCompletingOrder ||
+            _isRestoringCheckoutProgress;
 
         return PopScope(
           canPop: !isLoading,
@@ -169,50 +195,187 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               noBackArrow: !isLoading,
             ),
             body: SafeArea(
-              child: Column(
-                children: [
-                  CheckoutStepIndicator(
-                    currentStep: _currentIndex,
-                    onStepTap: (index) {
-                      if (!isLoading && index <= _currentIndex) {
-                        setState(() => _currentIndex = index);
-                      }
-                    },
-                  ),
-                  Expanded(
-                    child: IndexedStack(
-                      index: _currentIndex,
+              child: _isRestoringCheckoutProgress
+                  ? const _CheckoutLoadingSkeleton()
+                  : Column(
                       children: [
-                        AddressStep(
-                          key: _addressStepKey,
-                          summary: checkoutState.summary,
-                          onContinue: isLoading ? null : _goNext,
+                        CheckoutStepIndicator(
+                          currentStep: _currentIndex,
+                          onStepTap: (index) {
+                            if (!isLoading && index <= _currentIndex) {
+                              setState(() => _currentIndex = index);
+                            }
+                          },
                         ),
-                        ShippingStep(
-                          key: _shippingStepKey,
-                          methods: checkoutState.shippingMethods,
-                          summary: checkoutState.summary,
-                          onContinue: isLoading ? null : _goNext,
-                        ),
-                        PaymentStep(
-                          key: _paymentStepKey,
-                          methods: checkoutState.paymentMethods,
-                          summary: checkoutState.summary,
-                          onContinue: isLoading ? null : _goNext,
-                        ),
-                        CheckoutStep(
-                          isLoading: isLoading,
-                          onConfirm: isLoading ? null : _goNext,
+                        Expanded(
+                          child: IndexedStack(
+                            index: _currentIndex,
+                            children: [
+                              AddressStep(
+                                key: _addressStepKey,
+                                summary: checkoutState.summary,
+                                onContinue: isLoading ? null : _goNext,
+                              ),
+                              ShippingStep(
+                                key: _shippingStepKey,
+                                methods: checkoutState.shippingMethods,
+                                summary: checkoutState.summary,
+                                selectedMethodCode:
+                                    checkoutState.selectedShippingMethod,
+                                onContinue: isLoading ? null : _goNext,
+                              ),
+                              PaymentStep(
+                                key: _paymentStepKey,
+                                methods: checkoutState.paymentMethods,
+                                summary: checkoutState.summary,
+                                selectedMethodCode:
+                                    checkoutState.selectedPaymentMethod,
+                                onContinue: isLoading ? null : _goNext,
+                              ),
+                              CheckoutStep(
+                                isLoading: isLoading,
+                                onConfirm: isLoading ? null : _goNext,
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
-              ),
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _CheckoutLoadingSkeleton extends StatelessWidget {
+  const _CheckoutLoadingSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cardColor = theme.cardTheme.color ?? theme.colorScheme.surface;
+
+    return Skeletonizer(
+      enabled: true,
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 14.h, 16.w, 12.h),
+            child: Row(
+              children: List.generate(4, (index) {
+                return Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4.w),
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 34.r,
+                          height: 34.r,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        SizedBox(height: 8.h),
+                        Container(
+                          height: 10.h,
+                          width: 58.w,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6.r),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
+              children: [
+                Container(
+                  height: 18.h,
+                  width: 150.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                ),
+                SizedBox(height: 14.h),
+                _CheckoutSkeletonCard(cardColor: cardColor, height: 96.h),
+                SizedBox(height: 12.h),
+                _CheckoutSkeletonCard(cardColor: cardColor, height: 96.h),
+                SizedBox(height: 12.h),
+                _CheckoutSkeletonCard(cardColor: cardColor, height: 96.h),
+                SizedBox(height: 22.h),
+                _CheckoutSkeletonCard(cardColor: cardColor, height: 52.h),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CheckoutSkeletonCard extends StatelessWidget {
+  const _CheckoutSkeletonCard({required this.cardColor, required this.height});
+
+  final Color cardColor;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(14.r),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38.r,
+            height: 38.r,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 12.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                ),
+                SizedBox(height: 10.h),
+                Container(
+                  height: 10.h,
+                  width: 180.w,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6.r),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

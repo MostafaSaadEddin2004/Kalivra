@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
@@ -366,14 +367,7 @@ class _NotificationSwitchTile extends StatelessWidget {
             ),
           ),
           if (isBusy)
-            SizedBox(
-              width: 22.r,
-              height: 22.r,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: theme.colorScheme.primary,
-              ),
-            )
+            SpinKitFadingCircle(size: 22.r, color: theme.colorScheme.primary)
           else
             Switch(
               value: value,

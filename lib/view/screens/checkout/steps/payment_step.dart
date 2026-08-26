@@ -11,11 +11,13 @@ class PaymentStep extends StatefulWidget {
     required this.methods,
     required this.summary,
     required this.onContinue,
+    this.selectedMethodCode,
   });
 
   final List<CheckoutPaymentMethodModel> methods;
   final CheckoutSummaryModel? summary;
   final VoidCallback? onContinue;
+  final String? selectedMethodCode;
 
   @override
   State<PaymentStep> createState() => PaymentStepState();
@@ -27,12 +29,17 @@ class PaymentStepState extends State<PaymentStep> {
   @override
   void initState() {
     super.initState();
-    _selectedMethodCode = _visibleMethod.method;
+    _selectedMethodCode = widget.selectedMethodCode ?? _visibleMethod.method;
   }
 
   @override
   void didUpdateWidget(covariant PaymentStep oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.selectedMethodCode != widget.selectedMethodCode &&
+        widget.selectedMethodCode?.isNotEmpty == true) {
+      _selectedMethodCode = widget.selectedMethodCode;
+      return;
+    }
     _selectedMethodCode ??= _visibleMethod.method;
   }
 

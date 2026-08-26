@@ -221,14 +221,7 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
       child: TextButton(
         onPressed: _isResending ? null : _resendCode,
         child: _isResending
-            ? SizedBox(
-                width: 18.r,
-                height: 18.r,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: textColor,
-                ),
-              )
+            ? SpinKitFadingCircle(size: 18.r, color: textColor)
             : Text(
                 l10n.authOtpResendCode,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -303,9 +296,9 @@ class _OtpPhoneEntryScreenState extends State<OtpPhoneEntryScreen> {
                           onPressed: _isLoading ? null : _sendCode,
                           icon: _isLoading
                               ? SpinKitFadingCircle(
-                                size: 20.r,
-                                color: AppColors.offWhite,
-                              )
+                                  size: 20.r,
+                                  color: AppColors.offWhite,
+                                )
                               : Icon(Icons.chat_rounded, size: 20.r),
                           label: Text(
                             AppLocalizations.of(context)!.sendCodeViaWhatsApp,

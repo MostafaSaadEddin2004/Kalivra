@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/product/product_model.dart';
 import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
@@ -37,13 +38,9 @@ class _ProductImage extends StatelessWidget {
             height: height,
             color: colorScheme.surfaceContainerHighest,
             child: Center(
-              child: SizedBox(
-                width: 32.r,
-                height: 32.r,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colorScheme.primary,
-                ),
+              child: SpinKitFadingCircle(
+                size: 32.r,
+                color: colorScheme.primary,
               ),
             ),
           );

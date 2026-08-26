@@ -21,24 +21,13 @@ Future<DateTime?> showDateOfBirthScrollPicker({
       final l10n = AppLocalizations.of(sheetContext)!;
       final surfaceColor = theme.cardTheme.color ?? theme.colorScheme.surface;
       final primaryColor = theme.colorScheme.onTertiaryFixed;
-      final selectedTextStyle =
-          theme.textTheme.titleMedium?.copyWith(
-            color: primaryColor,
-            fontWeight: FontWeight.w700,
-          ) ??
-          TextStyle(
-            color: primaryColor,
-            fontSize: 16.sp,
-            fontWeight: FontWeight.w700,
-          );
-      final textStyle =
-          theme.textTheme.bodyMedium?.copyWith(
-            color: primaryColor.withValues(alpha: 0.55),
-          ) ??
-          TextStyle(
-            color: primaryColor.withValues(alpha: 0.55),
-            fontSize: 14.sp,
-          );
+      final selectedTextStyle = theme.textTheme.titleMedium?.copyWith(
+        color: primaryColor,
+        fontWeight: FontWeight.w700,
+      );
+      final textStyle = theme.textTheme.bodyMedium?.copyWith(
+        color: theme.colorScheme.primaryFixed,
+      );
 
       return StatefulBuilder(
         builder: (context, setModalState) {
@@ -73,22 +62,23 @@ Future<DateTime?> showDateOfBirthScrollPicker({
                 ),
                 SizedBox(height: 16.h),
                 SizedBox(
-                  height: 180.h,
+                  height: 240.h,
                   child: ScrollDatePicker(
                     selectedDate: selectedDate,
                     minimumDate: minimumDate,
                     maximumDate: maximumDate,
                     locale: Localizations.localeOf(context),
                     options: DatePickerOptions(
+                      isLoop: true,
                       itemExtent: 42.h,
-                      backgroundColor: Colors.transparent,
+                      backgroundColor: surfaceColor,
                     ),
                     scrollViewOptions: DatePickerScrollViewOptions.all(
                       ScrollViewDetailOptions(
                         alignment: Alignment.center,
                         margin: EdgeInsets.symmetric(horizontal: 4.w),
-                        selectedTextStyle: selectedTextStyle,
-                        textStyle: textStyle,
+                        selectedTextStyle: selectedTextStyle!,
+                        textStyle: textStyle!,
                         isLoop: false,
                       ),
                     ),

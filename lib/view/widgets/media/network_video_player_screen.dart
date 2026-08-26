@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:video_player/video_player.dart';
 
@@ -86,7 +87,10 @@ class _NetworkVideoPlayerScreenState extends State<NetworkVideoPlayerScreen> {
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return Center(
-              child: CircularProgressIndicator(color: AppColors.goldLight),
+              child: SpinKitFadingCircle(
+                color: AppColors.goldLight,
+                size: 42.r,
+              ),
             );
           }
 

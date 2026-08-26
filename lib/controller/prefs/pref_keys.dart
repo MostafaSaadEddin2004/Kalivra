@@ -14,4 +14,7 @@ abstract class PrefKeys {
   static const String associationLinkSubmittedKey =
       'association_link_submitted';
   static const String userIdKey = 'user_id';
+  static const String checkoutStepKey = 'checkout_step';
+  static const String checkoutShippingMethodKey = 'checkout_shipping_method';
+  static const String checkoutPaymentMethodKey = 'checkout_payment_method';
 }

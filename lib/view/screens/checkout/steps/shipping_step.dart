@@ -11,11 +11,13 @@ class ShippingStep extends StatefulWidget {
     required this.methods,
     required this.summary,
     required this.onContinue,
+    this.selectedMethodCode,
   });
 
   final List<CheckoutShippingMethodModel> methods;
   final CheckoutSummaryModel? summary;
   final VoidCallback? onContinue;
+  final String? selectedMethodCode;
 
   @override
   State<ShippingStep> createState() => ShippingStepState();
@@ -33,13 +35,20 @@ class ShippingStepState extends State<ShippingStep> {
   @override
   void didUpdateWidget(covariant ShippingStep oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_selectedMethodCode == null ||
+    if (oldWidget.selectedMethodCode != widget.selectedMethodCode ||
+        _selectedMethodCode == null ||
         !widget.methods.any((method) => method.method == _selectedMethodCode)) {
       _selectDefault();
     }
   }
 
   void _selectDefault() {
+    final storedMethod = widget.selectedMethodCode;
+    if (storedMethod != null &&
+        widget.methods.any((method) => method.method == storedMethod)) {
+      _selectedMethodCode = storedMethod;
+      return;
+    }
     if (widget.methods.isNotEmpty) {
       _selectedMethodCode = widget.methods.first.method;
     }

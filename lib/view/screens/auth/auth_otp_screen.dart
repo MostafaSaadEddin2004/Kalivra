@@ -164,14 +164,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
       child: _isResending
-          ? SizedBox(
-              width: 18.r,
-              height: 18.r,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                color: textColor,
-              ),
-            )
+          ? SpinKitFadingCircle(size: 18.r, color: textColor)
           : Text(
               l10n.authOtpResendCode,
               style: theme.textTheme.bodyMedium?.copyWith(

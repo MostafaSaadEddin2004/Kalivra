@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/app_info/contact_api_model.dart';
@@ -352,13 +353,9 @@ class _ContactLoadingCard extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         child: Row(
           children: [
-            SizedBox(
-              width: 22.r,
-              height: 22.r,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
-              ),
+            SpinKitFadingCircle(
+              size: 22.r,
+              color: isDark ? AppColors.goldLight : AppColors.burgundy,
             ),
             SizedBox(width: 12.w),
             Text(

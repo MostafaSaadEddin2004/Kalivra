@@ -197,14 +197,7 @@ class _OtpScreenState extends State<OtpScreen> {
       child: TextButton(
         onPressed: _isResending ? null : _resendCode,
         child: _isResending
-            ? SizedBox(
-                width: 18.r,
-                height: 18.r,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: textColor,
-                ),
-              )
+            ? SpinKitFadingCircle(size: 18.r, color: textColor)
             : Text(
                 l10n.authOtpResendCode,
                 style: theme.textTheme.bodyMedium?.copyWith(
@@ -272,13 +265,9 @@ class _OtpScreenState extends State<OtpScreen> {
                       child: FilledButton.icon(
                         onPressed: _isLoading ? null : _sendCode,
                         icon: _isLoading
-                            ? SizedBox(
-                                width: 20.r,
-                                height: 20.r,
-                                child: const CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: AppColors.offWhite,
-                                ),
+                            ? SpinKitFadingCircle(
+                                size: 20.r,
+                                color: AppColors.offWhite,
                               )
                             : Icon(Icons.chat_rounded, size: 20.r),
                         label: Text(l10n.sendCodeViaWhatsApp),
@@ -359,9 +348,9 @@ class _OtpScreenState extends State<OtpScreen> {
                           onPressed: _isLoading ? null : _verify,
                           icon: _isLoading
                               ? SpinKitFadingCircle(
-                                size: 20.r,
-                                color: AppColors.offWhite,
-                              )
+                                  size: 20.r,
+                                  color: AppColors.offWhite,
+                                )
                               : Icon(Icons.verified_user_rounded, size: 20.r),
                           label: Text(
                             l10n.verify,
