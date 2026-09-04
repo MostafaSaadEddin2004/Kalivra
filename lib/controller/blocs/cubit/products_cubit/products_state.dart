@@ -8,8 +8,31 @@ enum ProductReviewStatus { idle, submitting, submitted, loginRequired, failure }
 final class ProductsLoading extends ProductsState {}
 
 final class ProductsLoaded extends ProductsState {
+  ProductsLoaded({
+    required this.products,
+    this.currentPage = 1,
+    this.hasMoreProducts = false,
+    this.isLoadingMore = false,
+  });
+
   final List<ProductModel> products;
-  ProductsLoaded({required this.products});
+  final int currentPage;
+  final bool hasMoreProducts;
+  final bool isLoadingMore;
+
+  ProductsLoaded copyWith({
+    List<ProductModel>? products,
+    int? currentPage,
+    bool? hasMoreProducts,
+    bool? isLoadingMore,
+  }) {
+    return ProductsLoaded(
+      products: products ?? this.products,
+      currentPage: currentPage ?? this.currentPage,
+      hasMoreProducts: hasMoreProducts ?? this.hasMoreProducts,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    );
+  }
 }
 
 final class OneProductLoaded extends ProductsState {

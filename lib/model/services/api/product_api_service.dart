@@ -5,8 +5,8 @@ class ProductApiService {
   ProductApiService();
   final DioClient _client = DioClient();
 
-  Future<List<ProductModel>> getProducts() async {
-    final res = await _client.get('products');
+  Future<List<ProductModel>> getProducts({int page = 1}) async {
+    final res = await _client.get('products', queryParameters: {'page': page});
     final data = (res.data['data'] as List<dynamic>)
         .map((e) => ProductModel.fromJson(e))
         .toList();

@@ -34,3 +34,8 @@ final class UnAuthinticated extends AuthState {
 
   UnAuthinticated({required this.message});
 }
+final class ResendCodeSuccessed extends AuthState {
+  final String message;
+
+  ResendCodeSuccessed({required this.message});
+}

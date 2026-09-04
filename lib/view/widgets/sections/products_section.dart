@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/controller/blocs/cubit/products_cubit/products_cubit.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/product/product_model.dart';
@@ -28,6 +29,13 @@ class _ProductsSectionState extends State<ProductsSection> {
   void dispose() {
     _productsCubit.close();
     super.dispose();
+  }
+
+  void _loadMoreProducts() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _productsCubit.loadMoreProducts();
+    });
   }
 
   @override
@@ -72,11 +80,30 @@ class _ProductsSectionState extends State<ProductsSection> {
                   );
                 }
 
-                return _ProductsGrid(
-                  childCount: products.length,
-                  itemBuilder: (context, index) {
-                    return ProductCard(product: products[index]);
-                  },
+                return SliverMainAxisGroup(
+                  slivers: [
+                    _ProductsGrid(
+                      childCount: products.length,
+                      itemBuilder: (context, index) {
+                        if (index >= products.length - 2) {
+                          _loadMoreProducts();
+                        }
+                        return ProductCard(product: products[index]);
+                      },
+                    ),
+                    if (state.isLoadingMore)
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 20.h),
+                          child: Center(
+                            child: SpinKitFadingCircle(
+                              color: Theme.of(context).colorScheme.primaryFixed,
+                              size: 28.r,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 );
 
               default:

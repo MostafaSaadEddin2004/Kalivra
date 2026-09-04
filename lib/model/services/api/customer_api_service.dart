@@ -64,7 +64,7 @@ class CustomerApiService {
       'password_confirmation': passwordConfirmation,
       'fcm_token': fcmToken,
       if (referralCode != null && referralCode.trim().isNotEmpty)
-        'referral_code_input': referralCode.trim(),
+        'referral_code': referralCode.trim(),
     };
 
     final res = await _client.post('customer/register', data: body);

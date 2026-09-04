@@ -1056,6 +1056,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
                                   : _stateController.text.trim(),
                               items: _capitalNames(addressInfoState),
                               enabled: !addressInfoState.isLoadingCapitals,
+                              isLoading: addressInfoState.isLoadingCapitals,
                               showDropdownIcon: false,
                               onChanged: (value) =>
                                   _selectCapital(value, addressInfoState),
@@ -1072,6 +1073,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
                               enabled:
                                   _selectedCapitalId != null &&
                                   !addressInfoState.isLoadingCities,
+                              isLoading: addressInfoState.isLoadingCities,
                               showDropdownIcon: false,
                               onChanged: _selectCity,
                             ),

@@ -17,6 +17,7 @@ class AssociationDropdownField extends StatelessWidget {
     this.itemLabelBuilder,
     this.validator,
     this.showDropdownIcon = true,
+    this.isLoading = false,
   });
 
   final String label;
@@ -29,13 +30,17 @@ class AssociationDropdownField extends StatelessWidget {
   final String Function(String item)? itemLabelBuilder;
   final String? Function(String?)? validator;
   final bool showDropdownIcon;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final radius = 14.r;
-    final canSelect = enabled && items.isNotEmpty;
+    final canSelect = enabled && !isLoading && items.isNotEmpty;
+    final effectiveHintText = isLoading
+        ? _loadingText(context)
+        : hintText ?? label;
     final selectedValue =
         value != null && value!.isNotEmpty && items.contains(value)
         ? value
@@ -57,10 +62,12 @@ class AssociationDropdownField extends StatelessWidget {
       suffixProps: DropdownSuffixProps(
         dropdownButtonProps: DropdownButtonProps(
           isVisible: showDropdownIcon,
-          iconClosed: Icon(Icons.arrow_drop_down_rounded, size: 24.r),
-          color: canSelect
-              ? theme.colorScheme.onTertiaryFixed
-              : AppColors.lightGray,
+          iconClosed: Icon(
+            Icons.arrow_drop_down_rounded,
+            color: AppColors.lightGray,
+            size: 24.r,
+          ),
+          color: AppColors.lightGray,
           disabledColor: AppColors.lightGray,
         ),
       ),
@@ -199,7 +206,7 @@ class AssociationDropdownField extends StatelessWidget {
             borderRadius: BorderRadius.circular(radius),
             borderSide: BorderSide(color: theme.colorScheme.onError),
           ),
-          hintText: label,
+          hintText: effectiveHintText,
           hintStyle: theme.textTheme.bodyMedium!.copyWith(
             color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
           ),
@@ -215,5 +222,11 @@ class AssociationDropdownField extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _loadingText(BuildContext context) {
+    return Localizations.localeOf(context).languageCode == 'ar'
+        ? 'جاري التحميل...'
+        : 'loading...';
   }
 }

@@ -980,7 +980,7 @@ class _PaymentsSection extends StatelessWidget {
           : [
               _PaginatedSectionList<AssociationPayment>(
                 items: payments,
-                pageHeight: 420.h,
+                minPageHeight: 420.h,
                 itemBuilder: (payment) => _PaymentTile(payment: payment),
               ),
             ],
@@ -1089,7 +1089,7 @@ class _FinancialObligationsSection extends StatelessWidget {
           : [
               _PaginatedSectionList<AssociationFinancialObligation>(
                 items: obligations,
-                pageHeight: 460.h,
+                minPageHeight: 460.h,
                 itemBuilder: (obligation) =>
                     _ObligationTile(obligation: obligation),
               ),
@@ -1187,14 +1187,14 @@ class _PaginatedSectionList<T> extends StatefulWidget {
   const _PaginatedSectionList({
     required this.items,
     required this.itemBuilder,
-    required this.pageHeight,
+    required this.minPageHeight,
   });
 
   static const int pageSize = 5;
 
   final List<T> items;
   final Widget Function(T item) itemBuilder;
-  final double pageHeight;
+  final double minPageHeight;
 
   @override
   State<_PaginatedSectionList<T>> createState() =>
@@ -1202,17 +1202,11 @@ class _PaginatedSectionList<T> extends StatefulWidget {
 }
 
 class _PaginatedSectionListState<T> extends State<_PaginatedSectionList<T>> {
-  late final PageController _pageController;
   int _currentPage = 0;
+  double _maxMeasuredPageHeight = 0;
 
   int get _pageCount =>
       (widget.items.length / _PaginatedSectionList.pageSize).ceil();
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
 
   @override
   void didUpdateWidget(covariant _PaginatedSectionList<T> oldWidget) {
@@ -1222,25 +1216,12 @@ class _PaginatedSectionListState<T> extends State<_PaginatedSectionList<T>> {
     final lastPage = _pageCount - 1;
     if (_currentPage > lastPage) {
       _currentPage = lastPage.clamp(0, lastPage);
-      if (_pageController.hasClients) {
-        _pageController.jumpToPage(_currentPage);
-      }
     }
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _animateToPage(int page) {
+  void _goToPage(int page) {
     if (page < 0 || page >= _pageCount || page == _currentPage) return;
-    _pageController.animateToPage(
-      page,
-      duration: const Duration(milliseconds: 240),
-      curve: Curves.easeInOut,
-    );
+    setState(() => _currentPage = page);
   }
 
   @override
@@ -1253,62 +1234,70 @@ class _PaginatedSectionListState<T> extends State<_PaginatedSectionList<T>> {
     }
 
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.goldLight : AppColors.burgundy;
     final canGoBack = _currentPage > 0;
     final canGoForward = _currentPage < _pageCount - 1;
+    final start = _currentPage * _PaginatedSectionList.pageSize;
+    final pageItems = widget.items
+        .skip(start)
+        .take(_PaginatedSectionList.pageSize);
+    final minHeight = _maxMeasuredPageHeight > widget.minPageHeight
+        ? _maxMeasuredPageHeight
+        : widget.minPageHeight;
 
     return Column(
       children: [
-        SizedBox(
-          height: widget.pageHeight,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: _pageCount,
-            onPageChanged: (page) => setState(() => _currentPage = page),
-            itemBuilder: (context, pageIndex) {
-              final start = pageIndex * _PaginatedSectionList.pageSize;
-              final pageItems = widget.items
-                  .skip(start)
-                  .take(_PaginatedSectionList.pageSize);
-
-              return SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: pageItems.map(widget.itemBuilder).toList(),
-                ),
-              );
+        ConstrainedBox(
+          constraints: BoxConstraints(minHeight: minHeight),
+          child: _SizeReportingWidget(
+            onSizeChange: (size) {
+              if (size.height <= _maxMeasuredPageHeight) return;
+              setState(() => _maxMeasuredPageHeight = size.height);
             },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: pageItems.map(widget.itemBuilder).toList(),
+            ),
           ),
         ),
         SizedBox(height: 10.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton.filledTonal(
-              onPressed: canGoBack
-                  ? () => _animateToPage(_currentPage - 1)
-                  : null,
-              icon: const Icon(Icons.chevron_left_rounded),
-              color: accentColor,
+            IconButton.filled(
+              onPressed: canGoBack ? () => _goToPage(_currentPage - 1) : null,
+              icon: Icon(
+                Icons.chevron_left_rounded,
+                color: canGoBack
+                    ? theme.colorScheme.secondaryFixed
+                    : AppColors.black.withValues(alpha: 0.5),
+              ),
+              color: canGoBack
+                  ? theme.colorScheme.onTertiaryFixed
+                  : AppColors.lightGray,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 14.w),
               child: Text(
                 '${_currentPage + 1} / $_pageCount',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: accentColor,
+                  color: theme.colorScheme.onTertiaryFixed,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ),
-            IconButton.filledTonal(
+            IconButton.filled(
               onPressed: canGoForward
-                  ? () => _animateToPage(_currentPage + 1)
+                  ? () => _goToPage(_currentPage + 1)
                   : null,
-              icon: const Icon(Icons.chevron_right_rounded),
-              color: accentColor,
+              icon: Icon(
+                Icons.chevron_right_rounded,
+                color: canGoForward
+                    ? theme.colorScheme.secondaryFixed
+                    : AppColors.black.withValues(alpha: 0.5),
+              ),
+              color: canGoForward
+                  ? theme.colorScheme.onTertiaryFixed
+                  : AppColors.lightGray,
             ),
           ],
         ),
@@ -1959,7 +1948,7 @@ class _MediaGalleryState extends State<_MediaGallery> {
                       decoration: BoxDecoration(
                         border: isSelected
                             ? Border.all(
-                                color: theme.colorScheme.primary,
+                                color: theme.colorScheme.onTertiaryFixed,
                                 width: 2.w,
                               )
                             : null,
@@ -2042,40 +2031,28 @@ class _GalleryMediaPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     if (!media.isVideo) {
       return CustomNetworkImage(imageUrl: media.url, defaultIcon: defaultIcon);
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          color: AppColors.black,
+    return Container(
+      color: theme.colorScheme.primaryFixed,
+      child: Center(
+        child: Container(
+          width: compact ? 30.r : 64.r,
+          height: compact ? 30.r : 64.r,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.onTertiaryFixed,
+            shape: BoxShape.circle,
+          ),
           child: Icon(
-            Icons.videocam_outlined,
-            color: AppColors.offWhite.withValues(alpha: 0.72),
-            size: compact ? 24.r : 54.r,
+            Icons.play_arrow_rounded,
+            color: theme.colorScheme.primaryFixed,
+            size: compact ? 22.r : 42.r,
           ),
         ),
-        Container(
-          color: AppColors.black.withValues(alpha: compact ? 0.18 : 0.28),
-        ),
-        Center(
-          child: Container(
-            width: compact ? 30.r : 64.r,
-            height: compact ? 30.r : 64.r,
-            decoration: BoxDecoration(
-              color: AppColors.burgundy.withValues(alpha: 0.88),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.play_arrow_rounded,
-              color: AppColors.offWhite,
-              size: compact ? 22.r : 42.r,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -2119,6 +2096,7 @@ class _StagesTimeline extends StatefulWidget {
 
 class _StagesTimelineState extends State<_StagesTimeline> {
   late final PageController _pageController;
+  List<double> _stageHeights = [];
   int _selectedStageIndex = 0;
 
   @override
@@ -2133,6 +2111,9 @@ class _StagesTimelineState extends State<_StagesTimeline> {
     if (_selectedStageIndex >= widget.stages.length) {
       _selectedStageIndex = 0;
     }
+    if (oldWidget.stages.length != widget.stages.length) {
+      _stageHeights = List<double>.filled(widget.stages.length, 0);
+    }
   }
 
   @override
@@ -2141,8 +2122,8 @@ class _StagesTimelineState extends State<_StagesTimeline> {
     super.dispose();
   }
 
-  void _selectStage(int index) {
-    setState(() => _selectedStageIndex = index);
+  void _goToStage(int index) {
+    if (index < 0 || index >= widget.stages.length) return;
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 240),
@@ -2150,9 +2131,26 @@ class _StagesTimelineState extends State<_StagesTimeline> {
     );
   }
 
+  void _syncStageHeights() {
+    if (_stageHeights.length == widget.stages.length) return;
+    _stageHeights = List<double>.filled(widget.stages.length, 0);
+  }
+
+  void _updateStageHeight(int index, Size size) {
+    if (index < 0 || index >= _stageHeights.length) return;
+    if ((_stageHeights[index] - size.height).abs() < 1) return;
+    setState(() => _stageHeights[index] = size.height);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    _syncStageHeights();
+    final measuredHeight = widget.stages.isEmpty
+        ? 0.0
+        : _stageHeights[_selectedStageIndex];
+    final pageHeight = measuredHeight == 0 ? 760.h : measuredHeight;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2171,14 +2169,9 @@ class _StagesTimelineState extends State<_StagesTimeline> {
         else
           Column(
             children: [
-              _StagePageSelector(
-                stages: widget.stages,
-                selectedIndex: _selectedStageIndex,
-                onSelected: _selectStage,
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                height: 760.h,
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                height: pageHeight,
                 child: PageView.builder(
                   controller: _pageController,
                   itemCount: widget.stages.length,
@@ -2186,16 +2179,43 @@ class _StagesTimelineState extends State<_StagesTimeline> {
                     setState(() => _selectedStageIndex = index);
                   },
                   itemBuilder: (context, index) {
-                    return SingleChildScrollView(
-                      padding: EdgeInsets.symmetric(horizontal: 2.w),
-                      child: _StageTile(
-                        stage: widget.stages[index],
-                        index: index,
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: OverflowBox(
+                        minHeight: 0,
+                        maxHeight: double.infinity,
+                        alignment: Alignment.topCenter,
+                        child: _SizeReportingWidget(
+                          onSizeChange: (size) =>
+                              _updateStageHeight(index, size),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: _StageTile(
+                              stage: widget.stages[index],
+                              index: index,
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   },
                 ),
               ),
+              if (widget.stages.length > 1) ...[
+                SizedBox(height: 10.h),
+                _StagePageControls(
+                  canGoForward: _selectedStageIndex < widget.stages.length - 1,
+                  canGoBack: _selectedStageIndex > 0,
+                  currentIndex: _selectedStageIndex,
+                  pageCount: widget.stages.length,
+                  onPrevious: _selectedStageIndex > 0
+                      ? () => _goToStage(_selectedStageIndex - 1)
+                      : null,
+                  onNext: _selectedStageIndex < widget.stages.length - 1
+                      ? () => _goToStage(_selectedStageIndex + 1)
+                      : null,
+                ),
+              ],
             ],
           ),
       ],
@@ -2203,92 +2223,94 @@ class _StagesTimelineState extends State<_StagesTimeline> {
   }
 }
 
-class _StagePageSelector extends StatelessWidget {
-  const _StagePageSelector({
-    required this.stages,
-    required this.selectedIndex,
-    required this.onSelected,
+class _SizeReportingWidget extends StatefulWidget {
+  const _SizeReportingWidget({required this.child, required this.onSizeChange});
+
+  final Widget child;
+  final ValueChanged<Size> onSizeChange;
+
+  @override
+  State<_SizeReportingWidget> createState() => _SizeReportingWidgetState();
+}
+
+class _SizeReportingWidgetState extends State<_SizeReportingWidget> {
+  Size? _oldSize;
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final size = context.size;
+      if (size == null || size == _oldSize) return;
+      _oldSize = size;
+      widget.onSizeChange(size);
+    });
+
+    return widget.child;
+  }
+}
+
+class _StagePageControls extends StatelessWidget {
+  const _StagePageControls({
+    required this.currentIndex,
+    required this.pageCount,
+    required this.onPrevious,
+    required this.onNext,
+    required this.canGoForward,
+    required this.canGoBack,
   });
 
-  final List<StageModel> stages;
-  final int selectedIndex;
-  final ValueChanged<int> onSelected;
+  final int currentIndex;
+  final int pageCount;
+  final VoidCallback? onPrevious;
+  final VoidCallback? onNext;
+  final bool canGoForward;
+  final bool canGoBack;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
+    final accentColor = isDark ? AppColors.goldLight : AppColors.burgundy;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: List.generate(stages.length, (index) {
-          final stageName = stages[index].stageName?.trim() ?? '';
-          final label = stageName.isEmpty
-              ? '${AppLocalizations.of(context)!.associationMemberStage} ${index + 1}'
-              : stageName;
-          final isSelected = selectedIndex == index;
-
-          return Padding(
-            padding: EdgeInsetsDirectional.only(end: 10.w),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12.r),
-              onTap: () => onSelected(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                width: 112.w,
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? accent.withValues(alpha: 0.14)
-                      : theme.colorScheme.secondaryFixed.withValues(
-                          alpha: 0.08,
-                        ),
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: isSelected
-                        ? accent
-                        : theme.colorScheme.onTertiaryFixed.withValues(
-                            alpha: 0.14,
-                          ),
-                  ),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '(${index + 1})',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: isSelected
-                            ? accent
-                            : theme.colorScheme.onTertiaryFixed,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      label,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: isDark ? AppColors.taupe : AppColors.burgundy,
-                        fontWeight: isSelected
-                            ? FontWeight.w800
-                            : FontWeight.w600,
-                        height: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        IconButton.filled(
+          onPressed: onPrevious,
+           icon: Icon(
+                Icons.chevron_left_rounded,
+                color: canGoBack
+                    ? theme.colorScheme.secondaryFixed
+                    : AppColors.black.withValues(alpha: 0.5),
               ),
+              color: canGoBack
+                  ? theme.colorScheme.onTertiaryFixed
+                  : AppColors.lightGray,
             ),
-          );
-        }),
-      ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w),
+          child: Text(
+            '${currentIndex + 1} / $pageCount',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: accentColor,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        IconButton.filled(
+          onPressed: onNext,
+         icon: Icon(
+                Icons.chevron_right_rounded,
+                color: canGoForward
+                    ? theme.colorScheme.secondaryFixed
+                    : AppColors.black.withValues(alpha: 0.5),
+              ),
+              color: canGoForward
+                  ? theme.colorScheme.onTertiaryFixed
+                  : AppColors.lightGray,
+            ),
+      ],
     );
   }
 }

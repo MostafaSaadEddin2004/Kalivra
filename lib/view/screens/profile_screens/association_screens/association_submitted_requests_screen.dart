@@ -46,7 +46,7 @@ class _AssociationSubmittedRequestsScreenState
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.associationSubmittedRequestsTitle),
       body: BlocBuilder<AssociationLinkCubit, AssociationLinkState>(
-        bloc: _associationCubit..fetchRequests(),
+        bloc: _associationCubit,
         builder: (context, state) {
           if (state is AssociationLinkLoading) {
             return Skeletonizer(
@@ -55,6 +55,7 @@ class _AssociationSubmittedRequestsScreenState
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   return _RequestCard(
+                    requestNumber: index + 1,
                     request: AssociationRequestSummary(
                       id: 0,
                       status: 'status',
@@ -71,7 +72,8 @@ class _AssociationSubmittedRequestsScreenState
             return _ErrorState(onRetry: _reload);
           }
           if (state is AssociationLinkRequestsFetched) {
-            final requests = state.linkRequests;
+            final requests = [...state.linkRequests]
+              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
             if (requests.isEmpty) {
               return _EmptyState(
                 onNewRequest: () async {
@@ -86,7 +88,10 @@ class _AssociationSubmittedRequestsScreenState
                 padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
-                  return _RequestCard(request: requests[index]);
+                  return _RequestCard(
+                    requestNumber: requests.length - index,
+                    request: requests[index],
+                  );
                 },
               ),
             );
@@ -99,8 +104,9 @@ class _AssociationSubmittedRequestsScreenState
 }
 
 class _RequestCard extends StatelessWidget {
-  const _RequestCard({required this.request});
+  const _RequestCard({required this.requestNumber, required this.request});
 
+  final int requestNumber;
   final AssociationRequestSummary request;
 
   @override
@@ -153,7 +159,7 @@ class _RequestCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          '${l10n.associationRequestNumber} #${request.id}',
+                          '${l10n.associationRequestNumber} #$requestNumber',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: isDark

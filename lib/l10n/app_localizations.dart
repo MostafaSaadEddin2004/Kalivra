@@ -3737,7 +3737,7 @@ abstract class AppLocalizations {
   /// No description provided for @linkRequestsScreen.
   ///
   /// In en, this message translates to:
-  /// **'Joining requests'**
+  /// **'My requests'**
   String get linkRequestsScreen;
 
   /// No description provided for @whatsappNumber.

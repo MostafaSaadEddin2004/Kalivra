@@ -1903,7 +1903,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get delete => 'حذف';
 
   @override
-  String get linkRequestsScreen => 'طلبات الإنضمام';
+  String get linkRequestsScreen => 'طلباتي';
 
   @override
   String get whatsappNumber => 'رقم الواتساب';

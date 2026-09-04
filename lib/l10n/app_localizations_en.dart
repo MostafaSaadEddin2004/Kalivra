@@ -1917,7 +1917,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
-  String get linkRequestsScreen => 'Joining requests';
+  String get linkRequestsScreen => 'My requests';
 
   @override
   String get whatsappNumber => 'Whatsapp number';

@@ -219,7 +219,7 @@ class _OtpScreenState extends State<OtpScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: ScreenAppBar(title: _title(l10n)),
+      appBar: ScreenAppBar(title: _title(l10n),noBackArrow: true,),
       body: Form(
         key: _formKey,
         child: ListView(

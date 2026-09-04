@@ -29,15 +29,15 @@ class ScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       elevation: 0,
       centerTitle: true,
-      leading: noBackArrow == false
-          ? SizedBox.shrink()
-          : CustomIconButton(
+      leading: noBackArrow == true
+          ? CustomIconButton(
               icon: Icons.arrow_back_rounded,
               color: fgColor,
               iconSize: 20.r,
               onPressed: () => context.pop(),
               tooltip: AppLocalizations.of(context)!.back,
-            ),
+            )
+          : SizedBox.shrink(),
       title: Text(
         title,
         style: theme.textTheme.titleMedium?.copyWith(

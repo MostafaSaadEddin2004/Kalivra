@@ -417,6 +417,7 @@ class _AssociationRequestsAndServicesScreenState
             return item.label;
           },
           enabled: !isBusy,
+          isLoading: isLoadingTypes,
           onChanged: _onRequestTypeChanged,
           validator: (value) => value == null
               ? l10n.associationRequestTypeOrMessageRequired
@@ -430,6 +431,7 @@ class _AssociationRequestsAndServicesScreenState
     required AppLocalizations l10n,
     required ThemeData theme,
     required bool isDark,
+    required AssociationLinkState state,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -465,6 +467,8 @@ class _AssociationRequestsAndServicesScreenState
           attachments: _attachments,
           attachmentTypes: _attachmentTypes,
           attachmentTypeIds: _attachmentTypeIds,
+          isLoadingAttachmentTypes:
+              state is AssociationLinkLoading && _attachmentTypes.isEmpty,
           enabled: !_isLocked,
           onPickAttachment: _pickAttachment,
           onRemoveAttachment: _removeAttachment,
@@ -556,6 +560,9 @@ class _AssociationRequestsAndServicesScreenState
                       attachments: _attachments,
                       attachmentTypes: _attachmentTypes,
                       attachmentTypeIds: _attachmentTypeIds,
+                      isLoadingAttachmentTypes:
+                          state is AssociationLinkLoading &&
+                          _attachmentTypes.isEmpty,
                       onGovernorateChanged: _onGovernorateChanged,
                       onCityChanged: _onCityChanged,
                       onTownChanged: _onTownChanged,
@@ -583,6 +590,7 @@ class _AssociationRequestsAndServicesScreenState
                       l10n: l10n,
                       theme: theme,
                       isDark: isDark,
+                      state: state,
                     ),
                     _buildSubmitButton(state: state),
                   ],
@@ -620,6 +628,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.attachments,
     required this.attachmentTypes,
     required this.attachmentTypeIds,
+    required this.isLoadingAttachmentTypes,
     required this.onGovernorateChanged,
     required this.onCityChanged,
     required this.onTownChanged,
@@ -664,6 +673,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
   final List<AssociationLinkAttachment> attachments;
   final List<AssociationAttachmentType> attachmentTypes;
   final Map<String, String?> attachmentTypeIds;
+  final bool isLoadingAttachmentTypes;
 
   final ValueChanged<String?> onGovernorateChanged;
   final ValueChanged<String?> onCityChanged;
@@ -818,6 +828,7 @@ class _AssociationLinkRequestSectionState
           attachments: widget.attachments,
           attachmentTypes: widget.attachmentTypes,
           attachmentTypeIds: widget.attachmentTypeIds,
+          isLoadingAttachmentTypes: widget.isLoadingAttachmentTypes,
           enabled: !widget.isLocked,
           onPickAttachment: widget.onPickAttachment,
           onRemoveAttachment: widget.onRemoveAttachment,
@@ -1248,6 +1259,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                               : null,
                         )
                       : null,
+                  isLoading: addressState.isLoadingCapitals,
                   onChanged: _onGovernorateChanged,
                   validator: widget.isRequired ? _requiredValue : null,
                 ),
@@ -1275,6 +1287,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                               : null,
                         )
                       : null,
+                  isLoading: addressState.isLoadingCities,
                   onChanged: _onCityChanged,
                   validator: widget.isRequired ? _requiredValue : null,
                 ),
@@ -1301,6 +1314,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                               : null,
                         )
                       : null,
+                  isLoading: addressState.isLoadingTowns,
                   onChanged: _onTownChanged,
                   validator: widget.isRequired ? _requiredValue : null,
                 ),
@@ -1346,6 +1360,7 @@ class _RequestAttachmentsSection extends StatelessWidget {
     required this.attachments,
     required this.attachmentTypes,
     required this.attachmentTypeIds,
+    required this.isLoadingAttachmentTypes,
     required this.enabled,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
@@ -1355,6 +1370,7 @@ class _RequestAttachmentsSection extends StatelessWidget {
   final List<AssociationLinkAttachment> attachments;
   final List<AssociationAttachmentType> attachmentTypes;
   final Map<String, String?> attachmentTypeIds;
+  final bool isLoadingAttachmentTypes;
   final bool enabled;
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
@@ -1383,6 +1399,7 @@ class _RequestAttachmentsSection extends StatelessWidget {
             attachmentTypes: attachmentTypes,
             selectedAttachmentTypeId: attachmentTypeIds[attachment.fileName],
             enabled: enabled,
+            isLoadingAttachmentTypes: isLoadingAttachmentTypes,
             onDelete: () => onRemoveAttachment(attachment.fileName),
             onAttachmentTypeChanged: (value) =>
                 onAttachmentTypeChanged(attachment.fileName, value),
@@ -1392,8 +1409,10 @@ class _RequestAttachmentsSection extends StatelessWidget {
           SizedBox(height: 14.h),
           OutlinedButton.icon(
             onPressed: onPickAttachment,
-            icon:  Icon(Icons.add_rounded,
-                color: theme.colorScheme.primaryFixed,),
+            icon: Icon(
+              Icons.add_rounded,
+              color: theme.colorScheme.primaryFixed,
+            ),
             label: Text(
               l10n.associationLinkAddAttachment,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
@@ -1415,6 +1434,7 @@ class AttachmentTile extends StatelessWidget {
     required this.attachmentTypes,
     required this.selectedAttachmentTypeId,
     required this.enabled,
+    required this.isLoadingAttachmentTypes,
     required this.onDelete,
     required this.onAttachmentTypeChanged,
   });
@@ -1423,6 +1443,7 @@ class AttachmentTile extends StatelessWidget {
   final List<AssociationAttachmentType> attachmentTypes;
   final String? selectedAttachmentTypeId;
   final bool enabled;
+  final bool isLoadingAttachmentTypes;
   final VoidCallback onDelete;
   final ValueChanged<String?> onAttachmentTypeChanged;
 
@@ -1477,6 +1498,7 @@ class AttachmentTile extends StatelessWidget {
               return isArabic ? attachmentType.nameAr : attachmentType.nameEn;
             },
             enabled: enabled,
+            isLoading: isLoadingAttachmentTypes,
             onChanged: onAttachmentTypeChanged,
           ),
         ],

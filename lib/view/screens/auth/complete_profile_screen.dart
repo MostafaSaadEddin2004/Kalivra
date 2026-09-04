@@ -953,6 +953,7 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
                               : null,
                         )
                       : null,
+                  isLoading: addressState.isLoadingCapitals,
                   onChanged: _onGovernorateChanged,
                 ),
                 SizedBox(height: 16.h),
@@ -979,6 +980,7 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
                               : null,
                         )
                       : null,
+                  isLoading: addressState.isLoadingCities,
                   onChanged: _onCityChanged,
                 ),
                 SizedBox(height: 16.h),
@@ -1004,6 +1006,7 @@ class _ProfileAddressFormFieldsState extends State<_ProfileAddressFormFields> {
                               : null,
                         )
                       : null,
+                  isLoading: addressState.isLoadingTowns,
                   onChanged: _onTownChanged,
                 ),
               ],

@@ -189,7 +189,7 @@ class _AuthOtpScreenState extends State<AuthOtpScreen> {
       child: Form(
         key: _formState,
         child: Scaffold(
-          appBar: ScreenAppBar(title: l10n.authOtpTitle),
+          appBar: ScreenAppBar(title: l10n.authOtpTitle,noBackArrow: false,),
           body: ListView(
             padding: EdgeInsets.fromLTRB(20.w, 24.h, 20.w, 32.h),
             children: [

@@ -664,7 +664,7 @@
   "associationRequestStatusApproved": "Approved",
   "associationRequestStatusRejected": "Rejected",
   "delete": "Delete",
-  "linkRequestsScreen": "Joining requests",
+  "linkRequestsScreen": "My requests",
   "whatsappNumber": "Whatsapp number",
   "contactInfo": "Contact info",
   "userLocationInfo": "Address info",

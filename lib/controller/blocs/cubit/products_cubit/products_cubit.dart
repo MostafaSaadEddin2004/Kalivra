@@ -14,10 +14,50 @@ class ProductsCubit extends Cubit<ProductsState> {
   Future<void> loadProducts() async {
     emit(ProductsLoading());
     try {
-      final products = await _productService.getProducts();
-      emit(ProductsLoaded(products: products));
+      final products = await _productService.getProducts(page: 1);
+      emit(
+        ProductsLoaded(
+          products: products,
+          currentPage: 1,
+          hasMoreProducts: products.isNotEmpty,
+        ),
+      );
     } catch (e) {
       emit(ProductsFailed(message: e.toString()));
+    }
+  }
+
+  Future<void> loadMoreProducts() async {
+    final current = state;
+    if (current is! ProductsLoaded ||
+        current.isLoadingMore ||
+        !current.hasMoreProducts) {
+      return;
+    }
+
+    emit(current.copyWith(isLoadingMore: true));
+
+    try {
+      final nextPage = current.currentPage + 1;
+      final products = await _productService.getProducts(page: nextPage);
+      final productsById = {
+        for (final product in current.products) product.id: product,
+      };
+
+      for (final product in products) {
+        productsById[product.id] = product;
+      }
+
+      emit(
+        current.copyWith(
+          products: productsById.values.toList(),
+          currentPage: nextPage,
+          hasMoreProducts: products.isNotEmpty,
+          isLoadingMore: false,
+        ),
+      );
+    } catch (_) {
+      emit(current.copyWith(isLoadingMore: false));
     }
   }
 

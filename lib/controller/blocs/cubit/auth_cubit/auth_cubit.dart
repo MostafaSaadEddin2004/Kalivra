@@ -96,6 +96,7 @@ class AuthCubit extends Cubit<AuthState> {
     String? token,
     String purpose = 'login',
   }) async {
+    emit(AuthLoading());
     try {
       final storedToken = token ?? await LocalStore.getToken();
       await _customerApiService.resendOtp(
@@ -104,8 +105,16 @@ class AuthCubit extends Cubit<AuthState> {
         token: storedToken,
         purpose: purpose,
       );
+      emit(ResendCodeSuccessed(message: AppLocalizations.of(context)!.authOtpResendSuccess));
+      CustomSnackBar.show(
+        context,
+        AppLocalizations.of(context)!.authOtpResendSuccess,
+      );
     } catch (e) {
-      rethrow;
+      emit(AuthFailed(message: e.toString()));  CustomSnackBar.show(
+        context,
+        e.toString(),
+      );
     }
   }
 
