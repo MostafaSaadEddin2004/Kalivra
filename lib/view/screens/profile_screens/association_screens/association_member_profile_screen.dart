@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
 import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
@@ -215,30 +216,62 @@ class _AssociationMemberProfileScreenState
                 ),
               );
             case AssociationLinkFailure():
-              return _MessageState(
-                icon: Icons.error_outline_rounded,
-                message: l10n.associationMemberLoadFailed,
-                actionLabel: l10n.retry,
-                onAction: _reload,
+              return Center(
+                child: Column(
+                  children: [
+                    _MessageState(
+                      icon: Icons.error_outline_rounded,
+                      message: l10n.associationMemberLoadFailed,
+                    ),
+
+                    SizedBox(height: 20.h),
+                    FilledButton(onPressed: _reload, child: Text(l10n.retry)),
+                  ],
+                ),
               );
             case AssociationProfileFetched():
               final profile = state.memberInfo;
               if (!profile.isAssociationMember && profile.isLinkedPerson) {
-                return _MessageState(
-                  icon: Icons.person_pin_circle_outlined,
-                  title: AppLocalizations.of(
-                    context,
-                  )!.associationMemberRequestAcceptedTitle,
-                  message: AppLocalizations.of(
-                    context,
-                  )!.associationMemberRequestAcceptedMessage,
-                  actionLabel: l10n.retry,
-                  onAction: _reload,
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _MessageState(
+                      icon: Icons.person_pin_circle_outlined,
+                      title: AppLocalizations.of(
+                        context,
+                      )!.associationMemberRequestAcceptedTitle,
+                      message: AppLocalizations.of(
+                        context,
+                      )!.associationMemberRequestAcceptedMessage,
+                    ),
+                    FilledButton(
+                      onPressed: () => context.push(
+                        AppRoutes.associationRequestsAndServices,
+                      ),
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8.h,
+                          horizontal: 16.w,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14.r),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        l10n.associaitionSendLinkRequest,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.secondaryFixed,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               }
               if (!profile.isAssociationMember) {
                 return Column(
-                  spacing: 16.h,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _MessageState(
                       icon: Icons.info_outline_rounded,
@@ -248,15 +281,17 @@ class _AssociationMemberProfileScreenState
                       message: AppLocalizations.of(
                         context,
                       )!.associationMemberNoMembershipMessage,
-                      actionLabel: l10n.retry,
-                      onAction: _reload,
                     ),
                     FilledButton(
                       onPressed: () => context.push(
                         AppRoutes.associationRequestsAndServices,
                       ),
+
                       style: FilledButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 8.h),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 8.h,
+                          horizontal: 16.w,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14.r),
                         ),
@@ -265,7 +300,7 @@ class _AssociationMemberProfileScreenState
                       child: Text(
                         l10n.associaitionSendLinkRequest,
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: AppColors.offWhite,
+                          color: theme.colorScheme.secondaryFixed,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -2067,7 +2102,7 @@ List<GalleryMediaItem> _galleryMediaItems({
   return mediaItems;
 }
 
-class _StagesTimeline extends StatelessWidget {
+class _StagesTimeline extends StatefulWidget {
   const _StagesTimeline({
     required this.title,
     required this.stages,
@@ -2079,26 +2114,181 @@ class _StagesTimeline extends StatelessWidget {
   final String emptyText;
 
   @override
+  State<_StagesTimeline> createState() => _StagesTimelineState();
+}
+
+class _StagesTimelineState extends State<_StagesTimeline> {
+  late final PageController _pageController;
+  int _selectedStageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+  }
+
+  @override
+  void didUpdateWidget(covariant _StagesTimeline oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_selectedStageIndex >= widget.stages.length) {
+      _selectedStageIndex = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _selectStage(int index) {
+    setState(() => _selectedStageIndex = index);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 240),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          widget.title,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w800,
           ),
         ),
         SizedBox(height: 10.h),
-        if (stages.isEmpty)
-          _EmptyInlineState(icon: Icons.construction_rounded, text: emptyText)
+        if (widget.stages.isEmpty)
+          _EmptyInlineState(
+            icon: Icons.construction_rounded,
+            text: widget.emptyText,
+          )
         else
-          ...List.generate(
-            stages.length,
-            (index) => _StageTile(stage: stages[index], index: index),
+          Column(
+            children: [
+              _StagePageSelector(
+                stages: widget.stages,
+                selectedIndex: _selectedStageIndex,
+                onSelected: _selectStage,
+              ),
+              SizedBox(height: 12.h),
+              SizedBox(
+                height: 760.h,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: widget.stages.length,
+                  onPageChanged: (index) {
+                    setState(() => _selectedStageIndex = index);
+                  },
+                  itemBuilder: (context, index) {
+                    return SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 2.w),
+                      child: _StageTile(
+                        stage: widget.stages[index],
+                        index: index,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
       ],
+    );
+  }
+}
+
+class _StagePageSelector extends StatelessWidget {
+  const _StagePageSelector({
+    required this.stages,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<StageModel> stages;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: List.generate(stages.length, (index) {
+          final stageName = stages[index].stageName?.trim() ?? '';
+          final label = stageName.isEmpty
+              ? '${AppLocalizations.of(context)!.associationMemberStage} ${index + 1}'
+              : stageName;
+          final isSelected = selectedIndex == index;
+
+          return Padding(
+            padding: EdgeInsetsDirectional.only(end: 10.w),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12.r),
+              onTap: () => onSelected(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                width: 112.w,
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? accent.withValues(alpha: 0.14)
+                      : theme.colorScheme.secondaryFixed.withValues(
+                          alpha: 0.08,
+                        ),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: isSelected
+                        ? accent
+                        : theme.colorScheme.onTertiaryFixed.withValues(
+                            alpha: 0.14,
+                          ),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '(${index + 1})',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: isSelected
+                            ? accent
+                            : theme.colorScheme.onTertiaryFixed,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark ? AppColors.taupe : AppColors.burgundy,
+                        fontWeight: isSelected
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                        height: 1.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
     );
   }
 }
@@ -2751,26 +2941,22 @@ class _MessageState extends StatelessWidget {
     required this.icon,
     this.title = '',
     required this.message,
-    required this.actionLabel,
-    required this.onAction,
   });
 
   final IconData icon;
   final String title;
   final String message;
-  final String actionLabel;
-  final VoidCallback onAction;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(24.w),
+        padding: EdgeInsets.all(16.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 56.r, color: theme.colorScheme.primary),
+            Icon(icon, size: 56.r, color: theme.colorScheme.primaryFixed),
             SizedBox(height: 16.h),
             if (title.trim().isNotEmpty) ...[
               Text(
@@ -2787,8 +2973,6 @@ class _MessageState extends StatelessWidget {
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge,
             ),
-            SizedBox(height: 20.h),
-            FilledButton(onPressed: onAction, child: Text(actionLabel)),
           ],
         ),
       ),
@@ -2839,8 +3023,8 @@ String _formatNullableNumber(num? value) {
 }
 
 String _formatNullableMoney(BuildContext context, num? value) {
-  final formatted = _formatNullableNumber(value);
-  if (formatted.isEmpty) return '';
+  if (value == null) return '';
+  final formatted = NumberFormat('#,##0.##', 'en_US').format(value);
   return '$formatted ${AppLocalizations.of(context)!.currencySYP}';
 }
 

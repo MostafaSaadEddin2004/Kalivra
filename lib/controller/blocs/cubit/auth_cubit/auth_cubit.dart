@@ -15,7 +15,7 @@ import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 export 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthLoading());
+  AuthCubit() : super(AuthInitial());
 
   final CustomerApiService _customerApiService = CustomerApiService();
 

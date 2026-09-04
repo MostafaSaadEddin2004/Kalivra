@@ -46,8 +46,9 @@ class AssociationApiService {
   Future<void> submitLinkRequest({
     String customerNote = '',
     String type = 'association-membership',
-    String requestedMembershipType = 'residential',
+    required String firstName,
     required String fatherName,
+    required String lastName,
     required String motherName,
     required String nationalId,
     required AssociationRequestAddress permanentAddress,
@@ -56,13 +57,12 @@ class AssociationApiService {
     String? claimedMembershipNumber,
     String? claimedPriorityNumber,
     String? claimedBuildingNumber,
-    String? claimedUnitNumber,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final data = <String, dynamic>{
-      'requested_membership_type': requestedMembershipType,
-      'customer_note': customerNote,
+      'first_name': firstName,
       'father_name': fatherName,
+      'last_name': lastName,
       'mother_name': motherName,
       'national_id': nationalId,
       'addresses': {
@@ -72,17 +72,26 @@ class AssociationApiService {
             .map((address) => address.toMap(includeDetails: true))
             .toList(),
       },
-      'claimed_membership_number': claimedMembershipNumber,
-      'claimed_priority_number': claimedPriorityNumber,
-      'claimed_building_number': claimedBuildingNumber,
-      'claimed_unit_number': claimedUnitNumber,
+      'customer_note': customerNote,
     };
+
+    void addOptionalField(String key, String? value) {
+      final trimmedValue = value?.trim();
+      if (trimmedValue == null || trimmedValue.isEmpty) return;
+      data[key] = trimmedValue;
+    }
+
+    addOptionalField('claimed_membership_number', claimedMembershipNumber);
+    addOptionalField('claimed_priority_number', claimedPriorityNumber);
+    addOptionalField('claimed_building_number', claimedBuildingNumber);
 
     final requestDocuments = attachments;
     for (var i = 0; i < requestDocuments.length; i++) {
       final attachment = requestDocuments[i];
-      data['documents[$i][document_definition_id]'] =
-          attachment.attachmentTypeId;
+      addOptionalField(
+        'documents[$i][document_definition_id]',
+        attachment.attachmentTypeId,
+      );
       data['documents[$i][document]'] = await MultipartFile.fromFile(
         attachment.file.path,
         filename: CustomerApiService.basename(attachment.file.path),
@@ -95,16 +104,16 @@ class AssociationApiService {
         data: FormData.fromMap(data),
       );
     } catch (e) {
-      throw Exception('Failed to submit link request: $e');
+      throw Exception(e);
     }
   }
 
   Future<void> submitNormalRequest({
     required String type,
-    required String customerNot,
+    required String customerNote,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
-    final data = <String, dynamic>{'type': type, 'customer_note': customerNot};
+    final data = <String, dynamic>{'type': type, 'customer_note': customerNote};
     final requestDocuments = attachments;
     for (var i = 0; i < requestDocuments.length; i++) {
       final attachment = requestDocuments[i];
@@ -117,7 +126,7 @@ class AssociationApiService {
     try {
       await _client.post('customer/requests', data: FormData.fromMap(data));
     } catch (e) {
-      throw Exception('Failed to submit normal request: $e');
+      throw Exception(e);
     }
   }
 

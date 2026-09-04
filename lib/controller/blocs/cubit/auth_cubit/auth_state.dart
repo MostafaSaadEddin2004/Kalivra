@@ -2,6 +2,7 @@ import 'package:kalivra/model/customer/customer_api_model.dart';
 
 abstract class AuthState {}
 
+final class AuthInitial extends AuthState {}
 final class AuthLoading extends AuthState {}
 
 final class AuthSuccessed extends AuthState {

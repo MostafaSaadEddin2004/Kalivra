@@ -47,7 +47,9 @@ class _AssociationRequestsAndServicesScreenState
 
   final _messageController = TextEditingController();
 
+  final _firstNameController = TextEditingController();
   final _fatherNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _motherNameController = TextEditingController();
   final _nationalIdController = TextEditingController();
 
@@ -59,8 +61,7 @@ class _AssociationRequestsAndServicesScreenState
 
   final _membershipNumberController = TextEditingController();
   final _priorityNumberController = TextEditingController();
-  final _projectNameController = TextEditingController();
-  final _housingUnitController = TextEditingController();
+  final _claimedBuildingNumberController = TextEditingController();
   final _villageController = TextEditingController();
 
   final List<AssociationLinkAttachment> _attachments = [];
@@ -99,7 +100,9 @@ class _AssociationRequestsAndServicesScreenState
 
     _messageController.dispose();
 
+    _firstNameController.dispose();
     _fatherNameController.dispose();
+    _lastNameController.dispose();
     _motherNameController.dispose();
     _nationalIdController.dispose();
 
@@ -114,8 +117,7 @@ class _AssociationRequestsAndServicesScreenState
 
     _membershipNumberController.dispose();
     _priorityNumberController.dispose();
-    _projectNameController.dispose();
-    _housingUnitController.dispose();
+    _claimedBuildingNumberController.dispose();
     _villageController.dispose();
 
     super.dispose();
@@ -133,9 +135,9 @@ class _AssociationRequestsAndServicesScreenState
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value.trim());
   }
 
-  String? _validateRequiredName(String? value, AppLocalizations l10n) {
+  String? _validateRequiredField(String? value, AppLocalizations l10n) {
     if (value == null || value.trim().isEmpty) {
-      return l10n.associationLinkEnterFirstName;
+      return l10n.required;
     }
 
     return null;
@@ -337,34 +339,32 @@ class _AssociationRequestsAndServicesScreenState
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    try {
-      if (_isMembershipRequest) {
-        await _associationLinkCubit.submitLinkRequest(
-          context: context,
-          customerNote: _messageController.text.trim(),
-          type: _membershipRequestType,
-          fatherName: _fatherNameController.text.trim(),
-          motherName: _motherNameController.text.trim(),
-          nationalId: _nationalIdController.text.trim(),
-          permanentAddress: _permanentAddress(),
-          currentAddress: _currentRequestAddress(),
-          additionalAddresses: _additionalRequestAddresses(),
-          claimedMembershipNumber: _membershipNumberController.text.trim(),
-          claimedPriorityNumber: _priorityNumberController.text.trim(),
-          claimedBuildingNumber: _buildingController.text.trim(),
-          claimedUnitNumber: _housingUnitController.text.trim(),
-          attachments: _attachmentsWithTypes(),
-        );
-      } else {
-        await _associationLinkCubit.submitNormalRequest(
-          context: context,
-          type: _requestType!,
-          customerNote: _messageController.text.trim(),
-          attachments: _attachmentsWithTypes(),
-        );
-      }
-    } catch (e) {
-      CustomSnackBar.show(context, e.toString());
+
+    if (_isMembershipRequest) {
+      await _associationLinkCubit.submitLinkRequest(
+        context: context,
+        customerNote: _messageController.text.trim(),
+        type: _membershipRequestType,
+        firstName: _firstNameController.text.trim(),
+        fatherName: _fatherNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+        motherName: _motherNameController.text.trim(),
+        nationalId: _nationalIdController.text.trim(),
+        permanentAddress: _permanentAddress(),
+        currentAddress: _currentRequestAddress(),
+        additionalAddresses: _additionalRequestAddresses(),
+        claimedMembershipNumber: _membershipNumberController.text.trim(),
+        claimedPriorityNumber: _priorityNumberController.text.trim(),
+        claimedBuildingNumber: _claimedBuildingNumberController.text.trim(),
+        attachments: _attachmentsWithTypes(),
+      );
+    } else {
+      await _associationLinkCubit.submitNormalRequest(
+        context: context,
+        type: _requestType!,
+        customerNote: _messageController.text.trim(),
+        attachments: _attachmentsWithTypes(),
+      );
     }
   }
 
@@ -533,7 +533,9 @@ class _AssociationRequestsAndServicesScreenState
                     _AssociationLinkRequestSection(
                       isLocked: _isLocked,
                       hasSelectedGeneralRequest: _hasSelectedGeneralRequest,
+                      firstNameController: _firstNameController,
                       fatherNameController: _fatherNameController,
+                      lastNameController: _lastNameController,
                       motherNameController: _motherNameController,
                       nationalIdController: _nationalIdController,
                       customerNoteController: _messageController,
@@ -548,8 +550,8 @@ class _AssociationRequestsAndServicesScreenState
                       additionalAddresses: _additionalAddresses,
                       membershipNumberController: _membershipNumberController,
                       priorityNumberController: _priorityNumberController,
-                      projectNameController: _projectNameController,
-                      housingUnitController: _housingUnitController,
+                      claimedBuildingNumberController:
+                          _claimedBuildingNumberController,
                       villageController: _villageController,
                       attachments: _attachments,
                       attachmentTypes: _attachmentTypes,
@@ -564,8 +566,8 @@ class _AssociationRequestsAndServicesScreenState
                       onPickAttachment: _pickAttachment,
                       onRemoveAttachment: _removeAttachment,
                       onAttachmentTypeChanged: _onAttachmentTypeChanged,
-                      validateRequiredName: (value) =>
-                          _validateRequiredName(value, l10n),
+                      validateRequiredField: (value) =>
+                          _validateRequiredField(value, l10n),
                       validateRequiredPhone: (value) =>
                           _validateRequiredPhone(value, l10n),
                       validateOptionalPhone: (value) =>
@@ -596,7 +598,9 @@ class _AssociationRequestsAndServicesScreenState
 
 class _AssociationLinkRequestSection extends StatefulWidget {
   const _AssociationLinkRequestSection({
+    required this.firstNameController,
     required this.fatherNameController,
+    required this.lastNameController,
     required this.motherNameController,
     required this.nationalIdController,
     required this.customerNoteController,
@@ -611,8 +615,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.additionalAddresses,
     required this.membershipNumberController,
     required this.priorityNumberController,
-    required this.projectNameController,
-    required this.housingUnitController,
+    required this.claimedBuildingNumberController,
     required this.villageController,
     required this.attachments,
     required this.attachmentTypes,
@@ -626,7 +629,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.onPickAttachment,
     required this.onRemoveAttachment,
     required this.onAttachmentTypeChanged,
-    required this.validateRequiredName,
+    required this.validateRequiredField,
     required this.validateRequiredPhone,
     required this.validateOptionalPhone,
     required this.validateOptionalEmail,
@@ -635,7 +638,9 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.isLocked,
   });
 
+  final TextEditingController firstNameController;
   final TextEditingController fatherNameController;
+  final TextEditingController lastNameController;
   final TextEditingController motherNameController;
   final TextEditingController nationalIdController;
   final TextEditingController customerNoteController;
@@ -653,8 +658,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
 
   final TextEditingController membershipNumberController;
   final TextEditingController priorityNumberController;
-  final TextEditingController projectNameController;
-  final TextEditingController housingUnitController;
+  final TextEditingController claimedBuildingNumberController;
   final TextEditingController villageController;
 
   final List<AssociationLinkAttachment> attachments;
@@ -672,7 +676,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
   final ValueChanged<String> onRemoveAttachment;
   final void Function(String id, String? value) onAttachmentTypeChanged;
 
-  final String? Function(String?) validateRequiredName;
+  final String? Function(String?) validateRequiredField;
   final String? Function(String?) validateRequiredPhone;
   final String? Function(String?) validateOptionalPhone;
   final String? Function(String?) validateOptionalEmail;
@@ -701,23 +705,39 @@ class _AssociationLinkRequestSectionState
           icon: Icons.person_outline_rounded,
           children: [
             AppTextField(
+              controller: widget.firstNameController,
+              label: l10n.firstName,
+              textCapitalization: TextCapitalization.words,
+              validator: widget.validateRequiredField,
+            ),
+            widget.fieldSpacer(),
+            AppTextField(
+              controller: widget.lastNameController,
+              label: l10n.lastName,
+              textCapitalization: TextCapitalization.words,
+              validator: widget.validateRequiredField,
+            ),
+
+            widget.fieldSpacer(),
+            AppTextField(
               controller: widget.fatherNameController,
               label: l10n.associationLinkFatherName,
               textCapitalization: TextCapitalization.words,
-              validator: widget.validateRequiredName,
+              validator: widget.validateRequiredField,
             ),
             widget.fieldSpacer(),
             AppTextField(
               controller: widget.motherNameController,
               label: l10n.associationLinkMotherName,
               textCapitalization: TextCapitalization.words,
-              validator: widget.validateRequiredName,
+              validator: widget.validateRequiredField,
             ),
             widget.fieldSpacer(),
             AppTextField(
               controller: widget.nationalIdController,
               label: l10n.associationLinkNationalId,
               keyboardType: TextInputType.number,
+              validator: widget.validateRequiredField,
             ),
           ],
         ),
@@ -758,9 +778,6 @@ class _AssociationLinkRequestSectionState
                     controller: widget.membershipNumberController,
                     label: l10n.associationLinkMembershipNumber,
                     keyboardType: TextInputType.number,
-                    validator: (value) => value == null || value.trim().isEmpty
-                        ? l10n.required
-                        : null,
                   ),
                 ),
                 SizedBox(width: 16.w),
@@ -769,24 +786,15 @@ class _AssociationLinkRequestSectionState
                     controller: widget.priorityNumberController,
                     label: l10n.associationLinkPriorityNumber,
                     keyboardType: TextInputType.number,
-                    validator: (value) => value == null || value.trim().isEmpty
-                        ? l10n.required
-                        : null,
                   ),
                 ),
               ],
             ),
             widget.fieldSpacer(),
             AppTextField(
-              controller: widget.projectNameController,
-              label: l10n.associationLinkProjectName,
-            ),
-            widget.fieldSpacer(),
-            AppTextField(
-              controller: widget.housingUnitController,
-              label: l10n.associationLinkHousingUnit,
-              validator: (value) =>
-                  value == null || value.trim().isEmpty ? l10n.required : null,
+              controller: widget.claimedBuildingNumberController,
+              label: l10n.associationMemberBuildingNumber,
+              keyboardType: TextInputType.number,
             ),
             widget.fieldSpacer(),
           ],
@@ -802,6 +810,7 @@ class _AssociationLinkRequestSectionState
               enabled: !widget.isLocked,
               maxLines: 4,
               textInputAction: TextInputAction.newline,
+              validator: widget.validateRequiredField,
             ),
           ],
         ),
@@ -934,6 +943,7 @@ class _AssociationAddressesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -946,6 +956,7 @@ class _AssociationAddressesSection extends StatelessWidget {
           streetController: streetController,
           streetNumberController: streetNumberController,
           buildingController: buildingController,
+          isRequired: true,
           isBuildingRequired: true,
           enabled: enabled,
           fieldSpacer: fieldSpacer,
@@ -964,6 +975,7 @@ class _AssociationAddressesSection extends StatelessWidget {
             streetController: currentAddress.streetController,
             streetNumberController: currentAddress.streetNumberController,
             buildingController: currentAddress.buildingController,
+            isRequired: false,
             isBuildingRequired: false,
             enabled: enabled,
             fieldSpacer: fieldSpacer,
@@ -994,6 +1006,7 @@ class _AssociationAddressesSection extends StatelessWidget {
             streetNumberController:
                 additionalAddresses[index].streetNumberController,
             buildingController: additionalAddresses[index].buildingController,
+            isRequired: false,
             isBuildingRequired: false,
             labelController: additionalAddresses[index].labelController,
             typeController: additionalAddresses[index].typeController,
@@ -1018,11 +1031,18 @@ class _AssociationAddressesSection extends StatelessWidget {
           SizedBox(height: 14.h),
           OutlinedButton.icon(
             onPressed: onAddAddress,
-            icon: const Icon(Icons.add_rounded),
+            icon: Icon(
+              Icons.add_rounded,
+              color: theme.colorScheme.primaryFixed,
+            ),
             label: Text(
               hasCurrentAddress
                   ? l10n.associationAdditionalAddress
                   : l10n.associationAddCurrentAddress,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primaryFixed,
+              ),
             ),
           ),
         ],
@@ -1041,6 +1061,7 @@ class _AddressFormFields extends StatefulWidget {
     required this.streetController,
     required this.streetNumberController,
     required this.buildingController,
+    required this.isRequired,
     required this.isBuildingRequired,
     required this.enabled,
     required this.fieldSpacer,
@@ -1060,6 +1081,7 @@ class _AddressFormFields extends StatefulWidget {
   final TextEditingController streetController;
   final TextEditingController streetNumberController;
   final TextEditingController buildingController;
+  final bool isRequired;
   final bool isBuildingRequired;
   final TextEditingController? labelController;
   final TextEditingController? typeController;
@@ -1227,6 +1249,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                         )
                       : null,
                   onChanged: _onGovernorateChanged,
+                  validator: widget.isRequired ? _requiredValue : null,
                 ),
                 SizedBox(height: 16.h),
                 AssociationDropdownField(
@@ -1253,6 +1276,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                         )
                       : null,
                   onChanged: _onCityChanged,
+                  validator: widget.isRequired ? _requiredValue : null,
                 ),
                 SizedBox(height: 16.h),
                 AssociationDropdownField(
@@ -1278,6 +1302,7 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
                         )
                       : null,
                   onChanged: _onTownChanged,
+                  validator: widget.isRequired ? _requiredValue : null,
                 ),
               ],
             );
@@ -1288,18 +1313,21 @@ class _AddressFormFieldsState extends State<_AddressFormFields> {
           controller: widget.villageController,
           label: l10n.associationLinkVillage,
           enabled: widget.enabled,
+          validator: widget.isRequired ? _requiredValue : null,
         ),
         widget.fieldSpacer(),
         AppTextField(
           controller: widget.streetController,
           label: l10n.associationLinkStreet,
           enabled: widget.enabled,
+          validator: widget.isRequired ? _requiredValue : null,
         ),
         widget.fieldSpacer(),
         AppTextField(
           controller: widget.streetNumberController,
           label: l10n.associationStreetNumber,
           enabled: widget.enabled,
+          validator: widget.isRequired ? _requiredValue : null,
         ),
         widget.fieldSpacer(),
         AppTextField(
@@ -1364,8 +1392,15 @@ class _RequestAttachmentsSection extends StatelessWidget {
           SizedBox(height: 14.h),
           OutlinedButton.icon(
             onPressed: onPickAttachment,
-            icon: const Icon(Icons.add_rounded),
-            label: Text(l10n.associationLinkAddAttachment),
+            icon:  Icon(Icons.add_rounded,
+                color: theme.colorScheme.primaryFixed,),
+            label: Text(
+              l10n.associationLinkAddAttachment,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primaryFixed,
+              ),
+            ),
           ),
         ],
       ],

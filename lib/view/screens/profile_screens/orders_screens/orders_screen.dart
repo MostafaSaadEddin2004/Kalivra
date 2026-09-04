@@ -94,19 +94,11 @@ class _OrdersList extends StatelessWidget {
       itemBuilder: (context, index) {
         return _OrderCard(
           order: orders[index],
-          index: getIndexReversed(orders.length),
+          index: orders.length - index - 1,
         );
       },
     );
   }
-}
-
-int getIndexReversed(int length) {
-  int index = 0;
-  for (int i = 0; i < length;) {
-    index == i;
-  }
-  return index;
 }
 
 class _OrderCard extends StatefulWidget {

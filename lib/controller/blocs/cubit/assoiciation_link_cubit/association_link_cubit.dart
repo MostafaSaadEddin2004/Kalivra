@@ -97,7 +97,9 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     required BuildContext context,
     String customerNote = '',
     required String type,
+    required String firstName,
     required String fatherName,
+    required String lastName,
     required String motherName,
     required String nationalId,
     required AssociationRequestAddress permanentAddress,
@@ -106,7 +108,6 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     String? claimedMembershipNumber,
     String? claimedPriorityNumber,
     String? claimedBuildingNumber,
-    String? claimedUnitNumber,
     List<AssociationLinkAttachment> attachments = const [],
   }) async {
     final l10n = AppLocalizations.of(context)!;
@@ -115,7 +116,9 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
       await _api.submitLinkRequest(
         customerNote: customerNote,
         type: type,
+        firstName: firstName,
         fatherName: fatherName,
+        lastName: lastName,
         motherName: motherName,
         nationalId: nationalId,
         permanentAddress: permanentAddress,
@@ -124,7 +127,6 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
         claimedMembershipNumber: claimedMembershipNumber,
         claimedPriorityNumber: claimedPriorityNumber,
         claimedBuildingNumber: claimedBuildingNumber,
-        claimedUnitNumber: claimedUnitNumber,
         attachments: attachments,
       );
       emit(
@@ -150,7 +152,7 @@ class AssociationLinkCubit extends Cubit<AssociationLinkState> {
     try {
       await _api.submitNormalRequest(
         type: type,
-        customerNot: customerNote,
+        customerNote: customerNote,
         attachments: attachments,
       );
       emit(
