@@ -922,7 +922,9 @@ class AssociationProject {
     this.imageUrl = '',
     this.images = const [],
     this.galleryImages = const [],
+    this.galleryItems = const [],
     this.videos = const [],
+    this.videoItems = const [],
     this.latitude,
     this.longitude,
     this.governorate = '',
@@ -964,7 +966,9 @@ class AssociationProject {
   final String imageUrl;
   final List<String> images;
   final List<String> galleryImages;
+  final List<AssociationMediaItem> galleryItems;
   final List<String> videos;
+  final List<AssociationMediaItem> videoItems;
   final num? latitude;
   final num? longitude;
   final String governorate;
@@ -1025,12 +1029,24 @@ class AssociationProject {
       imageUrl: _stringValue(json['image_url']),
       images: _mediaUrlList(json['images']),
       galleryImages: _mediaUrlList(json['gallery_images']),
+      galleryItems: _mergedAssociationMediaItems([
+        json['image_url'],
+        json['images'],
+        json['gallery_images'],
+        json['gallery_items'],
+      ], isVideo: false),
       videos: _mergedMediaUrlList([
         json['videos'],
         json['gallery_videos'],
         json['media_videos'],
         json['video_urls'],
       ]),
+      videoItems: _mergedAssociationMediaItems([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ], isVideo: true),
       latitude: _numValue(json['latitude']),
       longitude: _numValue(json['longitude']),
       governorate: _stringValue(json['governorate']),
@@ -1075,7 +1091,9 @@ class AssociationProject {
       'image_url': imageUrl,
       'images': images,
       'gallery_images': galleryImages,
+      'gallery_items': galleryItems.map((item) => item.toJson()).toList(),
       'videos': videos,
+      'video_items': videoItems.map((item) => item.toJson()).toList(),
       'latitude': latitude,
       'longitude': longitude,
       'governorate': governorate,
@@ -1122,13 +1140,16 @@ class AssociationBuilding {
     this.buildingPlanUrl,
     this.floorPlanImages = const [],
     this.galleryImages = const [],
+    this.galleryItems = const [],
     this.videos = const [],
+    this.videoItems = const [],
     this.specifications,
     this.completionPercentage,
     this.totalUnits,
     this.availableUnits,
     this.allocatedUnits,
     this.deliveredUnits,
+    this.units = const [],
     this.stages = const [],
   });
 
@@ -1145,13 +1166,16 @@ class AssociationBuilding {
   final String? buildingPlanUrl;
   final List<String> floorPlanImages;
   final List<String> galleryImages;
+  final List<AssociationMediaItem> galleryItems;
   final List<String> videos;
+  final List<AssociationMediaItem> videoItems;
   final String? specifications;
   final num? completionPercentage;
   final int? totalUnits;
   final int? availableUnits;
   final int? allocatedUnits;
   final int? deliveredUnits;
+  final List<AssociationUnit> units;
   final List<StageModel> stages;
 
   String get displayName {
@@ -1183,18 +1207,37 @@ class AssociationBuilding {
       buildingPlanUrl: _stringOrNull(json['building_plan_url']),
       floorPlanImages: _mediaUrlList(json['floor_plan_images']),
       galleryImages: _mediaUrlList(json['gallery_images']),
+      galleryItems: _mergedAssociationMediaItems([
+        json['building_plan_url'],
+        json['floor_plan_images'],
+        json['gallery_images'],
+        json['gallery_items'],
+      ], isVideo: false),
       videos: _mergedMediaUrlList([
         json['videos'],
         json['gallery_videos'],
         json['media_videos'],
         json['video_urls'],
       ]),
+      videoItems: _mergedAssociationMediaItems([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ], isVideo: true),
       specifications: _stringOrNull(json['specifications']),
       completionPercentage: _numValue(json['completion_percentage']),
       totalUnits: _intValue(json['total_units']),
       availableUnits: _intValue(json['available_units']),
       allocatedUnits: _intValue(json['allocated_units']),
       deliveredUnits: _intValue(json['delivered_units']),
+      units: _listOf(
+        json['units'] ??
+            json['residential_units'] ??
+            json['housing_units'] ??
+            json['apartments'],
+        AssociationUnit.fromJson,
+      ),
       stages: _listOf(json['stages'], StageModel.fromJson),
     );
   }
@@ -1214,13 +1257,16 @@ class AssociationBuilding {
       'building_plan_url': buildingPlanUrl,
       'floor_plan_images': floorPlanImages,
       'gallery_images': galleryImages,
+      'gallery_items': galleryItems.map((item) => item.toJson()).toList(),
       'videos': videos,
+      'video_items': videoItems.map((item) => item.toJson()).toList(),
       'specifications': specifications,
       'completion_percentage': completionPercentage,
       'total_units': totalUnits,
       'available_units': availableUnits,
       'allocated_units': allocatedUnits,
       'delivered_units': deliveredUnits,
+      'units': units.map((item) => item.toJson()).toList(),
       'stages': stages.map((item) => item.toJson()).toList(),
     };
   }
@@ -1241,7 +1287,9 @@ class AssociationUnit {
     this.unitPlanUrl = '',
     this.galleryImages = const [],
     this.images = const [],
+    this.galleryItems = const [],
     this.videos = const [],
+    this.videoItems = const [],
     this.status = '',
     this.statusLabel = '',
     this.building,
@@ -1260,7 +1308,9 @@ class AssociationUnit {
   final String unitPlanUrl;
   final List<String> galleryImages;
   final List<String> images;
+  final List<AssociationMediaItem> galleryItems;
   final List<String> videos;
+  final List<AssociationMediaItem> videoItems;
   final String status;
   final String statusLabel;
   final AssociationBuilding? building;
@@ -1278,24 +1328,38 @@ class AssociationUnit {
       id: _intValue(json['id']),
       buildingId: _intValue(json['building_id']),
       unitNumber: _stringValue(json['unit_number']),
-      floorNumber: _intValue(json['floor_number']),
+      floorNumber: _intValue(json['floor_number'] ?? json['floor']),
       orientation: _stringValue(json['orientation']),
       orientationLabel: _stringValue(json['orientation_label']),
-      area: _numValue(json['area']),
+      area: _numValue(json['area'] ?? json['unit_area']),
       gardenTerraceArea: _numValue(json['garden_terrace_area']),
       price: _numValue(json['price']),
       specifications: _stringValue(json['specifications']),
       unitPlanUrl: _stringValue(json['unit_plan_url']),
       galleryImages: _mediaUrlList(json['gallery_images']),
       images: _mediaUrlList(json['images']),
+      galleryItems: _mergedAssociationMediaItems([
+        json['unit_plan_url'],
+        json['images'],
+        json['gallery_images'],
+        json['gallery_items'],
+      ], isVideo: false),
       videos: _mergedMediaUrlList([
         json['videos'],
         json['gallery_videos'],
         json['media_videos'],
         json['video_urls'],
       ]),
-      status: _stringValue(json['status']),
-      statusLabel: _stringValue(json['status_label']),
+      videoItems: _mergedAssociationMediaItems([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ], isVideo: true),
+      status: _stringValue(json['status'] ?? json['unit_status']),
+      statusLabel: _stringValue(
+        json['status_label'] ?? json['unit_status_label'],
+      ),
       building: _mapOrNull(json['building'], AssociationBuilding.fromJson),
     );
   }
@@ -1315,10 +1379,103 @@ class AssociationUnit {
       'unit_plan_url': unitPlanUrl,
       'gallery_images': galleryImages,
       'images': images,
+      'gallery_items': galleryItems.map((item) => item.toJson()).toList(),
       'videos': videos,
+      'video_items': videoItems.map((item) => item.toJson()).toList(),
       'status': status,
       'status_label': statusLabel,
       'building': building?.toJson(),
+    };
+  }
+}
+
+class AssociationMediaItem {
+  const AssociationMediaItem({
+    required this.url,
+    required this.isVideo,
+    this.thumbnailUrl = '',
+    this.description = '',
+    this.date = '',
+  });
+
+  final String url;
+  final bool isVideo;
+  final String thumbnailUrl;
+  final String description;
+  final String date;
+
+  bool get hasDetails => description.isNotEmpty || date.isNotEmpty;
+
+  factory AssociationMediaItem.fromJson(
+    Map<String, dynamic> json, {
+    bool? isVideo,
+  }) {
+    final url = _firstStringValue([
+      json['url'],
+      json['image_url'],
+      json['video_url'],
+      json['file_url'],
+      json['download_url'],
+      json['preview_url'],
+      json['full_url'],
+      json['media_url'],
+      json['src'],
+      json['path'],
+      json['file'],
+    ]);
+    final isVideoValue =
+        isVideo ??
+        (_boolValue(json['is_video']) ||
+            _stringValue(json['type']).toLowerCase().startsWith('video/') ||
+            _looksLikeVideoUrl(url));
+
+    return AssociationMediaItem(
+      url: url,
+      isVideo: isVideoValue,
+      thumbnailUrl: _firstStringValue([
+        json['thumbnail_url'],
+        json['thumbnail'],
+        json['preview_image_url'],
+        json['poster_url'],
+        json['poster'],
+      ]),
+      description: _firstStringValue([
+        json['description'],
+        json['caption'],
+        json['title'],
+        json['notes'],
+      ]),
+      date: _firstStringValue([
+        json['date'],
+        json['taken_at'],
+        json['captured_at'],
+        json['created_at'],
+        json['updated_at'],
+      ]),
+    );
+  }
+
+  factory AssociationMediaItem.fromUrl(String url, {required bool isVideo}) {
+    return AssociationMediaItem(url: url.trim(), isVideo: isVideo);
+  }
+
+  AssociationMediaItem mergeDetailsFrom(AssociationMediaItem other) {
+    return AssociationMediaItem(
+      url: url,
+      isVideo: isVideo || other.isVideo,
+      thumbnailUrl: thumbnailUrl.isNotEmpty ? thumbnailUrl : other.thumbnailUrl,
+      description: description.isNotEmpty ? description : other.description,
+      date: date.isNotEmpty ? date : other.date,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'url': url,
+      'is_video': isVideo,
+      'thumbnail_url': thumbnailUrl,
+      'description': description,
+      'date': date,
     };
   }
 }
@@ -1331,7 +1488,9 @@ class StageModel {
     this.imageUrl,
     this.images = const [],
     this.galleryImages = const [],
+    this.galleryItems = const [],
     this.videos = const [],
+    this.videoItems = const [],
     this.startDate,
     this.endDate,
     this.completionPercentage,
@@ -1346,7 +1505,9 @@ class StageModel {
   final String? imageUrl;
   final List<String> images;
   final List<String> galleryImages;
+  final List<AssociationMediaItem> galleryItems;
   final List<String> videos;
+  final List<AssociationMediaItem> videoItems;
   final String? startDate;
   final String? endDate;
   final num? completionPercentage;
@@ -1380,12 +1541,27 @@ class StageModel {
             json['photos'] ??
             json['media'],
       ),
+      galleryItems: _mergedAssociationMediaItems([
+        json['image_url'] ?? json['image'] ?? json['cover_image'],
+        json['images'],
+        json['gallery_images'],
+        json['gallery_items'],
+        json['gallery'],
+        json['photos'],
+        json['media'],
+      ], isVideo: false),
       videos: _mergedMediaUrlList([
         json['videos'],
         json['gallery_videos'],
         json['media_videos'],
         json['video_urls'],
       ]),
+      videoItems: _mergedAssociationMediaItems([
+        json['videos'],
+        json['gallery_videos'],
+        json['media_videos'],
+        json['video_urls'],
+      ], isVideo: true),
       startDate: _stringOrNull(json['start_date']),
       endDate: _stringOrNull(json['end_date']),
       completionPercentage: _numValue(json['completion_percentage']),
@@ -1403,7 +1579,9 @@ class StageModel {
       'image_url': imageUrl,
       'images': images,
       'gallery_images': galleryImages,
+      'gallery_items': galleryItems.map((item) => item.toJson()).toList(),
       'videos': videos,
+      'video_items': videoItems.map((item) => item.toJson()).toList(),
       'start_date': startDate,
       'end_date': endDate,
       'completion_percentage': completionPercentage,
@@ -1629,9 +1807,63 @@ List<String> _mergedMediaUrlList(List<Object?> sources) {
   return sources.expand(_mediaUrlList).toSet().toList();
 }
 
+List<AssociationMediaItem> _associationMediaItems(
+  Object? raw, {
+  bool? isVideo,
+}) {
+  if (raw is List) {
+    return raw
+        .expand((item) => _associationMediaItems(item, isVideo: isVideo))
+        .toList();
+  }
+
+  if (raw is Map) {
+    final item = AssociationMediaItem.fromJson(
+      Map<String, dynamic>.from(raw),
+      isVideo: isVideo,
+    );
+    return item.url.isEmpty ? const [] : [item];
+  }
+
+  final url = _stringValue(raw);
+  if (url.isEmpty) return const [];
+  return [
+    AssociationMediaItem.fromUrl(
+      url,
+      isVideo: isVideo ?? _looksLikeVideoUrl(url),
+    ),
+  ];
+}
+
+List<AssociationMediaItem> _mergedAssociationMediaItems(
+  List<Object?> sources, {
+  bool? isVideo,
+}) {
+  final itemsByUrl = <String, AssociationMediaItem>{};
+
+  for (final item in sources.expand(
+    (source) => _associationMediaItems(source, isVideo: isVideo),
+  )) {
+    final existing = itemsByUrl[item.url];
+    itemsByUrl[item.url] = existing == null
+        ? item
+        : existing.mergeDetailsFrom(item);
+  }
+
+  return itemsByUrl.values.toList();
+}
+
 Map<String, String> _stringMap(Object? raw) {
   if (raw is! Map) return const {};
   return raw.map((key, value) => MapEntry(key.toString(), _stringValue(value)));
+}
+
+String _firstStringValue(List<Object?> values) {
+  for (final value in values) {
+    final text = _stringValue(value);
+    if (text.isNotEmpty) return text;
+  }
+  return '';
 }
 
 String _stringValue(Object? value) {
@@ -1659,6 +1891,27 @@ bool? _boolOrNull(Object? value) {
   if (text == 'true' || text == '1' || text == 'yes') return true;
   if (text == 'false' || text == '0' || text == 'no') return false;
   return null;
+}
+
+bool _looksLikeVideoUrl(String url) {
+  final normalized = url.split('?').first.split('#').first.trim().toLowerCase();
+  const videoExtensions = [
+    '.mp4',
+    '.mov',
+    '.m4v',
+    '.webm',
+    '.mkv',
+    '.avi',
+    '.wmv',
+    '.flv',
+    '.3gp',
+    '.3gpp',
+    '.mpeg',
+    '.mpg',
+    '.ogv',
+  ];
+
+  return videoExtensions.any(normalized.endsWith);
 }
 
 int? _intValue(Object? value) {

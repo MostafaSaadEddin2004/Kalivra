@@ -218,12 +218,12 @@ class _AssociationMemberProfileScreenState
             case AssociationLinkFailure():
               return Center(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _MessageState(
                       icon: Icons.error_outline_rounded,
                       message: l10n.associationMemberLoadFailed,
                     ),
-
                     SizedBox(height: 20.h),
                     FilledButton(onPressed: _reload, child: Text(l10n.retry)),
                   ],
@@ -376,13 +376,9 @@ class _AssociationNewsFeedSlider extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: isDark
-              ? AppColors.black.withValues(alpha: 0.52)
-              : AppColors.goldLight.withValues(alpha: 0.22),
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.05),
           border: Border.all(
-            color: isDark
-                ? AppColors.goldLight.withValues(alpha: 0.22)
-                : AppColors.goldDark.withValues(alpha: 0.24),
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.5),
           ),
           borderRadius: BorderRadius.circular(16.r),
         ),
@@ -392,14 +388,12 @@ class _AssociationNewsFeedSlider extends StatelessWidget {
               width: 42.r,
               height: 42.r,
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.goldLight.withValues(alpha: 0.16)
-                    : AppColors.burgundy.withValues(alpha: 0.08),
+                color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.newspaper_rounded,
-                color: isDark ? AppColors.goldLight : AppColors.burgundy,
+                color: theme.colorScheme.onTertiaryFixed,
                 size: 22.r,
               ),
             ),
@@ -584,14 +578,16 @@ class _MembershipTabs extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: selected
                       ? color.withValues(alpha: isDark ? 0.18 : 0.1)
-                      : (isDark
-                            ? AppColors.burgundy.withValues(alpha: 0.08)
-                            : Colors.white),
+                      : theme.colorScheme.onTertiaryFixed.withValues(
+                          alpha: 0.1,
+                        ),
                   borderRadius: BorderRadius.circular(14.r),
                   border: Border.all(
                     color: selected
                         ? color
-                        : color.withValues(alpha: isDark ? 0.22 : 0.16),
+                        : theme.colorScheme.onTertiaryFixed.withValues(
+                            alpha: isDark ? 0.22 : 0.16,
+                          ),
                     width: selected ? 1.4 : 1,
                   ),
                 ),
@@ -601,7 +597,7 @@ class _MembershipTabs extends StatelessWidget {
                     Icon(
                       _membershipIcon(membership.membershipType),
                       size: 21.r,
-                      color: color,
+                      color: theme.colorScheme.onTertiary,
                     ),
                     SizedBox(width: 8.w),
                     Column(
@@ -809,7 +805,7 @@ class _MembershipDetailsSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final unit = membership.unit ?? membership.allocatedUnit;
     final projects = _projectsForMembership(profile, membership);
-    final buildings = _buildingsForMembership(membership);
+    final buildings = _buildingsForMembership(projects, membership);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -882,13 +878,27 @@ class _MembershipDetailsSection extends StatelessWidget {
   }
 
   List<AssociationBuilding> _buildingsForMembership(
+    List<AssociationProject> projects,
     AssociationMembership membership,
   ) {
-    final membershipBuilding = membership.building;
-    if (membershipBuilding != null) return [membershipBuilding];
+    final membershipBuilding =
+        membership.building ??
+        membership.unit?.building ??
+        membership.allocatedUnit?.building;
+    final buildingId =
+        membershipBuilding?.id ??
+        membership.unit?.buildingId ??
+        membership.allocatedUnit?.buildingId;
 
-    final unitBuilding = membership.unit?.building;
-    if (unitBuilding != null) return [unitBuilding];
+    if (buildingId != null) {
+      for (final project in projects) {
+        for (final building in project.buildings) {
+          if (building.id == buildingId) return [building];
+        }
+      }
+    }
+
+    if (membershipBuilding != null) return [membershipBuilding];
 
     return const [];
   }
@@ -996,16 +1006,13 @@ class _PaymentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final l1on = AppLocalizations.of(context)!;
 
     return Container(
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.taupe.withValues(alpha: 0.1)
-            : AppColors.burgundy.withValues(alpha: 0.045),
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(
@@ -1013,10 +1020,12 @@ class _PaymentTile extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 20.r,
-            backgroundColor: AppColors.goldDark.withValues(alpha: 0.14),
+            backgroundColor: theme.colorScheme.onTertiaryFixed.withValues(
+              alpha: 0.14,
+            ),
             child: Icon(
               Icons.receipt_long_outlined,
-              color: AppColors.goldDark,
+              color: theme.colorScheme.onTertiaryFixed,
               size: 20.r,
             ),
           ),
@@ -1031,6 +1040,7 @@ class _PaymentTile extends StatelessWidget {
                       child: Text(
                         _formatNullableMoney(context, payment.amount),
                         style: theme.textTheme.titleSmall?.copyWith(
+                          color: theme.colorScheme.onTertiary,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -1106,7 +1116,6 @@ class _ObligationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final statusText = obligation.statusLabel.isNotEmpty
         ? obligation.statusLabel
         : obligation.status;
@@ -1118,9 +1127,7 @@ class _ObligationTile extends StatelessWidget {
       margin: EdgeInsets.only(bottom: 10.h),
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.taupe.withValues(alpha: 0.1)
-            : AppColors.burgundy.withValues(alpha: 0.045),
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(14.r),
       ),
       child: Row(
@@ -1263,17 +1270,23 @@ class _PaginatedSectionListState<T> extends State<_PaginatedSectionList<T>> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton.filled(
-              onPressed: canGoBack ? () => _goToPage(_currentPage - 1) : null,
-              icon: Icon(
-                Icons.chevron_left_rounded,
-                color: canGoBack
-                    ? theme.colorScheme.secondaryFixed
-                    : AppColors.black.withValues(alpha: 0.5),
+            GestureDetector(
+              onTap: canGoBack ? () => _goToPage(_currentPage - 1) : null,
+              child: Container(
+                padding: EdgeInsets.all(6.w),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: canGoBack
+                      ? theme.colorScheme.onTertiaryFixed
+                      : AppColors.lightGray.withValues(alpha: 0.5),
+                ),
+                child: Icon(
+                  Icons.chevron_left_rounded,
+                  color: canGoBack
+                      ? theme.colorScheme.secondaryFixed
+                      : AppColors.black.withValues(alpha: 0.5),
+                ),
               ),
-              color: canGoBack
-                  ? theme.colorScheme.onTertiaryFixed
-                  : AppColors.lightGray,
             ),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 14.w),
@@ -1285,19 +1298,23 @@ class _PaginatedSectionListState<T> extends State<_PaginatedSectionList<T>> {
                 ),
               ),
             ),
-            IconButton.filled(
-              onPressed: canGoForward
-                  ? () => _goToPage(_currentPage + 1)
-                  : null,
-              icon: Icon(
-                Icons.chevron_right_rounded,
-                color: canGoForward
-                    ? theme.colorScheme.secondaryFixed
-                    : AppColors.black.withValues(alpha: 0.5),
+            GestureDetector(
+              onTap: canGoForward ? () => _goToPage(_currentPage + 1) : null,
+              child: Container(
+                padding: EdgeInsets.all(6.w),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: canGoForward
+                      ? theme.colorScheme.onTertiaryFixed
+                      : AppColors.lightGray.withValues(alpha: 0.5),
+                ),
+                child: Icon(
+                  Icons.chevron_right_rounded,
+                  color: canGoForward
+                      ? theme.colorScheme.secondaryFixed
+                      : AppColors.black.withValues(alpha: 0.5),
+                ),
               ),
-              color: canGoForward
-                  ? theme.colorScheme.onTertiaryFixed
-                  : AppColors.lightGray,
             ),
           ],
         ),
@@ -1380,12 +1397,22 @@ class _ProjectDetailsSection extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-
+        SizedBox(height: 8.h),
         _MediaGallery(
           title: AppLocalizations.of(context)!.associationMemberProjectGallery,
           imageUrl: project.imageUrl,
           galleryImages: [...project.images, ...project.galleryImages],
           videoUrls: project.videos,
+          mediaItems: _associationGalleryMediaItems(
+            imageItems: project.galleryItems,
+            imageFallbackUrls: [
+              project.imageUrl,
+              ...project.images,
+              ...project.galleryImages,
+            ],
+            videoItems: project.videoItems,
+            videoFallbackUrls: project.videos,
+          ),
           fallbackIcon: Icons.apartment_rounded,
         ),
         SizedBox(height: 12.h),
@@ -1398,15 +1425,7 @@ class _ProjectDetailsSection extends StatelessWidget {
           ]),
         ),
         _ProjectLocationButton(project: project),
-        _ProfileFilesSection(
-          title: AppLocalizations.of(
-            context,
-          )!.associationMemberProjectMasterPlan,
-          fileUrls: _fileUrlsFromValue(project.masterPlanUrl),
-          fallbackName: AppLocalizations.of(
-            context,
-          )!.associationMemberProjectMasterPlanFile,
-        ),
+
         _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberBuildings,
           value: _formatNullableNumber(
@@ -1420,32 +1439,17 @@ class _ProjectDetailsSection extends StatelessWidget {
           ),
         ),
         _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberAvailableUnits,
-          value: _formatNullableNumber(project.availableUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberAllocatedUnits,
-          value: _formatNullableNumber(project.allocatedUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberDeliveredUnits,
-          value: _formatNullableNumber(project.deliveredUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberRemainingUnits,
-          value: _formatNullableNumber(project.remainingUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberEstimatedCost,
-          value: _formatNullableMoney(context, project.estimatedCost),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberEngineer,
-          value: project.projectEngineer,
-        ),
-        _infoRowIfValue(
           label: AppLocalizations.of(context)!.associationMemberLandArea,
           value: _formatNullableNumber(project.landArea),
+        ),
+        _ProfileFilesSection(
+          title: AppLocalizations.of(
+            context,
+          )!.associationMemberProjectMasterPlan,
+          fileUrls: _fileUrlsFromValue(project.masterPlanUrl),
+          fallbackName: AppLocalizations.of(
+            context,
+          )!.associationMemberProjectMasterPlanFile,
         ),
         _StagesTimeline(
           title: AppLocalizations.of(context)!.associationMemberProjectStages,
@@ -1649,6 +1653,16 @@ class _BuildingDetailsSection extends StatelessWidget {
             ...building.galleryImages,
           ],
           videoUrls: building.videos,
+          mediaItems: _associationGalleryMediaItems(
+            imageItems: building.galleryItems,
+            imageFallbackUrls: [
+              building.buildingPlanUrl ?? '',
+              ...building.floorPlanImages,
+              ...building.galleryImages,
+            ],
+            videoItems: building.videoItems,
+            videoFallbackUrls: building.videos,
+          ),
           fallbackIcon: Icons.business_rounded,
         ),
         _infoRowIfValue(
@@ -1673,6 +1687,20 @@ class _BuildingDetailsSection extends StatelessWidget {
           label: l10n.associationMemberLocation,
           value: building.physicalAddress,
         ),
+        _infoRowIfValue(
+          label: AppLocalizations.of(context)!.associationMemberFloors,
+          value: _formatNullableNumber(building.numberOfFloors),
+        ),
+        _infoRowIfValue(
+          label: AppLocalizations.of(context)!.associationMemberTotalUnits,
+          value: _formatNullableNumber(building.totalUnits),
+        ),
+        _infoRowIfValue(
+          label: AppLocalizations.of(context)!.associationMemberSpecifications,
+          value: building.specifications,
+        ),
+        if (building.units.isNotEmpty)
+          _BuildingUnitsSection(units: building.units),
         _ProfileFilesSection(
           title: AppLocalizations.of(context)!.associationMemberBuildingPlan,
           fileUrls: _fileUrlsFromValue(building.buildingPlanUrl),
@@ -1680,40 +1708,115 @@ class _BuildingDetailsSection extends StatelessWidget {
             context,
           )!.associationMemberBuildingPlanFile,
         ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberFloors,
-          value: _formatNullableNumber(building.numberOfFloors),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberUnits,
-          value: _formatNullableNumber(building.numberOfUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberTotalUnits,
-          value: _formatNullableNumber(building.totalUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberAvailableUnits,
-          value: _formatNullableNumber(building.availableUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberAllocatedUnits,
-          value: _formatNullableNumber(building.allocatedUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberDeliveredUnits,
-          value: _formatNullableNumber(building.deliveredUnits),
-        ),
-        _infoRowIfValue(
-          label: AppLocalizations.of(context)!.associationMemberSpecifications,
-          value: building.specifications,
-        ),
         _StagesTimeline(
           title: AppLocalizations.of(context)!.associationMemberBuildingStages,
           stages: building.stages,
           emptyText: AppLocalizations.of(
             context,
           )!.associationMemberNoBuildingStagesAvailable,
+        ),
+      ],
+    );
+  }
+}
+
+class _BuildingUnitsSection extends StatelessWidget {
+  const _BuildingUnitsSection({required this.units});
+
+  final List<AssociationUnit> units;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(top: 4.h, bottom: 12.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.associationMemberUnits,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: 10.h),
+          for (var index = 0; index < units.length; index++) ...[
+            if (index > 0) SizedBox(height: 12.h),
+            _InlineUnitDetails(unit: units[index]),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineUnitDetails extends StatelessWidget {
+  const _InlineUnitDetails({required this.unit});
+
+  final AssociationUnit unit;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          unit.unitNumber.trim().isNotEmpty
+              ? '${l10n.residentialUnit} ${unit.unitNumber}'
+              : l10n.residentialUnit,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        SizedBox(height: 8.h),
+        _MediaGallery(
+          title: l10n.associationMemberUnitGallery,
+          imageUrl: unit.unitPlanUrl,
+          galleryImages: [...unit.images, ...unit.galleryImages],
+          videoUrls: unit.videos,
+          mediaItems: _associationGalleryMediaItems(
+            imageItems: unit.galleryItems,
+            imageFallbackUrls: [
+              unit.unitPlanUrl,
+              ...unit.images,
+              ...unit.galleryImages,
+            ],
+            videoItems: unit.videoItems,
+            videoFallbackUrls: unit.videos,
+          ),
+          fallbackIcon: Icons.home_work_outlined,
+        ),
+        InfoRow(
+          label: l10n.associationMemberFloor,
+          value: _formatNullableNumber(unit.floorNumber),
+        ),
+        InfoRow(
+          label: l10n.associationMemberOrientation,
+          value: unit.orientationLabel.isNotEmpty
+              ? unit.orientationLabel
+              : unit.orientation,
+        ),
+        InfoRow(
+          label: l10n.associationMemberArea,
+          value: _formatNullableNumber(unit.area),
+        ),
+        InfoRow(
+          label: l10n.associationMemberGardenTerraceArea,
+          value: _formatNullableNumber(unit.gardenTerraceArea),
+        ),
+        InfoRow(
+          label: l10n.associationMemberSpecifications,
+          value: unit.specifications,
+        ),
+        _ProfileFilesSection(
+          title: l10n.associationMemberUnitPlan,
+          fileUrls: _fileUrlsFromValue(unit.unitPlanUrl),
+          fallbackName: l10n.associationMemberUnitPlanFile,
         ),
       ],
     );
@@ -1738,9 +1841,18 @@ class _UnitDetailsSection extends StatelessWidget {
           imageUrl: unit.unitPlanUrl,
           galleryImages: [...unit.images, ...unit.galleryImages],
           videoUrls: unit.videos,
+          mediaItems: _associationGalleryMediaItems(
+            imageItems: unit.galleryItems,
+            imageFallbackUrls: [
+              unit.unitPlanUrl,
+              ...unit.images,
+              ...unit.galleryImages,
+            ],
+            videoItems: unit.videoItems,
+            videoFallbackUrls: unit.videos,
+          ),
           fallbackIcon: Icons.home_work_outlined,
         ),
-        InfoRow(label: l10n.unit, value: unit.unitNumber),
         InfoRow(
           label: AppLocalizations.of(context)!.associationMemberFloor,
           value: _formatNullableNumber(unit.floorNumber),
@@ -1762,16 +1874,12 @@ class _UnitDetailsSection extends StatelessWidget {
           value: _formatNullableNumber(unit.gardenTerraceArea),
         ),
         InfoRow(
-          label: l10n.associationMemberAmount,
-          value: _formatNullableMoney(context, unit.price),
-        ),
-        InfoRow(
           label: AppLocalizations.of(context)!.associationMemberSpecifications,
           value: unit.specifications,
         ),
         InfoRow(
-          label: l10n.associationMemberStatus,
-          value: unit.statusLabel.isNotEmpty ? unit.statusLabel : unit.status,
+          label: AppLocalizations.of(context)!.associationMemberUnitPlan,
+          value: unit.unitPlanUrl,
         ),
         _ProfileFilesSection(
           title: AppLocalizations.of(context)!.associationMemberUnitPlan,
@@ -1779,10 +1887,6 @@ class _UnitDetailsSection extends StatelessWidget {
           fallbackName: AppLocalizations.of(
             context,
           )!.associationMemberUnitPlanFile,
-        ),
-        InfoRow(
-          label: AppLocalizations.of(context)!.associationMemberUnitPlan,
-          value: unit.unitPlanUrl,
         ),
       ],
     );
@@ -1841,6 +1945,7 @@ class _MediaGallery extends StatefulWidget {
     required this.imageUrl,
     required this.galleryImages,
     this.videoUrls = const [],
+    this.mediaItems = const [],
     required this.fallbackIcon,
   });
 
@@ -1848,6 +1953,7 @@ class _MediaGallery extends StatefulWidget {
   final String? imageUrl;
   final List<String> galleryImages;
   final List<String> videoUrls;
+  final List<GalleryMediaItem> mediaItems;
   final IconData fallbackIcon;
 
   @override
@@ -1869,7 +1975,8 @@ class _MediaGalleryState extends State<_MediaGallery> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.imageUrl != widget.imageUrl ||
         oldWidget.galleryImages != widget.galleryImages ||
-        oldWidget.videoUrls != widget.videoUrls) {
+        oldWidget.videoUrls != widget.videoUrls ||
+        oldWidget.mediaItems != widget.mediaItems) {
       _currentIndex = 0;
       if (_pageController.hasClients) {
         _pageController.jumpToPage(0);
@@ -1895,10 +2002,12 @@ class _MediaGalleryState extends State<_MediaGallery> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final mediaItems = _galleryMediaItems(
-      imageUrls: [widget.imageUrl ?? '', ...widget.galleryImages],
-      videoUrls: widget.videoUrls,
-    );
+    final mediaItems = widget.mediaItems.isNotEmpty
+        ? _dedupeGalleryMediaItems(widget.mediaItems)
+        : _galleryMediaItems(
+            imageUrls: [widget.imageUrl ?? '', ...widget.galleryImages],
+            videoUrls: widget.videoUrls,
+          );
 
     if (mediaItems.isEmpty) return const SizedBox.shrink();
 
@@ -1999,6 +2108,8 @@ class _GalleryMainImage extends StatelessWidget {
               context,
               name: '$title ${index + 1}',
               url: media.url,
+              description: media.description,
+              date: media.date,
             );
             return;
           }
@@ -2007,6 +2118,8 @@ class _GalleryMainImage extends StatelessWidget {
             context,
             name: '$title ${index + 1}',
             url: media.url,
+            description: media.description,
+            date: media.date,
           );
         },
         child: ClipRRect(
@@ -2043,7 +2156,7 @@ class _GalleryMediaPreview extends StatelessWidget {
           width: compact ? 30.r : 64.r,
           height: compact ? 30.r : 64.r,
           decoration: BoxDecoration(
-            color: theme.colorScheme.onTertiaryFixed,
+            color: theme.colorScheme.onSecondaryFixedVariant,
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -2276,18 +2389,24 @@ class _StagePageControls extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        IconButton.filled(
-          onPressed: onPrevious,
-           icon: Icon(
-                Icons.chevron_left_rounded,
-                color: canGoBack
-                    ? theme.colorScheme.secondaryFixed
-                    : AppColors.black.withValues(alpha: 0.5),
-              ),
+        GestureDetector(
+          onTap: onPrevious,
+          child: Container(
+            padding: EdgeInsets.all(6.w),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
               color: canGoBack
                   ? theme.colorScheme.onTertiaryFixed
-                  : AppColors.lightGray,
+                  : AppColors.lightGray.withValues(alpha: 0.5),
             ),
+            child: Icon(
+              Icons.chevron_left_rounded,
+              color: canGoBack
+                  ? theme.colorScheme.secondaryFixed
+                  : AppColors.black.withValues(alpha: 0.5),
+            ),
+          ),
+        ),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 14.w),
           child: Text(
@@ -2298,18 +2417,24 @@ class _StagePageControls extends StatelessWidget {
             ),
           ),
         ),
-        IconButton.filled(
-          onPressed: onNext,
-         icon: Icon(
-                Icons.chevron_right_rounded,
-                color: canGoForward
-                    ? theme.colorScheme.secondaryFixed
-                    : AppColors.black.withValues(alpha: 0.5),
-              ),
+        GestureDetector(
+          onTap: onNext,
+          child: Container(
+            padding: EdgeInsets.all(6.w),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
               color: canGoForward
                   ? theme.colorScheme.onTertiaryFixed
-                  : AppColors.lightGray,
+                  : AppColors.lightGray.withValues(alpha: 0.5),
             ),
+            child: Icon(
+              Icons.chevron_right_rounded,
+              color: canGoForward
+                  ? theme.colorScheme.secondaryFixed
+                  : AppColors.black.withValues(alpha: 0.5),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -2343,7 +2468,9 @@ class _StageTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.secondaryFixed.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(22.r),
-        border: Border.all(color: accent.withValues(alpha: 0.12)),
+        border: Border.all(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -2363,7 +2490,10 @@ class _StageTile extends StatelessWidget {
             fallbackIcon: Icons.business_rounded,
           ),
           SizedBox(height: 16.h),
-          Divider(color: accent.withValues(alpha: 0.12), height: 1),
+          Divider(
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.3),
+            height: 1,
+          ),
           SizedBox(height: 16.h),
           Text(
             AppLocalizations.of(context)!.associationMemberCompletion,
@@ -2431,13 +2561,39 @@ class _StageHero extends StatelessWidget {
             CustomNetworkImage(
               imageUrl: imageUrl,
               defaultIcon: fallbackIcon,
-              defaultIconColor: AppColors.burgundy,
+              defaultIconColor: theme.colorScheme.onTertiaryFixed,
             ),
             Row(
               children: [
                 Expanded(
                   child: Container(
                     color: AppColors.burgundy.withValues(alpha: 0.58),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            percentText,
+                            style: theme.textTheme.headlineLarge?.copyWith(
+                              color: AppColors.offWhite,
+                              fontSize: 44.sp,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          SizedBox(height: 12.h),
+                          Text(
+                            title,
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: AppColors.offWhite,
+                              fontWeight: FontWeight.w900,
+                              height: 1.2,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 Expanded(
@@ -2446,35 +2602,6 @@ class _StageHero extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-            PositionedDirectional(
-              top: 34.h,
-              start: 28.w,
-              end: 28.w,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    percentText,
-                    style: theme.textTheme.headlineLarge?.copyWith(
-                      color: AppColors.offWhite,
-                      fontSize: 44.sp,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: AppColors.offWhite,
-                      fontWeight: FontWeight.w900,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -2508,7 +2635,9 @@ class _StageProgressRow extends StatelessWidget {
             child: LinearProgressIndicator(
               value: _percentRatio(percentage),
               minHeight: 9.h,
-              backgroundColor: AppColors.burgundy.withValues(alpha: 0.12),
+              backgroundColor: theme.colorScheme.onTertiaryFixed.withValues(
+                alpha: 0.12,
+              ),
               valueColor: AlwaysStoppedAnimation<Color>(accent),
             ),
           ),
@@ -2516,7 +2645,7 @@ class _StageProgressRow extends StatelessWidget {
         Text(
           percent.isEmpty ? '-' : percent,
           style: theme.textTheme.titleSmall?.copyWith(
-            color: AppColors.burgundy,
+            color: accent,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -2592,12 +2721,14 @@ class _StageDateCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: AppColors.burgundy.withValues(alpha: 0.12),
+                color: theme.colorScheme.onTertiaryFixed.withValues(
+                  alpha: 0.12,
+                ),
               ),
             ),
             child: Icon(
               Icons.calendar_month_outlined,
-              color: AppColors.burgundy,
+              color: theme.colorScheme.onTertiaryFixed,
               size: 22.r,
             ),
           ),
@@ -2611,7 +2742,9 @@ class _StageDateCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.black.withValues(alpha: 0.55),
+                    color: theme.colorScheme.primaryFixed.withValues(
+                      alpha: 0.55,
+                    ),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -2621,7 +2754,7 @@ class _StageDateCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    color: AppColors.burgundy,
+                    color: theme.colorScheme.onTertiaryFixed,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -2673,12 +2806,12 @@ class _StageGalleryPanel extends StatelessWidget {
               width: 44.r,
               height: 44.r,
               decoration: BoxDecoration(
-                color: AppColors.burgundy.withValues(alpha: 0.08),
+                color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Icon(
                 Icons.image_outlined,
-                color: AppColors.burgundy,
+                color: theme.colorScheme.onTertiaryFixed,
                 size: 24.r,
               ),
             ),
@@ -2726,7 +2859,9 @@ class _MembershipSummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(18.r),
-        border: Border.all(color: accent.withValues(alpha: 0.18)),
+        border: Border.all(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.18),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2736,14 +2871,14 @@ class _MembershipSummaryCard extends StatelessWidget {
               Icon(
                 _membershipIcon(membership.membershipType),
                 size: 24.r,
-                color: accent,
+                color: theme.colorScheme.onTertiary,
               ),
               SizedBox(width: 10.w),
               Expanded(
                 child: Text(
                   membership.displayType,
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark ? AppColors.offWhite : AppColors.burgundy,
+                    color: theme.colorScheme.onTertiary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -2761,11 +2896,6 @@ class _MembershipSummaryCard extends StatelessWidget {
             spacing: 8.w,
             runSpacing: 8.h,
             children: [
-              _StatusPill(label: membership.displayStatus, color: accent),
-              _StatusPill(
-                label: membership.displayFinancialStatus,
-                color: AppColors.goldDark,
-              ),
               _StatusPill(
                 label: membership.isAssignedToProject
                     ? AppLocalizations.of(
@@ -2832,6 +2962,7 @@ class _ProfileHeaderCard extends StatelessWidget {
     final name = profile.person.displayName.trim().isEmpty
         ? l10n.associationMemberNoData
         : profile.person.displayName;
+    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
 
     return Container(
       width: double.infinity,
@@ -2841,12 +2972,10 @@ class _ProfileHeaderCard extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
-          colors: isDark
-              ? [
-                  AppColors.burgundy.withValues(alpha: 0.85),
-                  AppColors.black.withValues(alpha: 0.9),
-                ]
-              : [AppColors.burgundy, AppColors.goldDark],
+          colors: [
+            accent.withValues(alpha: 0.85),
+            AppColors.black.withValues(alpha: 0.9),
+          ],
         ),
       ),
       child: Column(
@@ -2973,30 +3102,27 @@ class _MessageState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Center(
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 56.r, color: theme.colorScheme.primaryFixed),
-            SizedBox(height: 16.h),
-            if (title.trim().isNotEmpty) ...[
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              SizedBox(height: 8.h),
-            ],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 56.r, color: theme.colorScheme.primaryFixed),
+          SizedBox(height: 16.h),
+          if (title.trim().isNotEmpty) ...[
             Text(
-              message,
+              title,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyLarge,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
             ),
+            SizedBox(height: 8.h),
           ],
-        ),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge,
+          ),
+        ],
       ),
     );
   }
@@ -3173,4 +3299,81 @@ String _joinValues(List<Object?> values) {
       .map((value) => value?.toString().trim() ?? '')
       .where((value) => value.isNotEmpty && value != '-')
       .join(' • ');
+}
+
+List<GalleryMediaItem> _associationGalleryMediaItems({
+  required List<AssociationMediaItem> imageItems,
+  required List<String> imageFallbackUrls,
+  required List<AssociationMediaItem> videoItems,
+  required List<String> videoFallbackUrls,
+}) {
+  return _dedupeGalleryMediaItems([
+    ...imageFallbackUrls
+        .map((url) => url.trim())
+        .where((url) => url.isNotEmpty)
+        .map(GalleryMediaItem.fromUrl),
+    ...imageItems.map(_galleryItemFromAssociationItem),
+    ...videoFallbackUrls
+        .map((url) => url.trim())
+        .where((url) => url.isNotEmpty)
+        .map(GalleryMediaItem.video),
+    ...videoItems.map(_galleryItemFromAssociationItem),
+  ]);
+}
+
+GalleryMediaItem _galleryItemFromAssociationItem(AssociationMediaItem item) {
+  return item.isVideo
+      ? GalleryMediaItem.video(
+          item.url,
+          thumbnailUrl: item.thumbnailUrl,
+          description: item.description,
+          date: item.date,
+        )
+      : GalleryMediaItem.fromUrl(
+          item.url,
+          thumbnailUrl: item.thumbnailUrl,
+          description: item.description,
+          date: item.date,
+        );
+}
+
+List<GalleryMediaItem> _dedupeGalleryMediaItems(List<GalleryMediaItem> items) {
+  final byUrl = <String, GalleryMediaItem>{};
+
+  for (final item in items) {
+    final cleanUrl = item.url.trim();
+    if (cleanUrl.isEmpty) continue;
+
+    final cleanItem = GalleryMediaItem(
+      url: cleanUrl,
+      isVideo: item.isVideo,
+      thumbnailUrl: item.thumbnailUrl,
+      description: item.description,
+      date: item.date,
+    );
+
+    final existing = byUrl[cleanUrl];
+    byUrl[cleanUrl] = existing == null
+        ? cleanItem
+        : _mergeGalleryMediaDetails(existing, cleanItem);
+  }
+
+  return byUrl.values.toList();
+}
+
+GalleryMediaItem _mergeGalleryMediaDetails(
+  GalleryMediaItem existing,
+  GalleryMediaItem incoming,
+) {
+  return GalleryMediaItem(
+    url: existing.url,
+    isVideo: existing.isVideo || incoming.isVideo,
+    thumbnailUrl: existing.thumbnailUrl?.trim().isNotEmpty == true
+        ? existing.thumbnailUrl
+        : incoming.thumbnailUrl,
+    description: existing.description.trim().isNotEmpty
+        ? existing.description
+        : incoming.description,
+    date: existing.date.trim().isNotEmpty ? existing.date : incoming.date,
+  );
 }

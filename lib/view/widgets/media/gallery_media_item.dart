@@ -3,33 +3,61 @@ class GalleryMediaItem {
     required this.url,
     required this.isVideo,
     this.thumbnailUrl,
+    this.description = '',
+    this.date = '',
   });
 
   final String url;
   final bool isVideo;
   final String? thumbnailUrl;
+  final String description;
+  final String date;
 
-  factory GalleryMediaItem.image(String url, {String? thumbnailUrl}) {
+  bool get hasDetails =>
+      description.trim().isNotEmpty || date.trim().isNotEmpty;
+
+  factory GalleryMediaItem.image(
+    String url, {
+    String? thumbnailUrl,
+    String description = '',
+    String date = '',
+  }) {
     return GalleryMediaItem(
       url: url,
       isVideo: false,
       thumbnailUrl: thumbnailUrl,
+      description: description,
+      date: date,
     );
   }
 
-  factory GalleryMediaItem.video(String url, {String? thumbnailUrl}) {
+  factory GalleryMediaItem.video(
+    String url, {
+    String? thumbnailUrl,
+    String description = '',
+    String date = '',
+  }) {
     return GalleryMediaItem(
       url: url,
       isVideo: true,
       thumbnailUrl: thumbnailUrl,
+      description: description,
+      date: date,
     );
   }
 
-  factory GalleryMediaItem.fromUrl(String url, {String? thumbnailUrl}) {
+  factory GalleryMediaItem.fromUrl(
+    String url, {
+    String? thumbnailUrl,
+    String description = '',
+    String date = '',
+  }) {
     return GalleryMediaItem(
       url: url,
       isVideo: isVideoUrl(url),
       thumbnailUrl: thumbnailUrl,
+      description: description,
+      date: date,
     );
   }
 

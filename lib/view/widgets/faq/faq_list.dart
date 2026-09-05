@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/model/app_info/faq_item_model.dart';
 
 class FaqList extends StatefulWidget {
@@ -58,19 +57,16 @@ class FaqAnimatedCrossFadeItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final accentColor = isDark ? AppColors.goldLight : AppColors.burgundy;
 
     return AnimatedCrossFade(
       firstChild: _FaqQuestionContainer(
         question: faq.question,
         icon: Icons.keyboard_arrow_down_rounded,
-        accentColor: accentColor,
+        accentColor: theme.colorScheme.onTertiaryFixed,
         onTap: onTap,
       ),
       secondChild: _FaqAnswerContainer(
         faq: faq,
-        accentColor: accentColor,
         onTap: onTap,
       ),
       crossFadeState: isExpanded
@@ -105,10 +101,10 @@ class _FaqQuestionContainer extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
         decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryFixed,
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: theme.colorScheme.primaryFixed.withValues(alpha: 0.26),
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.26),
           ),
         ),
         child: Row(
@@ -119,14 +115,14 @@ class _FaqQuestionContainer extends StatelessWidget {
                 question,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
-                  color: accentColor,
+                  color: theme.colorScheme.onTertiaryFixed,
                 ),
                 softWrap: true,
                 overflow: TextOverflow.visible,
               ),
             ),
             SizedBox(width: 12.w),
-            Icon(icon, color: accentColor),
+            Icon(icon, color: theme.colorScheme.onTertiaryFixed),
           ],
         ),
       ),
@@ -137,12 +133,10 @@ class _FaqQuestionContainer extends StatelessWidget {
 class _FaqAnswerContainer extends StatelessWidget {
   const _FaqAnswerContainer({
     required this.faq,
-    required this.accentColor,
     required this.onTap,
   });
 
   final FaqItemModel faq;
-  final Color accentColor;
   final VoidCallback onTap;
 
   @override
@@ -153,11 +147,10 @@ class _FaqAnswerContainer extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryFixed,
+          decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: theme.colorScheme.primaryFixed.withValues(alpha: 0.26),
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.26),
           ),
         ),
         child: Column(
@@ -170,24 +163,29 @@ class _FaqAnswerContainer extends StatelessWidget {
                     faq.question,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: accentColor,
+                      color: theme.colorScheme.onTertiaryFixed,
                     ),
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   ),
                 ),
                 SizedBox(width: 12.w),
-                Icon(Icons.keyboard_arrow_up_rounded, color: accentColor),
+                Icon(Icons.keyboard_arrow_up_rounded, color: theme.colorScheme.onTertiaryFixed),
               ],
             ),
-            SizedBox(height: 8.h),
+            SizedBox(height: 4.h),
+            Divider(
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.26),
+              thickness: 1,
+            ),
+            SizedBox(height: 4.h),
             Align(
               alignment: AlignmentDirectional.centerStart,
               child: Text(
                 faq.answer,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   height: 1.55,
-                  color: accentColor.withValues(alpha: 0.78),
+                  color: theme.colorScheme.primaryFixed,
                 ),
               ),
             ),

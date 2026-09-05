@@ -70,7 +70,7 @@ class _ProductsSectionState extends State<ProductsSection> {
                 );
 
               case ProductsLoaded():
-                final products = state.products;
+                final products = state.products.reversed.toList();
                 if (products.isEmpty) {
                   return SliverToBoxAdapter(
                     child: Padding(

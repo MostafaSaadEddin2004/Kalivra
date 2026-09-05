@@ -222,6 +222,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get back => 'رجوع';
 
   @override
+  String get showMore => 'عرض المزيد';
+
+  @override
+  String get showLess => 'عرض أقل';
+
+  @override
   String get loginRequiredForCart =>
       'يجب تسجيل الدخول لإضافة المنتجات إلى السلة';
 
@@ -2552,10 +2558,10 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا توجد مراحل تنفيذ متاحة لهذا البناء بعد.';
 
   @override
-  String get associationMemberAssignedToProject => 'مخصص لمشروع';
+  String get associationMemberAssignedToProject => 'مكتتب بمشروع';
 
   @override
-  String get associationMemberNoProjectAssignment => 'غير مخصص لمشروع';
+  String get associationMemberNoProjectAssignment => 'غير مكتتب بمشروع';
 
   @override
   String get associationMemberAssignedToUnit => 'مخصص لوحدة';

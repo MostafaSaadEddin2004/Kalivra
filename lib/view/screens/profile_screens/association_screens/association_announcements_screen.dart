@@ -39,6 +39,7 @@ class _AssociationAnnouncementsScreenState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.associationAnnouncementsTitle),
@@ -59,8 +60,8 @@ class _AssociationAnnouncementsScreenState
             );
           }
 
-          return const Center(
-            child: SpinKitFadingCircle(color: AppColors.burgundy),
+          return  Center(
+            child: SpinKitFadingCircle(color: theme.colorScheme.onTertiaryFixed),
           );
         },
       ),

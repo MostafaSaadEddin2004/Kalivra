@@ -518,6 +518,18 @@ abstract class AppLocalizations {
   /// **'Back'**
   String get back;
 
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Show more'**
+  String get showMore;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
+
   /// No description provided for @loginRequiredForCart.
   ///
   /// In en, this message translates to:
@@ -4955,13 +4967,13 @@ abstract class AppLocalizations {
   /// No description provided for @associationMemberAssignedToProject.
   ///
   /// In en, this message translates to:
-  /// **'Assigned to project'**
+  /// **'Allocated to project'**
   String get associationMemberAssignedToProject;
 
   /// No description provided for @associationMemberNoProjectAssignment.
   ///
   /// In en, this message translates to:
-  /// **'No project assignment'**
+  /// **'No project allocation'**
   String get associationMemberNoProjectAssignment;
 
   /// No description provided for @associationMemberAssignedToUnit.

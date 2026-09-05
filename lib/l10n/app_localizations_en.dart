@@ -223,6 +223,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get back => 'Back';
 
   @override
+  String get showMore => 'Show more';
+
+  @override
+  String get showLess => 'Show less';
+
+  @override
   String get loginRequiredForCart =>
       'Please sign in to add products to the cart';
 
@@ -2575,10 +2581,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'No construction stages are available for this building yet.';
 
   @override
-  String get associationMemberAssignedToProject => 'Assigned to project';
+  String get associationMemberAssignedToProject => 'Allocated to project';
 
   @override
-  String get associationMemberNoProjectAssignment => 'No project assignment';
+  String get associationMemberNoProjectAssignment => 'No project allocation';
 
   @override
   String get associationMemberAssignedToUnit => 'Assigned to unit';
