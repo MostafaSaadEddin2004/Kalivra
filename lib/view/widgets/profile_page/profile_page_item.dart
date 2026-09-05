@@ -105,7 +105,7 @@ class ProfilePageItem extends StatelessWidget {
                 Icon(
                   Icons.chevron_right_rounded,
                   size: 22.r,
-                  color: AppColors.burgundy,
+                  color: theme.colorScheme.onTertiaryFixed,
                 ),
             ],
           ),

@@ -221,7 +221,7 @@ class _ProfileHeroCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
-        color: AppColors.burgundy,
+        color: theme.colorScheme.onTertiaryFixed,
         borderRadius: BorderRadius.circular(18.r),
         boxShadow: [
           BoxShadow(
@@ -240,13 +240,13 @@ class _ProfileHeroCard extends StatelessWidget {
                 child: Container(
                   width: 74.r,
                   height: 74.r,
-                  color: AppColors.offWhite,
+                  color: theme.colorScheme.secondaryFixed,
                   child: CustomNetworkImage(
                     imageUrl: imageUrl,
                     width: 74.r,
                     height: 74.r,
                     defaultIcon: Icons.person_rounded,
-                    defaultIconColor: AppColors.burgundy,
+                    defaultIconColor: theme.colorScheme.onTertiaryFixed,
                   ),
                 ),
               ),
@@ -262,13 +262,13 @@ class _ProfileHeroCard extends StatelessWidget {
                       color: AppColors.taupe,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: AppColors.burgundy,
+                        color: theme.colorScheme.secondaryFixed,
                         width: 1.5.w,
                       ),
                     ),
                     child: Icon(
                       Icons.edit_rounded,
-                      color: AppColors.burgundy,
+                      color: theme.colorScheme.secondaryFixed,
                       size: 16.r,
                     ),
                   ),
@@ -287,7 +287,7 @@ class _ProfileHeroCard extends StatelessWidget {
                 Text(
                   _displayName(l10n),
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: AppColors.offWhite,
+                    color: theme.colorScheme.secondaryFixed,
                     fontWeight: FontWeight.w800,
                   ),
                   maxLines: 1,
@@ -300,11 +300,12 @@ class _ProfileHeroCard extends StatelessWidget {
                       Icon(
                         Icons.person,
                         color: theme.colorScheme.secondaryFixed,
+                        size: 16.r,
                       ),
                       Text(
                         customer!.gender!,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.offWhite,
+                          color: theme.colorScheme.secondaryFixed,
                           fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,

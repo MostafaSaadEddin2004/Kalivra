@@ -36,7 +36,7 @@ class EmptyStateView extends StatelessWidget {
             Icon(
               icon,
               size: 72.r,
-              color: colorScheme.primary.withValues(alpha: 0.62),
+              color: colorScheme.onTertiaryFixed,
             ),
             SizedBox(height: 18.h),
             Text(
