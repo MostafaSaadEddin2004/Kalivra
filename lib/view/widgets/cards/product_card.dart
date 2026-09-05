@@ -122,9 +122,6 @@ class _ProductCardState extends State<ProductCard> {
     final cartCubit = context.read<CartCubit>();
     var dialogProduct = widget.product;
 
-    try {
-      dialogProduct = await cartCubit.loadProduct(widget.product.id);
-    } catch (_) {}
 
     if (!mounted) return;
     await showDialog<bool>(

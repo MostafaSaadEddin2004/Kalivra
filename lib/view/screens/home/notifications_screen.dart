@@ -82,10 +82,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             if (state.notifications.isEmpty) {
               final l10n = AppLocalizations.of(context)!;
               return RefreshableStateBox(
-                child: EmptyStateView(
-                  icon: Icons.notifications_none_rounded,
-                  title: l10n.noNotifications,
-                  description: l10n.notificationsEmptyPrompt,
+                child: Center(
+                  child: EmptyStateView(
+                    icon: Icons.notifications_none_rounded,
+                    title: l10n.noNotifications,
+                    description: l10n.notificationsEmptyPrompt,
+                  ),
                 ),
               );
             }

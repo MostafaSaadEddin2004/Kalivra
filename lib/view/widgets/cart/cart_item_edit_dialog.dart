@@ -524,7 +524,10 @@ class _CartItemEditDialogState extends State<CartItemEditDialog> {
             SizedBox(height: 16.h),
             TextButton(
               onPressed: () => context.pop(),
-              child: Text(l10n.cancel),
+              child: Text(l10n.cancel,style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onTertiaryFixed,
+                fontWeight: FontWeight.w800,
+              ),),
             ),
           ],
         ),
