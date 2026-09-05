@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/controller/blocs/bloc/locale_bloc/locale_bloc_bloc.dart';
 import 'package:kalivra/controller/blocs/bloc/theme_bloc/theme_bloc_bloc.dart';
@@ -10,10 +9,8 @@ import 'package:kalivra/controller/blocs/cubit/notification_preferences_cubit/no
 import 'package:kalivra/controller/prefs/local_store.dart';
 import 'package:kalivra/controller/prefs/pref_keys.dart';
 import 'package:kalivra/core/app_router.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/view/screens/profile_screens/change_password_screen.dart';
-import 'package:kalivra/view/screens/profile_screens/notification_preferences_text.dart';
 import 'package:kalivra/view/widgets/confirm_dialog.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
@@ -163,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildNotificationSection(BuildContext context) {
-    final copy = NotificationPreferencesText.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocProvider(
       create: (_) => NotificationPreferencesCubit(),
@@ -181,24 +178,12 @@ class SettingsScreen extends StatelessWidget {
             },
             builder: (context, state) {
               return _SettingsSection(
-                title: copy.sectionTitle,
+                title: l10n.notificationPreferencesSectionTitle,
                 children: [
-                  _NotificationSwitchTile(
-                    icon: Icons.notifications_active_outlined,
-                    label: copy.switchTitle,
-                    subtitle: state.isEnabled
-                        ? copy.enabledSubtitle
-                        : copy.disabledSubtitle,
-                    value: state.isEnabled,
-                    isBusy: state.isLoading || state.isSaving,
-                    onChanged: (enabled) => context
-                        .read<NotificationPreferencesCubit>()
-                        .setNotificationsEnabled(enabled),
-                  ),
                   _SettingsTile(
                     icon: Icons.tune_rounded,
-                    label: copy.channelsTitle,
-                    subtitle: copy.channelsSubtitle,
+                    label: l10n.notificationPreferencesChannelsTitle,
+                    subtitle: l10n.notificationPreferencesChannelsSubtitle,
                     onTap: () => _openProtectedScreen(
                       context,
                       () => context.push(AppRoutes.notificationPreferences),
@@ -221,8 +206,6 @@ class _SettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -231,7 +214,7 @@ class _SettingsSection extends StatelessWidget {
           child: Text(
             title,
             style: theme.textTheme.titleSmall?.copyWith(
-              color: isDark ? AppColors.goldLight : AppColors.burgundy,
+              color: theme.colorScheme.onTertiaryFixed,
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -264,16 +247,12 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.offWhite : AppColors.black;
-    final iconColor = isDark ? AppColors.goldLight : AppColors.burgundy;
-
     final content = Padding(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       child: Row(
         children: [
-          Icon(icon, size: 24.r, color: iconColor),
-          SizedBox(width: 14.w),
+          Icon(icon, size: 24.r, color: theme.colorScheme.onTertiaryFixed),
+          SizedBox(width: 8.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,7 +260,7 @@ class _SettingsTile extends StatelessWidget {
                 Text(
                   label,
                   style: theme.textTheme.bodyLarge?.copyWith(
-                    color: labelColor,
+                    color: theme.colorScheme.primaryFixed,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -290,7 +269,7 @@ class _SettingsTile extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: isDark ? AppColors.taupe : AppColors.burgundy,
+                      color: theme.colorScheme.onTertiaryFixed,
                     ),
                   ),
                 ],
@@ -301,7 +280,7 @@ class _SettingsTile extends StatelessWidget {
             Icon(
               Icons.chevron_right_rounded,
               size: 24.r,
-              color: isDark ? AppColors.taupe : AppColors.burgundy,
+              color: theme.colorScheme.onTertiaryFixed,
             ),
         ],
       ),
@@ -315,70 +294,5 @@ class _SettingsTile extends StatelessWidget {
       );
     }
     return content;
-  }
-}
-
-class _NotificationSwitchTile extends StatelessWidget {
-  const _NotificationSwitchTile({
-    required this.icon,
-    required this.label,
-    required this.subtitle,
-    required this.value,
-    required this.isBusy,
-    required this.onChanged,
-  });
-
-  final IconData icon;
-  final String label;
-  final String subtitle;
-  final bool value;
-  final bool isBusy;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-      child: Row(
-        children: [
-          Icon(icon, size: 24.r, color: theme.colorScheme.primary),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.primaryFixed,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Text(
-                  subtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          if (isBusy)
-            SpinKitFadingCircle(size: 22.r, color: theme.colorScheme.primary)
-          else
-            Switch(
-              value: value,
-              activeThumbColor: AppColors.offWhite,
-              activeTrackColor: theme.colorScheme.primary,
-              inactiveThumbColor: theme.colorScheme.onSurface,
-              inactiveTrackColor: theme.colorScheme.tertiaryFixed,
-              onChanged: onChanged,
-            ),
-        ],
-      ),
-    );
   }
 }

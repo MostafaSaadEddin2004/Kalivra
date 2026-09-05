@@ -15,7 +15,7 @@ class NotificationsCubit extends Cubit<NotificationsState> {
 
   final NotificationPreferencesApiService _service;
 
-  Future<void> _updateLoginRequired() async {
+  Future<void> _updateLoginRequired({bool showLoading = true}) async {
     final token = await LocalStore.getToken();
     final loginRequired = token == null || token.isEmpty;
     if (loginRequired) {
@@ -31,11 +31,21 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     }
 
     emit(
-      state.copyWith(loginRequired: false, isLoading: true, errorMessage: ''),
+      state.copyWith(
+        loginRequired: false,
+        isLoading: showLoading,
+        errorMessage: '',
+      ),
     );
 
     try {
-      final notifications = await _service.getNotificationHistory();
+      final fetchedNotifications = await _service.getNotificationHistory();
+      final notifications = showLoading
+          ? fetchedNotifications
+          : _mergeNotifications(
+              fetchedNotifications,
+              fallbackNotifications: state.notifications,
+            );
       emit(
         state.copyWith(
           loginRequired: false,
@@ -56,6 +66,8 @@ class NotificationsCubit extends Cubit<NotificationsState> {
   }
 
   Future<void> refresh() => _updateLoginRequired();
+
+  Future<void> syncFromServer() => _updateLoginRequired(showLoading: false);
 
   void markAsRead(String notificationId) {
     final readAt = DateTime.now();
@@ -101,5 +113,23 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     }
 
     emit(state.copyWith(notifications: notifications));
+  }
+
+  List<AppNotification> _mergeNotifications(
+    List<AppNotification> fetchedNotifications, {
+    required List<AppNotification> fallbackNotifications,
+  }) {
+    final byId = <String, AppNotification>{};
+
+    for (final notification in fallbackNotifications) {
+      byId[notification.id] = notification;
+    }
+
+    for (final notification in fetchedNotifications.reversed) {
+      byId[notification.id] = notification;
+    }
+
+    return byId.values.toList()
+      ..sort((left, right) => right.createdAt.compareTo(left.createdAt));
   }
 }

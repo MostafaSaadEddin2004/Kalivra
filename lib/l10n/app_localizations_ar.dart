@@ -566,6 +566,61 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationMandatory => 'إلزامي';
 
   @override
+  String get notificationPreferencesSectionTitle => 'الإشعارات';
+
+  @override
+  String get notificationPreferencesChannelsTitle => 'أماكن وصول الإشعارات';
+
+  @override
+  String get notificationPreferencesChannelsSubtitle =>
+      'اختر القنوات التي تريد استقبال الإشعارات منها';
+
+  @override
+  String get notificationPreferencesScreenTitle => 'أماكن وصول الإشعارات';
+
+  @override
+  String get notificationPreferencesScreenDescription =>
+      'حدد أين تريد استقبال إشعارات الإعلانات.';
+
+  @override
+  String get notificationChannelInAppTitle => 'داخل التطبيق';
+
+  @override
+  String get notificationChannelInAppDescription =>
+      'تظهر الإشعارات في صفحة الإشعارات.';
+
+  @override
+  String get notificationChannelPushTitle => 'إشعارات الهاتف';
+
+  @override
+  String get notificationChannelPushDescription =>
+      'استقبل إشعارات فورية على جهازك.';
+
+  @override
+  String get notificationChannelEmailTitle => 'البريد الإلكتروني';
+
+  @override
+  String get notificationChannelEmailDescription =>
+      'استقبل نسخة من الإشعارات على بريدك الإلكتروني.';
+
+  @override
+  String get notificationChannelWhatsappTitle => 'واتساب';
+
+  @override
+  String get notificationChannelWhatsappDescription =>
+      'استقبل إشعارات عبر واتساب.';
+
+  @override
+  String get notificationPreferencesSave => 'حفظ';
+
+  @override
+  String get notificationPreferencesSaved => 'تم حفظ إعدادات الإشعارات';
+
+  @override
+  String get notificationPreferencesLoadFailed =>
+      'تعذر تحميل إعدادات الإشعارات';
+
+  @override
   String get loginRequiredForOrders => 'يجب تسجيل الدخول لعرض طلباتك';
 
   @override

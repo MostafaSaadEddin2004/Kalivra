@@ -7,8 +7,15 @@ class NotificationPreference {
 
   static const String announcementType = 'announcement';
   static const String inAppChannel = 'in_app';
+  static const String pushChannel = 'push';
+  static const String emailChannel = 'email';
   static const String whatsappChannel = 'whatsapp';
-  static const List<String> availableChannels = [inAppChannel, whatsappChannel];
+  static const List<String> availableChannels = [
+    inAppChannel,
+    pushChannel,
+    emailChannel,
+    whatsappChannel,
+  ];
 
   final String notificationType;
   final bool enabled;

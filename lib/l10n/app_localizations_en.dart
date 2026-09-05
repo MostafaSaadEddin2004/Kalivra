@@ -570,6 +570,62 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationMandatory => 'Mandatory';
 
   @override
+  String get notificationPreferencesSectionTitle => 'Notifications';
+
+  @override
+  String get notificationPreferencesChannelsTitle =>
+      'Notification destinations';
+
+  @override
+  String get notificationPreferencesChannelsSubtitle =>
+      'Choose the channels where you want to receive notifications';
+
+  @override
+  String get notificationPreferencesScreenTitle => 'Notification destinations';
+
+  @override
+  String get notificationPreferencesScreenDescription =>
+      'Choose where you want to receive announcement notifications.';
+
+  @override
+  String get notificationChannelInAppTitle => 'In-app';
+
+  @override
+  String get notificationChannelInAppDescription =>
+      'Show notifications in the notifications screen.';
+
+  @override
+  String get notificationChannelPushTitle => 'Phone notifications';
+
+  @override
+  String get notificationChannelPushDescription =>
+      'Receive instant notifications on your device.';
+
+  @override
+  String get notificationChannelEmailTitle => 'Email';
+
+  @override
+  String get notificationChannelEmailDescription =>
+      'Receive a copy of notifications by email.';
+
+  @override
+  String get notificationChannelWhatsappTitle => 'WhatsApp';
+
+  @override
+  String get notificationChannelWhatsappDescription =>
+      'Receive notifications through WhatsApp.';
+
+  @override
+  String get notificationPreferencesSave => 'Save';
+
+  @override
+  String get notificationPreferencesSaved => 'Notification settings saved';
+
+  @override
+  String get notificationPreferencesLoadFailed =>
+      'Could not load notification settings';
+
+  @override
   String get loginRequiredForOrders => 'Sign in to view your orders';
 
   @override

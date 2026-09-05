@@ -16,7 +16,7 @@ enum AppNotificationStatus { created, sent, failed }
 
 enum AppNotificationSourceType { system, manual }
 
-enum AppNotificationDeliveryChannel { inApp, sms, email, whatsapp }
+enum AppNotificationDeliveryChannel { inApp, push, sms, email, whatsapp }
 
 enum AppNotificationRelatedEntity {
   person,
@@ -336,6 +336,9 @@ class AppNotification {
 
   static AppNotificationDeliveryChannel _parseChannel(Object? value) {
     switch (_normalize(value)) {
+      case 'push':
+      case 'fcm':
+        return AppNotificationDeliveryChannel.push;
       case 'sms':
         return AppNotificationDeliveryChannel.sms;
       case 'email':

@@ -96,6 +96,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverToBoxAdapter(child: SizedBox(height: 8.h)),
+                SliverToBoxAdapter(
+                  child: _UnreadNotificationsSummary(
+                    unreadCount: state.unreadCount,
+                  ),
+                ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                     final notification = state.notifications[index];
@@ -157,11 +162,74 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case AppNotificationType.decisionSession:
       case AppNotificationType.officialAnnouncement:
       case AppNotificationType.legalDeadline:
-        return AppRoutes.associationRequestsAndServices;
+        return AppRoutes.associationAnnouncements;
       case AppNotificationType.manualSystemNotice:
         return AppRoutes.settings;
       case AppNotificationType.deliveryFailure:
         return AppRoutes.contact;
     }
+  }
+}
+
+class _UnreadNotificationsSummary extends StatelessWidget {
+  const _UnreadNotificationsSummary({required this.unreadCount});
+
+  final int unreadCount;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 12.h),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.tertiaryFixed.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(
+            color: theme.colorScheme.primary.withValues(alpha: 0.12),
+          ),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+          child: Row(
+            children: [
+              Icon(
+                Icons.mark_email_unread_outlined,
+                color: theme.colorScheme.primary,
+                size: 22.r,
+              ),
+              SizedBox(width: 10.w),
+              Expanded(
+                child: Text(
+                  l10n.notificationUnread,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.primaryFixed,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                constraints: BoxConstraints(minWidth: 34.r),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(999.r),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  unreadCount.toString(),
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: theme.colorScheme.onPrimaryFixed,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

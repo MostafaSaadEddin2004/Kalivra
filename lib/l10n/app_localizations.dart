@@ -1154,6 +1154,102 @@ abstract class AppLocalizations {
   /// **'Mandatory'**
   String get notificationMandatory;
 
+  /// No description provided for @notificationPreferencesSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationPreferencesSectionTitle;
+
+  /// No description provided for @notificationPreferencesChannelsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification destinations'**
+  String get notificationPreferencesChannelsTitle;
+
+  /// No description provided for @notificationPreferencesChannelsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the channels where you want to receive notifications'**
+  String get notificationPreferencesChannelsSubtitle;
+
+  /// No description provided for @notificationPreferencesScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification destinations'**
+  String get notificationPreferencesScreenTitle;
+
+  /// No description provided for @notificationPreferencesScreenDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose where you want to receive announcement notifications.'**
+  String get notificationPreferencesScreenDescription;
+
+  /// No description provided for @notificationChannelInAppTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'In-app'**
+  String get notificationChannelInAppTitle;
+
+  /// No description provided for @notificationChannelInAppDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Show notifications in the notifications screen.'**
+  String get notificationChannelInAppDescription;
+
+  /// No description provided for @notificationChannelPushTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone notifications'**
+  String get notificationChannelPushTitle;
+
+  /// No description provided for @notificationChannelPushDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive instant notifications on your device.'**
+  String get notificationChannelPushDescription;
+
+  /// No description provided for @notificationChannelEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get notificationChannelEmailTitle;
+
+  /// No description provided for @notificationChannelEmailDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive a copy of notifications by email.'**
+  String get notificationChannelEmailDescription;
+
+  /// No description provided for @notificationChannelWhatsappTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'WhatsApp'**
+  String get notificationChannelWhatsappTitle;
+
+  /// No description provided for @notificationChannelWhatsappDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive notifications through WhatsApp.'**
+  String get notificationChannelWhatsappDescription;
+
+  /// No description provided for @notificationPreferencesSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get notificationPreferencesSave;
+
+  /// No description provided for @notificationPreferencesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification settings saved'**
+  String get notificationPreferencesSaved;
+
+  /// No description provided for @notificationPreferencesLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load notification settings'**
+  String get notificationPreferencesLoadFailed;
+
   /// No description provided for @loginRequiredForOrders.
   ///
   /// In en, this message translates to:

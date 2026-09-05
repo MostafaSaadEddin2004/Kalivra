@@ -64,6 +64,9 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
+
   @override
   void initState() {
     super.initState();
@@ -84,7 +87,10 @@ class _MainState extends State<Main> {
       return;
     }
 
-    context.read<NotificationsCubit>().receiveRemoteNotification(data);
+    final cubit = context.read<NotificationsCubit>();
+    final notification = cubit.receiveRemoteNotification(data);
+    cubit.syncFromServer();
+    _showNotificationToast(notification);
   }
 
   void _handleNotificationTap(Map<String, dynamic> data) {
@@ -99,6 +105,100 @@ class _MainState extends State<Main> {
     AppRouter.router.push(_routeForNotification(notification));
   }
 
+  void _openNotification(AppNotification notification) {
+    context.read<NotificationsCubit>().markAsRead(notification.id);
+    _scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+    AppRouter.router.push(_routeForNotification(notification));
+  }
+
+  void _showNotificationToast(AppNotification notification) {
+    final messengerState = _scaffoldMessengerKey.currentState;
+    if (messengerState == null) return;
+
+    final messengerContext = messengerState.context;
+    final theme = Theme.of(messengerContext);
+    final title = notification.title.trim();
+    final message = notification.message.trim();
+
+    messengerState
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: theme.colorScheme.onTertiaryFixed,
+          duration: const Duration(seconds: 6),
+          margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 18.h),
+          padding: EdgeInsets.zero,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          content: InkWell(
+            borderRadius: BorderRadius.circular(12.r),
+            onTap: () => _openNotification(notification),
+            child: Padding(
+              padding: EdgeInsets.all(14.w),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42.r,
+                    height: 42.r,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onPrimaryFixed.withValues(
+                        alpha: 0.14,
+                      ),
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Icon(
+                      notification.icon,
+                      color: theme.colorScheme.onPrimaryFixed,
+                      size: 22.r,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title.isEmpty ? 'Kalivra' : title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onPrimaryFixed,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        if (message.isNotEmpty) ...[
+                          SizedBox(height: 3.h),
+                          Text(
+                            message,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onPrimaryFixed
+                                  .withValues(alpha: 0.82),
+                              height: 1.3,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+                  Icon(
+                    Icons.chevron_right_rounded,
+                    color: theme.colorScheme.onPrimaryFixed,
+                    size: 22.r,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+  }
+
   String _routeForNotification(AppNotification notification) {
     switch (notification.type) {
       case AppNotificationType.memberOperation:
@@ -108,7 +208,7 @@ class _MainState extends State<Main> {
       case AppNotificationType.decisionSession:
       case AppNotificationType.officialAnnouncement:
       case AppNotificationType.legalDeadline:
-        return AppRoutes.associationRequestsAndServices;
+        return AppRoutes.associationAnnouncements;
       case AppNotificationType.manualSystemNotice:
         return AppRoutes.settings;
       case AppNotificationType.deliveryFailure:
@@ -134,6 +234,7 @@ class _MainState extends State<Main> {
           final theme = context.watch<ThemeBloc>().state;
           final locale = context.watch<LocaleBloc>().state;
           return MaterialApp.router(
+            scaffoldMessengerKey: _scaffoldMessengerKey,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
