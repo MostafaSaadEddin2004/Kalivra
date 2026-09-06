@@ -135,7 +135,7 @@ class _OrderCardState extends State<_OrderCard> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14.r),
             border: Border.all(
-              color: colorScheme.primaryFixed.withValues(alpha: 0.08),
+              color: colorScheme.primaryFixed.withValues(alpha: 0.3),
             ),
             boxShadow: [
               BoxShadow(
@@ -154,12 +154,14 @@ class _OrderCardState extends State<_OrderCard> {
                     width: 42.w,
                     height: 42.w,
                     decoration: BoxDecoration(
-                      color: AppColors.burgundy.withValues(alpha: 0.08),
+                      color: theme.colorScheme.onTertiaryFixed.withValues(
+                        alpha: 0.1,
+                      ),
                       borderRadius: BorderRadius.circular(10.r),
                     ),
                     child: Icon(
                       Icons.receipt_long_outlined,
-                      color: AppColors.burgundy,
+                      color: theme.colorScheme.onTertiaryFixed,
                       size: 23.r,
                     ),
                   ),
@@ -200,20 +202,23 @@ class _OrderCardState extends State<_OrderCard> {
               ),
               SizedBox(height: 14.h),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: _OrderMetaItem(
-                      label: AppLocalizations.of(context)!.status,
-                      value: order.displayStatus,
+                  Text(
+                    AppLocalizations.of(context)!.total,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.primaryFixed,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: _OrderMetaItem(
-                      label: AppLocalizations.of(context)!.total,
-                      value: _formatTotal(context, order),
-                      alignEnd: true,
+                  SizedBox(height: 4.h),
+                  Text(
+                    _formatTotal(context, order),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: theme.colorScheme.onTertiaryFixed,
+                      fontWeight: FontWeight.w800,
                     ),
+                    maxLines: 1,
                   ),
                 ],
               ),
@@ -228,17 +233,19 @@ class _OrderCardState extends State<_OrderCard> {
                       icon: _isCancelling
                           ? SpinKitFadingCircle(
                               size: 16.r,
-                              color: AppColors.burgundy,
+                              color: theme.colorScheme.onTertiaryFixed,
                             )
                           : const Icon(Icons.cancel_outlined),
                       label: Text(labels.cancelOrder),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.burgundy,
+                        foregroundColor: theme.colorScheme.onTertiaryFixed,
                         side: BorderSide(
-                          color: AppColors.burgundy.withValues(alpha: 0.34),
+                          color: theme.colorScheme.onTertiaryFixed.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(24.r),
                         ),
                       ),
                     ),
@@ -250,9 +257,9 @@ class _OrderCardState extends State<_OrderCard> {
                       icon: _isReordering
                           ? SpinKitFadingCircle(
                               size: 16.r,
-                              color: AppColors.offWhite,
+                              color: theme.colorScheme.secondaryFixed,
                             )
-                          : const Icon(Icons.replay_outlined),
+                          : const Icon(Icons.replay_rounded),
                       label: Text(labels.reorder),
                     ),
                   ),
@@ -263,18 +270,17 @@ class _OrderCardState extends State<_OrderCard> {
                 alignment: AlignmentDirectional.centerEnd,
                 child: TextButton(
                   onPressed: isBusy ? null : () => _openOrderDetails(context),
-                  child: Text(AppLocalizations.of(context)!.viewDetails),
-                ),
-              ),
-              if (!canCancel) ...[
-                Text(
-                  labels.cancelUnavailable,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colorScheme.primaryFixed.withValues(alpha: 0.46),
-                    fontWeight: FontWeight.w600,
+                  style: TextButton.styleFrom(),
+                  child: Text(
+                    AppLocalizations.of(context)!.viewDetails,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primaryFixed,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
-              ],
+              ),
             ],
           ),
         ),
@@ -427,49 +433,6 @@ class _StatusBadge extends StatelessWidget {
           fontWeight: FontWeight.w800,
         ),
       ),
-    );
-  }
-}
-
-class _OrderMetaItem extends StatelessWidget {
-  const _OrderMetaItem({
-    required this.label,
-    required this.value,
-    this.alignEnd = false,
-  });
-
-  final String label;
-  final String value;
-  final bool alignEnd;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return Column(
-      crossAxisAlignment: alignEnd
-          ? CrossAxisAlignment.end
-          : CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.primaryFixed.withValues(alpha: 0.48),
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        SizedBox(height: 4.h),
-        Text(
-          value,
-          style: theme.textTheme.titleSmall?.copyWith(
-            color: alignEnd ? AppColors.burgundy : colorScheme.primaryFixed,
-            fontWeight: FontWeight.w800,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: alignEnd ? TextAlign.end : TextAlign.start,
-        ),
-      ],
     );
   }
 }

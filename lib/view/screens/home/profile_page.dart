@@ -85,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 90.h),
             children: [
               if (isLoggedIn) ...[
-                _ProfileHeroCard(customer: customer),
+                ProfileHeroCard(customer: customer),
                 SizedBox(height: 24.h),
                 _ProfileSectionTitle(title: l10n.profileSectionAccountOrders),
                 SizedBox(height: 8.h),
@@ -192,8 +192,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class _ProfileHeroCard extends StatelessWidget {
-  const _ProfileHeroCard({required this.customer});
+class ProfileHeroCard extends StatelessWidget {
+  const ProfileHeroCard({super.key, required this.customer});
 
   final CustomerApiModel? customer;
 
@@ -259,11 +259,11 @@ class _ProfileHeroCard extends StatelessWidget {
                     width: 28.w,
                     padding: EdgeInsets.all(4.w),
                     decoration: BoxDecoration(
-                      color: AppColors.taupe,
+                      color: theme.colorScheme.onTertiaryFixed,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: theme.colorScheme.secondaryFixed,
-                        width: 1.5.w,
+                        width: 1.w,
                       ),
                     ),
                     child: Icon(

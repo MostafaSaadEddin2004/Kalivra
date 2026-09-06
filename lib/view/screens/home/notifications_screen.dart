@@ -99,6 +99,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 SliverToBoxAdapter(
                   child: _UnreadNotificationsSummary(
                     unreadCount: state.unreadCount,
+                    onMarkAllRead: state.unreadCount == 0
+                        ? null
+                        : () => context
+                              .read<NotificationsCubit>()
+                              .markAllAsRead(),
                   ),
                 ),
                 SliverList(
@@ -155,6 +160,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   String _routeForNotification(AppNotification notification) {
     switch (notification.type) {
+      case AppNotificationType.orderPlaced:
+      case AppNotificationType.orderCanceled:
+      case AppNotificationType.shipment:
+        return AppRoutes.orders;
+      case AppNotificationType.associationRequest:
+      case AppNotificationType.membership:
+      case AppNotificationType.paymentConfirmation:
+        return AppRoutes.associationMemberProfile;
       case AppNotificationType.memberOperation:
         return AppRoutes.associationMemberProfile;
       case AppNotificationType.financialOperation:
@@ -172,9 +185,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 }
 
 class _UnreadNotificationsSummary extends StatelessWidget {
-  const _UnreadNotificationsSummary({required this.unreadCount});
+  const _UnreadNotificationsSummary({
+    required this.unreadCount,
+    required this.onMarkAllRead,
+  });
 
   final int unreadCount;
+  final VoidCallback? onMarkAllRead;
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +241,16 @@ class _UnreadNotificationsSummary extends StatelessWidget {
                     color: theme.colorScheme.onPrimaryFixed,
                     fontWeight: FontWeight.w900,
                   ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              IconButton(
+                onPressed: onMarkAllRead,
+                tooltip: l10n.notificationRead,
+                icon: Icon(Icons.done_all_rounded, size: 22.r),
+                color: theme.colorScheme.primaryFixed,
+                disabledColor: theme.colorScheme.primaryFixed.withValues(
+                  alpha: 0.35,
                 ),
               ),
             ],

@@ -220,7 +220,7 @@ class _OrderHeaderCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(18.w),
       decoration: BoxDecoration(
-        color: AppColors.burgundy,
+        color: colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
@@ -380,6 +380,7 @@ class _OrderActionsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final labels = _OrderDetailsLabels.of(context);
     final canCancel = _canCancel(order.status);
+    final theme = Theme.of(context);
 
     return _SectionCard(
       title: labels.actions,
@@ -392,13 +393,13 @@ class _OrderActionsCard extends StatelessWidget {
                   ? onCancel
                   : null,
               icon: isCancelling
-                  ? SpinKitFadingCircle(size: 16.r, color: AppColors.burgundy)
+                  ? SpinKitFadingCircle(size: 16.r, color: theme.colorScheme.onTertiaryFixed)
                   : const Icon(Icons.cancel_outlined),
               label: Text(labels.cancelOrder),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.burgundy,
+                foregroundColor: theme.colorScheme.onTertiaryFixed,
                 side: BorderSide(
-                  color: AppColors.burgundy.withValues(alpha: 0.34),
+                  color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.34),
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.r),
@@ -465,10 +466,10 @@ class _SectionCard extends StatelessWidget {
                 width: 36.w,
                 height: 36.w,
                 decoration: BoxDecoration(
-                  color: AppColors.burgundy.withValues(alpha: 0.08),
+                  color: colorScheme.onTertiaryFixed.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(icon, color: AppColors.burgundy, size: 20.r),
+                child: Icon(icon, color: colorScheme.onTertiaryFixed, size: 20.r),
               ),
               SizedBox(width: 10.w),
               Expanded(
@@ -532,7 +533,7 @@ class _DetailsRow extends StatelessWidget {
                           : theme.textTheme.bodyMedium)
                       ?.copyWith(
                         color: isEmphasized
-                            ? AppColors.burgundy
+                            ? colorScheme.onTertiaryFixed
                             : colorScheme.primaryFixed,
                         fontWeight: isEmphasized
                             ? FontWeight.w900
@@ -575,7 +576,7 @@ class _OrderItemTile extends StatelessWidget {
             child: CustomNetworkImage(
               imageUrl: item.imageUrl,
               defaultIcon: Icons.inventory_2_outlined,
-              defaultIconColor: AppColors.burgundy,
+              defaultIconColor: colorScheme.onTertiaryFixed,
             ),
           ),
           SizedBox(width: 12.w),
@@ -624,7 +625,7 @@ class _OrderItemTile extends StatelessWidget {
             child: Text(
               _formatItemTotal(context, item, order),
               style: theme.textTheme.titleSmall?.copyWith(
-                color: AppColors.burgundy,
+                color: colorScheme.onTertiaryFixed,
                 fontWeight: FontWeight.w900,
               ),
               textAlign: TextAlign.end,
@@ -791,7 +792,7 @@ class _AddressLine extends StatelessWidget {
           Icon(
             icon,
             size: 17.r,
-            color: AppColors.burgundy.withValues(alpha: 0.78),
+            color: colorScheme.onTertiaryFixed.withValues(alpha: 0.78),
           ),
           SizedBox(width: 8.w),
           Expanded(

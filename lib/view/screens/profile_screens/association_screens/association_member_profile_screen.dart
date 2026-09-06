@@ -1565,7 +1565,7 @@ class _BuildingsInformationSection extends StatelessWidget {
         .toList();
     final hasMembershipBuildings = buildings.isNotEmpty;
 
-    return _ExpandableProfileSection(
+    return hasMembershipBuildings? _ExpandableProfileSection(
       title: AppLocalizations.of(context)!.associationMemberBuildingInformation,
       icon: Icons.business_rounded,
       children: hasMembershipBuildings
@@ -1584,7 +1584,7 @@ class _BuildingsInformationSection extends StatelessWidget {
           : projectsWithBuildings
                 .map((project) => _ProjectBuildingsGroup(project: project))
                 .toList(),
-    );
+    ):const SizedBox.shrink();
   }
 }
 

@@ -27,10 +27,16 @@ class AuthInterceptor extends Interceptor {
     final token = await LocalStore.getToken();
     options.headers.addAll({
       'Accept': 'application/json',
-      'Content-Type': 'application/json',
       'Locale': locale,
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     });
+
+    if (options.data is FormData) {
+      options.headers.remove(Headers.contentTypeHeader);
+      options.headers.remove('Content-Type');
+    } else {
+      options.headers[Headers.contentTypeHeader] = Headers.jsonContentType;
+    }
     super.onRequest(options, handler);
   }
 

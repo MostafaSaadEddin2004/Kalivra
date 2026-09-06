@@ -201,6 +201,14 @@ class _MainState extends State<Main> {
 
   String _routeForNotification(AppNotification notification) {
     switch (notification.type) {
+      case AppNotificationType.orderPlaced:
+      case AppNotificationType.orderCanceled:
+      case AppNotificationType.shipment:
+        return AppRoutes.orders;
+      case AppNotificationType.associationRequest:
+      case AppNotificationType.membership:
+      case AppNotificationType.paymentConfirmation:
+        return AppRoutes.associationMemberProfile;
       case AppNotificationType.memberOperation:
         return AppRoutes.associationMemberProfile;
       case AppNotificationType.financialOperation:

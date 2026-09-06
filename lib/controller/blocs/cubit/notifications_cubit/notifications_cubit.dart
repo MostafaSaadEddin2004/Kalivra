@@ -83,6 +83,36 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     emit(state.copyWith(notifications: notifications));
   }
 
+  Future<void> markAllAsRead() async {
+    final hasUnreadNotifications = state.notifications.any(
+      (notification) => !notification.isRead,
+    );
+    if (!hasUnreadNotifications) return;
+
+    final previousNotifications = state.notifications;
+    final readAt = DateTime.now();
+    final notifications = state.notifications
+        .map(
+          (notification) => notification.isRead
+              ? notification
+              : notification.copyWith(readAt: readAt),
+        )
+        .toList(growable: false);
+
+    emit(state.copyWith(notifications: notifications, errorMessage: ''));
+
+    try {
+      await _service.markAllNotificationsAsRead();
+    } catch (error) {
+      emit(
+        state.copyWith(
+          notifications: previousNotifications,
+          errorMessage: error.toString(),
+        ),
+      );
+    }
+  }
+
   AppNotification receiveRemoteNotification(
     Map<String, dynamic> data, {
     String? fallbackId,

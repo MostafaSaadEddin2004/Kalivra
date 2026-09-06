@@ -24,4 +24,32 @@ void main() {
     expect(notification.isMandatory, isTrue);
     expect(notification.channels, contains(AppNotificationDeliveryChannel.sms));
   });
+
+  test('AppNotification parses customer notification API payload data', () {
+    final notification = AppNotification.fromRemoteData({
+      'id': 'e9d2a2f4-be6c-473b-bd68-8f7e6727e731',
+      'title': 'تم إلغاء طلب جديد',
+      'body': 'تم إلغاء طلبك #15 المنجز في 2026-08-27 00:14:48',
+      'type': 'order_canceled',
+      'source': 'kalivra',
+      'source_label': 'كاليفرا',
+      'reference_id': 15,
+      'read': false,
+      'created_at': '2026-09-06T22:59:49+03:00',
+      'url': 'https://test2.kalivra-world.com/customer/account/orders/view/15',
+    });
+
+    expect(notification.id, 'e9d2a2f4-be6c-473b-bd68-8f7e6727e731');
+    expect(notification.type, AppNotificationType.orderCanceled);
+    expect(notification.rawType, 'order_canceled');
+    expect(notification.source, 'kalivra');
+    expect(notification.sourceLabel, 'كاليفرا');
+    expect(notification.referenceId, '15');
+    expect(notification.relatedEntityId, '15');
+    expect(notification.isRead, isFalse);
+    expect(
+      notification.url,
+      'https://test2.kalivra-world.com/customer/account/orders/view/15',
+    );
+  });
 }

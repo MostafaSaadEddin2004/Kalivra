@@ -100,36 +100,41 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                 );
               default:
-                return ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.all(16.w),
-                  itemCount: 4,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 12.h),
-                      child: Skeletonizer(
-                        child: ProductCard(
-                          product: ProductModel(
-                            id: 0,
-                            sku: '',
-                            name: '',
-                            urlKey: '',
-                            images: [],
-                            isNew: true,
-                            prices: ProductPrices(
-                              regular: PriceDetail(price: ''),
-                            ),
-                            isFeatured: true,
-                            onSale: true,
-                            isSaleable: true,
-                            isWishlist: true,
-                            ratings: ProductRatings(average: '', total: 0),
-                            reviews: ProductReviews(total: 0),
-                          ),
-                        ),
+                return Skeletonizer(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: GridView.builder(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12.h,
+                        crossAxisSpacing: 12.w,
+                        childAspectRatio: 0.72,
                       ),
-                    );
-                  },
+                      itemBuilder: (context, index) {
+                        return ProductCard(
+                          product: ProductModel(
+                              id: 0,
+                              sku: '',
+                              name: '',
+                              urlKey: '',
+                              images: [],
+                              isNew: true,
+                              prices: ProductPrices(
+                                regular: PriceDetail(price: ''),
+                              ),
+                              isFeatured: true,
+                              onSale: true,
+                              isSaleable: true,
+                              isWishlist: true,
+                              ratings: ProductRatings(average: '', total: 0),
+                              reviews: ProductReviews(total: 0),
+                            ),
+                        );
+                      },
+                      itemCount: 6,
+                    ),
+                  ),
                 );
             }
           },

@@ -124,7 +124,7 @@ class _DetailsColumn extends StatelessWidget {
               child: Text(
                 productName,
                 style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.primaryFixed,
+                  color: colorScheme.onTertiaryFixed,
                   fontWeight: FontWeight.w900,
                 ),
                 maxLines: 2,
@@ -170,7 +170,7 @@ class _DetailsColumn extends StatelessWidget {
               label: _firstWord(l10n.editItem),
               onPressed: isDeleting || isEditing ? null : onEdit,
               isLoading: isEditing,
-              color: colorScheme.primary,
+              color: colorScheme.onTertiaryFixed,
             ),
           ],
         ),
@@ -196,7 +196,7 @@ class _InfoLine extends StatelessWidget {
         Text(
           '$label:',
           style: theme.textTheme.bodySmall?.copyWith(
-            color: colorScheme.primaryFixed.withValues(alpha: 0.54),
+            color: colorScheme.primaryFixed,
             fontWeight: FontWeight.w700,
           ),
           maxLines: 1,
@@ -206,7 +206,7 @@ class _InfoLine extends StatelessWidget {
           child: Text(
             value,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.primaryFixed,
+              color: colorScheme.onTertiaryFixed,
               fontWeight: FontWeight.w900,
             ),
             maxLines: 1,
@@ -241,7 +241,7 @@ class _TotalPanel extends StatelessWidget {
           Text(
             '$label:',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: colorScheme.primaryFixed.withValues(alpha: 0.54),
+              color: colorScheme.primaryFixed,
               fontWeight: FontWeight.w600,
             ),
             maxLines: 1,
@@ -251,7 +251,7 @@ class _TotalPanel extends StatelessWidget {
             child: Text(
               value,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.primary,
+                color: colorScheme.onTertiaryFixed,
                 fontWeight: FontWeight.w900,
               ),
               maxLines: 1,

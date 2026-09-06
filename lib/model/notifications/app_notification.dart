@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 
 enum AppNotificationType {
+  orderPlaced,
+  orderCanceled,
+  shipment,
+  associationRequest,
+  membership,
+  paymentConfirmation,
   memberOperation,
   financialOperation,
   decisionSession,
@@ -36,6 +42,11 @@ class AppNotification {
     required this.message,
     required this.createdAt,
     required this.sourceEvent,
+    required this.rawType,
+    this.source,
+    this.sourceLabel,
+    this.referenceId,
+    this.url,
     this.status = AppNotificationStatus.sent,
     this.sourceType = AppNotificationSourceType.system,
     this.channels = const [AppNotificationDeliveryChannel.inApp],
@@ -53,6 +64,11 @@ class AppNotification {
   final String message;
   final DateTime createdAt;
   final String sourceEvent;
+  final String rawType;
+  final String? source;
+  final String? sourceLabel;
+  final String? referenceId;
+  final String? url;
   final AppNotificationStatus status;
   final AppNotificationSourceType sourceType;
   final List<AppNotificationDeliveryChannel> channels;
@@ -71,7 +87,11 @@ class AppNotification {
     String? fallbackTitle,
     String? fallbackMessage,
   }) {
-    final type = _parseType(data['notification_type'] ?? data['type']);
+    final rawType = _stringValue(data['notification_type'] ?? data['type']);
+    final type = _parseType(rawType);
+    final createdAt = _parseDate(data['created_at']) ?? DateTime.now();
+    final readAt = _parseDate(data['read_at']);
+    final isRead = _parseBool(data['read']);
     final id =
         _stringValue(
           data['id'] ?? data['notification_id'] ?? data['message_id'],
@@ -92,22 +112,44 @@ class AppNotification {
           ) ??
           fallbackMessage ??
           '',
-      createdAt: _parseDate(data['created_at']) ?? DateTime.now(),
+      createdAt: createdAt,
       sourceEvent:
-          _stringValue(data['source_event']) ?? _sourceEventForType(type),
+          _stringValue(data['source_event']) ??
+          rawType ??
+          _sourceEventForType(type),
+      rawType: rawType ?? _sourceEventForType(type),
+      source: _stringValue(data['source']),
+      sourceLabel: _stringValue(data['source_label']),
+      referenceId: _stringValue(data['reference_id']),
+      url: _stringValue(data['url']),
       status: _parseStatus(data['status']),
-      sourceType: _parseSourceType(data['source_type']),
+      sourceType: _parseSourceType(data['source_type'] ?? data['source']),
       channels: _parseChannels(data['channels'] ?? data['channel']),
       priority: _parsePriority(data['priority']),
-      relatedEntity: _parseRelatedEntity(data['related_entity']),
-      relatedEntityId: _stringValue(data['related_entity_id']),
+      relatedEntity: _parseRelatedEntity(data['related_entity'] ?? rawType),
+      relatedEntityId:
+          _stringValue(data['related_entity_id']) ??
+          _stringValue(data['reference_id']),
       isMandatory: _parseBool(data['is_mandatory'] ?? data['mandatory']),
       expiredAt: _parseDate(data['expired_at'] ?? data['expiration_date']),
+      readAt: readAt ?? (isRead ? createdAt : null),
     );
   }
 
   String get code {
     switch (type) {
+      case AppNotificationType.orderPlaced:
+        return 'order_placed';
+      case AppNotificationType.orderCanceled:
+        return 'order_canceled';
+      case AppNotificationType.shipment:
+        return 'shipment';
+      case AppNotificationType.associationRequest:
+        return 'association_request';
+      case AppNotificationType.membership:
+        return 'membership';
+      case AppNotificationType.paymentConfirmation:
+        return 'payment_confirmation';
       case AppNotificationType.memberOperation:
         return 'member_operation';
       case AppNotificationType.financialOperation:
@@ -127,6 +169,18 @@ class AppNotification {
 
   IconData get icon {
     switch (type) {
+      case AppNotificationType.orderPlaced:
+        return Icons.shopping_bag_outlined;
+      case AppNotificationType.orderCanceled:
+        return Icons.cancel_outlined;
+      case AppNotificationType.shipment:
+        return Icons.local_shipping_outlined;
+      case AppNotificationType.associationRequest:
+        return Icons.fact_check_outlined;
+      case AppNotificationType.membership:
+        return Icons.home_work_outlined;
+      case AppNotificationType.paymentConfirmation:
+        return Icons.payments_outlined;
       case AppNotificationType.memberOperation:
         return Icons.groups_rounded;
       case AppNotificationType.financialOperation:
@@ -146,6 +200,18 @@ class AppNotification {
 
   String get typeLabel {
     switch (type) {
+      case AppNotificationType.orderPlaced:
+        return 'Order placed';
+      case AppNotificationType.orderCanceled:
+        return 'Order canceled';
+      case AppNotificationType.shipment:
+        return 'Shipment';
+      case AppNotificationType.associationRequest:
+        return 'Association request';
+      case AppNotificationType.membership:
+        return 'Membership';
+      case AppNotificationType.paymentConfirmation:
+        return 'Payment confirmation';
       case AppNotificationType.memberOperation:
         return 'Member operation';
       case AppNotificationType.financialOperation:
@@ -202,6 +268,11 @@ class AppNotification {
       message: message,
       createdAt: createdAt,
       sourceEvent: sourceEvent,
+      rawType: rawType,
+      source: source,
+      sourceLabel: sourceLabel,
+      referenceId: referenceId,
+      url: url,
       status: status,
       sourceType: sourceType,
       channels: channels,
@@ -217,9 +288,27 @@ class AppNotification {
   static AppNotificationType _parseType(Object? value) {
     final normalized = _normalize(value);
     switch (normalized) {
+      case 'orderplaced':
+      case 'order_placed':
+        return AppNotificationType.orderPlaced;
+      case 'ordercanceled':
+      case 'order_canceled':
+      case 'order_cancelled':
+        return AppNotificationType.orderCanceled;
+      case 'shipment':
+      case 'shipping':
+      case 'order_shipped':
+        return AppNotificationType.shipment;
+      case 'associationrequest':
+      case 'association_request':
+        return AppNotificationType.associationRequest;
+      case 'membership':
+        return AppNotificationType.membership;
+      case 'paymentconfirmation':
+      case 'payment_confirmation':
+        return AppNotificationType.paymentConfirmation;
       case 'memberoperation':
       case 'member_operation':
-      case 'membership':
       case 'member':
         return AppNotificationType.memberOperation;
       case 'financialoperation':
@@ -298,6 +387,7 @@ class AppNotification {
 
   static AppNotificationRelatedEntity _parseRelatedEntity(Object? value) {
     switch (_normalize(value)) {
+      case 'association_request':
       case 'person':
       case 'user':
         return AppNotificationRelatedEntity.person;
@@ -307,6 +397,7 @@ class AppNotification {
       case 'project':
         return AppNotificationRelatedEntity.project;
       case 'payment':
+      case 'payment_confirmation':
         return AppNotificationRelatedEntity.payment;
       case 'obligation':
         return AppNotificationRelatedEntity.obligation;
@@ -397,6 +488,18 @@ class AppNotification {
 
   static String _sourceEventForType(AppNotificationType type) {
     switch (type) {
+      case AppNotificationType.orderPlaced:
+        return 'order_placed';
+      case AppNotificationType.orderCanceled:
+        return 'order_canceled';
+      case AppNotificationType.shipment:
+        return 'shipment';
+      case AppNotificationType.associationRequest:
+        return 'association_request';
+      case AppNotificationType.membership:
+        return 'membership';
+      case AppNotificationType.paymentConfirmation:
+        return 'payment_confirmation';
       case AppNotificationType.memberOperation:
         return 'member_operation';
       case AppNotificationType.financialOperation:

@@ -81,6 +81,7 @@ class _NotificationIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final visibleCount = unreadCount > 99 ? '99+' : unreadCount.toString();
+    final theme = Theme.of(context);
 
     return Stack(
       clipBehavior: Clip.none,
@@ -94,21 +95,20 @@ class _NotificationIconButton extends StatelessWidget {
         ),
         if (unreadCount > 0)
           PositionedDirectional(
-            top: 4.h,
-            end: 2.w,
+            top: 6.h,
+            end: 6.w,
             child: Container(
               constraints: BoxConstraints(minWidth: 18.r, minHeight: 18.r),
               padding: EdgeInsets.symmetric(horizontal: 4.w),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.error,
-                borderRadius: BorderRadius.circular(9.r),
-                border: Border.all(color: iconColor, width: 1.2.w),
+                color: theme.colorScheme.onError,
+                shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Text(
                 visibleCount,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onError,
+                  color: AppColors.offWhite,
                   fontSize: 9.sp,
                   fontWeight: FontWeight.w700,
                   height: 1,

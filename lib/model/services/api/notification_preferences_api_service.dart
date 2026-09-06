@@ -9,7 +9,7 @@ class NotificationPreferencesApiService {
   final DioClient _client;
 
   Future<List<AppNotification>> getNotificationHistory() async {
-    final response = await _client.get('customer/notification-preferences');
+    final response = await _client.get('customer/notifications');
     final rawNotifications = _rawListFromPayload(
       response.data,
       keys: const ['notifications', 'notification_history', 'history', 'items'],
@@ -20,6 +20,10 @@ class NotificationPreferencesApiService {
         .where(_looksLikeNotification)
         .map((item) => AppNotification.fromRemoteData(Map.from(item)))
         .toList(growable: false);
+  }
+
+  Future<void> markAllNotificationsAsRead() async {
+    await _client.post('customer/notifications/read-all');
   }
 
   Future<NotificationPreference> getAnnouncementPreference() async {

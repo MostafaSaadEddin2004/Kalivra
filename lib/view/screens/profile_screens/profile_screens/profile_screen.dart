@@ -7,11 +7,10 @@ import 'package:kalivra/core/app_router.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
+import 'package:kalivra/view/screens/home/profile_page.dart';
 import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
-import 'package:kalivra/view/widgets/cards/custom_network_image.dart';
 import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
-import 'package:kalivra/view/widgets/profile/referral_qr_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class Profile extends StatefulWidget {
@@ -203,60 +202,9 @@ class _ProfileState extends State<Profile> {
                     children: [
                       Column(
                         children: [
-                          Row(
-                            spacing: 16.w,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 96.r,
-                                height: 96.r,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: theme.colorScheme.onTertiaryFixed,
-                                ),
-                                child: ClipOval(
-                                  child: CustomNetworkImage(
-                                    imageUrl: '',
-                                    defaultIcon: Icons.person_rounded,
-                                    defaultIconColor:
-                                        theme.colorScheme.onTertiaryFixed,
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'fullName',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w900,
-                                          ),
-                                    ),
-                                    Text(
-                                      'email',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                    Text(
-                                      'gender',
-                                      style: theme.textTheme.bodyLarge
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                          ProfileHeroCard(customer: CustomerApiModel(id: 0)),
                           SizedBox(height: 12.h),
+                        
                         ],
                       ),
                       _SectionCard(
@@ -305,140 +253,14 @@ class _ProfileState extends State<Profile> {
                 );
               case AuthFetchedData():
                 final customer = state.customer;
-                final firstName = customer.firstName ?? '';
-                final lastName = customer.lastName ?? '';
-                final fullName = '$firstName $lastName'.trim();
                 final addressInfo = customer.addressInformation;
-                final referralCode = customer.referralCode;
                 return ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.all(20.w),
                   children: [
                     Column(
                       children: [
-                        Container(
-                          padding: EdgeInsets.all(18.w),
-                          decoration: BoxDecoration(
-                            color: AppColors.burgundy,
-                            borderRadius: BorderRadius.circular(18.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.black.withValues(alpha: 0.16),
-                                blurRadius: 16.r,
-                                offset: Offset(0, 8.h),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  ClipOval(
-                                    child: Container(
-                                      width: 74.r,
-                                      height: 74.r,
-                                      color: AppColors.offWhite,
-                                      child: CustomNetworkImage(
-                                        imageUrl: customer.imageUrl,
-                                        width: 74.r,
-                                        height: 74.r,
-                                        defaultIcon: Icons.person_rounded,
-                                        defaultIconColor: AppColors.burgundy,
-                                      ),
-                                    ),
-                                  ),
-                                  PositionedDirectional(
-                                    end: -2.w,
-                                    bottom: -2.h,
-                                    child: InkWell(
-                                      child: Container(
-                                        height: 28.h,
-                                        width: 28.w,
-                                        padding: EdgeInsets.all(4.w),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.taupe,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: AppColors.burgundy,
-                                            width: 1.5.w,
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.edit_rounded,
-                                          color: AppColors.burgundy,
-                                          size: 16.r,
-                                        ),
-                                      ),
-                                      onTap: () => context.push(
-                                        AppRoutes.editProfile,
-                                        extra: customer,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 16.w),
-                              Expanded(
-                                child: Column(
-                                  spacing: 8.h,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      fullName,
-                                      style: theme.textTheme.titleLarge
-                                          ?.copyWith(
-                                            color: AppColors.offWhite,
-                                            fontWeight: FontWeight.w800,
-                                          ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Row(
-                                      spacing: 4.w,
-                                      children: [
-                                        Icon(
-                                          Icons.person,
-                                          color:
-                                              theme.colorScheme.secondaryFixed,
-                                        ),
-                                        Text(
-                                          customer.gender ?? '',
-                                          style: theme.textTheme.bodySmall
-                                              ?.copyWith(
-                                                color: AppColors.offWhite,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (referralCode != null &&
-                                  referralCode.isNotEmpty) ...[
-                                SizedBox(width: 8.w),
-                                InkWell(
-                                  onTap: () => showReferralQrDialog(
-                                    context,
-                                    referralCode: referralCode,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(8.w),
-                                    child: Icon(
-                                      Icons.qr_code_2_rounded,
-                                      color: theme.colorScheme.secondaryFixed,
-                                      size: 24.r,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+                        ProfileHeroCard(customer: customer),
                         SizedBox(height: 12.h),
                       ],
                     ),
@@ -631,19 +453,17 @@ class _AddressDisplayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final primary = isDark ? AppColors.goldLight : AppColors.burgundy;
     final muted = isDark ? AppColors.taupe : AppColors.burgundy;
-    final surface = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.16)
-        : AppColors.burgundy.withValues(alpha: 0.05);
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: EdgeInsets.all(14.w),
       decoration: BoxDecoration(
-        color: surface,
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: primary.withValues(alpha: 0.18)),
+        border: Border.all(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.3),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,16 +474,22 @@ class _AddressDisplayCard extends StatelessWidget {
                 width: 32.r,
                 height: 32.r,
                 decoration: BoxDecoration(
-                  color: primary.withValues(alpha: 0.12),
+                  color: theme.colorScheme.onTertiaryFixed.withValues(
+                    alpha: 0.1,
+                  ),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: primary, size: 18.r),
+                child: Icon(
+                  icon,
+                  color: theme.colorScheme.onTertiaryFixed,
+                  size: 18.r,
+                ),
               ),
               SizedBox(width: 12.w),
               Text(
                 title,
                 style: theme.textTheme.titleSmall?.copyWith(
-                  color: primary,
+                  color: theme.colorScheme.onTertiaryFixed,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -709,6 +535,7 @@ class _AddressDisplayCard extends StatelessWidget {
     );
   }
 }
+
 class _AddressDetail {
   const _AddressDetail(this.label, this.value);
 

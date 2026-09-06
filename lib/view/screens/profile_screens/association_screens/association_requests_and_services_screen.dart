@@ -17,6 +17,8 @@ import 'package:kalivra/view/widgets/association/association_dropdown_field.dart
 import 'package:kalivra/view/widgets/association/association_form_section.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AssociationRequestsAndServicesScreen extends StatefulWidget {
   const AssociationRequestsAndServicesScreen({super.key});
@@ -277,6 +279,41 @@ class _AssociationRequestsAndServicesScreenState
     });
   }
 
+  Future<void> _openAttachment(AssociationLinkAttachment attachment) async {
+    final l10n = AppLocalizations.of(context)!;
+    final file = attachment.file;
+
+    if (!await file.exists()) {
+      if (!mounted) return;
+      CustomSnackBar.show(context, l10n.fileActionCouldNotOpenFile);
+      return;
+    }
+
+    if (_isImageFileName(attachment.fileName)) {
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              _LocalImagePreviewScreen(title: attachment.fileName, file: file),
+        ),
+      );
+      return;
+    }
+
+    try {
+      final opened = await launchUrl(
+        Uri.file(file.path),
+        mode: LaunchMode.externalApplication,
+      );
+      if (!opened && mounted) {
+        CustomSnackBar.show(context, l10n.fileActionCouldNotOpenFile);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      CustomSnackBar.show(context, l10n.fileActionCouldNotOpenFile);
+    }
+  }
+
   void _addAdditionalAddress() {
     if (_isLocked) return;
 
@@ -472,6 +509,7 @@ class _AssociationRequestsAndServicesScreenState
           enabled: !_isLocked,
           onPickAttachment: _pickAttachment,
           onRemoveAttachment: _removeAttachment,
+          onOpenAttachment: _openAttachment,
           onAttachmentTypeChanged: _onAttachmentTypeChanged,
         ),
       ],
@@ -572,6 +610,7 @@ class _AssociationRequestsAndServicesScreenState
                       onRemoveCurrentAddress: _removeCurrentAddress,
                       onPickAttachment: _pickAttachment,
                       onRemoveAttachment: _removeAttachment,
+                      onOpenAttachment: _openAttachment,
                       onAttachmentTypeChanged: _onAttachmentTypeChanged,
                       validateRequiredField: (value) =>
                           _validateRequiredField(value, l10n),
@@ -637,6 +676,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
     required this.onRemoveCurrentAddress,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
+    required this.onOpenAttachment,
     required this.onAttachmentTypeChanged,
     required this.validateRequiredField,
     required this.validateRequiredPhone,
@@ -684,6 +724,7 @@ class _AssociationLinkRequestSection extends StatefulWidget {
 
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
+  final ValueChanged<AssociationLinkAttachment> onOpenAttachment;
   final void Function(String id, String? value) onAttachmentTypeChanged;
 
   final String? Function(String?) validateRequiredField;
@@ -832,6 +873,7 @@ class _AssociationLinkRequestSectionState
           enabled: !widget.isLocked,
           onPickAttachment: widget.onPickAttachment,
           onRemoveAttachment: widget.onRemoveAttachment,
+          onOpenAttachment: widget.onOpenAttachment,
           onAttachmentTypeChanged: widget.onAttachmentTypeChanged,
         ),
       ],
@@ -1364,6 +1406,7 @@ class _RequestAttachmentsSection extends StatelessWidget {
     required this.enabled,
     required this.onPickAttachment,
     required this.onRemoveAttachment,
+    required this.onOpenAttachment,
     required this.onAttachmentTypeChanged,
   });
 
@@ -1374,6 +1417,7 @@ class _RequestAttachmentsSection extends StatelessWidget {
   final bool enabled;
   final VoidCallback onPickAttachment;
   final ValueChanged<String> onRemoveAttachment;
+  final ValueChanged<AssociationLinkAttachment> onOpenAttachment;
   final void Function(String id, String? value) onAttachmentTypeChanged;
 
   @override
@@ -1400,6 +1444,7 @@ class _RequestAttachmentsSection extends StatelessWidget {
             selectedAttachmentTypeId: attachmentTypeIds[attachment.fileName],
             enabled: enabled,
             isLoadingAttachmentTypes: isLoadingAttachmentTypes,
+            onOpen: () => onOpenAttachment(attachment),
             onDelete: () => onRemoveAttachment(attachment.fileName),
             onAttachmentTypeChanged: (value) =>
                 onAttachmentTypeChanged(attachment.fileName, value),
@@ -1435,6 +1480,7 @@ class AttachmentTile extends StatelessWidget {
     required this.selectedAttachmentTypeId,
     required this.enabled,
     required this.isLoadingAttachmentTypes,
+    required this.onOpen,
     required this.onDelete,
     required this.onAttachmentTypeChanged,
   });
@@ -1444,6 +1490,7 @@ class AttachmentTile extends StatelessWidget {
   final String? selectedAttachmentTypeId;
   final bool enabled;
   final bool isLoadingAttachmentTypes;
+  final VoidCallback onOpen;
   final VoidCallback onDelete;
   final ValueChanged<String?> onAttachmentTypeChanged;
 
@@ -1465,20 +1512,46 @@ class AttachmentTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.insert_drive_file_outlined),
-              SizedBox(width: 8.w),
               Expanded(
-                child: Text(
-                  attachment.fileName,
-                  style: theme.textTheme.bodyMedium,
-                  overflow: TextOverflow.ellipsis,
+                child: InkWell(
+                  onTap: onOpen,
+                  borderRadius: BorderRadius.circular(8.r),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.h),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.insert_drive_file_outlined),
+                        SizedBox(width: 8.w),
+                        Expanded(
+                          child: Text(
+                            attachment.fileName,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onTertiaryFixed,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
+                        Icon(
+                          _isImageFileName(attachment.fileName)
+                              ? Icons.zoom_out_map_rounded
+                              : Icons.open_in_new_rounded,
+                          size: 20.r,
+                          color: theme.colorScheme.onTertiaryFixed,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               if (enabled)
                 IconButton(
                   onPressed: onDelete,
                   tooltip: l10n.associationLinkDeleteAttachment,
-                  icon: const Icon(Icons.delete_outline_rounded),
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    color: theme.colorScheme.onTertiaryFixed,
+                  ),
                 ),
             ],
           ),
@@ -1505,4 +1578,73 @@ class AttachmentTile extends StatelessWidget {
       ),
     );
   }
+}
+
+class _LocalImagePreviewScreen extends StatelessWidget {
+  const _LocalImagePreviewScreen({required this.title, required this.file});
+
+  final String title;
+  final File file;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      backgroundColor: AppColors.black,
+      appBar: AppBar(
+        backgroundColor: AppColors.black,
+        foregroundColor: AppColors.offWhite,
+        title: Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: AppColors.offWhite,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: PhotoView(
+        imageProvider: FileImage(file),
+        backgroundDecoration: const BoxDecoration(color: AppColors.black),
+        minScale: PhotoViewComputedScale.contained,
+        maxScale: PhotoViewComputedScale.covered * 4,
+        loadingBuilder: (context, event) {
+          return Center(
+            child: SpinKitFadingCircle(size: 42.r, color: AppColors.offWhite),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: Icon(
+              Icons.broken_image_outlined,
+              color: AppColors.offWhite.withValues(alpha: 0.75),
+              size: 58.r,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+bool _isImageFileName(String fileName) {
+  return const {
+    'jpg',
+    'jpeg',
+    'png',
+    'webp',
+    'gif',
+    'bmp',
+    'heic',
+    'heif',
+  }.contains(_fileExtension(fileName));
+}
+
+String _fileExtension(String fileName) {
+  final cleanPath = fileName.split('?').first.split('#').first;
+  final dotIndex = cleanPath.lastIndexOf('.');
+  if (dotIndex < 0 || dotIndex == cleanPath.length - 1) return '';
+  return cleanPath.substring(dotIndex + 1).toLowerCase();
 }
