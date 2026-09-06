@@ -117,8 +117,8 @@ class AssociationApiService {
     final requestDocuments = attachments;
     for (var i = 0; i < requestDocuments.length; i++) {
       final attachment = requestDocuments[i];
-      data['documents[$i][attachment_type_id]'] = attachment.attachmentTypeId;
-      data['documents[$i][file]'] = await MultipartFile.fromFile(
+      data['documents[$i][document_definition_id]'] = attachment.attachmentTypeId;
+      data['documents[$i][document]'] = await MultipartFile.fromFile(
         attachment.file.path,
         filename: CustomerApiService.basename(attachment.file.path),
       );

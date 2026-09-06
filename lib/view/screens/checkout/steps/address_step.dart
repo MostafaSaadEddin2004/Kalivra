@@ -579,12 +579,12 @@ class _AddressCard extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.burgundy.withValues(alpha: 0.035)
+              ? theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.035)
               : theme.cardTheme.color,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: selected
-                ? AppColors.burgundy
+                ? theme.colorScheme.onTertiaryFixed
                 : colorScheme.primaryFixed.withValues(alpha: 0.08),
             width: selected ? 1.2.w : 1.w,
           ),
@@ -597,7 +597,7 @@ class _AddressCard extends StatelessWidget {
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
               color: selected
-                  ? AppColors.burgundy
+                  ? theme.colorScheme.onTertiaryFixed
                   : colorScheme.primaryFixed.withValues(alpha: 0.45),
               size: 23.r,
             ),
@@ -733,27 +733,24 @@ class _AddAddressPreviewButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    return OutlinedButton(
-      onPressed: onTap,
-      style: OutlinedButton.styleFrom(
-        textStyle: theme.textTheme.titleMedium?.copyWith(
-          color: colorScheme.secondaryFixed,
-          fontWeight: FontWeight.w800,
-        ),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1.w),
-          borderRadius: BorderRadius.circular(14.r),
-        ),
-      ),
-      child: Text(
+    return OutlinedButton.icon(
+            onPressed: onTap,
+            icon:  Icon(Icons.add_rounded, size: 22.r,color: theme.colorScheme.onTertiaryFixed,),
+            label: Text(
         label,
         style: theme.textTheme.titleSmall?.copyWith(
-          color: colorScheme.onTertiaryFixed,
+          color: theme.colorScheme.onTertiaryFixed,
           fontWeight: FontWeight.w800,
         ),
       ),
-    );
+            style: OutlinedButton.styleFrom(
+              foregroundColor: theme.colorScheme.primaryFixed,
+              side: BorderSide(color: theme.colorScheme.onTertiaryFixed),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14.r),
+              ),
+            ),
+          );
   }
 }
 
@@ -1448,14 +1445,14 @@ class _CheckoutPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FilledButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 21.r),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.burgundy,
-        foregroundColor: AppColors.offWhite,
-        padding: EdgeInsets.symmetric(vertical: 17.h, horizontal: 18.w),
+        backgroundColor: theme.colorScheme.onTertiaryFixed,
+        padding: EdgeInsets.symmetric(vertical: 12.h,),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.r),
         ),

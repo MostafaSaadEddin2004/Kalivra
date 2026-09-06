@@ -343,6 +343,40 @@ class _AssociationRequestsAndServicesScreenState
     });
   }
 
+  void _clearRequestForm() {
+    _formKey.currentState?.reset();
+
+    for (final address in _additionalAddresses) {
+      address.dispose();
+    }
+
+    setState(() {
+      _requestType = null;
+      _selectedGovernorate = null;
+      _selectedCity = null;
+      _selectedTown = null;
+      _hasCurrentAddress = false;
+
+      _messageController.clear();
+      _firstNameController.clear();
+      _fatherNameController.clear();
+      _lastNameController.clear();
+      _motherNameController.clear();
+      _nationalIdController.clear();
+      _streetController.clear();
+      _streetNumberController.clear();
+      _buildingController.clear();
+      _currentAddress.clear();
+      _additionalAddresses.clear();
+      _membershipNumberController.clear();
+      _priorityNumberController.clear();
+      _claimedBuildingNumberController.clear();
+      _villageController.clear();
+      _attachments.clear();
+      _attachmentTypeIds.clear();
+    });
+  }
+
   List<AssociationLinkAttachment> _attachmentsWithTypes() {
     return _attachments.map((attachment) {
       return attachment.copyWith(
@@ -561,6 +595,10 @@ class _AssociationRequestsAndServicesScreenState
                   ..clear()
                   ..addAll(state.attachmentTypes);
               });
+            }
+
+            if (state is AssociationLinkSubmittedSuccessfully) {
+              _clearRequestForm();
             }
           },
           builder: (context, state) {

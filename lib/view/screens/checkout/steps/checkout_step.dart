@@ -31,6 +31,7 @@ class CheckoutStep extends StatelessWidget {
     final shippingMethod = _selectedShippingMethod(checkoutState);
     final paymentMethod = _selectedPaymentMethod(checkoutState);
     final address = CheckoutAddressData.fromSummary(summary).firstOrNull;
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 24.h),
@@ -86,8 +87,7 @@ class CheckoutStep extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.burgundy,
-              foregroundColor: AppColors.offWhite,
+              backgroundColor: theme.colorScheme.onTertiaryFixed,
               padding: EdgeInsets.symmetric(vertical: 17.h, horizontal: 18.w),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.r),
@@ -229,7 +229,7 @@ class _ProductsSummaryCard extends StatelessWidget {
                         item.total?.toStringAsFixed(0) ??
                         '',
                     style: theme.textTheme.titleSmall?.copyWith(
-                      color: AppColors.burgundy,
+                      color: theme.colorScheme.onTertiaryFixed,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -450,10 +450,10 @@ class _SectionHeader extends StatelessWidget {
           width: 34.r,
           height: 34.r,
           decoration: BoxDecoration(
-            color: AppColors.burgundy.withValues(alpha: 0.06),
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.06),
             borderRadius: BorderRadius.circular(8.r),
           ),
-          child: Icon(icon, color: AppColors.burgundy, size: 21.r),
+          child: Icon(icon, color: theme.colorScheme.onTertiaryFixed, size: 21.r),
         ),
         SizedBox(width: 10.w),
         Expanded(
@@ -500,7 +500,7 @@ class _TotalRow extends StatelessWidget {
         Text(
           value,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: bold ? AppColors.burgundy : colorScheme.primaryFixed,
+            color: bold ? theme.colorScheme.onTertiaryFixed : colorScheme.primaryFixed,
             fontWeight: bold ? FontWeight.w900 : FontWeight.w500,
           ),
         ),

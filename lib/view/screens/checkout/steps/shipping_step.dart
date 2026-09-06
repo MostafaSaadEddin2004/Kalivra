@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/checkout/checkout_summary_model.dart';
 import 'package:kalivra/view/screens/checkout/steps/address_step.dart';
@@ -136,7 +135,7 @@ class _AddressSummaryCard extends StatelessWidget {
         children: [
           Icon(
             Icons.location_on_outlined,
-            color: AppColors.burgundy,
+            color: theme.colorScheme.onTertiaryFixed,
             size: 25.r,
           ),
           SizedBox(width: 12.w),
@@ -168,7 +167,7 @@ class _AddressSummaryCard extends StatelessWidget {
           ),
           Icon(
             Icons.chevron_right_rounded,
-            color: AppColors.burgundy,
+            color: theme.colorScheme.onTertiaryFixed,
             size: 24.r,
           ),
         ],
@@ -200,12 +199,12 @@ class _ShippingMethodCard extends StatelessWidget {
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: selected
-              ? AppColors.burgundy.withValues(alpha: 0.035)
+              ? theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1)
               : theme.cardTheme.color,
           borderRadius: BorderRadius.circular(14.r),
           border: Border.all(
             color: selected
-                ? AppColors.burgundy
+                ? theme.colorScheme.onTertiaryFixed
                 : colorScheme.primaryFixed.withValues(alpha: 0.08),
             width: selected ? 1.2.w : 1.w,
           ),
@@ -217,7 +216,7 @@ class _ShippingMethodCard extends StatelessWidget {
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
               color: selected
-                  ? AppColors.burgundy
+                  ? theme.colorScheme.onTertiaryFixed
                   : colorScheme.primaryFixed.withValues(alpha: 0.45),
               size: 23.r,
             ),
@@ -328,13 +327,13 @@ class _CheckoutPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FilledButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 21.r),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.burgundy,
-        foregroundColor: AppColors.offWhite,
+        backgroundColor: theme.colorScheme.onTertiaryFixed,
         padding: EdgeInsets.symmetric(vertical: 17.h, horizontal: 18.w),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.r),

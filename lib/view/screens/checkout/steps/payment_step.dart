@@ -135,7 +135,7 @@ class _AddressSummaryCard extends StatelessWidget {
         children: [
           Icon(
             Icons.location_on_outlined,
-            color: AppColors.burgundy,
+            color: theme.colorScheme.onTertiaryFixed,
             size: 25.r,
           ),
           SizedBox(width: 12.w),
@@ -199,9 +199,9 @@ class _PaymentMethodCard extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: AppColors.burgundy.withValues(alpha: 0.035),
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(color: AppColors.burgundy, width: 1.2.w),
+          border: Border.all(color: theme.colorScheme.onTertiaryFixed, width: 1.2.w),
         ),
         child: Row(
           children: [
@@ -209,7 +209,7 @@ class _PaymentMethodCard extends StatelessWidget {
               selected
                   ? Icons.radio_button_checked_rounded
                   : Icons.radio_button_off_rounded,
-              color: AppColors.burgundy,
+              color: theme.colorScheme.onTertiaryFixed,
               size: 23.r,
             ),
             SizedBox(width: 12.w),
@@ -277,13 +277,13 @@ class _CheckoutPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FilledButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 21.r),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: FilledButton.styleFrom(
-        backgroundColor: AppColors.burgundy,
-        foregroundColor: AppColors.offWhite,
+        backgroundColor: theme.colorScheme.onTertiaryFixed,
         padding: EdgeInsets.symmetric(vertical: 17.h, horizontal: 18.w),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.r),

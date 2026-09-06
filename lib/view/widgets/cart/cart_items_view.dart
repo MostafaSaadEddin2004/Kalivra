@@ -193,16 +193,18 @@ class _CartActionsBar extends StatelessWidget {
                     size: 20.r,
                     color: colorScheme.primaryFixed,
                   )
-                : Icon(Icons.delete_outline_rounded, size: 22.r),
+                : Icon(Icons.delete_outline_rounded, size: 22.r,color: theme.colorScheme.onTertiaryFixed,),
             label: Text(
               l10n.emptyCart,
+              style: theme.textTheme.titleMedium!.copyWith(
+                color: theme.colorScheme.onTertiaryFixed,
+              ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: colorScheme.primaryFixed,
-              side: BorderSide(color: AppColors.burgundy),
-              textStyle: theme.textTheme.titleMedium,
+              side: BorderSide(color: theme.colorScheme.onTertiaryFixed),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.r),
               ),

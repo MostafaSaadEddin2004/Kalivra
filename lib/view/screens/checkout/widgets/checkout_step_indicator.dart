@@ -48,7 +48,7 @@ class CheckoutStepIndicator extends StatelessWidget {
               child: Container(
                 height: 1.2.h,
                 margin: EdgeInsets.only(bottom: 28.h),
-                color: filled ? AppColors.burgundy : inactive,
+                color: filled ? theme.colorScheme.onTertiaryFixed : inactive,
               ),
             );
           }
@@ -58,7 +58,7 @@ class CheckoutStepIndicator extends StatelessWidget {
           final isPast = index < currentStep;
           final iconColor = isActive
               ? colorScheme.secondaryFixed
-              : AppColors.burgundy;
+              : AppColors.black;
 
           return InkWell(
             onTap: onStepTap != null && (isPast || isActive)
@@ -75,9 +75,9 @@ class CheckoutStepIndicator extends StatelessWidget {
                     height: 40.r,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isActive ? AppColors.burgundy : Colors.white,
+                      color: isActive ? theme.colorScheme.onTertiaryFixed : Colors.white,
                       border: Border.all(
-                        color: isActive ? AppColors.burgundy : inactive,
+                        color: isActive ? theme.colorScheme.onTertiaryFixed : inactive,
                         width: 1.2.w,
                       ),
                     ),
@@ -88,7 +88,7 @@ class CheckoutStepIndicator extends StatelessWidget {
                     labels[index],
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: isActive
-                          ? AppColors.burgundy
+                          ? theme.colorScheme.onTertiaryFixed
                           : colorScheme.primaryFixed.withValues(alpha: 0.62),
                       fontWeight: isActive ? FontWeight.w800 : FontWeight.w500,
                     ),
