@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/checkout/checkout_summary_model.dart';
@@ -11,12 +12,14 @@ class PaymentStep extends StatefulWidget {
     required this.methods,
     required this.summary,
     required this.onContinue,
+    this.isLoading = false,
     this.selectedMethodCode,
   });
 
   final List<CheckoutPaymentMethodModel> methods;
   final CheckoutSummaryModel? summary;
   final VoidCallback? onContinue;
+  final bool isLoading;
   final String? selectedMethodCode;
 
   @override
@@ -101,6 +104,7 @@ class PaymentStepState extends State<PaymentStep> {
           _CheckoutPrimaryButton(
             label: l10n.checkoutContinueToSummary,
             icon: Icons.receipt_long_outlined,
+            isLoading: widget.isLoading,
             onPressed: widget.onContinue,
           ),
         ],
@@ -201,7 +205,10 @@ class _PaymentMethodCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(14.r),
-          border: Border.all(color: theme.colorScheme.onTertiaryFixed, width: 1.2.w),
+          border: Border.all(
+            color: theme.colorScheme.onTertiaryFixed,
+            width: 1.2.w,
+          ),
         ),
         child: Row(
           children: [
@@ -269,18 +276,25 @@ class _CheckoutPrimaryButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return FilledButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon, size: 21.r),
+      icon: isLoading
+          ? SpinKitFadingCircle(
+              size: 21.r,
+              color: theme.colorScheme.onPrimaryFixed,
+            )
+          : Icon(icon, size: 21.r),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: FilledButton.styleFrom(
         backgroundColor: theme.colorScheme.onTertiaryFixed,

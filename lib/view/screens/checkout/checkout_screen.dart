@@ -214,12 +214,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               AddressStep(
                                 key: _addressStepKey,
                                 summary: checkoutState.summary,
+                                isLoading: isLoading,
                                 onContinue: isLoading ? null : _goNext,
                               ),
                               ShippingStep(
                                 key: _shippingStepKey,
                                 methods: checkoutState.shippingMethods,
                                 summary: checkoutState.summary,
+                                isLoading: isLoading,
                                 selectedMethodCode:
                                     checkoutState.selectedShippingMethod,
                                 onContinue: isLoading ? null : _goNext,
@@ -228,6 +230,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 key: _paymentStepKey,
                                 methods: checkoutState.paymentMethods,
                                 summary: checkoutState.summary,
+                                isLoading: isLoading,
                                 selectedMethodCode:
                                     checkoutState.selectedPaymentMethod,
                                 onContinue: isLoading ? null : _goNext,

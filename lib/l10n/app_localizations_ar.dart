@@ -560,7 +560,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationRead => 'مقروء';
 
   @override
-  String get notificationUnread => 'غير مقروء';
+  String get notificationMarkAsRead => 'تمييز الكل كمقروء';
+
+  @override
+  String get notificationUnread => 'الإشعارات الغير مقروءة';
+
+  @override
+  String get unreadNotification => 'غير مقروء';
 
   @override
   String get notificationMandatory => 'إلزامي';

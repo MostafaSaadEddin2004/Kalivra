@@ -37,6 +37,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Scaffold(
       appBar: ScreenAppBar(
         title: AppLocalizations.of(context)!.navNotifications,
+        actions: const [_MarkAllNotificationsAction()],
       ),
       body: AppRefreshIndicator(
         onRefresh: _refreshNotifications,
@@ -61,7 +62,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Center(
                   child: SpinKitFadingCircle(
                     size: 42.r,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Theme.of(context).colorScheme.primaryFixed,
                   ),
                 ),
               );
@@ -99,11 +100,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 SliverToBoxAdapter(
                   child: _UnreadNotificationsSummary(
                     unreadCount: state.unreadCount,
-                    onMarkAllRead: state.unreadCount == 0
-                        ? null
-                        : () => context
-                              .read<NotificationsCubit>()
-                              .markAllAsRead(),
                   ),
                 ),
                 SliverList(
@@ -184,14 +180,43 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 }
 
+class _MarkAllNotificationsAction extends StatelessWidget {
+  const _MarkAllNotificationsAction();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    return BlocBuilder<NotificationsCubit, NotificationsState>(
+      buildWhen: (previous, current) =>
+          previous.loginRequired != current.loginRequired,
+      builder: (context, state) {
+        if (state.loginRequired) return const SizedBox.shrink();
+
+        return Padding(
+          padding: EdgeInsetsDirectional.only(end: 8.w),
+          child: TextButton(
+            onPressed: () => context.read<NotificationsCubit>().markAllAsRead(),
+            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+            child: Text(
+              l10n.notificationMarkAsRead,
+              style: theme.textTheme.bodySmall!.copyWith(
+                color: theme.colorScheme.primaryFixed,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class _UnreadNotificationsSummary extends StatelessWidget {
-  const _UnreadNotificationsSummary({
-    required this.unreadCount,
-    required this.onMarkAllRead,
-  });
+  const _UnreadNotificationsSummary({required this.unreadCount});
 
   final int unreadCount;
-  final VoidCallback? onMarkAllRead;
 
   @override
   Widget build(BuildContext context) {
@@ -199,62 +224,36 @@ class _UnreadNotificationsSummary extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 12.h),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.tertiaryFixed.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(
-            color: theme.colorScheme.primary.withValues(alpha: 0.12),
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
-          child: Row(
-            children: [
-              Icon(
-                Icons.mark_email_unread_outlined,
-                color: theme.colorScheme.primary,
-                size: 22.r,
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+        child: Row(
+          spacing: 8.w,
+          children: [
+            Text(
+              l10n.notificationUnread,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.onTertiaryFixed,
+                fontWeight: FontWeight.w700,
               ),
-              SizedBox(width: 10.w),
-              Expanded(
-                child: Text(
-                  l10n.notificationUnread,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.primaryFixed,
-                    fontWeight: FontWeight.w700,
-                  ),
+            ),
+            Container(
+              constraints: BoxConstraints(minWidth: 34.r),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                unreadCount.toString(),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.onTertiaryFixed,
+                  fontWeight: FontWeight.w900,
                 ),
               ),
-              Container(
-                constraints: BoxConstraints(minWidth: 34.r),
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(999.r),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  unreadCount.toString(),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.onPrimaryFixed,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              IconButton(
-                onPressed: onMarkAllRead,
-                tooltip: l10n.notificationRead,
-                icon: Icon(Icons.done_all_rounded, size: 22.r),
-                color: theme.colorScheme.primaryFixed,
-                disabledColor: theme.colorScheme.primaryFixed.withValues(
-                  alpha: 0.35,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

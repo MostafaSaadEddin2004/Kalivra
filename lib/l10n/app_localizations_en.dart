@@ -564,7 +564,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationRead => 'Read';
 
   @override
-  String get notificationUnread => 'Unread';
+  String get notificationMarkAsRead => 'Mark all as read';
+
+  @override
+  String get notificationUnread => 'Unread notifications';
+
+  @override
+  String get unreadNotification => 'Unread';
 
   @override
   String get notificationMandatory => 'Mandatory';

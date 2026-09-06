@@ -1142,11 +1142,23 @@ abstract class AppLocalizations {
   /// **'Read'**
   String get notificationRead;
 
+  /// No description provided for @notificationMarkAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get notificationMarkAsRead;
+
   /// No description provided for @notificationUnread.
   ///
   /// In en, this message translates to:
-  /// **'Unread'**
+  /// **'Unread notifications'**
   String get notificationUnread;
+
+  /// No description provided for @unreadNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get unreadNotification;
 
   /// No description provided for @notificationMandatory.
   ///

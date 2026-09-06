@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:kalivra/controller/blocs/cubit/address_info_cubit/address_info_cubit.dart';
 import 'package:kalivra/core/app_theme.dart';
 import 'package:kalivra/l10n/app_localizations.dart';
@@ -17,10 +18,12 @@ class AddressStep extends StatefulWidget {
     super.key,
     required this.summary,
     required this.onContinue,
+    this.isLoading = false,
   });
 
   final CheckoutSummaryModel? summary;
   final VoidCallback? onContinue;
+  final bool isLoading;
 
   @override
   State<AddressStep> createState() => AddressStepState();
@@ -332,6 +335,7 @@ class AddressStepState extends State<AddressStep> {
           _CheckoutPrimaryButton(
             label: l10n.checkoutContinueToShipping,
             icon: Icons.local_shipping_outlined,
+            isLoading: widget.isLoading,
             onPressed: widget.onContinue,
           ),
         ],
@@ -734,23 +738,27 @@ class _AddAddressPreviewButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return OutlinedButton.icon(
-            onPressed: onTap,
-            icon:  Icon(Icons.add_rounded, size: 22.r,color: theme.colorScheme.onTertiaryFixed,),
-            label: Text(
+      onPressed: onTap,
+      icon: Icon(
+        Icons.add_rounded,
+        size: 22.r,
+        color: theme.colorScheme.onTertiaryFixed,
+      ),
+      label: Text(
         label,
         style: theme.textTheme.titleSmall?.copyWith(
           color: theme.colorScheme.onTertiaryFixed,
           fontWeight: FontWeight.w800,
         ),
       ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: theme.colorScheme.primaryFixed,
-              side: BorderSide(color: theme.colorScheme.onTertiaryFixed),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14.r),
-              ),
-            ),
-          );
+      style: OutlinedButton.styleFrom(
+        foregroundColor: theme.colorScheme.primaryFixed,
+        side: BorderSide(color: theme.colorScheme.onTertiaryFixed),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14.r),
+        ),
+      ),
+    );
   }
 }
 
@@ -1113,6 +1121,7 @@ class _AddressFormSheetState extends State<_AddressFormSheet> {
                             ? l10n.checkoutUpdateAddress
                             : l10n.checkoutSaveAddress,
                         icon: Icons.check_rounded,
+                        isLoading: _isSaving,
                         onPressed: _isSaving ? null : _submit,
                       ),
                     ],
@@ -1437,22 +1446,29 @@ class _CheckoutPrimaryButton extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.onPressed,
+    this.isLoading = false,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return FilledButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon, size: 21.r),
+      icon: isLoading
+          ? SpinKitFadingCircle(
+              size: 21.r,
+              color: theme.colorScheme.onPrimaryFixed,
+            )
+          : Icon(icon, size: 21.r),
       label: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
       style: FilledButton.styleFrom(
         backgroundColor: theme.colorScheme.onTertiaryFixed,
-        padding: EdgeInsets.symmetric(vertical: 12.h,),
+        padding: EdgeInsets.symmetric(vertical: 12.h),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14.r),
         ),

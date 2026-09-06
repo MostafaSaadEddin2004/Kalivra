@@ -35,7 +35,7 @@ class NotificationCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: 20.w, vertical: 6.h),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
         leading: Container(
@@ -66,7 +66,7 @@ class NotificationCard extends StatelessWidget {
                   _NotificationReadStatusChip(
                     label: isRead
                         ? l10n.notificationRead
-                        : l10n.notificationUnread,
+                        : l10n.unreadNotification,
                     isRead: isRead,
                   ),
                   if (isMandatory)
