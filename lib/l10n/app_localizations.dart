@@ -1388,6 +1388,12 @@ abstract class AppLocalizations {
   /// **'Products'**
   String get products;
 
+  /// No description provided for @relatedProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Related products'**
+  String get relatedProducts;
+
   /// No description provided for @loadProductsFailed.
   ///
   /// In en, this message translates to:

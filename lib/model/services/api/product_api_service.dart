@@ -21,6 +21,14 @@ class ProductApiService {
     return data;
   }
 
+  Future<List<ProductModel>> getRelatedProducts(int productId) async {
+    final res = await _client.get('products/$productId/related');
+    final data = (res.data['data'] as List<dynamic>)
+        .map((e) => ProductModel.fromJson(e))
+        .toList();
+    return data;
+  }
+
   Future<ProductModel> getProductById(int productId) async {
     final res = await _client.get('products/$productId');
     final data = res.data['data'];

@@ -71,6 +71,16 @@ class ProductsCubit extends Cubit<ProductsState> {
     }
   }
 
+  Future<void> loadRelatedProducts(int productId) async {
+    emit(ProductsLoading());
+    try {
+      final products = await _productService.getRelatedProducts(productId);
+      emit(ProductsLoaded(products: products));
+    } catch (e) {
+      emit(ProductsFailed(message: e.toString()));
+    }
+  }
+
   Future<void> loadProductById(int productId) async {
     emit(ProductsLoading());
     try {

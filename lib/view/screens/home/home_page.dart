@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:kalivra/view/widgets/app_refresh_indicator.dart';
 import 'package:kalivra/view/widgets/sections/brands_section.dart';
 import 'package:kalivra/view/widgets/sections/products_section.dart';
+import 'package:kalivra/view/widgets/sections/sales_section.dart';
 import 'package:kalivra/view/widgets/slider_widgets/ad_slider.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,6 +31,10 @@ class _HomePageState extends State<HomePage> {
           SliverToBoxAdapter(child: SizedBox(height: 16.h)),
           SliverToBoxAdapter(
             child: BrandsSection(key: ValueKey('brands-$_reloadKey')),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 16.h)),
+          SliverToBoxAdapter(
+            child: SalesSection(key: ValueKey('sales-$_reloadKey')),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 16.h)),
           ProductsSection(key: ValueKey('products-$_reloadKey')),

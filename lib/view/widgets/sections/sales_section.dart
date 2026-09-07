@@ -10,15 +10,35 @@ import 'package:kalivra/view/widgets/buttons/show_all_button.dart';
 import 'package:kalivra/view/widgets/cards/product_card.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class SalesSection extends StatelessWidget {
+class SalesSection extends StatefulWidget {
   const SalesSection({super.key});
+
+  @override
+  State<SalesSection> createState() => _SalesSectionState();
+}
+
+class _SalesSectionState extends State<SalesSection> {
+  late final ProductsCubit _productsCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _productsCubit = ProductsCubit()..loadSaleProducts();
+  }
+
+  @override
+  void dispose() {
+    _productsCubit.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
     return BlocBuilder<ProductsCubit, ProductsState>(
-      bloc: ProductsCubit()..loadSaleProducts(),
+      bloc: _productsCubit,
       builder: (context, state) {
         switch (state) {
           case ProductsLoading():

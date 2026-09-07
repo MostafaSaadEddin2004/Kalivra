@@ -166,6 +166,9 @@ abstract class AppRoutesName {
 }
 
 abstract class AppRouter {
+  static final GlobalKey<NavigatorState> rootNavigatorKey =
+      GlobalKey<NavigatorState>();
+
   static void openScreenWithPop(BuildContext context, String location) {
     context.push(location);
   }
@@ -175,6 +178,7 @@ abstract class AppRouter {
   }
 
   static final GoRouter router = GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     routes: <RouteBase>[
       GoRoute(

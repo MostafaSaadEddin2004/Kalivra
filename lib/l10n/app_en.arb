@@ -239,6 +239,7 @@
   "allSaleProducts": "All Sale Products",
 
   "products": "Products",
+  "relatedProducts": "Related products",
   "loadProductsFailed": "Failed to load products",
   "noProducts": "No products",
 

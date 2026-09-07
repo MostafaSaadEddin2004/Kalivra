@@ -697,6 +697,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get products => 'Products';
 
   @override
+  String get relatedProducts => 'Related products';
+
+  @override
   String get loadProductsFailed => 'Failed to load products';
 
   @override

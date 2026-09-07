@@ -22,7 +22,7 @@ class _AllSaleProductsScreenState extends State<AllSaleProductsScreen> {
   @override
   void initState() {
     super.initState();
-    _productsCubit = ProductsCubit()..loadProducts();
+    _productsCubit = ProductsCubit()..loadSaleProducts();
   }
 
   @override
@@ -32,14 +32,14 @@ class _AllSaleProductsScreenState extends State<AllSaleProductsScreen> {
   }
 
   Future<void> _refreshProducts() {
-    return _productsCubit.loadProducts();
+    return _productsCubit.loadSaleProducts();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: ScreenAppBar(title: l10n.products),
+      appBar: ScreenAppBar(title: l10n.allSaleProducts),
       body: AppRefreshIndicator(
         onRefresh: _refreshProducts,
         child: BlocBuilder<ProductsCubit, ProductsState>(

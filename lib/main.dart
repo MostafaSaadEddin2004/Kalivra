@@ -66,6 +66,7 @@ class Main extends StatefulWidget {
 class _MainState extends State<Main> {
   final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
       GlobalKey<ScaffoldMessengerState>();
+  OverlayEntry? _notificationToastEntry;
 
   @override
   void initState() {
@@ -107,96 +108,39 @@ class _MainState extends State<Main> {
 
   void _openNotification(AppNotification notification) {
     context.read<NotificationsCubit>().markAsRead(notification.id);
-    _scaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+    _hideNotificationToast();
     AppRouter.router.push(_routeForNotification(notification));
   }
 
-  void _showNotificationToast(AppNotification notification) {
-    final messengerState = _scaffoldMessengerKey.currentState;
-    if (messengerState == null) return;
+  void _hideNotificationToast() {
+    _notificationToastEntry?.remove();
+    _notificationToastEntry = null;
+  }
 
-    final messengerContext = messengerState.context;
-    final theme = Theme.of(messengerContext);
+  void _showNotificationToast(AppNotification notification) {
+    final overlay = AppRouter.rootNavigatorKey.currentState?.overlay;
+    if (overlay == null) return;
+
     final title = notification.title.trim();
     final message = notification.message.trim();
 
-    messengerState
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: theme.colorScheme.onTertiaryFixed,
-          duration: const Duration(seconds: 6),
-          margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 18.h),
-          padding: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
-          ),
-          content: InkWell(
-            borderRadius: BorderRadius.circular(12.r),
-            onTap: () => _openNotification(notification),
-            child: Padding(
-              padding: EdgeInsets.all(14.w),
-              child: Row(
-                children: [
-                  Container(
-                    width: 42.r,
-                    height: 42.r,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onPrimaryFixed.withValues(
-                        alpha: 0.14,
-                      ),
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                    child: Icon(
-                      notification.icon,
-                      color: theme.colorScheme.onPrimaryFixed,
-                      size: 22.r,
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title.isEmpty ? 'Kalivra' : title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onPrimaryFixed,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        if (message.isNotEmpty) ...[
-                          SizedBox(height: 3.h),
-                          Text(
-                            message,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onPrimaryFixed
-                                  .withValues(alpha: 0.82),
-                              height: 1.3,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Icon(
-                    Icons.chevron_right_rounded,
-                    color: theme.colorScheme.onPrimaryFixed,
-                    size: 22.r,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+    _hideNotificationToast();
+    _notificationToastEntry = OverlayEntry(
+      builder: (context) => _InAppNotificationToast(
+        title: title.isEmpty ? 'Kalivra' : title,
+        message: message,
+        icon: notification.icon,
+        onTap: () => _openNotification(notification),
+        onDismiss: _hideNotificationToast,
+      ),
+    );
+
+    overlay.insert(_notificationToastEntry!);
+    final toastEntry = _notificationToastEntry;
+    Future<void>.delayed(const Duration(seconds: 6), () {
+      if (!mounted || _notificationToastEntry != toastEntry) return;
+      _hideNotificationToast();
+    });
   }
 
   String _routeForNotification(AppNotification notification) {
@@ -222,6 +166,12 @@ class _MainState extends State<Main> {
       case AppNotificationType.deliveryFailure:
         return AppRoutes.contact;
     }
+  }
+
+  @override
+  void dispose() {
+    _hideNotificationToast();
+    super.dispose();
   }
 
   @override
@@ -265,6 +215,121 @@ class _MainState extends State<Main> {
             routerConfig: AppRouter.router,
           );
         },
+      ),
+    );
+  }
+}
+
+class _InAppNotificationToast extends StatelessWidget {
+  const _InAppNotificationToast({
+    required this.title,
+    required this.message,
+    required this.icon,
+    required this.onTap,
+    required this.onDismiss,
+  });
+
+  final String title;
+  final String message;
+  final IconData icon;
+  final VoidCallback onTap;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return PositionedDirectional(
+      top: 0,
+      start: 0,
+      end: 0,
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(16.w, 10.h, 16.w, 0),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12.r),
+              onTap: onTap,
+              child: Container(
+                padding: EdgeInsets.all(14.w),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onTertiaryFixed,
+                  borderRadius: BorderRadius.circular(12.r),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.black.withValues(alpha: 0.18),
+                      blurRadius: 18.r,
+                      offset: Offset(0, 8.h),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 42.r,
+                      height: 42.r,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onPrimaryFixed.withValues(
+                          alpha: 0.14,
+                        ),
+                        borderRadius: BorderRadius.circular(10.r),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: theme.colorScheme.onPrimaryFixed,
+                        size: 22.r,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: theme.colorScheme.onPrimaryFixed,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if (message.isNotEmpty) ...[
+                            SizedBox(height: 3.h),
+                            Text(
+                              message,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onPrimaryFixed
+                                    .withValues(alpha: 0.82),
+                                height: 1.3,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: 8.w),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints.tight(Size.square(32.r)),
+                      onPressed: onDismiss,
+                      icon: Icon(
+                        Icons.close_rounded,
+                        color: theme.colorScheme.onPrimaryFixed,
+                        size: 20.r,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -19,6 +19,7 @@ import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
 import 'package:kalivra/view/widgets/product/product_gallery_card.dart';
 import 'package:kalivra/view/widgets/product/wishlist_icon.dart';
 import 'package:kalivra/view/widgets/rating_stars.dart';
+import 'package:kalivra/view/widgets/sections/related_products_section.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
@@ -562,6 +563,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     elevation: 0,
                   ),
                 ),
+                SizedBox(height: 24.h),
+                RelatedProductsSection(productId: product.id),
               ],
             );
           },

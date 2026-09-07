@@ -691,6 +691,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get products => 'المنتجات';
 
   @override
+  String get relatedProducts => 'منتجات ذات صلة';
+
+  @override
   String get loadProductsFailed => 'فشل تحميل المنتجات';
 
   @override
