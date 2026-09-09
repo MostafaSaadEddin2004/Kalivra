@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kalivra/model/association/association_announcement_model.dart';
+import 'package:kalivra/model/association/association_request_summary.dart';
 import 'package:kalivra/model/customer/customer_api_model.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcement_details_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_announcements_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_chat_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_faq_screen.dart';
+import 'package:kalivra/view/screens/profile_screens/association_screens/association_request_details_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_requests_and_services_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/association_screens/association_submitted_requests_screen.dart';
 import 'package:kalivra/view/screens/profile_screens/terms_conditions_screen.dart';
@@ -101,6 +103,8 @@ abstract class AppRoutes {
   static const String associationMemberProfile = '/association-member-profile';
   static const String associationSubmittedRequests =
       '/association-submitted-requests';
+  static const String associationRequestDetails =
+      '/association-request-details';
   static const String associationFaq = '/association-faq';
   static const String associationChat = '/association-chat';
   static const String associationRequestsAndServices =
@@ -156,6 +160,7 @@ abstract class AppRoutesName {
   static const String associationMemberProfile = 'association-member-profile';
   static const String associationSubmittedRequests =
       'association-submitted-requests';
+  static const String associationRequestDetails = 'association-request-details';
   static const String associationFaq = 'association-faq';
   static const String associationChat = 'association-chat';
   static const String associationRequestsAndServices =
@@ -494,6 +499,22 @@ abstract class AppRouter {
             path: AppRoutes.associationSubmittedRequests,
             builder: (context, state) =>
                 const AssociationSubmittedRequestsScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.associationRequestDetails,
+            name: AppRoutesName.associationRequestDetails,
+            builder: (context, state) {
+              final request = state.extra as AssociationRequestSummary?;
+              if (request == null) {
+                return Scaffold(
+                  body: Center(
+                    child: Text(AppLocalizations.of(context)!.errorMissingData),
+                  ),
+                );
+              }
+
+              return AssociationRequestDetailsScreen(request: request);
+            },
           ),
           GoRoute(
             path: AppRoutes.associationFaq,

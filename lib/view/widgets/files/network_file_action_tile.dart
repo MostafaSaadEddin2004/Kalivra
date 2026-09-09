@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -11,86 +12,125 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NetworkFileActionTile extends StatelessWidget {
+class NetworkFileActionTile extends StatefulWidget {
   const NetworkFileActionTile({
     super.key,
     required this.name,
     required this.url,
     this.subtitle,
     this.icon = Icons.insert_drive_file_outlined,
+    this.openDirectly = false,
   });
 
   final String name;
   final String? url;
   final String? subtitle;
   final IconData icon;
+  final bool openDirectly;
+
+  @override
+  State<NetworkFileActionTile> createState() => _NetworkFileActionTileState();
+}
+
+class _NetworkFileActionTileState extends State<NetworkFileActionTile> {
+  bool _isOpening = false;
+
+  Future<void> _handleTap(String fileName) async {
+    if (_isOpening) return;
+
+    setState(() => _isOpening = true);
+    try {
+      await handleNetworkFileTap(
+        context,
+        name: fileName,
+        url: widget.url,
+        openDirectly: widget.openDirectly,
+      );
+    } finally {
+      if (mounted) setState(() => _isOpening = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fileName = _displayFileName(name, url);
+    final fileName = _displayFileName(widget.name, widget.url);
 
     return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      margin: EdgeInsets.only(bottom: 8.h),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12.r),
         color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
       ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-        child: Row(
-          children: [
-            Container(
-              width: 38.r,
-              height: 38.r,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10.r),
-              ),
-              child: Icon(
-                icon,
-                size: 20.r,
-                color: theme.colorScheme.primaryFixed,
-              ),
+      child: Row(
+        children: [
+          Container(
+            width: 38.r,
+            height: 38.r,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10.r),
             ),
-            SizedBox(width: 10.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            child: Icon(
+              widget.icon,
+              size: 20.r,
+              color: theme.colorScheme.primaryFixed,
+            ),
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  fileName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (widget.subtitle?.trim().isNotEmpty == true) ...[
+                  SizedBox(height: 2.h),
                   Text(
-                    fileName,
+                    widget.subtitle!.trim(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: theme.textTheme.bodySmall,
                   ),
-                  if (subtitle?.trim().isNotEmpty == true) ...[
-                    SizedBox(height: 2.h),
-                    Text(
-                      subtitle!.trim(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ],
                 ],
+              ],
+            ),
+          ),
+          SizedBox(width: 8.w),
+          InkWell(
+            onTap: _isOpening ? null : () => _handleTap(fileName),
+            child: SizedBox(
+              width: 28.r,
+              height: 28.r,
+              child: Center(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 180),
+                  child: _isOpening
+                      ? SpinKitFadingCircle(
+                          key: const ValueKey('opening'),
+                          size: 18.r,
+                          color: theme.colorScheme.onTertiaryFixed,
+                        )
+                      : Icon(
+                          widget.openDirectly
+                              ? Icons.open_in_new_rounded
+                              : _trailingIcon(widget.url ?? fileName),
+                          key: const ValueKey('action'),
+                          size: 20.r,
+                          color: theme.colorScheme.onTertiaryFixed,
+                        ),
+                ),
               ),
             ),
-            SizedBox(width: 8.w),
-            InkWell(
-              onTap: () =>
-                  handleNetworkFileTap(context, name: fileName, url: url),
-              child: Icon(
-                _isImageFileReference(url ?? fileName)
-                    ? Icons.zoom_out_map_rounded
-                    : Icons.download_rounded,
-                size: 20.r,
-                color: theme.colorScheme.onTertiaryFixed,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -102,6 +142,7 @@ Future<void> handleNetworkFileTap(
   required String? url,
   String description = '',
   String date = '',
+  bool openDirectly = false,
 }) async {
   final uri = _fileUriOrNull(url ?? name);
   if (uri == null) {
@@ -113,6 +154,11 @@ Future<void> handleNetworkFileTap(
   }
 
   final fileName = _displayFileName(name, uri.toString());
+  if (openDirectly) {
+    await _downloadAndOpenFile(context, uri, fileName);
+    return;
+  }
+
   if (_isImageFileReference(name) ||
       _isImageFileReference(url ?? '') ||
       _isImageFileReference(uri.path)) {
@@ -149,15 +195,19 @@ Future<void> showNetworkFileActionDialog(
     );
     return;
   }
-
+  final theme = Theme.of(context);
   final fileName = _safeFileName(_displayFileName(name, uri.toString()));
   final shouldDownload = await showDialog<bool>(
     context: context,
     builder: (dialogContext) {
       return AlertDialog(
-        title: Text(AppLocalizations.of(dialogContext)!.fileActionDownloadFile),
+        title: Text(
+          AppLocalizations.of(dialogContext)!.fileActionDownloadFile,
+          style: theme.textTheme.titleLarge!.copyWith(color: AppColors.black),
+        ),
         content: Text(
           AppLocalizations.of(dialogContext)!.fileActionDownloadPrompt,
+          style: theme.textTheme.titleMedium!.copyWith(color: AppColors.black),
         ),
         actions: [
           TextButton(
@@ -184,6 +234,28 @@ Future<void> showNetworkFileActionDialog(
   }
 
   await _openFileUri(context, uri);
+}
+
+Future<void> _downloadAndOpenFile(
+  BuildContext context,
+  Uri uri,
+  String fileName,
+) async {
+  try {
+    final safeFileName = _safeFileName(fileName);
+    final directory = await Directory.systemTemp.createTemp('kalivra_files_');
+    final filePath = '${directory.path}${Platform.pathSeparator}$safeFileName';
+    await Dio().download(uri.toString(), filePath);
+    if (!context.mounted) return;
+
+    await _openFileUri(context, Uri.file(filePath));
+  } catch (_) {
+    if (!context.mounted) return;
+    _showFileSnackBar(
+      context,
+      AppLocalizations.of(context)!.fileActionCouldNotOpenFile,
+    );
+  }
 }
 
 Future<void> _downloadFile(
@@ -509,6 +581,11 @@ bool _isImageFileReference(String value) {
     r'\.(png|jpe?g|webp|gif|bmp|heic|heif)(\?.*)?$',
     caseSensitive: false,
   ).hasMatch(path);
+}
+
+IconData _trailingIcon(String value) {
+  if (_isImageFileReference(value)) return Icons.zoom_out_map_rounded;
+  return Icons.open_in_new_rounded;
 }
 
 void _showFileSnackBar(BuildContext context, String message) {

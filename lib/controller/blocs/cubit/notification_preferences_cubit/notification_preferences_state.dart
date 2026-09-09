@@ -21,6 +21,7 @@ class NotificationPreferencesState {
 
   bool get isEnabled => preference.enabled;
   List<String> get channels => preference.channels;
+  List<String> get availableChannels => preference.availableChannels;
 
   NotificationPreferencesState copyWith({
     NotificationPreference? preference,

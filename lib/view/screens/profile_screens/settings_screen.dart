@@ -15,34 +15,34 @@ import 'package:kalivra/view/widgets/confirm_dialog.dart';
 import 'package:kalivra/view/widgets/custom_snack_bar.dart';
 import '../../widgets/profile_page/screen_app_bar.dart';
 
+Future<void> _openProtectedScreen(
+  BuildContext context,
+  VoidCallback onAuthenticated,
+) async {
+  final token = await LocalStore.getToken();
+  if (token != null && token.isNotEmpty) {
+    onAuthenticated();
+    return;
+  }
+
+  if (!context.mounted) return;
+
+  final l10n = AppLocalizations.of(context)!;
+  showDialog(
+    context: context,
+    builder: (dialogContext) => ConfirmDialog(
+      title: l10n.loginRequiredTitle,
+      message: l10n.settingsLoginRequiredDescription,
+      onConfirm: () {
+        dialogContext.pop();
+        context.go(AppRoutes.login);
+      },
+    ),
+  );
+}
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
-  Future<void> _openProtectedScreen(
-    BuildContext context,
-    VoidCallback onAuthenticated,
-  ) async {
-    final token = await LocalStore.getToken();
-    if (token != null && token.isNotEmpty) {
-      onAuthenticated();
-      return;
-    }
-
-    if (!context.mounted) return;
-
-    final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (dialogContext) => ConfirmDialog(
-        title: l10n.loginRequiredTitle,
-        message: l10n.settingsLoginRequiredDescription,
-        onConfirm: () {
-          dialogContext.pop();
-          context.go(AppRoutes.login);
-        },
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +106,7 @@ class SettingsScreen extends StatelessWidget {
                           accountEmail != null && accountEmail.isNotEmpty;
                       return Column(
                         children: [
-                          _buildNotificationSection(context),
+                          NotificationPreferencesSettingsCard(),
                           SizedBox(height: 16.h),
                           _SettingsSection(
                             title: l10n.settingsAccountSecurity,
@@ -158,8 +158,13 @@ class SettingsScreen extends StatelessWidget {
       },
     );
   }
+}
 
-  Widget _buildNotificationSection(BuildContext context) {
+class NotificationPreferencesSettingsCard extends StatelessWidget {
+  const NotificationPreferencesSettingsCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return BlocProvider(

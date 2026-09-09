@@ -613,7 +613,7 @@ class _MembershipTabs extends StatelessWidget {
                         if (membership.membershipNumber.isNotEmpty) ...[
                           SizedBox(height: 2.h),
                           Text(
-                            '#${membership.membershipNumber}',
+                            membership.membershipNumber,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: isDark ? AppColors.taupe : AppColors.black,
                             ),

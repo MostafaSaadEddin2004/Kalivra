@@ -30,7 +30,7 @@ class _NotificationPreferencesView extends StatefulWidget {
 
 class _NotificationPreferencesViewState
     extends State<_NotificationPreferencesView> {
-  List<String> _selectedChannels = NotificationPreference.availableChannels;
+  List<String> _selectedChannels = const [];
   bool _syncedInitialChannels = false;
 
   @override
@@ -74,7 +74,7 @@ class _NotificationPreferencesViewState
                       ),
                     ),
                     SizedBox(height: 16.h),
-                    ...NotificationPreference.availableChannels.map(
+                    ...state.availableChannels.map(
                       (channel) => Padding(
                         padding: EdgeInsets.only(bottom: 10.h),
                         child: _NotificationChannelTile(
@@ -160,8 +160,9 @@ class _NotificationPreferencesViewState
       case NotificationPreference.whatsappChannel:
         return l10n.notificationChannelWhatsappTitle;
       case NotificationPreference.inAppChannel:
-      default:
         return l10n.notificationChannelInAppTitle;
+      default:
+        return _formatChannelLabel(channel);
     }
   }
 
@@ -174,8 +175,9 @@ class _NotificationPreferencesViewState
       case NotificationPreference.whatsappChannel:
         return l10n.notificationChannelWhatsappDescription;
       case NotificationPreference.inAppChannel:
-      default:
         return l10n.notificationChannelInAppDescription;
+      default:
+        return _formatChannelLabel(channel);
     }
   }
 
@@ -188,9 +190,18 @@ class _NotificationPreferencesViewState
       case NotificationPreference.whatsappChannel:
         return Icons.chat_rounded;
       case NotificationPreference.inAppChannel:
-      default:
         return Icons.notifications_active_outlined;
+      default:
+        return Icons.notifications_none_rounded;
     }
+  }
+
+  String _formatChannelLabel(String channel) {
+    return channel
+        .split('_')
+        .where((part) => part.isNotEmpty)
+        .map((part) => part[0].toUpperCase() + part.substring(1))
+        .join(' ');
   }
 }
 

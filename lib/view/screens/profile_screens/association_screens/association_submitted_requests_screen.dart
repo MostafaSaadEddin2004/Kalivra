@@ -55,12 +55,15 @@ class _AssociationSubmittedRequestsScreenState
                 itemCount: 3,
                 itemBuilder: (context, index) {
                   return _RequestCard(
-                    requestNumber: index + 1,
                     request: AssociationRequestSummary(
                       id: 0,
+                      requestNumber: 'REQ-0000000$index',
+                      type: 'type',
+                      typeLabel: 'type',
                       status: 'status',
                       createdAt: DateTime.now(),
                       updatedAt: DateTime.now(),
+                      documents: const [],
                     ),
                   );
                 },
@@ -88,10 +91,7 @@ class _AssociationSubmittedRequestsScreenState
                 padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 32.h),
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
-                  return _RequestCard(
-                    requestNumber: requests.length - index,
-                    request: requests[index],
-                  );
+                  return _RequestCard(request: requests[index]);
                 },
               ),
             );
@@ -103,144 +103,233 @@ class _AssociationSubmittedRequestsScreenState
   }
 }
 
-class _RequestCard extends StatelessWidget {
-  const _RequestCard({required this.requestNumber, required this.request});
+class _RequestCard extends StatefulWidget {
+  const _RequestCard({required this.request});
 
-  final int requestNumber;
   final AssociationRequestSummary request;
+
+  @override
+  State<_RequestCard> createState() => _RequestCardState();
+}
+
+class _RequestCardState extends State<_RequestCard> {
+  bool _isExpanded = false;
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
-
-    final borderColor = isDark
-        ? AppColors.taupe.withValues(alpha: 0.2)
-        : AppColors.burgundy.withValues(alpha: 0.12);
-
-    final createdLabel = DateFormat.yMMMd().add_jm().format(
-      request.createdAt.toLocal(),
-    );
+    final request = widget.request;
 
     return Card(
       margin: EdgeInsets.only(bottom: 12.h),
-      color: isDark ? AppColors.burgundy.withValues(alpha: 0.08) : Colors.white,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16.r),
-        side: BorderSide(color: borderColor),
+        side: BorderSide(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.12),
+        ),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Status icon
-            Container(
-              width: 48.w,
-              height: 48.w,
-              decoration: BoxDecoration(
-                color: _statusIconBackground(isDark),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Icon(
-                _statusIcon(),
-                color: _statusIconColor(isDark),
-                size: 24.r,
-              ),
+      child: InkWell(
+        onTap: _toggleExpanded,
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: AnimatedCrossFade(
+            duration: const Duration(milliseconds: 260),
+            reverseDuration: const Duration(milliseconds: 200),
+            firstCurve: Curves.easeOutCubic,
+            secondCurve: Curves.easeInCubic,
+            sizeCurve: Curves.easeInOutCubic,
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: _RequestCardHeader(
+              request: request,
+              isExpanded: _isExpanded,
             ),
-            SizedBox(width: 14.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Request ID + status chip
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          '${l10n.associationRequestNumber} #$requestNumber',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: isDark
-                                ? AppColors.offWhite
-                                : AppColors.burgundy,
-                          ),
-                        ),
+            secondChild: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _RequestCardHeader(request: request, isExpanded: _isExpanded),
+                SizedBox(height: 14.h),
+                _RequestDetailsPanel(
+                  children: [
+                    _RequestDetailLine(
+                      icon: Icons.sticky_note_2_outlined,
+                      label: l10n.associationRequestCustomerNote,
+                      value: _textOrFallback(context, request.customerNote),
+                    ),
+                    _RequestDetailLine(
+                      icon: Icons.mark_chat_read_outlined,
+                      label: l10n.associationRequestReplyMessage,
+                      value: _textOrFallback(
+                        context,
+                        request.effectiveReplyMessage,
                       ),
-                      SizedBox(width: 8.w),
-                      _StatusChip(request: request),
-                    ],
-                  ),
-                  SizedBox(height: 8.h),
-                  // Submitted at
-                  _InfoLine(
-                    icon: Icons.calendar_today_outlined,
-                    text: '${l10n.associationRequestCreatedAt}: $createdLabel',
-                    isDark: isDark,
-                  ),
-                  // Approved at (if any)
-                  if (request.approvedAt != null) ...[
+                    ),
+                    _RequestDetailLine(
+                      icon: Icons.schedule_outlined,
+                      label: l10n.associationRequestReplyAt,
+                      value: _dateTimeLabel(context, request.effectiveReplyAt),
+                    ),
                     SizedBox(height: 4.h),
-                    _InfoLine(
-                      icon: Icons.check_circle_outline_rounded,
-                      text:
-                          '${l10n.associationRequestApprovedAt}: ${DateFormat.yMMMd().format(request.approvedAt!.toLocal())}',
-                      isDark: isDark,
-                    ),
-                  ],
-                  // Document URL (if any)
-                  if (request.documentUrl != null &&
-                      request.documentUrl!.isNotEmpty) ...[
-                    SizedBox(height: 8.h),
-                    OutlinedButton.icon(
-                      onPressed: () {},
-                      icon: Icon(Icons.open_in_new_rounded, size: 16.r),
-                      label: Text(l10n.associationRequestViewDocument),
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 6.h,
-                        ),
-                        textStyle: TextStyle(fontSize: 12.sp),
+                    FilledButton.icon(
+                      onPressed: () => context.push(
+                        AppRoutes.associationRequestDetails,
+                        extra: request,
                       ),
+                      icon: const Icon(Icons.open_in_new_rounded),
+                      label: Text(l10n.associationRequestViewAllDetails),
                     ),
                   ],
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
+}
 
-  IconData _statusIcon() {
-    if (request.isApproved) return Icons.check_circle_outline_rounded;
-    if (request.isRejected) return Icons.cancel_outlined;
-    return Icons.hourglass_empty_rounded;
+class _RequestCardHeader extends StatelessWidget {
+  const _RequestCardHeader({required this.request, required this.isExpanded});
+
+  final AssociationRequestSummary request;
+  final bool isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final statusColor = _statusColor(context, request);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 46.r,
+          height: 46.r,
+          decoration: BoxDecoration(
+            color: statusColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14.r),
+          ),
+          child: Icon(_statusIcon(request), color: statusColor, size: 24.r),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                request.displayNumber,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 6.h,
+                children: [
+                  _InfoChip(
+                    icon: Icons.label_outline_rounded,
+                    label: _textOrFallback(context, request.displayType),
+                  ),
+                  _StatusChip(request: request),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 8.w),
+        AnimatedRotation(
+          turns: isExpanded ? 0.5 : 0,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOutCubic,
+          child: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: theme.colorScheme.onTertiaryFixed,
+            size: 26.r,
+          ),
+        ),
+      ],
+    );
   }
+}
 
-  Color _statusIconBackground(bool isDark) {
-    if (request.isApproved) {
-      return isDark
-          ? Colors.green.withValues(alpha: 0.2)
-          : Colors.green.withValues(alpha: 0.1);
-    }
-    if (request.isRejected) {
-      return isDark
-          ? Colors.red.withValues(alpha: 0.2)
-          : Colors.red.withValues(alpha: 0.1);
-    }
-    return isDark
-        ? AppColors.goldDark.withValues(alpha: 0.2)
-        : AppColors.goldDark.withValues(alpha: 0.1);
+class _RequestDetailsPanel extends StatelessWidget {
+  const _RequestDetailsPanel({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14.r),
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.06),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: children,
+      ),
+    );
   }
+}
 
-  Color _statusIconColor(bool isDark) {
-    if (request.isApproved) return Colors.green;
-    if (request.isRejected) return Colors.red;
-    return isDark ? AppColors.goldLight : AppColors.goldDark;
+class _RequestDetailLine extends StatelessWidget {
+  const _RequestDetailLine({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.h),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18.r, color: theme.colorScheme.onTertiaryFixed),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onTertiaryFixed,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                SizedBox(height: 3.h),
+                Text(value, style: theme.textTheme.bodyMedium),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -251,74 +340,86 @@ class _StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    Color bgColor;
-    Color textColor;
-    String label;
-
-    if (request.isApproved) {
-      bgColor = Colors.green.withValues(alpha: 0.15);
-      textColor = Colors.green.shade700;
-      label = l10n.associationRequestStatusApproved;
-    } else if (request.isRejected) {
-      bgColor = Colors.red.withValues(alpha: 0.15);
-      textColor = Colors.red.shade700;
-      label = l10n.associationRequestStatusRejected;
-    } else {
-      bgColor = AppColors.goldDark.withValues(alpha: 0.15);
-      textColor = AppColors.goldDark;
-      label = l10n.associationRequestStatusPending;
-    }
+    final theme = Theme.of(context);
+    final color = _statusColor(context, request);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: color.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
-        label,
-        style: TextStyle(
-          color: textColor,
-          fontSize: 11.sp,
-          fontWeight: FontWeight.w600,
+        _statusLabel(context, request),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w800,
         ),
       ),
     );
   }
 }
 
-class _InfoLine extends StatelessWidget {
-  const _InfoLine({
-    required this.icon,
-    required this.text,
-    required this.isDark,
-  });
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({required this.icon, required this.label});
 
   final IconData icon;
-  final String text;
-  final bool isDark;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    final color = isDark
-        ? AppColors.taupe
-        : AppColors.burgundy.withValues(alpha: 0.7);
+    final theme = Theme.of(context);
 
-    return Row(
-      children: [
-        Icon(icon, size: 14.r, color: color),
-        SizedBox(width: 6.w),
-        Expanded(
-          child: Text(
-            text,
-            style: TextStyle(fontSize: 12.sp, color: color),
-          ),
-        ),
-      ],
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14.r, color: theme.colorScheme.onTertiaryFixed),
+          SizedBox(width: 5.w),
+          Text(label, style: theme.textTheme.labelSmall),
+        ],
+      ),
     );
   }
+}
+
+IconData _statusIcon(AssociationRequestSummary request) {
+  if (request.isApproved) return Icons.check_circle_outline_rounded;
+  if (request.isRejected) return Icons.cancel_outlined;
+  return Icons.hourglass_empty_rounded;
+}
+
+Color _statusColor(BuildContext context, AssociationRequestSummary request) {
+  if (request.isApproved) return Colors.green;
+  if (request.isRejected) return Theme.of(context).colorScheme.onError;
+  return AppColors.goldDark;
+}
+
+String _statusLabel(BuildContext context, AssociationRequestSummary request) {
+  final l10n = AppLocalizations.of(context)!;
+  if (request.isApproved) return l10n.associationRequestStatusApproved;
+  if (request.isRejected) return l10n.associationRequestStatusRejected;
+  if (request.isPending) return l10n.associationRequestStatusPending;
+  return request.status.trim().isNotEmpty
+      ? request.status
+      : l10n.associationMemberNoData;
+}
+
+String _textOrFallback(BuildContext context, String? value) {
+  final text = value?.trim();
+  if (text?.isNotEmpty == true) return text!;
+  return AppLocalizations.of(context)!.associationMemberNoData;
+}
+
+String _dateTimeLabel(BuildContext context, DateTime? date) {
+  final l10n = AppLocalizations.of(context)!;
+  if (date == null) return l10n.associationMemberNoData;
+  return DateFormat.yMMMd().add_jm().format(date.toLocal());
 }
 
 class _EmptyState extends StatelessWidget {
@@ -330,7 +431,6 @@ class _EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Center(
       child: Padding(
@@ -341,16 +441,14 @@ class _EmptyState extends StatelessWidget {
             Icon(
               Icons.inbox_outlined,
               size: 72.r,
-              color: (isDark ? AppColors.taupe : AppColors.burgundy).withValues(
-                alpha: 0.4,
-              ),
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.4),
             ),
             SizedBox(height: 20.h),
             Text(
               l10n.associationNoSubmittedRequests,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: isDark ? AppColors.taupe : AppColors.burgundy,
+                color: theme.colorScheme.onTertiaryFixed,
               ),
             ),
             SizedBox(height: 24.h),

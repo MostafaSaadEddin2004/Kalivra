@@ -101,9 +101,6 @@ class _AnnouncementDetailsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final statusColor = announcement.isDelivered
-        ? Colors.green
-        : AppColors.goldDark;
 
     return ListView(
       padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
@@ -115,12 +112,10 @@ class _AnnouncementDetailsBody extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
-              colors: theme.brightness == Brightness.dark
-                  ? [
-                      AppColors.burgundy.withValues(alpha: 0.9),
-                      AppColors.black.withValues(alpha: 0.96),
-                    ]
-                  : [AppColors.burgundy, AppColors.goldDark],
+              colors: [
+                theme.colorScheme.onTertiaryFixed,
+                AppColors.black.withValues(alpha: 0.96),
+              ],
             ),
           ),
           child: Column(
@@ -171,13 +166,6 @@ class _AnnouncementDetailsBody extends StatelessWidget {
                     ),
                   ),
                 ],
-              ),
-              SizedBox(height: 18.h),
-              _StatusBanner(
-                label: announcement.isDelivered
-                    ? l10n.associationAnnouncementDelivered
-                    : l10n.associationAnnouncementPending,
-                color: statusColor,
               ),
             ],
           ),
@@ -275,15 +263,13 @@ class _DetailRow extends StatelessWidget {
             width: 34.r,
             height: 34.r,
             decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.taupe.withValues(alpha: 0.14)
-                  : AppColors.burgundy.withValues(alpha: 0.08),
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10.r),
             ),
             child: Icon(
               icon,
               size: 18.r,
-              color: isDark ? AppColors.goldLight : AppColors.burgundy,
+              color: theme.colorScheme.onTertiaryFixed,
             ),
           ),
           SizedBox(width: 10.w),
@@ -388,45 +374,11 @@ class _AttachmentsSection extends StatelessWidget {
                   name: attachment.name,
                   url: attachment.url,
                   icon: Icons.attach_file_rounded,
+                  openDirectly: true,
                 ),
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _StatusBanner extends StatelessWidget {
-  const _StatusBanner({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 10.r,
-            height: 10.r,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          SizedBox(width: 8.w),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: AppColors.offWhite,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
       ),
     );
   }

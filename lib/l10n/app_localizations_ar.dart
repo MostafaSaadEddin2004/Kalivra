@@ -1970,6 +1970,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get associationRequestStatusRejected => 'مرفوض';
 
   @override
+  String get associationRequestDetailsTitle => 'تفاصيل الطلب';
+
+  @override
+  String get associationRequestType => 'النوع';
+
+  @override
+  String get associationRequestStatus => 'الحالة';
+
+  @override
+  String get associationRequestCustomerNote => 'ملاحظة العميل';
+
+  @override
+  String get associationRequestReplyMessage => 'رسالة الرد';
+
+  @override
+  String get associationRequestReplyAt => 'وقت الرد';
+
+  @override
+  String get associationRequestViewAllDetails => 'عرض كل التفاصيل';
+
+  @override
+  String get associationRequestDocuments => 'الوثائق';
+
+  @override
+  String get associationRequestNoDocuments => 'لا توجد وثائق مرفقة';
+
+  @override
+  String get associationRequestDocumentDefinition => 'نوع الوثيقة';
+
+  @override
   String get delete => 'حذف';
 
   @override

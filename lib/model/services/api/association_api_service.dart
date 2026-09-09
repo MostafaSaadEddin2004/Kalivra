@@ -179,14 +179,13 @@ class AssociationApiService {
     int perPage = 15,
   }) async {
     final res = await _client.get(
-      'customer/association/reports',
+      'customer/announcements',
       queryParameters: {'per_page': perPage},
     );
     final data = res.data['data'];
     if (data is! List) return const [];
 
     return data
-        .whereType<Map>()
         .map(
           (item) => AssociationAnnouncementModel.fromJson(
             Map<String, dynamic>.from(item),
@@ -196,7 +195,7 @@ class AssociationApiService {
   }
 
   Future<AssociationAnnouncementModel> getAnnouncement(int id) async {
-    final res = await _client.get('customer/association/reports/$id');
+    final res = await _client.get('customer/announcements/$id');
     final data = res.data['data'];
     if (data is Map) {
       return AssociationAnnouncementModel.fromJson(

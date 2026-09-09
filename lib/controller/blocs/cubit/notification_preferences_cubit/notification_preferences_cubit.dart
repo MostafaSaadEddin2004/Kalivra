@@ -63,8 +63,12 @@ class NotificationPreferencesCubit extends Cubit<NotificationPreferencesState> {
 
   Future<void> setChannels(List<String> channels) async {
     final previousPreference = state.preference;
+    final availableChannels = previousPreference.availableChannels.toSet();
     final nextPreference = previousPreference.copyWith(
-      channels: channels.toSet().toList(growable: false),
+      channels: channels
+          .where(availableChannels.contains)
+          .toSet()
+          .toList(growable: false),
     );
     emit(
       state.copyWith(

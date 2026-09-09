@@ -1985,6 +1985,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get associationRequestStatusRejected => 'Rejected';
 
   @override
+  String get associationRequestDetailsTitle => 'Request details';
+
+  @override
+  String get associationRequestType => 'Type';
+
+  @override
+  String get associationRequestStatus => 'Status';
+
+  @override
+  String get associationRequestCustomerNote => 'Customer note';
+
+  @override
+  String get associationRequestReplyMessage => 'Reply message';
+
+  @override
+  String get associationRequestReplyAt => 'Reply at';
+
+  @override
+  String get associationRequestViewAllDetails => 'View all details';
+
+  @override
+  String get associationRequestDocuments => 'Documents';
+
+  @override
+  String get associationRequestNoDocuments => 'No documents attached';
+
+  @override
+  String get associationRequestDocumentDefinition => 'Document type';
+
+  @override
   String get delete => 'Delete';
 
   @override

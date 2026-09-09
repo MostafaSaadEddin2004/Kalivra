@@ -60,8 +60,10 @@ class _AssociationAnnouncementsScreenState
             );
           }
 
-          return  Center(
-            child: SpinKitFadingCircle(color: theme.colorScheme.onTertiaryFixed),
+          return Center(
+            child: SpinKitFadingCircle(
+              color: theme.colorScheme.onTertiaryFixed,
+            ),
           );
         },
       ),
@@ -85,298 +87,195 @@ class _AnnouncementsList extends StatelessWidget {
     if (announcements.isEmpty) {
       return RefreshIndicator(
         onRefresh: () async => onRetry(),
-        child: ListView(
-          children: [
-            SizedBox(height: 120.h),
-            EmptyStateView(
-              icon: Icons.campaign_outlined,
-              title: l10n.associationAnnouncementEmptyTitle,
-              description: l10n.associationAnnouncementEmptyDescription,
-            ),
-          ],
+        child: EmptyStateView(
+          icon: Icons.campaign_outlined,
+          title: l10n.associationAnnouncementEmptyTitle,
+          description: l10n.associationAnnouncementEmptyDescription,
         ),
       );
     }
-
-    final deliveredCount = announcements
-        .where((announcement) => announcement.isDelivered)
-        .length;
-    final pendingCount = announcements.length - deliveredCount;
-
     return RefreshIndicator(
       onRefresh: () async => onRetry(),
       child: ListView.separated(
         padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
-        itemCount: announcements.length + 2,
+        itemCount: announcements.length,
         separatorBuilder: (context, index) => SizedBox(height: 12.h),
         itemBuilder: (context, index) {
-          if (index == 0) {
-            return _AnnouncementsHeader(
-              totalCount: announcements.length,
-              deliveredCount: deliveredCount,
-              pendingCount: pendingCount,
-            );
-          }
-
-          if (index == 1) {
-            return Text(
-              l10n.associationAnnouncementsHint,
-              style: Theme.of(context).textTheme.bodyMedium,
-            );
-          }
-
-          return _AnnouncementCard(announcement: announcements[index - 2]);
+          return _AnnouncementCard(announcement: announcements[index]);
         },
       ),
     );
   }
 }
 
-class _AnnouncementsHeader extends StatelessWidget {
-  const _AnnouncementsHeader({
-    required this.totalCount,
-    required this.deliveredCount,
-    required this.pendingCount,
-  });
-
-  final int totalCount;
-  final int deliveredCount;
-  final int pendingCount;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return Container(
-      padding: EdgeInsets.all(18.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.r),
-        gradient: LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          colors: isDark
-              ? [
-                  AppColors.burgundy.withValues(alpha: 0.9),
-                  AppColors.black.withValues(alpha: 0.92),
-                ]
-              : [AppColors.burgundy, AppColors.goldDark],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(10.r),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(14.r),
-                ),
-                child: Icon(
-                  Icons.campaign_rounded,
-                  color: AppColors.offWhite,
-                  size: 28.r,
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.associationAnnouncementsTitle,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: AppColors.offWhite,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      l10n.associationAnnouncementsSubtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.offWhite.withValues(alpha: 0.86),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 18.h),
-          Row(
-            children: [
-              Expanded(
-                child: _HeaderStat(
-                  label: l10n.associationAnnouncementTotal,
-                  value: totalCount.toString(),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: _HeaderStat(
-                  label: l10n.associationAnnouncementDelivered,
-                  value: deliveredCount.toString(),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: _HeaderStat(
-                  label: l10n.associationAnnouncementPending,
-                  value: pendingCount.toString(),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeaderStat extends StatelessWidget {
-  const _HeaderStat({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(14.r),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            value,
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: AppColors.offWhite,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          SizedBox(height: 2.h),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.offWhite.withValues(alpha: 0.84),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AnnouncementCard extends StatelessWidget {
+class _AnnouncementCard extends StatefulWidget {
   const _AnnouncementCard({required this.announcement});
 
   final AssociationAnnouncementModel announcement;
 
   @override
+  State<_AnnouncementCard> createState() => _AnnouncementCardState();
+}
+
+class _AnnouncementCardState extends State<_AnnouncementCard> {
+  bool _isExpanded = false;
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final statusColor = announcement.isDelivered
-        ? Colors.green
-        : AppColors.goldDark;
+    final announcement = widget.announcement;
 
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-      child: Theme(
-        data: theme.copyWith(dividerColor: Colors.transparent),
-        child: ExpansionTile(
-          tilePadding: EdgeInsets.fromLTRB(16.w, 12.h, 12.w, 12.h),
-          childrenPadding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 16.h),
-          leading: Container(
-            width: 44.r,
-            height: 44.r,
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: isDark ? 0.22 : 0.12),
-              borderRadius: BorderRadius.circular(14.r),
+      child: InkWell(
+        onTap: _toggleExpanded,
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: AnimatedCrossFade(
+            duration: const Duration(milliseconds: 260),
+            reverseDuration: const Duration(milliseconds: 200),
+            firstCurve: Curves.easeOutCubic,
+            secondCurve: Curves.easeInCubic,
+            sizeCurve: Curves.easeInOutCubic,
+            crossFadeState: _isExpanded
+                ? CrossFadeState.showSecond
+                : CrossFadeState.showFirst,
+            firstChild: _AnnouncementCardHeader(
+              announcement: announcement,
+              isExpanded: _isExpanded,
             ),
-            child: Icon(
-              _typeIcon(announcement.type),
-              color: statusColor,
-              size: 24.r,
-            ),
-          ),
-          title: Text(
-            announcement.title,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          subtitle: Padding(
-            padding: EdgeInsets.only(top: 8.h),
-            child: Wrap(
-              spacing: 8.w,
-              runSpacing: 6.h,
+            secondChild: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _InfoChip(
-                  icon: Icons.confirmation_number_outlined,
-                  label: announcement.referenceNumber,
+                _AnnouncementCardHeader(
+                  announcement: announcement,
+                  isExpanded: _isExpanded,
                 ),
-                _InfoChip(
-                  icon: Icons.calendar_today_outlined,
-                  label: _dateLabel(context, announcement.announcementDate),
-                ),
-                _StatusChip(
-                  label: announcement.isDelivered
-                      ? l10n.associationAnnouncementDelivered
-                      : l10n.associationAnnouncementPending,
-                  color: statusColor,
+                SizedBox(height: 14.h),
+                _DetailsPanel(
+                  children: [
+                    _DetailRow(
+                      icon: Icons.category_outlined,
+                      label: l10n.associationAnnouncementCategory,
+                      value:
+                          announcement.category ?? l10n.associationMemberNoData,
+                    ),
+                    _DetailRow(
+                      icon: Icons.calendar_today_outlined,
+                      label: l10n.associationAnnouncementDate,
+                      value: _dateLabel(context, announcement.announcementDate),
+                    ),
+                    _DetailRow(
+                      icon: Icons.hourglass_bottom_outlined,
+                      label: l10n.associationAnnouncementDeadline,
+                      value: _dateLabel(context, announcement.legalDeadline),
+                    ),
+                    _ContentPreview(content: announcement.content),
+                    SizedBox(height: 8.h),
+                    FilledButton.icon(
+                      onPressed: () => context.push(
+                        AppRoutes.associationAnnouncementDetails,
+                        extra: announcement,
+                      ),
+                      icon: const Icon(Icons.open_in_new_rounded),
+                      label: Text(l10n.associationAnnouncementShowDetails),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          children: [
-            _DetailsPanel(
-              children: [
-                _DetailRow(
-                  icon: Icons.category_outlined,
-                  label: l10n.associationAnnouncementCategory,
-                  value: announcement.category ?? l10n.associationMemberNoData,
-                ),
-                _DetailRow(
-                  icon: Icons.label_outline_rounded,
-                  label: l10n.associationAnnouncementType,
-                  value: announcement.typeLabel.isNotEmpty
-                      ? announcement.typeLabel
-                      : announcement.type,
-                ),
-                _DetailRow(
-                  icon: Icons.hourglass_bottom_outlined,
-                  label: l10n.associationAnnouncementDeadline,
-                  value: _dateLabel(context, announcement.legalDeadline),
-                ),
-                _ContentPreview(content: announcement.content),
-                SizedBox(height: 8.h),
-                FilledButton.icon(
-                  onPressed: () => context.push(
-                    AppRoutes.associationAnnouncementDetails,
-                    extra: announcement,
-                  ),
-                  icon: const Icon(Icons.open_in_new_rounded),
-                  label: Text(l10n.associationAnnouncementShowDetails),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
+    );
+  }
+}
+
+class _AnnouncementCardHeader extends StatelessWidget {
+  const _AnnouncementCardHeader({
+    required this.announcement,
+    required this.isExpanded,
+  });
+
+  final AssociationAnnouncementModel announcement;
+  final bool isExpanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final typeLabel = _announcementTypeLabel(context, announcement);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Container(
+          width: 44.r,
+          height: 44.r,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14.r),
+          ),
+          child: Icon(
+            _typeIcon(announcement.type),
+            color: theme.colorScheme.onTertiaryFixed,
+            size: 24.r,
+          ),
+        ),
+        SizedBox(width: 12.w),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                announcement.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  color: theme.colorScheme.onTertiaryFixed,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Wrap(
+                spacing: 8.w,
+                runSpacing: 6.h,
+                children: [
+                  _InfoChip(
+                    icon: Icons.confirmation_number_outlined,
+                    label: announcement.referenceNumber.isNotEmpty
+                        ? announcement.referenceNumber
+                        : l10n.associationMemberNoData,
+                  ),
+                  _InfoChip(
+                    icon: Icons.label_outline_rounded,
+                    label: typeLabel,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 8.w),
+        AnimatedRotation(
+          turns: isExpanded ? 0.5 : 0,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeInOutCubic,
+          child: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: theme.colorScheme.onTertiaryFixed,
+            size: 26.r,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -431,7 +330,7 @@ class _DetailRow extends StatelessWidget {
           Icon(
             icon,
             size: 19.r,
-            color: isDark ? AppColors.goldLight : AppColors.burgundy,
+            color: theme.colorScheme.onTertiaryFixed,
           ),
           SizedBox(width: 10.w),
           Expanded(
@@ -501,41 +400,21 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 5.h),
       decoration: BoxDecoration(
-        color: theme.colorScheme.onSecondaryFixed,
+        color: theme.colorScheme.primaryFixed.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.r, color: theme.colorScheme.onTertiaryFixed),
+          Icon(icon, size: 14.r, color: theme.colorScheme.primaryFixed),
           SizedBox(width: 5.w),
-          Text(label, style: theme.textTheme.labelSmall),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall!.copyWith(
+              color: theme.colorScheme.primaryFixed,
+            ),
+          ),
         ],
-      ),
-    );
-  }
-}
-
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w800,
-        ),
       ),
     );
   }
@@ -588,6 +467,20 @@ IconData _typeIcon(String type) {
     default:
       return Icons.campaign_outlined;
   }
+}
+
+String _announcementTypeLabel(
+  BuildContext context,
+  AssociationAnnouncementModel announcement,
+) {
+  final l10n = AppLocalizations.of(context)!;
+  final typeLabel = announcement.typeLabel.trim();
+  if (typeLabel.isNotEmpty) return typeLabel;
+
+  final type = announcement.type.trim();
+  if (type.isNotEmpty) return type;
+
+  return l10n.associationMemberNoData;
 }
 
 String _dateLabel(BuildContext context, DateTime? date) {

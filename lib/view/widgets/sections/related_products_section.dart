@@ -53,7 +53,6 @@ class _RelatedProductsSectionState extends State<RelatedProductsSection> {
             return _RelatedProductsList(
               title: l10n.relatedProducts,
               products: state.products,
-             
             );
           case ProductsFailed():
             return const SizedBox.shrink();
@@ -99,7 +98,6 @@ class _RelatedProductsList extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(title, style: titleStyle ?? theme.textTheme.titleMedium),
-              
             ],
           ),
         ),

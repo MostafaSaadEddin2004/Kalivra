@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kalivra/model/notifications/app_notification.dart';
+import 'package:kalivra/model/notifications/notification_preference.dart';
 
 void main() {
   test('AppNotification parses Firebase payload data', () {
@@ -51,5 +52,15 @@ void main() {
       notification.url,
       'https://test2.kalivra-world.com/customer/account/orders/view/15',
     );
+  });
+
+  test('NotificationPreference parses available and selected channels', () {
+    final preference = NotificationPreference.fromJson({
+      'available_channels': ['in_app', 'push'],
+      'channels': ['in_app', 'push', 'email'],
+    });
+
+    expect(preference.availableChannels, ['in_app', 'push']);
+    expect(preference.channels, ['in_app', 'push']);
   });
 }

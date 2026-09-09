@@ -3854,6 +3854,66 @@ abstract class AppLocalizations {
   /// **'Rejected'**
   String get associationRequestStatusRejected;
 
+  /// No description provided for @associationRequestDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request details'**
+  String get associationRequestDetailsTitle;
+
+  /// No description provided for @associationRequestType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get associationRequestType;
+
+  /// No description provided for @associationRequestStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get associationRequestStatus;
+
+  /// No description provided for @associationRequestCustomerNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer note'**
+  String get associationRequestCustomerNote;
+
+  /// No description provided for @associationRequestReplyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply message'**
+  String get associationRequestReplyMessage;
+
+  /// No description provided for @associationRequestReplyAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply at'**
+  String get associationRequestReplyAt;
+
+  /// No description provided for @associationRequestViewAllDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View all details'**
+  String get associationRequestViewAllDetails;
+
+  /// No description provided for @associationRequestDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get associationRequestDocuments;
+
+  /// No description provided for @associationRequestNoDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents attached'**
+  String get associationRequestNoDocuments;
+
+  /// No description provided for @associationRequestDocumentDefinition.
+  ///
+  /// In en, this message translates to:
+  /// **'Document type'**
+  String get associationRequestDocumentDefinition;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:

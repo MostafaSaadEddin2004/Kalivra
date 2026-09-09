@@ -29,7 +29,7 @@ class NotificationPreferencesApiService {
   Future<NotificationPreference> getAnnouncementPreference() async {
     final response = await _client.get('customer/notification-preferences');
     final data = _unwrapData(response.data);
-    if (data is Map && data['notification_type'] != null) {
+    if (data is Map && _looksLikePreference(data)) {
       return NotificationPreference.fromJson(data);
     }
 
@@ -52,9 +52,7 @@ class NotificationPreferencesApiService {
   Future<void> updatePreference(NotificationPreference preference) async {
     await _client.put(
       'customer/notification-preferences',
-      data: {
-        'preferences': [preference.toJson()],
-      },
+      data: {'channels': preference.channels},
     );
   }
 
@@ -89,5 +87,13 @@ class NotificationPreferencesApiService {
         item.containsKey('notification_body') ||
         item.containsKey('message_id') ||
         item.containsKey('notification_id');
+  }
+
+  bool _looksLikePreference(Map<dynamic, dynamic> item) {
+    return item.containsKey('channels') ||
+        item.containsKey('channel') ||
+        item.containsKey('available_channels') ||
+        item.containsKey('availableChannels') ||
+        item.containsKey('notification_type');
   }
 }

@@ -3,6 +3,7 @@ class NotificationPreference {
     required this.notificationType,
     required this.enabled,
     required this.channels,
+    required this.availableChannels,
   });
 
   static const String announcementType = 'announcement';
@@ -10,7 +11,7 @@ class NotificationPreference {
   static const String pushChannel = 'push';
   static const String emailChannel = 'email';
   static const String whatsappChannel = 'whatsapp';
-  static const List<String> availableChannels = [
+  static const List<String> defaultAvailableChannels = [
     inAppChannel,
     pushChannel,
     emailChannel,
@@ -20,12 +21,14 @@ class NotificationPreference {
   final String notificationType;
   final bool enabled;
   final List<String> channels;
+  final List<String> availableChannels;
 
   factory NotificationPreference.announcementDefault() {
     return const NotificationPreference(
       notificationType: announcementType,
       enabled: true,
       channels: [inAppChannel],
+      availableChannels: defaultAvailableChannels,
     );
   }
 
@@ -34,19 +37,35 @@ class NotificationPreference {
         json['notification_type']?.toString().trim().isNotEmpty == true
         ? json['notification_type'].toString().trim()
         : announcementType;
+    final availableChannels = _parseChannels(
+      json['available_channels'] ?? json['availableChannels'],
+      fallback: defaultAvailableChannels,
+    );
+    final channels = _parseChannels(
+      json['channels'] ?? json['channel'],
+      fallback: availableChannels.contains(inAppChannel)
+          ? const [inAppChannel]
+          : const [],
+    ).where(availableChannels.contains).toList(growable: false);
 
     return NotificationPreference(
       notificationType: notificationType,
       enabled: _parseBool(json['enabled'], fallback: true),
-      channels: _parseChannels(json['channels'] ?? json['channel']),
+      channels: channels,
+      availableChannels: availableChannels,
     );
   }
 
-  NotificationPreference copyWith({bool? enabled, List<String>? channels}) {
+  NotificationPreference copyWith({
+    bool? enabled,
+    List<String>? channels,
+    List<String>? availableChannels,
+  }) {
     return NotificationPreference(
       notificationType: notificationType,
       enabled: enabled ?? this.enabled,
       channels: channels ?? this.channels,
+      availableChannels: availableChannels ?? this.availableChannels,
     );
   }
 
@@ -55,10 +74,14 @@ class NotificationPreference {
       'notification_type': notificationType,
       'enabled': enabled,
       'channels': channels,
+      'available_channels': availableChannels,
     };
   }
 
-  static List<String> _parseChannels(Object? value) {
+  static List<String> _parseChannels(
+    Object? value, {
+    required List<String> fallback,
+  }) {
     final channels = <String>{};
     if (value is Iterable) {
       for (final item in value) {
@@ -72,7 +95,7 @@ class NotificationPreference {
       _addChannel(channels, value);
     }
 
-    return channels.isEmpty ? [inAppChannel] : channels.toList(growable: false);
+    return channels.isEmpty ? fallback : channels.toList(growable: false);
   }
 
   static void _addChannel(Set<String> channels, Object? value) {
@@ -82,8 +105,8 @@ class NotificationPreference {
         .toLowerCase()
         .replaceAll('-', '_')
         .replaceAll(' ', '_');
-    if (availableChannels.contains(normalized)) {
-      channels.add(normalized!);
+    if (normalized != null && normalized.isNotEmpty) {
+      channels.add(normalized);
     }
   }
 
