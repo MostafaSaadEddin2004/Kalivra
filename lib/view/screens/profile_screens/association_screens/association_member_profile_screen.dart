@@ -340,6 +340,10 @@ class _AssociationMemberProfileScreenState
                       ),
                       SizedBox(height: 16.h),
                       _MemberContactSection(profile: profile),
+                      _MemberAddressesSection(
+                        addresses: profile.addresses,
+                        fallbackAddress: profile.person.address,
+                      ),
                       _MemberDocumentsSection(documents: profile.documents),
                       if (selectedMembership != null)
                         _MembershipDetailsSection(
@@ -752,10 +756,9 @@ class _MemberContactSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final person = profile.person;
-    final addresses = profile.addresses;
 
     return _ExpandableProfileSection(
-      title: l10n.associationLinkContactSection,
+      title: l10n.contactInfo,
       icon: Icons.contact_phone_outlined,
       children: [
         InfoRow(
@@ -784,23 +787,198 @@ class _MemberContactSection extends StatelessWidget {
           value: person.whatsappNumber,
         ),
         InfoRow(label: l10n.associationLinkEmail, value: person.email),
-        InfoRow(
-          label: l10n.associationMemberCurrentAddress,
-          value: _addressDisplay(addresses?.current) ?? person.address,
+      ],
+    );
+  }
+}
+
+class _MemberAddressesSection extends StatelessWidget {
+  const _MemberAddressesSection({
+    required this.addresses,
+    required this.fallbackAddress,
+  });
+
+  final AssociationProfileAddresses? addresses;
+  final String fallbackAddress;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final cards = <Widget>[];
+    final permanent = addresses?.permanent;
+    final current = addresses?.current;
+    final additional = addresses?.additional ?? const <Map<String, dynamic>>[];
+
+    if (_addressHasContent(permanent)) {
+      cards.add(
+        _MemberAddressDisplayCard(
+          title: l10n.associationLinkPermanentAddress,
+          address: permanent!,
+          icon: Icons.home_work_outlined,
         ),
-        if (_addressDisplay(addresses?.permanent) != null)
-          InfoRow(
-            label: l10n.associationLinkPermanentAddress,
-            value: _addressDisplay(addresses?.permanent)!,
-          ),
-        if (addresses != null)
-          for (var index = 0; index < addresses.additional.length; index++)
-            if (_addressDisplay(addresses.additional[index]) != null)
-              InfoRow(
-                label: l10n.associationAdditionalAddress,
-                value: _addressDisplay(addresses.additional[index])!,
-                labelNumber: '${index + 1}',
+      );
+    }
+
+    if (_addressHasContent(current)) {
+      cards.add(
+        _MemberAddressDisplayCard(
+          title: l10n.associationMemberCurrentAddress,
+          address: current!,
+          icon: Icons.location_on_outlined,
+        ),
+      );
+    } else if (fallbackAddress.trim().isNotEmpty) {
+      cards.add(
+        _MemberAddressDisplayCard(
+          title: l10n.associationMemberCurrentAddress,
+          address: {'formatted': fallbackAddress},
+          icon: Icons.location_on_outlined,
+        ),
+      );
+    }
+
+    for (var index = 0; index < additional.length; index++) {
+      final address = additional[index];
+      if (!_addressHasContent(address)) continue;
+      cards.add(
+        _MemberAddressDisplayCard(
+          title: '${l10n.associationAdditionalAddress} ${index + 1}',
+          address: address,
+          icon: Icons.add_location_alt_outlined,
+        ),
+      );
+    }
+
+    if (cards.isEmpty) return const SizedBox.shrink();
+
+    return _ExpandableProfileSection(
+      title: l10n.userLocationInfo,
+      icon: Icons.location_on_outlined,
+      children: [
+        for (var index = 0; index < cards.length; index++) ...[
+          if (index > 0) SizedBox(height: 12.h),
+          cards[index],
+        ],
+      ],
+    );
+  }
+}
+
+class _MemberAddressDisplayCard extends StatelessWidget {
+  const _MemberAddressDisplayCard({
+    required this.title,
+    required this.address,
+    required this.icon,
+  });
+
+  final String title;
+  final Map<String, dynamic> address;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final muted = theme.colorScheme.onTertiaryFixed;
+    final displayAddress = _addressDisplay(address);
+
+    return Container(
+      padding: EdgeInsets.all(14.w),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32.r,
+                height: 32.r,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onTertiaryFixed.withValues(
+                    alpha: 0.1,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: theme.colorScheme.onTertiaryFixed,
+                  size: 18.r,
+                ),
               ),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onTertiaryFixed,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10.h),
+          displayAddress == null
+              ? Text('---', style: theme.textTheme.bodyMedium)
+              : _MemberAddressDetailGrid(
+                  rows: _addressDetailRows(context, address),
+                  muted: muted,
+                ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MemberAddressDetail {
+  const _MemberAddressDetail(this.label, this.value);
+
+  final String label;
+  final String value;
+}
+
+class _MemberAddressDetailGrid extends StatelessWidget {
+  const _MemberAddressDetailGrid({required this.rows, required this.muted});
+
+  final List<_MemberAddressDetail> rows;
+  final Color muted;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        for (final row in rows)
+          Padding(
+            padding: EdgeInsets.only(bottom: 8.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: 118.w,
+                  child: Text(
+                    row.label,
+                    style: theme.textTheme.bodySmall?.copyWith(color: muted),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: Text(
+                    row.value,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }
@@ -3252,6 +3430,70 @@ String? _addressDisplay(Map<String, dynamic>? address) {
 
   if (parts.isEmpty) return null;
   return parts.join(', ');
+}
+
+bool _addressHasContent(Map<String, dynamic>? address) {
+  return _addressDisplay(address) != null ||
+      _mapText(address ?? const {}, 'label').isNotEmpty ||
+      _mapText(address ?? const {}, 'type').isNotEmpty ||
+      _mapText(address ?? const {}, 'notes').isNotEmpty;
+}
+
+List<_MemberAddressDetail> _addressDetailRows(
+  BuildContext context,
+  Map<String, dynamic> address,
+) {
+  final l10n = AppLocalizations.of(context)!;
+  final hasStructuredParts = [
+    'capital',
+    'city',
+    'town',
+    'village',
+    'street_name',
+    'street_number',
+    'building',
+  ].any((key) => _mapText(address, key).isNotEmpty);
+
+  if (!hasStructuredParts) {
+    return [
+      _MemberAddressDetail(
+        l10n.associationAddress,
+        _mapText(address, 'formatted'),
+      ),
+    ];
+  }
+
+  String dash(String value) => value.trim().isEmpty ? '---' : value.trim();
+
+  return [
+    _MemberAddressDetail(
+      l10n.associationLinkGovernorate,
+      dash(_mapText(address, 'capital')),
+    ),
+    _MemberAddressDetail(l10n.profileCity, dash(_mapText(address, 'city'))),
+    _MemberAddressDetail(
+      l10n.associationLinkTown,
+      dash(_mapText(address, 'town')),
+    ),
+    _MemberAddressDetail(
+      l10n.associationLinkVillage,
+      dash(_mapText(address, 'village')),
+    ),
+    _MemberAddressDetail(
+      l10n.associationLinkStreet,
+      dash(_mapText(address, 'street_name')),
+    ),
+    _MemberAddressDetail(
+      l10n.associationStreetNumber,
+      dash(_mapText(address, 'street_number')),
+    ),
+    _MemberAddressDetail(
+      l10n.associationLinkBuilding,
+      dash(_mapText(address, 'building')),
+    ),
+    if (_mapText(address, 'notes').isNotEmpty)
+      _MemberAddressDetail('Notes', _mapText(address, 'notes')),
+  ];
 }
 
 String _mapText(Map<String, dynamic> map, String key) {
