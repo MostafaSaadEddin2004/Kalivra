@@ -373,7 +373,7 @@ class _AttachmentsSection extends StatelessWidget {
                 (attachment) => NetworkFileActionTile(
                   name: attachment.name,
                   url: attachment.url,
-                  icon: Icons.attach_file_rounded,
+                  icon: Icons.open_in_new_rounded,
                   openDirectly: true,
                 ),
               ),

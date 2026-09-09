@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -38,7 +37,11 @@ class _NetworkFileActionTileState extends State<NetworkFileActionTile> {
   Future<void> _handleTap(String fileName) async {
     if (_isOpening) return;
 
-    setState(() => _isOpening = true);
+    final shouldShowLoading =
+        widget.openDirectly &&
+        !_isImageFileAction(name: widget.name, url: widget.url);
+
+    if (shouldShowLoading) setState(() => _isOpening = true);
     try {
       await handleNetworkFileTap(
         context,
@@ -47,7 +50,7 @@ class _NetworkFileActionTileState extends State<NetworkFileActionTile> {
         openDirectly: widget.openDirectly,
       );
     } finally {
-      if (mounted) setState(() => _isOpening = false);
+      if (shouldShowLoading && mounted) setState(() => _isOpening = false);
     }
   }
 
@@ -55,6 +58,7 @@ class _NetworkFileActionTileState extends State<NetworkFileActionTile> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fileName = _displayFileName(widget.name, widget.url);
+    final isImageFile = _isImageFileAction(name: widget.name, url: widget.url);
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
@@ -119,7 +123,7 @@ class _NetworkFileActionTileState extends State<NetworkFileActionTile> {
                           color: theme.colorScheme.onTertiaryFixed,
                         )
                       : Icon(
-                          widget.openDirectly
+                          widget.openDirectly && !isImageFile
                               ? Icons.open_in_new_rounded
                               : _trailingIcon(widget.url ?? fileName),
                           key: const ValueKey('action'),
@@ -154,11 +158,6 @@ Future<void> handleNetworkFileTap(
   }
 
   final fileName = _displayFileName(name, uri.toString());
-  if (openDirectly) {
-    await _downloadAndOpenFile(context, uri, fileName);
-    return;
-  }
-
   if (_isImageFileReference(name) ||
       _isImageFileReference(url ?? '') ||
       _isImageFileReference(uri.path)) {
@@ -172,6 +171,11 @@ Future<void> handleNetworkFileTap(
         ),
       ),
     );
+    return;
+  }
+
+  if (openDirectly) {
+    await _openFileUri(context, uri);
     return;
   }
 
@@ -234,28 +238,6 @@ Future<void> showNetworkFileActionDialog(
   }
 
   await _openFileUri(context, uri);
-}
-
-Future<void> _downloadAndOpenFile(
-  BuildContext context,
-  Uri uri,
-  String fileName,
-) async {
-  try {
-    final safeFileName = _safeFileName(fileName);
-    final directory = await Directory.systemTemp.createTemp('kalivra_files_');
-    final filePath = '${directory.path}${Platform.pathSeparator}$safeFileName';
-    await Dio().download(uri.toString(), filePath);
-    if (!context.mounted) return;
-
-    await _openFileUri(context, Uri.file(filePath));
-  } catch (_) {
-    if (!context.mounted) return;
-    _showFileSnackBar(
-      context,
-      AppLocalizations.of(context)!.fileActionCouldNotOpenFile,
-    );
-  }
 }
 
 Future<void> _downloadFile(
@@ -581,6 +563,13 @@ bool _isImageFileReference(String value) {
     r'\.(png|jpe?g|webp|gif|bmp|heic|heif)(\?.*)?$',
     caseSensitive: false,
   ).hasMatch(path);
+}
+
+bool _isImageFileAction({required String name, required String? url}) {
+  final uri = _fileUriOrNull(url ?? name);
+  return _isImageFileReference(name) ||
+      _isImageFileReference(url ?? '') ||
+      (uri != null && _isImageFileReference(uri.path));
 }
 
 IconData _trailingIcon(String value) {

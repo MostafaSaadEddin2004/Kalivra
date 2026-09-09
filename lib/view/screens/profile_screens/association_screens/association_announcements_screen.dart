@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:kalivra/controller/blocs/cubit/assoiciation_link_cubit/association_link_cubit.dart';
@@ -11,6 +10,7 @@ import 'package:kalivra/l10n/app_localizations.dart';
 import 'package:kalivra/model/association/association_announcement_model.dart';
 import 'package:kalivra/view/widgets/empty_state_view.dart';
 import 'package:kalivra/view/widgets/profile_page/screen_app_bar.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class AssociationAnnouncementsScreen extends StatefulWidget {
   const AssociationAnnouncementsScreen({super.key});
@@ -39,7 +39,6 @@ class _AssociationAnnouncementsScreenState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: ScreenAppBar(title: l10n.associationAnnouncementsTitle),
@@ -60,9 +59,24 @@ class _AssociationAnnouncementsScreenState
             );
           }
 
-          return Center(
-            child: SpinKitFadingCircle(
-              color: theme.colorScheme.onTertiaryFixed,
+          return Skeletonizer(
+            child: ListView.separated(
+              padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+              itemCount: 3,
+              separatorBuilder: (context, index) => SizedBox(height: 12.h),
+              itemBuilder: (context, index) {
+                return _AnnouncementCardHeader(
+                  isExpanded: false,
+                  announcement: AssociationAnnouncementModel(
+                    id: 0,
+                    referenceNumber: '4224',
+                    type: 'type',
+                    typeLabel: 'typeLabel',
+                    title: 'title',
+                    attachments: [],
+                  ),
+                );
+              },
             ),
           );
         },
@@ -129,35 +143,98 @@ class _AnnouncementCardState extends State<_AnnouncementCard> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final announcement = widget.announcement;
-
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-      child: InkWell(
-        onTap: _toggleExpanded,
-        child: Padding(
-          padding: EdgeInsets.all(16.w),
-          child: AnimatedCrossFade(
-            duration: const Duration(milliseconds: 260),
-            reverseDuration: const Duration(milliseconds: 200),
-            firstCurve: Curves.easeOutCubic,
-            secondCurve: Curves.easeInCubic,
-            sizeCurve: Curves.easeInOutCubic,
-            crossFadeState: _isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            firstChild: _AnnouncementCardHeader(
-              announcement: announcement,
-              isExpanded: _isExpanded,
-            ),
-            secondChild: Column(
+    return InkWell(
+      onTap: _toggleExpanded,
+      child: AnimatedCrossFade(
+        duration: const Duration(milliseconds: 260),
+        reverseDuration: const Duration(milliseconds: 200),
+        firstCurve: Curves.easeOutCubic,
+        secondCurve: Curves.easeInCubic,
+        sizeCurve: Curves.easeInOutCubic,
+        crossFadeState: _isExpanded
+            ? CrossFadeState.showSecond
+            : CrossFadeState.showFirst,
+        firstChild: _AnnouncementCardHeader(
+          announcement: announcement,
+          isExpanded: _isExpanded,
+        ),
+        secondChild: Card(
+          elevation: 2,
+          child: Padding(
+            padding: EdgeInsets.all(16.w),
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _AnnouncementCardHeader(
-                  announcement: announcement,
-                  isExpanded: _isExpanded,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 44.r,
+                      height: 44.r,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.onTertiaryFixed.withValues(
+                          alpha: 0.1,
+                        ),
+                        borderRadius: BorderRadius.circular(14.r),
+                      ),
+                      child: Icon(
+                        _typeIcon(announcement.type),
+                        color: theme.colorScheme.onTertiaryFixed,
+                        size: 24.r,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                announcement.title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: theme.colorScheme.onTertiaryFixed,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                              AnimatedRotation(
+                                turns: _isExpanded ? 0.5 : 0,
+                                duration: const Duration(milliseconds: 220),
+                                curve: Curves.easeInOutCubic,
+                                child: Icon(
+                                  Icons.keyboard_arrow_down_rounded,
+                                  color: theme.colorScheme.onTertiaryFixed,
+                                  size: 26.r,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8.h),
+                          Wrap(
+                            spacing: 8.w,
+                            runSpacing: 6.h,
+                            children: [
+                              _InfoChip(
+                                label: announcement.referenceNumber.isNotEmpty
+                                    ? announcement.referenceNumber
+                                    : l10n.associationMemberNoData,
+                              ),
+                              _InfoChip(
+                                icon: Icons.label_outline_rounded,
+                                label: announcement.typeLabel,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 14.h),
                 _DetailsPanel(
@@ -214,68 +291,79 @@ class _AnnouncementCardHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final typeLabel = _announcementTypeLabel(context, announcement);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 44.r,
-          height: 44.r,
-          decoration: BoxDecoration(
-            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(14.r),
-          ),
-          child: Icon(
-            _typeIcon(announcement.type),
-            color: theme.colorScheme.onTertiaryFixed,
-            size: 24.r,
-          ),
-        ),
-        SizedBox(width: 12.w),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                announcement.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  color: theme.colorScheme.onTertiaryFixed,
-                  fontWeight: FontWeight.w800,
-                ),
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      child: Padding(
+        padding: EdgeInsets.all(16.w),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              width: 44.r,
+              height: 44.r,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14.r),
               ),
-              SizedBox(height: 8.h),
-              Wrap(
-                spacing: 8.w,
-                runSpacing: 6.h,
+              child: Icon(
+                _typeIcon(announcement.type),
+                color: theme.colorScheme.onTertiaryFixed,
+                size: 24.r,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _InfoChip(
-                    icon: Icons.confirmation_number_outlined,
-                    label: announcement.referenceNumber.isNotEmpty
-                        ? announcement.referenceNumber
-                        : l10n.associationMemberNoData,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        announcement.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: theme.colorScheme.onTertiaryFixed,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      AnimatedRotation(
+                        turns: isExpanded ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 220),
+                        curve: Curves.easeInOutCubic,
+                        child: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: theme.colorScheme.onTertiaryFixed,
+                          size: 26.r,
+                        ),
+                      ),
+                    ],
                   ),
-                  _InfoChip(
-                    icon: Icons.label_outline_rounded,
-                    label: typeLabel,
+                  SizedBox(height: 8.h),
+                  Wrap(
+                    spacing: 8.w,
+                    runSpacing: 6.h,
+                    children: [
+                      _InfoChip(
+                        label: announcement.referenceNumber.isNotEmpty
+                            ? announcement.referenceNumber
+                            : l10n.associationMemberNoData,
+                      ),
+                      _InfoChip(
+                        icon: Icons.label_outline_rounded,
+                        label: typeLabel,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        SizedBox(width: 8.w),
-        AnimatedRotation(
-          turns: isExpanded ? 0.5 : 0,
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeInOutCubic,
-          child: Icon(
-            Icons.keyboard_arrow_down_rounded,
-            color: theme.colorScheme.onTertiaryFixed,
-            size: 26.r,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -327,11 +415,7 @@ class _DetailRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 19.r,
-            color: theme.colorScheme.onTertiaryFixed,
-          ),
+          Icon(icon, size: 19.r, color: theme.colorScheme.onTertiaryFixed),
           SizedBox(width: 10.w),
           Expanded(
             child: Column(
@@ -388,9 +472,9 @@ class _ContentPreview extends StatelessWidget {
 }
 
 class _InfoChip extends StatelessWidget {
-  const _InfoChip({required this.icon, required this.label});
+  const _InfoChip({this.icon, required this.label});
 
-  final IconData icon;
+  final IconData? icon;
   final String label;
 
   @override
@@ -406,8 +490,10 @@ class _InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.r, color: theme.colorScheme.primaryFixed),
-          SizedBox(width: 5.w),
+          if (icon != null) ...[
+            Icon(icon, size: 14.r, color: theme.colorScheme.primaryFixed),
+            SizedBox(width: 5.w),
+          ],
           Text(
             label,
             style: theme.textTheme.labelSmall!.copyWith(
