@@ -26,6 +26,8 @@ class AppTextField extends StatelessWidget {
     this.textDirection,
     this.readOnly = false,
     this.onTap,
+    this.textStyle,
+    this.cursorColor,
   });
 
   final TextEditingController controller;
@@ -49,6 +51,8 @@ class AppTextField extends StatelessWidget {
   final TextDirection? textDirection;
   final bool readOnly;
   final VoidCallback? onTap;
+  final TextStyle? textStyle;
+  final Color? cursorColor;
 
   @override
   Widget build(BuildContext context) {
@@ -70,8 +74,9 @@ class AppTextField extends StatelessWidget {
       textInputAction: textInputAction,
       textCapitalization: textCapitalization,
       maxLength: maxLength,
-      cursorColor: Theme.of(context).colorScheme.inversePrimary,
+      cursorColor: cursorColor ?? Theme.of(context).colorScheme.inversePrimary,
       cursorWidth: .5.w,
+      style: textStyle ?? theme.textTheme.bodySmall,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
@@ -79,19 +84,23 @@ class AppTextField extends StatelessWidget {
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: theme.colorScheme.secondaryFixed.withValues(alpha: 0.05),
+        fillColor:fillColor??theme.colorScheme.secondaryFixed.withValues(alpha: 0.05),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6)),
+          borderSide: BorderSide(
+            color:borderColor?? theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
-          borderSide: BorderSide(color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6)),
+          borderSide: BorderSide(
+            color:borderColor?? theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radius),
           borderSide: BorderSide(
-            color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
+            color:borderColor?? theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.6),
           ),
         ),
         errorBorder: OutlineInputBorder(
@@ -103,13 +112,13 @@ class AppTextField extends StatelessWidget {
           borderSide: const BorderSide(color: AppColors.red),
         ),
         errorStyle: const TextStyle(color: AppColors.red),
-        labelStyle:  theme.textTheme.bodyMedium!.copyWith(
-                        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
-                      ),
+        labelStyle: theme.textTheme.bodyMedium!.copyWith(
+          color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
+        ),
         hintStyle: theme.textTheme.bodyMedium!.copyWith(
-                        color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
-                      ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+          color:borderColor?? theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.7),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
       ),
     );
   }

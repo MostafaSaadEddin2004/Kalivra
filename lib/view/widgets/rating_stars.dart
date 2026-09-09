@@ -27,13 +27,6 @@ class RatingStars extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final selectedColor =
-        activeColor ?? (isDark ? AppColors.goldLight : AppColors.burgundy);
-    final unselectedColor =
-        inactiveColor ??
-        (isDark ? AppColors.taupe : AppColors.burgundy.withValues(alpha: 0.4));
     final starSize = size ?? 40.r;
 
     return Row(
@@ -46,7 +39,7 @@ class RatingStars extends StatelessWidget {
         return CustomIconButton(
           icon: isSelected ? Icons.star_rounded : Icons.star_border_rounded,
           iconSize: starSize,
-          color: isSelected ? selectedColor : unselectedColor,
+          color: isSelected ? AppColors.burgundy : AppColors.burgundy.withValues(alpha: 0.5),
           onPressed: enabled && onRatingChanged != null
               ? () => onRatingChanged!(value)
               : null,

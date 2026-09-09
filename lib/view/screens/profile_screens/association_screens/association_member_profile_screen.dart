@@ -340,6 +340,7 @@ class _AssociationMemberProfileScreenState
                       ),
                       SizedBox(height: 16.h),
                       _MemberContactSection(profile: profile),
+                      _MemberDocumentsSection(documents: profile.documents),
                       if (selectedMembership != null)
                         _MembershipDetailsSection(
                           profile: profile,
@@ -751,6 +752,7 @@ class _MemberContactSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final person = profile.person;
+    final addresses = profile.addresses;
 
     return _ExpandableProfileSection(
       title: l10n.associationLinkContactSection,
@@ -784,8 +786,50 @@ class _MemberContactSection extends StatelessWidget {
         InfoRow(label: l10n.associationLinkEmail, value: person.email),
         InfoRow(
           label: l10n.associationMemberCurrentAddress,
-          value: person.address,
+          value: _addressDisplay(addresses?.current) ?? person.address,
         ),
+        if (_addressDisplay(addresses?.permanent) != null)
+          InfoRow(
+            label: l10n.associationLinkPermanentAddress,
+            value: _addressDisplay(addresses?.permanent)!,
+          ),
+        if (addresses != null)
+          for (var index = 0; index < addresses.additional.length; index++)
+            if (_addressDisplay(addresses.additional[index]) != null)
+              InfoRow(
+                label: l10n.associationAdditionalAddress,
+                value: _addressDisplay(addresses.additional[index])!,
+                labelNumber: '${index + 1}',
+              ),
+      ],
+    );
+  }
+}
+
+class _MemberDocumentsSection extends StatelessWidget {
+  const _MemberDocumentsSection({required this.documents});
+
+  final List<AssociationMembershipDocument> documents;
+
+  @override
+  Widget build(BuildContext context) {
+    final visibleDocuments = documents
+        .where((document) => document.displayUrl.trim().isNotEmpty)
+        .toList();
+    if (visibleDocuments.isEmpty) return const SizedBox.shrink();
+
+    return _ExpandableProfileSection(
+      title: AppLocalizations.of(context)!.associationMemberJoinDocuments,
+      icon: Icons.description_outlined,
+      children: [
+        for (final document in visibleDocuments)
+          NetworkFileActionTile(
+            name: document.displayName,
+            url: document.displayUrl,
+            subtitle: _documentSubtitle(document),
+            icon: Icons.attach_file_rounded,
+            openDirectly: true,
+          ),
       ],
     );
   }
@@ -1565,26 +1609,35 @@ class _BuildingsInformationSection extends StatelessWidget {
         .toList();
     final hasMembershipBuildings = buildings.isNotEmpty;
 
-    return hasMembershipBuildings? _ExpandableProfileSection(
-      title: AppLocalizations.of(context)!.associationMemberBuildingInformation,
-      icon: Icons.business_rounded,
-      children: hasMembershipBuildings
-          ? buildings
-                .map((building) => _BuildingDetailsSection(building: building))
-                .toList()
-          : projectsWithBuildings.isEmpty
-          ? [
-              _EmptyInlineState(
-                icon: Icons.business_rounded,
-                text: AppLocalizations.of(
-                  context,
-                )!.associationMemberNoBuildingsAvailable,
-              ),
-            ]
-          : projectsWithBuildings
-                .map((project) => _ProjectBuildingsGroup(project: project))
-                .toList(),
-    ):const SizedBox.shrink();
+    return hasMembershipBuildings
+        ? _ExpandableProfileSection(
+            title: AppLocalizations.of(
+              context,
+            )!.associationMemberBuildingInformation,
+            icon: Icons.business_rounded,
+            children: hasMembershipBuildings
+                ? buildings
+                      .map(
+                        (building) =>
+                            _BuildingDetailsSection(building: building),
+                      )
+                      .toList()
+                : projectsWithBuildings.isEmpty
+                ? [
+                    _EmptyInlineState(
+                      icon: Icons.business_rounded,
+                      text: AppLocalizations.of(
+                        context,
+                      )!.associationMemberNoBuildingsAvailable,
+                    ),
+                  ]
+                : projectsWithBuildings
+                      .map(
+                        (project) => _ProjectBuildingsGroup(project: project),
+                      )
+                      .toList(),
+          )
+        : const SizedBox.shrink();
   }
 }
 
@@ -3179,6 +3232,63 @@ String _formatNullableMoney(BuildContext context, num? value) {
 String _formatNullablePercent(num? value) {
   final formatted = _formatNullableNumber(value);
   return formatted.isEmpty ? '' : '$formatted%';
+}
+
+String? _addressDisplay(Map<String, dynamic>? address) {
+  if (address == null || address.isEmpty) return null;
+
+  final formatted = _mapText(address, 'formatted');
+  if (formatted.isNotEmpty) return formatted;
+
+  final parts = [
+    _mapText(address, 'capital'),
+    _mapText(address, 'city'),
+    _mapText(address, 'town'),
+    _mapText(address, 'village'),
+    _mapText(address, 'street_name'),
+    _mapText(address, 'street_number'),
+    _mapText(address, 'building'),
+  ].where((part) => part.isNotEmpty).toList();
+
+  if (parts.isEmpty) return null;
+  return parts.join(', ');
+}
+
+String _mapText(Map<String, dynamic> map, String key) {
+  final value = map[key]?.toString().trim() ?? '';
+  return value == 'null' ? '' : value;
+}
+
+String _documentSubtitle(AssociationMembershipDocument document) {
+  final parts = [
+    document.displayType,
+    _formatDocumentDate(document.uploadDate),
+    _formatFileSize(document.fileSize),
+    document.status,
+  ].where((part) => part.trim().isNotEmpty).toList();
+
+  return parts.join(' - ');
+}
+
+String _formatDocumentDate(String value) {
+  final text = value.trim();
+  if (text.isEmpty) return '';
+
+  final date = DateTime.tryParse(text);
+  if (date == null) return text;
+
+  return DateFormat.yMMMd().format(date.toLocal());
+}
+
+String _formatFileSize(int? bytes) {
+  if (bytes == null || bytes <= 0) return '';
+  if (bytes < 1024) return '$bytes B';
+
+  final kb = bytes / 1024;
+  if (kb < 1024) return '${kb.toStringAsFixed(kb < 10 ? 1 : 0)} KB';
+
+  final mb = kb / 1024;
+  return '${mb.toStringAsFixed(mb < 10 ? 1 : 0)} MB';
 }
 
 List<String> _fileUrlsFromValue(Object? value) {

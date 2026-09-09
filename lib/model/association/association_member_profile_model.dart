@@ -870,6 +870,15 @@ class AssociationHolderHistory {
 
 class AssociationMembershipDocument {
   const AssociationMembershipDocument({
+    this.id,
+    this.documentDefinitionId,
+    this.documentDefinition,
+    this.originalFileName = '',
+    this.fileUrl = '',
+    this.mimeType = '',
+    this.fileSize,
+    this.uploadedAt = '',
+    this.createdAt = '',
     this.documentType = '',
     this.documentTypeLabel = '',
     this.status = '',
@@ -878,6 +887,15 @@ class AssociationMembershipDocument {
     this.downloadUrl = '',
   });
 
+  final int? id;
+  final int? documentDefinitionId;
+  final AssociationDocumentDefinition? documentDefinition;
+  final String originalFileName;
+  final String fileUrl;
+  final String mimeType;
+  final int? fileSize;
+  final String uploadedAt;
+  final String createdAt;
   final String documentType;
   final String documentTypeLabel;
   final String status;
@@ -887,23 +905,115 @@ class AssociationMembershipDocument {
 
   factory AssociationMembershipDocument.fromJson(Map<String, dynamic> json) {
     return AssociationMembershipDocument(
+      id: _intValue(json['id']),
+      documentDefinitionId: _intValue(json['document_definition_id']),
+      documentDefinition: _mapOrNull(
+        json['document_definition'],
+        AssociationDocumentDefinition.fromJson,
+      ),
+      originalFileName: _stringValue(json['original_file_name']),
+      fileUrl: _stringValue(json['file_url']),
+      mimeType: _stringValue(json['mime_type']),
+      fileSize: _intValue(json['file_size']),
+      uploadedAt: _stringValue(json['uploaded_at']),
+      createdAt: _stringValue(json['created_at']),
       documentType: _stringValue(json['document_type']),
       documentTypeLabel: _stringValue(json['document_type_label']),
       status: _stringValue(json['status']),
-      uploadDate: _stringValue(json['upload_date']),
+      uploadDate: _firstStringValue([json['upload_date'], json['uploaded_at']]),
       previewUrl: _stringValue(json['preview_url']),
-      downloadUrl: _stringValue(json['download_url']),
+      downloadUrl: _firstStringValue([
+        json['download_url'],
+        json['file_url'],
+        json['preview_url'],
+      ]),
     );
+  }
+
+  String get displayName {
+    if (originalFileName.isNotEmpty) return originalFileName;
+    if (documentDefinition?.displayName.isNotEmpty == true) {
+      return documentDefinition!.displayName;
+    }
+    if (documentTypeLabel.isNotEmpty) return documentTypeLabel;
+    if (documentType.isNotEmpty) return documentType;
+    if (downloadUrl.isNotEmpty) return downloadUrl;
+    return previewUrl;
+  }
+
+  String get displayType {
+    if (documentDefinition?.displayName.isNotEmpty == true) {
+      return documentDefinition!.displayName;
+    }
+    if (documentTypeLabel.isNotEmpty) return documentTypeLabel;
+    return documentType;
+  }
+
+  String get displayUrl {
+    if (fileUrl.isNotEmpty) return fileUrl;
+    if (downloadUrl.isNotEmpty) return downloadUrl;
+    return previewUrl;
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
+      'document_definition_id': documentDefinitionId,
+      'document_definition': documentDefinition?.toJson(),
+      'original_file_name': originalFileName,
+      'file_url': fileUrl,
+      'mime_type': mimeType,
+      'file_size': fileSize,
+      'uploaded_at': uploadedAt,
+      'created_at': createdAt,
       'document_type': documentType,
       'document_type_label': documentTypeLabel,
       'status': status,
       'upload_date': uploadDate,
       'preview_url': previewUrl,
       'download_url': downloadUrl,
+    };
+  }
+}
+
+class AssociationDocumentDefinition {
+  const AssociationDocumentDefinition({
+    this.id,
+    this.name = '',
+    this.nameAr = '',
+    this.nameEn = '',
+    this.isRequired = false,
+  });
+
+  final int? id;
+  final String name;
+  final String nameAr;
+  final String nameEn;
+  final bool isRequired;
+
+  factory AssociationDocumentDefinition.fromJson(Map<String, dynamic> json) {
+    return AssociationDocumentDefinition(
+      id: _intValue(json['id']),
+      name: _stringValue(json['name']),
+      nameAr: _stringValue(json['name_ar']),
+      nameEn: _stringValue(json['name_en']),
+      isRequired: _boolValue(json['is_required']),
+    );
+  }
+
+  String get displayName {
+    if (name.isNotEmpty) return name;
+    if (nameAr.isNotEmpty) return nameAr;
+    return nameEn;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'name_ar': nameAr,
+      'name_en': nameEn,
+      'is_required': isRequired,
     };
   }
 }

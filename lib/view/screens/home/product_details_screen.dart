@@ -104,8 +104,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             final isReviewSubmitting =
                 variantState?.reviewStatus == ProductReviewStatus.submitting;
             final isDark = Theme.of(context).brightness == Brightness.dark;
-            final theme = Theme.of(context);
-
             return StatefulBuilder(
               builder: (context, dialogSetState) {
                 return Dialog(
@@ -134,18 +132,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     width: 28.r,
                                     height: 28.r,
                                     decoration: BoxDecoration(
-                                      color:
-                                          (isDark
-                                                  ? AppColors.goldLight
-                                                  : AppColors.burgundy)
-                                              .withValues(alpha: 0.12),
+                                      color: AppColors.burgundy.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
                                       Icons.star_border_outlined,
-                                      color: isDark
-                                          ? AppColors.goldLight
-                                          : AppColors.burgundy,
+                                      color: AppColors.burgundy,
                                       size: 16.r,
                                     ),
                                   ),
@@ -155,7 +149,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium
-                                        ?.copyWith(fontWeight: FontWeight.w800),
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.burgundy,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -164,7 +161,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 icon: Icon(
                                   Icons.close_rounded,
                                   size: 24.r,
-                                  color: theme.colorScheme.onTertiary,
+                                  color: AppColors.burgundy,
                                 ),
                               ),
                             ],
@@ -355,7 +352,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(10.r),
         border: Border.all(
-          color: colorScheme.primaryFixed.withValues(alpha: 0.12),
+          color: colorScheme.onTertiaryFixed.withValues(alpha: 0.12),
         ),
       ),
       child: Row(
@@ -517,6 +514,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       if (maxQuantity != null) ...[
+                        SizedBox(height: 8.h),
                         Text(
                           l10n.availableQuantity(maxQuantity),
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -593,7 +591,9 @@ class _ProductQuantityButton extends StatelessWidget {
       width: 36.r,
       height: 36.r,
       child: Material(
-        color: colorScheme.primaryFixed.withValues(alpha: 0.05),
+        color: enabled
+            ? colorScheme.onTertiaryFixed
+            : colorScheme.primaryFixed.withValues(alpha: 0.24),
         shape: const CircleBorder(),
         child: InkWell(
           customBorder: const CircleBorder(),
@@ -601,8 +601,8 @@ class _ProductQuantityButton extends StatelessWidget {
           child: Icon(
             icon,
             color: enabled
-                ? colorScheme.primaryFixed
-                : colorScheme.primaryFixed.withValues(alpha: 0.24),
+                ? colorScheme.secondaryFixed
+                : AppColors.black.withValues(alpha: 0.5),
             size: 20.r,
           ),
         ),
@@ -666,7 +666,6 @@ class ProductRatingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
     final hasRating = product.ratings.total > 0;
     final average = double.tryParse(product.ratings.average) ?? 0;
     final averageLabel = product.ratings.average.trim().isEmpty
@@ -684,11 +683,11 @@ class ProductRatingCard extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(14.w),
               decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.black.withValues(alpha: 0.25)
-                    : Colors.white,
+                color: AppColors.burgundy,
                 borderRadius: BorderRadius.circular(14.r),
-                border: Border.all(color: accent.withValues(alpha: 0.12)),
+                border: Border.all(
+                  color: AppColors.burgundy.withValues(alpha: 0.12),
+                ),
               ),
               child: Row(
                 children: [
@@ -697,13 +696,13 @@ class ProductRatingCard extends StatelessWidget {
                     height: 54.r,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: accent.withValues(alpha: 0.12),
+                      color: AppColors.burgundy.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
                     child: Text(
                       averageLabel,
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: accent,
+                        color: AppColors.burgundy,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -727,9 +726,7 @@ class ProductRatingCard extends StatelessWidget {
                             product.ratings.total,
                           ),
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: isDark
-                                ? AppColors.taupe
-                                : AppColors.burgundy,
+                            color: AppColors.burgundy,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -756,12 +753,20 @@ class ProductRatingCard extends StatelessWidget {
             enabled: !isSubmitting,
             maxLines: 4,
             textInputAction: TextInputAction.newline,
+            textStyle: theme.textTheme.bodySmall!.copyWith(
+              color: AppColors.burgundy,
+            ),
+            borderColor: AppColors.burgundy.withValues(alpha: 0.7),
+            labelColor: AppColors.burgundy,
+            cursorColor: AppColors.burgundy,
+            fillColor: AppColors.offWhite,
           ),
           SizedBox(height: 18.h),
           FilledButton(
             onPressed: isSubmitting ? null : onSubmit,
             style: FilledButton.styleFrom(
-              minimumSize: Size(double.infinity, 50.h),
+              minimumSize: Size(double.infinity, 40.h),
+              backgroundColor: AppColors.burgundy,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14.r),
               ),
@@ -769,7 +774,12 @@ class ProductRatingCard extends StatelessWidget {
             ),
             child: isSubmitting
                 ? SpinKitFadingCircle(size: 20.r, color: AppColors.offWhite)
-                : Text(l10n.submit),
+                : Text(
+                    l10n.submit,
+                    style: theme.textTheme.titleSmall!.copyWith(
+                      color: AppColors.offWhite,
+                    ),
+                  ),
           ),
         ],
       ),
@@ -810,7 +820,6 @@ class ProductVariantsSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Size label ──────────────────────────────────────────────
             Text(
               l10n.size,
               style: theme.textTheme.bodySmall?.copyWith(
@@ -819,8 +828,6 @@ class ProductVariantsSection extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10.h),
-
-            // ── Size chips ──────────────────────────────────────────────
             Wrap(
               spacing: 8.w,
               runSpacing: 8.h,
@@ -1312,17 +1319,14 @@ class ProductHeaderSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.burgundy.withValues(alpha: 0.15)
-            : Colors.white,
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: accent.withValues(alpha: 0.12)),
+        border: Border.all(color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.12)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -1490,14 +1494,13 @@ class ProductSectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
 
     return ProductSectionCardShell(
       isDark: isDark,
       title: title,
       icon: icon,
       titleStyle: theme.textTheme.titleMedium?.copyWith(
-        color: accent,
+        color: theme.colorScheme.onTertiaryFixed,
         fontWeight: FontWeight.w700,
       ),
       child: child,
@@ -1558,20 +1561,14 @@ class ProductSectionCardShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final accent = isDark ? AppColors.goldLight : AppColors.burgundy;
-    final listBackground = isDark
-        ? AppColors.burgundy.withValues(alpha: 0.18)
-        : AppColors.burgundy.withValues(alpha: 0.05);
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
       decoration: BoxDecoration(
-        color: isDark
-            ? AppColors.burgundy.withValues(alpha: 0.12)
-            : Colors.white,
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: accent.withValues(alpha: 0.12)),
+        border: Border.all(color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.12)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1581,10 +1578,10 @@ class ProductSectionCardShell extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.r),
                 decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.12),
+                  color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
-                child: Icon(icon, size: 20.r, color: accent),
+                child: Icon(icon, size: 20.r, color: theme.colorScheme.onTertiaryFixed),
               ),
               SizedBox(width: 10.w),
               Text(
@@ -1592,7 +1589,7 @@ class ProductSectionCardShell extends StatelessWidget {
                 style:
                     titleStyle ??
                     theme.textTheme.titleMedium?.copyWith(
-                      color: accent,
+                      color: theme.colorScheme.onTertiaryFixed,
                       fontWeight: FontWeight.w700,
                     ),
               ),
@@ -1602,7 +1599,7 @@ class ProductSectionCardShell extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: listBackground,
+              color: theme.colorScheme.onTertiaryFixed.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(14.r),
             ),
             child: child,
